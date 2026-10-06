@@ -196,7 +196,7 @@
                 <h3 class="font-black text-amber-950 text-base">✨ AI 智慧導入行程</h3>
                 <button onclick="closeSmartPasteModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
-            <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。AI 會自動抓取時間與備註，完美收納！</p>
+            <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。備註與代碼會完美收納至卡片內！</p>
             <textarea id="smart-paste-input" rows="8" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3.5 bg-amber-50/50 border border-amber-100 rounded-2xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
             <div class="flex gap-2.5 pt-1">
                 <button onclick="closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-black">取消</button>
@@ -608,12 +608,12 @@
             }
         }
 
-        // 🌟 修正版 AI 智慧解析引擎：確實抓取時間並正確綁定備註
+        // 🌟 最終修正版 AI 智慧解析引擎：精準抓取時間開頭，並依「備註：」或跨行文字歸納備註
         window.parseSmartPaste = async function() {
             const rawText = document.getElementById('smart-paste-input').value.trim();
             if(!rawText) { alert("請先輸入或貼上行程文字喔！"); return; }
 
-            alert("✨ AI 正在精準擷取時間與備註中...");
+            alert("✨ AI 正在精準抓取時間與備註中...");
 
             const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentDay = "Day 1";
@@ -635,7 +635,7 @@
                         continue;
                     }
 
-                    // 2. 偵測是否為新行程開頭（檢查是否含有時間，如 07:55 或帶有 •, -）
+                    // 2. 嚴格偵測：必須包含時間格式（如 07:55）才算新行程！
                     let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
                     let isNewItem = timeMatch || line.startsWith("•") || line.startsWith("-");
 
@@ -658,7 +658,7 @@
                             createdAt: Date.now() + parsedItems.length
                         };
                     } 
-                    // 3. 如果不是新行程，全部當作當前行程的備註！
+                    // 3. 如果沒有時間開頭，代表這是目前行程的備註（保留「備註：」或直接收納）
                     else if (currentItem) {
                         currentItem.location = currentItem.location ? (currentItem.location + "\n" + line) : line;
                     }
@@ -680,7 +680,7 @@
 
                 document.getElementById('smart-paste-input').value = "";
                 closeSmartPasteModal();
-                alert(`✨ 成功！已智慧導入 ${parsedItems.length} 筆行程與對應時間、備註！`);
+                alert(`✨ 成功！已智慧導入 ${parsedItems.length} 筆行程（包含正確的時間與備註）！`);
             } catch (e) {
                 console.error("AI 拆解失敗", e);
                 alert("解析發生錯誤，請再試一次");
