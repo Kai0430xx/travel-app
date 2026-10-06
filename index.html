@@ -22,6 +22,23 @@
             box-shadow: 0 4px 20px rgba(180, 150, 130, 0.08);
             border: 1.5px solid #eae1d7;
         }
+        .badge-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #d98262;
+            background: #fffaf5;
+            transition: all 0.3s ease;
+        }
+        .badge-circle.unlocked {
+            border: 2px solid #d98262;
+            background: #f0dcd0;
+            box-shadow: 0 4px 12px rgba(217, 130, 98, 0.2);
+        }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #e2d3c3; border-radius: 4px; }
     </style>
@@ -32,7 +49,7 @@
     <header class="bg-[#f3e9de] text-[#5c4a3d] px-4 py-4 shadow-sm sticky top-0 z-50 flex justify-between items-center rounded-b-[24px] border-b border-[#eae1d7]">
         <div class="flex items-center gap-2 min-w-0 pr-2">
             <button id="back-btn" onclick="backToProjects()" class="hidden bg-white/90 hover:bg-white text-[#5c4a3d] px-3 py-1.5 rounded-full text-xs font-bold shadow-sm transition active:scale-95 shrink-0 flex items-center gap-1 border border-[#eae1d7]">
-                ⬅ 專案
+                專案
             </button>
             <div class="min-w-0">
                 <h1 id="header-title" class="text-sm font-black truncate flex items-center gap-1">🌸 我的旅遊小專案</h1>
@@ -128,13 +145,13 @@
                 </div>
             </div>
 
-            <!-- 分頁 5：闖關成就 (全新動態偵測與稱號系統) -->
+            <!-- 分頁 5：闖關成就 (圓形布章與拍照打卡) -->
             <div id="tab-quest" class="tab-content hidden space-y-4">
-                <!-- 成績總覽與成就進度卡片 -->
-                <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-3.5 shadow-md border-[#e2d3c3]">
+                <!-- 成績總覽與圓形布章區 -->
+                <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-4 shadow-md border-[#e2d3c3]">
                     <div class="flex justify-between items-center">
                         <span id="quest-project-title" class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black">🌸 冒險進行中</span>
-                        <span id="quest-total-count" class="text-xs font-black text-[#d98262]">已完成 0 / 0</span>
+                        <span id="quest-total-count" class="text-xs font-black text-[#d98262]">已打卡 0 / 0</span>
                     </div>
                     <div>
                         <div class="flex justify-between text-xs font-black text-[#736052] mb-1">
@@ -145,24 +162,34 @@
                             <div id="quest-progress-bar" class="bg-[#d98262] h-full transition-all duration-500 rounded-full" style="width: 0%"></div>
                         </div>
                     </div>
-                    <!-- 三大稱號解鎖狀態列 -->
-                    <div class="grid grid-cols-3 gap-2 pt-1 border-t border-[#eae1d7]">
-                        <div id="badge-food" class="p-2 rounded-xl text-center bg-gray-100 text-gray-400 transition">
-                            <p class="text-[10px] font-bold">🍽️ 美食</p>
-                            <p class="text-[9px] font-black mt-0.5 truncate" id="badge-food-title">未解鎖</p>
+
+                    <!-- 圓形布章區 (三大稱號) -->
+                    <div class="grid grid-cols-3 gap-3 pt-2 border-t border-[#eae1d7] text-center">
+                        <div class="flex flex-col items-center">
+                            <div id="badge-food" class="badge-circle">
+                                <span class="text-lg">🍽️</span>
+                                <span class="text-[9px] font-black text-[#735848] mt-0.5">美食</span>
+                            </div>
+                            <p class="text-[10px] font-black text-[#5c4a3d] mt-1.5" id="badge-food-title">未解鎖</p>
                         </div>
-                        <div id="badge-spot" class="p-2 rounded-xl text-center bg-gray-100 text-gray-400 transition">
-                            <p class="text-[10px] font-bold">🗺️ 景點</p>
-                            <p class="text-[9px] font-black mt-0.5 truncate" id="badge-spot-title">未解鎖</p>
+                        <div class="flex flex-col items-center">
+                            <div id="badge-spot" class="badge-circle">
+                                <span class="text-lg">🗺️</span>
+                                <span class="text-[9px] font-black text-[#735848] mt-0.5">景點</span>
+                            </div>
+                            <p class="text-[10px] font-black text-[#5c4a3d] mt-1.5" id="badge-spot-title">未解鎖</p>
                         </div>
-                        <div id="badge-shop" class="p-2 rounded-xl text-center bg-gray-100 text-gray-400 transition">
-                            <p class="text-[10px] font-bold">🛍️ 購物</p>
-                            <p class="text-[9px] font-black mt-0.5 truncate" id="badge-shop-title">未解鎖</p>
+                        <div class="flex flex-col items-center">
+                            <div id="badge-shop" class="badge-circle">
+                                <span class="text-lg">🛍️</span>
+                                <span class="text-[9px] font-black text-[#735848] mt-0.5">購物</span>
+                            </div>
+                            <p class="text-[10px] font-black text-[#5c4a3d] mt-1.5" id="badge-shop-title">未解鎖</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- 按天排序的闖關/打卡清單 -->
+                <!-- 任務清單 (按天排序) -->
                 <div id="quest-list-container" class="space-y-3.5">
                     <p class="text-center text-xs text-gray-400 py-6">正在載入闖關任務... ⏳</p>
                 </div>
@@ -171,7 +198,32 @@
         </div>
     </main>
 
-    <!-- 🌸 行程詳細與修改 Modal -->
+    <!-- 🌸 闖關拍照打卡 Modal -->
+    <div id="quest-photo-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-[#5c4a3d] text-base" id="quest-modal-title">📸 景點打卡上傳</h3>
+                <button onclick="closeQuestPhotoModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <p class="text-gray-500 font-bold">上傳你的現場照片或記錄，即完成此項任務打卡！✨</p>
+            
+            <div id="quest-photo-preview-container" class="hidden w-full h-40 bg-gray-50 rounded-2xl border border-[#eae1d7] overflow-hidden flex items-center justify-center">
+                <img id="quest-photo-preview" src="" alt="預覽照片" class="w-full h-full object-cover">
+            </div>
+
+            <div>
+                <label class="block font-bold text-gray-600 mb-1">選擇上傳照片</label>
+                <input type="file" id="quest-file-input" accept="image/*" onchange="previewQuestPhoto(event)" class="w-full text-xs p-2.5 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
+            </div>
+
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="closeQuestPhotoModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
+                <button onclick="submitQuestPhoto()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認打卡完成</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 行程詳細與修改 Modal -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             <div id="modal-view-mode" class="space-y-4">
@@ -216,14 +268,13 @@
         </div>
     </div>
 
-    <!-- 智慧導入 Modal -->
+    <!-- 智慧導入與手動新增 Modal (保留) -->
     <div id="smart-paste-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base">✨ AI 智慧導入行程</h3>
                 <button onclick="closeSmartPasteModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
-            <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。時間精準抓取，備註與營業時間內的數字絕不誤判！</p>
             <textarea id="smart-paste-input" rows="8" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none"></textarea>
             <div class="flex gap-2.5 pt-1">
                 <button onclick="closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
@@ -232,7 +283,6 @@
         </div>
     </div>
 
-    <!-- 手動新增行程 Modal -->
     <div id="schedule-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
@@ -240,10 +290,10 @@
                 <button onclick="closeAddScheduleModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
             <div class="space-y-3 text-xs">
-                <div><label class="block font-bold text-gray-600 mb-1">天數（例如：Day 1）</label><input type="text" id="input-day" value="Day 1" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-                <div><label class="block font-bold text-gray-600 mb-1">時間（例如：14:00）</label><input type="text" id="input-time" value="10:00" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
+                <div><label class="block font-bold text-gray-600 mb-1">天數</label><input type="text" id="input-day" value="Day 1" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
+                <div><label class="block font-bold text-gray-600 mb-1">時間</label><input type="text" id="input-time" value="10:00" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
                 <div><label class="block font-bold text-gray-600 mb-1">行程名稱</label><input type="text" id="input-title" placeholder="例如：黑豬肉晚餐" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-                <div><label class="block font-bold text-gray-600 mb-1">備註（選填）</label><textarea id="input-location" rows="3" placeholder="例如：餐廳預訂代碼或補充說明" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none font-bold"></textarea></div>
+                <div><label class="block font-bold text-gray-600 mb-1">備註</label><textarea id="input-location" rows="3" placeholder="備註..." class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none font-bold"></textarea></div>
             </div>
             <div class="flex gap-2.5 pt-2">
                 <button onclick="closeAddScheduleModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
@@ -252,94 +302,66 @@
         </div>
     </div>
 
-    <!-- 記帳 Modal -->
+    <!-- 記帳與結算 Modal (保留) -->
     <div id="expense-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-3.5 shadow-2xl text-xs max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base">✍️ 新增記帳</h3>
                 <button onclick="closeAddExpenseModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
-            <div>
-                <label class="block font-bold text-gray-600 mb-1">項目名稱</label>
-                <input type="text" id="exp-title" placeholder="例如：黑豬肉晚餐、計程車" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold">
-            </div>
+            <div><label class="block font-bold text-gray-600 mb-1">項目名稱</label><input type="text" id="exp-title" placeholder="例如：晚餐" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
             <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">金額</label>
-                    <input type="number" id="exp-amount" placeholder="例如：50000" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold">
-                </div>
+                <div><label class="block font-bold text-gray-600 mb-1">金額</label><input type="number" id="exp-amount" placeholder="金額" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
                 <div>
                     <label class="block font-bold text-gray-600 mb-1">幣別</label>
                     <select id="exp-currency" onchange="toggleExchangeRate()" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold">
-                        <option value="TWD">TWD (台幣)</option>
-                        <option value="KRW" selected>KRW (韓元)</option>
-                        <option value="JPY">JPY (日圓)</option>
-                        <option value="THB">THB (泰銖)</option>
-                        <option value="USD">USD (美元)</option>
+                        <option value="TWD">TWD</option><option value="KRW" selected>KRW</option><option value="JPY">JPY</option><option value="THB">THB</option><option value="USD">USD</option>
                     </select>
                 </div>
             </div>
-            <div id="rate-box">
-                <label class="block font-bold text-gray-600 mb-1">對台幣匯率</label>
-                <input type="number" id="exp-rate" value="0.024" step="0.0001" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold">
-            </div>
+            <div id="rate-box"><label class="block font-bold text-gray-600 mb-1">對台幣匯率</label><input type="number" id="exp-rate" value="0.024" step="0.0001" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
+            <div><label class="block font-bold text-gray-600 mb-1">誰付錢？</label><select id="exp-payer" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></select></div>
             <div>
-                <label class="block font-bold text-gray-600 mb-1">誰先付錢的？</label>
-                <select id="exp-payer" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></select>
-            </div>
-            <div>
-                <label class="block font-bold text-gray-600 mb-1">你想收回什麼幣別？</label>
+                <label class="block font-bold text-gray-600 mb-1">收款幣別</label>
                 <select id="exp-settle-currency" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold">
-                    <option value="ORIGINAL">依原幣別收回 (例如繼續收外幣現金)</option>
-                    <option value="TWD">折合台幣收回 (幫大家換算成台幣給付)</option>
+                    <option value="ORIGINAL">依原幣別</option><option value="TWD">折合台幣</option>
                 </select>
             </div>
             <div>
                 <div class="flex justify-between items-center mb-1">
-                    <label class="font-bold text-gray-600">分攤模式與金額</label>
+                    <label class="font-bold text-gray-600">分攤模式</label>
                     <div class="flex gap-2">
-                        <button type="button" onclick="setSplitMode('equal')" id="btn-mode-equal" class="text-[10px] px-2.5 py-1 rounded-full font-black bg-[#d98262] text-white transition">均攤</button>
-                        <button type="button" onclick="setSplitMode('custom')" id="btn-mode-custom" class="text-[10px] px-2.5 py-1 rounded-full font-black bg-gray-100 text-gray-600 transition">自訂金額</button>
+                        <button type="button" onclick="setSplitMode('equal')" id="btn-mode-equal" class="text-[10px] px-2.5 py-1 rounded-full font-black bg-[#d98262] text-white">均攤</button>
+                        <button type="button" onclick="setSplitMode('custom')" id="btn-mode-custom" class="text-[10px] px-2.5 py-1 rounded-full font-black bg-gray-100 text-gray-600">自訂</button>
                     </div>
                 </div>
                 <div id="exp-participants-container" class="space-y-2 p-2.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl max-h-40 overflow-y-auto"></div>
             </div>
             <div class="flex gap-2.5 pt-2">
                 <button onclick="closeAddExpenseModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="submitExpense()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認記帳</button>
+                <button onclick="submitExpense()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確定</button>
             </div>
         </div>
     </div>
 
-    <!-- 成員管理 Modal -->
     <div id="member-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">👥 旅伴成員管理</h3>
-                <button onclick="closeAddMemberModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <div class="flex gap-2">
-                <input type="text" id="new-member-name" placeholder="輸入成員名字" class="flex-1 p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold">
-                <button onclick="addMember()" class="bg-[#d98262] text-white px-4 py-3 rounded-2xl font-black shadow-sm">新增</button>
-            </div>
+            <div class="flex justify-between items-center"><h3 class="font-black text-[#5c4a3d] text-base">👥 成員管理</h3><button onclick="closeAddMemberModal()" class="text-gray-400 font-black">✕</button></div>
+            <div class="flex gap-2"><input type="text" id="new-member-name" placeholder="名字" class="flex-1 p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"><button onclick="addMember()" class="bg-[#d98262] text-white px-4 py-3 rounded-2xl font-black">新增</button></div>
             <div id="member-list-display" class="space-y-2 max-h-48 overflow-y-auto"></div>
             <button onclick="closeAddMemberModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">完成</button>
         </div>
     </div>
 
-    <!-- 結算結果 Modal -->
     <div id="settlement-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">📊 分帳結算與還款清單</h3>
-                <button onclick="closeSettlementModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
+            <div class="flex justify-between items-center"><h3 class="font-black text-[#5c4a3d] text-base">📊 分帳結算</h3><button onclick="closeSettlementModal()" class="text-gray-400 font-black">✕</button></div>
             <div id="settlement-content" class="space-y-3 max-h-72 overflow-y-auto pr-1"></div>
             <button onclick="closeSettlementModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button>
         </div>
     </div>
 
-    <!-- 底部導覽列 (新增「闖關」分頁) -->
+    <!-- 底部導覽列 -->
     <nav id="bottom-nav" class="hidden fixed bottom-3 left-4 right-4 max-w-[448px] mx-auto bg-white/95 backdrop-blur-md border border-[#eae1d7] flex justify-around py-3 rounded-2xl shadow-xl z-50">
         <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5"><span class="text-xl">📅</span>行程</button>
         <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💡</span>提醒</button>
@@ -379,6 +401,7 @@
         let allMembersData = [];
         let currentSplitMode = 'equal';
         let activeDayFilter = 'all';
+        let currentQuestTargetId = null; // 當前正在拍照打卡的行程 ID
 
         const languageData = {
             korea: {
@@ -433,7 +456,7 @@
             japan: {
                 langCode: 'ja-JP',
                 categories: [
-                    { id: 'restaurant', name: '🍽️ 餐廳' },
+                    { id: 'restaurant', name: '🍽️️ 餐廳' },
                     { id: 'shopping', name: '🛍️ 購物' },
                     { id: 'transport', name: '🚆 交通' },
                     { id: 'hotel', name: '🏨 住宿' },
@@ -696,14 +719,15 @@
             });
         }
 
-        // 🌟 闖關任務自動分類與打卡邏輯
+        // 🌟 嚴格分類：只抓取美食/餐廳/咖啡廳、景點、購物，排除交通等其他項目
         function classifyScheduleItem(title) {
             let t = title.toLowerCase();
-            // 美食餐廳咖啡廳
+            if (t.includes('交通') || t.includes('機場') || t.includes('租車') || t.includes('還車') || t.includes('出發') || t.includes('前往') || t.includes('搭車') || t.includes('班機')) {
+                return null; // 不在闖關範圍
+            }
             if (t.includes('餐廳') || t.includes('美食') || t.includes('咖啡') || t.includes('晚餐') || t.includes('午餐') || t.includes('早餐') || t.includes('烤肉') || t.includes('料理') || t.includes('吃') || t.includes('酒') || t.includes('茶')) {
                 return 'food';
             }
-            // 購物
             if (t.includes('購物') || t.includes('免稅') || t.includes('超市') || t.includes('商場') || t.includes('買') || t.includes('市場') || t.includes('outlet')) {
                 return 'shop';
             }
@@ -720,15 +744,17 @@
 
             titleEl.innerText = `🌸 ${currentProjectName} 冒險中`;
 
-            // 篩選出符合條件的任務 (美食、景點、購物)
-            let questItems = allSchedulesData.map(s => {
+            let questItems = [];
+            allSchedulesData.forEach(s => {
                 let category = classifyScheduleItem(s.title);
-                return { ...s, category };
+                if (category !== null) {
+                    questItems.push({ ...s, category });
+                }
             });
 
             if (questItems.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前行程中尚無符合的美食、景點或購物項目！✨</p>`;
-                countEl.innerText = `已完成 0 / 0`;
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前行程中尚無符合的美食、景點或購物任務！✨</p>`;
+                countEl.innerText = `已打卡 0 / 0`;
                 percentEl.innerText = `0%`;
                 progressBar.style.width = `0%`;
                 updateBadges(0, 0, 0, 0, 0, 0);
@@ -739,11 +765,10 @@
             let completedCount = questItems.filter(item => item.completed).length;
             let percent = Math.round((completedCount / totalCount) * 100);
 
-            countEl.innerText = `已完成 ${completedCount} / ${totalCount}`;
+            countEl.innerText = `已打卡 ${completedCount} / ${totalCount}`;
             percentEl.innerText = `${percent}%`;
             progressBar.style.width = `${percent}%`;
 
-            // 計算三大類別進度
             let foodItems = questItems.filter(i => i.category === 'food');
             let spotItems = questItems.filter(i => i.category === 'spot');
             let shopItems = questItems.filter(i => i.category === 'shop');
@@ -754,7 +779,6 @@
 
             updateBadges(foodDone, foodItems.length, spotDone, spotItems.length, shopDone, shopItems.length);
 
-            // 按天數分組渲染
             let grouped = {};
             questItems.forEach(item => {
                 let dayKey = item.day || 'Day 1';
@@ -779,11 +803,11 @@
                 items.forEach(s => {
                     let cleanTitle = cleanDisplayTitle(s.title);
                     let catName = s.category === 'food' ? '🍽️ 美食' : (s.category === 'shop' ? '🛍️ 購物' : '🗺️ 景點');
-                    let isChecked = s.completed ? 'checked' : '';
-                    let cardBg = s.completed ? 'bg-[#fffaf5] border-[#d98262]/50 opacity-90' : 'bg-white border-[#eae1d7]';
+                    let statusBadge = s.completed ? `<span class="text-[10px] bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-black">✔️ 已打卡</span>` : `<span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-1 rounded-full font-black">📸 點擊打卡</span>`;
+                    let photoThumbnail = s.photoUrl ? `<img src="${s.photoUrl}" class="w-10 h-10 rounded-xl object-cover border border-[#eae1d7] shrink-0">` : '';
 
                     listHtml += `
-                        <div class="p-3.5 ${cardBg} rounded-2xl border flex justify-between items-center transition">
+                        <div onclick="openQuestPhotoModal('${s.id}', '${cleanTitle}')" class="p-3.5 bg-[#fffaf5] hover:bg-[#fbf2e9] rounded-2xl border border-[#eae1d7] flex justify-between items-center cursor-pointer transition">
                             <div class="space-y-1 min-w-0 flex-1 pr-2">
                                 <div class="flex items-center gap-2">
                                     <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
@@ -791,9 +815,10 @@
                                 </div>
                                 <h5 class="font-black text-gray-900 text-xs mt-0.5 truncate">${cleanTitle}</h5>
                             </div>
-                            <label class="relative flex items-center justify-center p-2 cursor-pointer shrink-0">
-                                <input type="checkbox" ${isChecked} onchange="toggleQuestComplete('${s.id}', this.checked)" class="w-5 h-5 rounded-lg accent-[#d98262] cursor-pointer">
-                            </label>
+                            <div class="flex items-center gap-2 shrink-0">
+                                ${photoThumbnail}
+                                ${statusBadge}
+                            </div>
                         </div>
                     `;
                 });
@@ -804,7 +829,7 @@
             });
         }
 
-        // 更新三大稱號狀態
+        // 更新圓形布章解鎖狀態
         function updateBadges(fDone, fTotal, sDone, sTotal, shDone, shTotal) {
             const fBadge = document.getElementById('badge-food');
             const sBadge = document.getElementById('badge-spot');
@@ -814,43 +839,73 @@
             const sTitle = document.getElementById('badge-spot-title');
             const shTitle = document.getElementById('badge-shop-title');
 
-            // 美食稱號：美食雷達全開
             if (fTotal > 0 && fDone === fTotal) {
-                fBadge.className = "p-2 rounded-xl text-center bg-[#f0dcd0] text-[#735848] border border-[#d98262]/40 shadow-sm transition";
-                fTitle.innerText = "美食雷達全開 🍜";
+                fBadge.className = "badge-circle unlocked";
+                fTitle.innerText = "美食雷達全開";
             } else {
-                fBadge.className = "p-2 rounded-xl text-center bg-gray-100 text-gray-400 transition";
-                fTitle.innerText = `${fDone}/${fTotal} 進行中`;
+                fBadge.className = "badge-circle";
+                fTitle.innerText = `美食 (${fDone}/${fTotal})`;
             }
 
-            // 景點稱號：深度冒險家
             if (sTotal > 0 && sDone === sTotal) {
-                sBadge.className = "p-2 rounded-xl text-center bg-[#f0dcd0] text-[#735848] border border-[#d98262]/40 shadow-sm transition";
-                sTitle.innerText = "深度冒險家 🗺️";
+                sBadge.className = "badge-circle unlocked";
+                sTitle.innerText = "深度冒險家";
             } else {
-                sBadge.className = "p-2 rounded-xl text-center bg-gray-100 text-gray-400 transition";
-                sTitle.innerText = `${sDone}/${sTotal} 進行中`;
+                sBadge.className = "badge-circle";
+                sTitle.innerText = `景點 (${sDone}/${sTotal})`;
             }
 
-            // 購物稱號：精品大收割
             if (shTotal > 0 && shDone === shTotal) {
-                shBadge.className = "p-2 rounded-xl text-center bg-[#f0dcd0] text-[#735848] border border-[#d98262]/40 shadow-sm transition";
-                shTitle.innerText = "精品大收割 🛍️";
+                shBadge.className = "badge-circle unlocked";
+                shTitle.innerText = "精品大收割";
             } else {
-                shBadge.className = "p-2 rounded-xl text-center bg-gray-100 text-gray-400 transition";
-                shTitle.innerText = `${shDone}/${shTotal} 進行中`;
+                shBadge.className = "badge-circle";
+                shTitle.innerText = `購物 (${shDone}/${shTotal})`;
             }
         }
 
-        // 切換任務打卡狀態並即時同步到 Firebase
-        window.toggleQuestComplete = async function(scheduleId, isCompleted) {
-            if (!currentProjectId) return;
+        // 開啟闖關拍照打卡 Modal
+        window.openQuestPhotoModal = function(scheduleId, title) {
+            currentQuestTargetId = scheduleId;
+            document.getElementById('quest-modal-title').innerText = `📸 打卡：${title}`;
+            document.getElementById('quest-file-input').value = '';
+            document.getElementById('quest-photo-preview-container').classList.add('hidden');
+            document.getElementById('quest-photo-preview').src = '';
+            document.getElementById('quest-photo-modal').classList.remove('hidden');
+        }
+        window.closeQuestPhotoModal = function() {
+            document.getElementById('quest-photo-modal').classList.add('hidden');
+            currentQuestTargetId = null;
+        }
+
+        window.previewQuestPhoto = function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('quest-photo-preview').src = e.target.result;
+                    document.getElementById('quest-photo-preview-container').classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        window.submitQuestPhoto = async function() {
+            if (!currentProjectId || !currentQuestTargetId) return;
+            const previewSrc = document.getElementById('quest-photo-preview').src;
+            if (!previewSrc) {
+                alert("請先選擇或拍攝打卡照片！");
+                return;
+            }
+
             try {
-                const docRef = doc(db, "projects", currentProjectId, "schedules", scheduleId);
-                await updateDoc(docRef, { completed: isCompleted });
+                const docRef = doc(db, "projects", currentProjectId, "schedules", currentQuestTargetId);
+                await updateDoc(docRef, { completed: true, photoUrl: previewSrc });
+                closeQuestPhotoModal();
+                alert("✨ 打卡成功！已解鎖成就！");
             } catch (e) {
-                console.error("更新打卡狀態失敗", e);
-                alert("更新失敗，請檢查網路連線");
+                console.error("打卡失敗", e);
+                alert("打卡失敗，請檢查網路連線");
             }
         }
 
@@ -1372,7 +1427,7 @@
                 snapshot.forEach((docSnap) => { allSchedulesData.push({ id: docSnap.id, ...docSnap.data() }); });
                 renderDayPills();
                 renderScheduleUI();
-                renderQuestUI(); // 同時更新闖關頁面
+                renderQuestUI();
             });
         }
 
@@ -1462,7 +1517,6 @@
                                 <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
                                 <h5 class="font-black text-gray-900 text-sm mt-1">${cleanTitle}</h5>
                             </div>
-                            <span class="text-gray-300 text-sm">➡️</span>
                         </div>
                     `;
                 });
