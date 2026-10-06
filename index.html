@@ -120,7 +120,7 @@
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             
-            <!-- 檢視模式 -->
+            <!-- 檢視模式 (預設顯示) -->
             <div id="modal-view-mode" class="space-y-4">
                 <div class="flex justify-between items-start">
                     <div>
@@ -150,7 +150,7 @@
                 </div>
             </div>
 
-            <!-- 編輯模式 -->
+            <!-- 編輯模式 (預設隱藏) -->
             <div id="modal-edit-mode" class="hidden space-y-3 text-xs">
                 <div class="flex justify-between items-center">
                     <h3 class="font-black text-amber-950 text-base">✏️ 編輯行程內容</h3>
@@ -205,7 +205,7 @@
     <div id="schedule-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
-                <h3 class="font-black text-amber-950 text-base">✏️ 手動新增行程</h3>
+                <h3 class="font-black text-amber-950 text-base">✏️️ 手動新增行程</h3>
                 <button onclick="closeAddScheduleModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
             
@@ -299,14 +299,13 @@
                     if (docSnap.exists()) {
                         const p = docSnap.data();
                         const card = document.createElement('div');
-                        // 🌟 使用更嚴謹的 flex 與 w-full 排版，避免日期擠壓出框
                         card.className = "cute-card p-5 space-y-3 relative transition hover:border-orange-300 overflow-hidden";
                         card.innerHTML = `
                             <div class="flex justify-between items-center gap-2 w-full">
                                 <span class="text-xs bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-black shrink-0">進行中 🚗</span>
                                 <div class="flex items-center gap-2 shrink-0">
                                     <span class="text-xs text-gray-500 font-bold">${p.dates || '未定日期'}</span>
-                                    <button onclick="event.stopPropagation(); removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1 shrink-0" title="從我的清單移除">🗑️</button>
+                                    <button onclick="event.stopPropagation(); removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1 shrink-0" title="從我的清單移除">🗑️️</button>
                                 </div>
                             </div>
                             <div onclick="enterProject('${id}', '${p.name}', '${p.dates}')" class="cursor-pointer space-y-1">
@@ -411,7 +410,7 @@
                 return;
             }
 
-            // 即將到來的行程置頂
+            // 即將到來的行程置頂 (已套用 cleanDisplayTitle 確保不帶時間)
             const nextItem = allSchedulesData[0];
             const cleanNextTitle = cleanDisplayTitle(nextItem.title);
             upcomingContainer.innerHTML = `
@@ -484,7 +483,7 @@
             }
         }
 
-        // 開啟詳情 Modal
+        // 開啟詳情 Modal (固定為檢視模式)
         window.openDetailModal = function(id) {
             const item = allSchedulesData.find(s => s.id === id);
             if (!item) return;
