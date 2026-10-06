@@ -86,11 +86,9 @@
                 </div>
             </div>
 
-            <!-- 分頁 2：提醒 (會根據專案名稱自動偵測並切換內容) -->
+            <!-- 分頁 2：提醒 (已清除所有星號) -->
             <div id="tab-ai" class="tab-content hidden space-y-3.5">
-                <div id="dynamic-reminders-container" class="space-y-3.5">
-                    <!-- 這裡會由 JS 根據專案名稱動態填入對應國家的提醒 -->
-                </div>
+                <div id="dynamic-reminders-container" class="space-y-3.5"></div>
             </div>
 
             <!-- 分頁 3：語言 -->
@@ -148,7 +146,7 @@
                 </div>
 
                 <div class="pt-2 flex gap-2.5">
-                    <button onclick="switchToEditMode()" class="flex-1 bg-amber-100 text-amber-900 text-xs py-3 rounded-2xl font-black hover:bg-amber-200 transition">✏️️ 修改行程</button>
+                    <button onclick="switchToEditMode()" class="flex-1 bg-amber-100 text-amber-900 text-xs py-3 rounded-2xl font-black hover:bg-amber-200 transition">✏️ 修改行程</button>
                     <button onclick="closeDetailModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-bold">關閉</button>
                 </div>
             </div>
@@ -242,7 +240,7 @@
     <nav id="bottom-nav" class="hidden fixed bottom-3 left-4 right-4 max-w-[448px] mx-auto bg-white/95 backdrop-blur-md border border-amber-100 flex justify-around py-3 rounded-2xl shadow-xl z-50">
         <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-orange-500 text-xs font-black gap-0.5"><span class="text-xl">📅</span>行程</button>
         <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💡</span>提醒</button>
-        <button onclick="switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🗣️</span>語言</button>
+        <button onclick="switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🗣️️</span>語言</button>
         <button onclick="switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💰</span>分帳</button>
     </nav>
 
@@ -365,14 +363,13 @@
             document.getElementById('header-title').innerText = `🌸 ${projectName}`;
             document.getElementById('header-sub').innerText = `日期：${dateRange} ✨`;
             
-            // 根據專案名稱動態渲染提醒內容
             renderReminders(projectName);
             
             switchTab('schedule');
             loadSchedules(id);
         }
 
-        // 🌟 智慧根據專案名稱偵測並產生對應提醒
+        // 🌟 提醒內容動態生成（已完全清除多餘的星號）
         function renderReminders(projectName) {
             const container = document.getElementById('dynamic-reminders-container');
             let nameLower = projectName.toLowerCase();
@@ -380,78 +377,75 @@
             let html = '';
 
             if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山')) {
-                // 韓國 / 濟州島專屬提醒
                 html = `
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
                         <p class="text-xs text-gray-600 leading-relaxed">
-                            當地早晚溫差大且風較大，建議採取**洋蔥式穿搭**（內搭發熱衣＋毛衣＋防風外套/大衣、圍巾與毛帽 🧣）。
+                            當地早晚溫差大且風較大，建議採取洋蔥式穿搭（內搭發熱衣＋毛衣＋防風外套/大衣、圍巾與毛帽 🧣）。
                         </p>
                     </div>
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
                         <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>**導航 App：** 強烈建議使用 **Naver Map** 或 **Kakao Map**，以**電話號碼 (Phone Number)** 查詢最準確！</li>
-                            <li>**測速照相：** 道路速限嚴格，沿途有大量測速照相，務必依速限行駛。</li>
-                            <li>**加油還車：** 多為自助/半人工，記得確認租車規定（通常為滿油出借、滿油還車）。</li>
+                            <li>導航 App：強烈建議使用 Naver Map 或 Kakao Map，以電話號碼 (Phone Number) 查詢最準確！</li>
+                            <li>測速照相：道路速限嚴格，沿途有大量測速照相，務必依速限行駛。</li>
+                            <li>加油還車：多為自助/半人工，記得確認租車規定（通常為滿油出借、滿油還車）。</li>
                         </ul>
                     </div>
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
                         <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>**駕照證件：** 務必備妥**台灣駕照正本**與**國際駕照**。</li>
-                            <li>**行動支付：** 信用卡與行動支付極為普及，建議身上備妥 5~10 萬韓元現金備用。</li>
-                            <li>**插頭規格：** 電壓 220V，為**圓形雙孔（歐規/韓規）**。</li>
+                            <li>駕照證件：務必備妥台灣駕照正本與國際駕照。</li>
+                            <li>行動支付：信用卡與行動支付極為普及，建議身上備妥 5~10 萬韓元現金備用。</li>
+                            <li>插頭規格：電壓 220V，為圓形雙孔（歐規/韓規）。</li>
                         </ul>
                     </div>
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
                         <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>**警察局：** 112 | **救護車/消防：** 119</li>
-                            <li>**韓國旅遊諮詢熱線（中文）：** 1330</li>
+                            <li>警察局：112 | 救護車/消防：119</li>
+                            <li>韓國旅遊諮詢熱線（中文）：1330</li>
                         </ul>
                     </div>
                 `;
             } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都')) {
-                // 日本 / 東京專屬提醒
                 html = `
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇯🇵 日本旅遊與天氣指南</h3>
                         <p class="text-xs text-gray-600 leading-relaxed">
-                            行程多以步行與搭乘大鐵路為主，建議穿著舒適好走的布鞋，並攜帶輕便防風外套與雨具 🌂。
+                            行程多以步行與搭乘大眾運輸為主，建議穿著舒適好走的布鞋，並攜帶輕便防風外套與雨具 🌂。
                         </p>
                     </div>
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚆 交通與導航提醒</h3>
                         <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>**導航 App：** 推薦使用 **Google Maps** 或 **乗換案內** 查詢地鐵轉乘與班次。</li>
-                            <li>**IC 卡：** 建議事先將 Suica 或 Pasmo 卡加入手機錢包（Apple Pay），搭車刷卡超方便。</li>
+                            <li>導航 App：推薦使用 Google Maps 或 乗換案內 查詢地鐵轉乘與班次。</li>
+                            <li>IC 卡：建議事先將 Suica 或 Pasmo 卡加入手機錢包（Apple Pay），搭車刷卡超方便。</li>
                         </ul>
                     </div>
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
                         <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>**護照效期：** 確認效期大於 6 個月。</li>
-                            <li>**現金備用：** 部分傳統小店或拉麵販賣機仍需現金，建議備妥適量日幣。</li>
-                            <li>**插頭規格：** 電壓 100V，為**雙孔扁平插頭**（與台灣相同）。</li>
+                            <li>護照效期：確認效期大於 6 個月。</li>
+                            <li>現金備用：部分傳統小店或拉麵販賣機仍需現金，建議備妥適量日幣。</li>
+                            <li>插頭規格：電壓 100V，為雙孔扁平插頭（與台灣相同）。</li>
                         </ul>
                     </div>
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
                         <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>**警察局：** 110 | **救護車/消防：** 119</li>
+                            <li>警察局：110 | 救護車/消防：119</li>
                         </ul>
                     </div>
                 `;
             } else {
-                // 預設通用提醒
                 html = `
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌍 通用行前準備指南</h3>
                         <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>**證件確認：** 檢查護照效期是否大於 6 個月，並備妥機票、住宿預訂憑證。</li>
-                            <li>**網卡與通訊：** 提前確認網卡或 eSIM 已啟用，並下載離線地圖。</li>
-                            <li>**隨身藥品：** 準備常備藥品（如腸胃藥、止痛藥、暈車藥）。</li>
+                            <li>證件確認：檢查護照效期是否大於 6 個月，並備妥機票、住宿預訂憑證。</li>
+                            <li>網卡與通訊：提前確認網卡或 eSIM 已啟用，並下載離線地圖。</li>
+                            <li>隨身藥品：準備常備藥品（如腸胃藥、止痛藥、暈車藥）。</li>
                         </ul>
                     </div>
                 `;
@@ -526,6 +520,7 @@
                 grouped[dayKey].push(item);
             });
 
+            // 🌟 每一天預設全部收合 (isExpanded = false)
             Object.keys(grouped).forEach((dayKey, index) => {
                 let items = grouped[dayKey];
                 let sectionId = `day_section_${index}`;
@@ -541,7 +536,7 @@
                     </div>
                 `;
 
-                let isExpanded = index === 0;
+                let isExpanded = false; // 預設全部收合
                 let listHtml = `<div id="${sectionId}" class="${isExpanded ? '' : 'hidden'} p-3 space-y-2.5 bg-white">`;
 
                 items.forEach(s => {
