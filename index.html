@@ -1,1 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的旅遊協作 App</title>
+    <!-- Tailwind CSS 讓手機排版好看 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f3f4f6; max-width: 480px; margin: auto; min-height: 100vh; position: relative; }
+    </style>
+</head>
+<body class="pb-20">
 
+    <!-- 頂部標題區 -->
+    <header class="bg-blue-600 text-white p-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
+        <h1 id="app-title" class="text-lg font-bold">✈️ 11/23 濟州島自駕遊</h1>
+        <button onclick="shareProject()" class="bg-blue-700 text-xs px-3 py-1.5 rounded-full">分享專案</button>
+    </header>
+
+    <!-- 內容容器 (依分頁切換) -->
+    <main class="p-4">
+        <!-- 分頁 1：行程 -->
+        <div id="tab-schedule" class="tab-content space-y-4">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="font-bold text-gray-800 mb-2">🪄 AI 智慧貼上解析</h2>
+                <textarea id="smart-paste-input" rows="3" placeholder="請貼上LINE對話或部落格行程文字..." class="w-full text-sm p-2 border rounded-lg mb-2 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                <button onclick="parseSmartPaste()" class="w-full bg-blue-600 text-white text-sm py-2 rounded-lg font-medium">開始 AI 解析並加入行程</button>
+            </div>
+
+            <div class="space-y-3">
+                <h3 class="font-bold text-gray-700 text-sm">📅 每日行程時間軸</h3>
+                <!-- 動態行程列表會顯示在這裡 -->
+                <div id="schedule-list" class="space-y-3">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">14:00</span>
+                            <span class="text-xs text-gray-400">Day 1</span>
+                        </div>
+                        <h4 class="font-bold text-gray-800 mt-1">🚗 領車與機場出發</h4>
+                        <p class="text-xs text-gray-500 mt-1">地點：Lotte Rent-a-car 濟州機場店</p>
+                        <div class="mt-3 flex gap-2">
+                            <a href="https://maps.google.com/?q=Lotte+Rent-a-car+Jeju" target="_blank" class="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md flex items-center gap-1">🗺️ Google Maps</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分頁 2：AI 錦囊 -->
+        <div id="tab-ai" class="tab-content hidden space-y-4">
+            <div class="bg-white p-4 rounded-xl shadow-sm border">
+                <h3 class="font-bold text-gray-800 mb-2">🌤️ 天氣與穿搭建議</h3>
+                <p class="text-xs text-gray-600 leading-relaxed">11月濟州島氣溫約 10°C ~ 15°C，風大。建議洋蔥式穿法，務必攜帶防風外套與毛帽。</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border">
+                <h3 class="font-bold text-gray-800 mb-2">🚗 自駕與導航須知</h3>
+                <p class="text-xs text-gray-600 leading-relaxed">韓國右駕。導航請愛用 <b>Naver Map</b>，當地測速照相多且精準，Google Maps 容易漏掉。</p>
+            </div>
+        </div>
+
+        <!-- 分頁 3：語言 -->
+        <div id="tab-lang" class="tab-content hidden space-y-3">
+            <div class="bg-white p-3 rounded-xl shadow-sm border flex justify-between items-center">
+                <div>
+                    <p class="text-xs text-gray-400">請幫我結帳</p>
+                    <p class="font-bold text-gray-800 text-base">계산해주세요.</p>
+                </div>
+                <button onclick="speakText('계산해주세요.')" class="bg-blue-50 text-blue-600 p-2.5 rounded-full text-lg">🔊</button>
+            </div>
+            <div class="bg-white p-3 rounded-xl shadow-sm border flex justify-between items-center">
+                <div>
+                    <p class="text-xs text-gray-400">這個請不要放辣，謝謝</p>
+                    <p class="font-bold text-gray-800 text-base">이거 안 맵게 해주세요.</p>
+                </div>
+                <button onclick="speakText('이거 안 맵게 해주세요.')" class="bg-blue-50 text-blue-600 p-2.5 rounded-full text-lg">🔊</button>
+            </div>
+        </div>
+
+        <!-- 分頁 4：分帳 -->
+        <div id="tab-split" class="tab-content hidden space-y-4">
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-4 rounded-2xl shadow-md">
+                <p class="text-xs opacity-80">總支出金額</p>
+                <h3 class="text-2xl font-bold mt-1">NT$ 24,500</h3>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border">
+                <h3 class="font-bold text-gray-800 mb-2 text-sm">💡 結算建議</h3>
+                <p class="text-xs text-gray-600">小美 需支付給 小明 <span class="font-bold text-blue-600">NT$ 3,200</span></p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部固定導覽列 (Mobile Nav) -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-white border-t border-gray-200 flex justify-around py-2.5 shadow-lg z-50">
+        <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-blue-600 text-xs font-bold">📅 行程</button>
+        <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs">🤖 錦囊</button>
+        <button onclick="switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs">🗣️ 語言</button>
+        <button onclick="switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs">💰 分帳</button>
+    </nav>
+
+    <!-- Firebase 核心 SDK 與邏輯 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // 你的真實 Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcKmZhJaZn5emOlHRV95-uC9q01wFxt4M",
+            authDomain: "my-travel-app-6e00c.firebaseapp.com",
+            projectId: "my-travel-app-6e00c",
+            storageBucket: "my-travel-app-6e00c.firebasestorage.app",
+            messagingSenderId: "135860333246",
+            appId: "1:135860333246:web:a25402eb743d6cebc9ccef"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 頁籤切換邏輯
+        window.switchTab = function(tabName) {
+            ['schedule', 'ai', 'lang', 'split'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).className = "flex flex-col items-center text-gray-400 text-xs";
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabName}`).className = "flex flex-col items-center text-blue-600 text-xs font-bold";
+        }
+
+        // 語音播放功能
+        window.speakText = function(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ko-KR'; // 設為韓文發音
+            window.speechSynthesis.speak(utterance);
+        }
+
+        window.shareProject = function() {
+            navigator.clipboard.writeText(window.location.href);
+            alert("網址已複製！可以傳給朋友一起加入囉！");
+        }
+
+        // 模擬智慧貼上解析
+        window.parseSmartPaste = function() {
+            const text = document.getElementById('smart-paste-input').value;
+            if(!text) { alert("請先輸入或貼上文字！"); return; }
+            alert("AI 智慧解析成功！（此為展示版，未來可串接 Gemini API 自動切換欄位）");
+            document.getElementById('smart-paste-input').value = "";
+        }
+    </script>
+</body>
+</html>
