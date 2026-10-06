@@ -22,14 +22,13 @@
             box-shadow: 0 4px 20px rgba(180, 150, 130, 0.08);
             border: 1.5px solid #eae1d7;
         }
-        /* 自定義捲軸 */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #e2d3c3; border-radius: 4px; }
     </style>
 </head>
 <body class="pb-28 text-gray-800">
 
-    <!-- 頂部標題區 (日系手帳質感) -->
+    <!-- 頂部標題區 -->
     <header class="bg-[#f3e9de] text-[#5c4a3d] px-4 py-4 shadow-sm sticky top-0 z-50 flex justify-between items-center rounded-b-[24px] border-b border-[#eae1d7]">
         <div class="flex items-center gap-2 min-w-0 pr-2">
             <button id="back-btn" onclick="backToProjects()" class="hidden bg-white/90 hover:bg-white text-[#5c4a3d] px-3 py-1.5 rounded-full text-xs font-bold shadow-sm transition active:scale-95 shrink-0 flex items-center gap-1 border border-[#eae1d7]">
@@ -56,7 +55,6 @@
                     ＋ 新增專案
                 </button>
             </div>
-
             <div id="project-list" class="space-y-3.5">
                 <p class="text-center text-xs text-gray-400 py-8">載入中... ☁️</p>
             </div>
@@ -67,29 +65,15 @@
             
             <!-- 分頁 1：行程 -->
             <div id="tab-schedule" class="tab-content space-y-4">
-                
-                <!-- 即將到來行程卡片 -->
                 <div id="upcoming-card-container"></div>
-
-                <!-- 頂部天數圓形快捷列 (日系手帳風格) -->
-                <div id="day-pills-container" class="flex gap-2 overflow-x-auto pb-1 pt-0.5 px-1 scrollbar-none">
-                    <!-- 動態產生的 Day 圓形按鈕列 -->
-                </div>
-
-                <!-- 行程列表標題與按鈕 -->
+                <div id="day-pills-container" class="flex gap-2 overflow-x-auto pb-1 pt-0.5 px-1 scrollbar-none"></div>
                 <div class="flex justify-between items-center px-1 pt-1">
                     <h3 class="font-black text-[#736052] text-xs tracking-wider">📅 完整行程時間軸</h3>
                     <div class="flex gap-2">
-                        <button onclick="openSmartPasteModal()" class="bg-white hover:bg-orange-50 text-[#d98262] border border-[#d98262]/30 text-xs px-3 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">
-                            ✨ 智慧導入
-                        </button>
-                        <button onclick="openAddScheduleModal()" class="bg-[#d98262] text-white text-xs px-3.5 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">
-                            ＋ 新增
-                        </button>
+                        <button onclick="openSmartPasteModal()" class="bg-white hover:bg-orange-50 text-[#d98262] border border-[#d98262]/30 text-xs px-3 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">✨ 智慧導入</button>
+                        <button onclick="openAddScheduleModal()" class="bg-[#d98262] text-white text-xs px-3.5 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">＋ 新增</button>
                     </div>
                 </div>
-
-                <!-- 時間軸容器 -->
                 <div id="schedule-container" class="space-y-3">
                     <p class="text-center text-xs text-gray-400 py-6">正在載入行程... ⏳</p>
                 </div>
@@ -104,16 +88,14 @@
             <div id="tab-lang" class="tab-content hidden space-y-4">
                 <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-3 shadow-md text-center relative border-[#e2d3c3]">
                     <div class="absolute top-3 left-4">
-                        <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-0.5 rounded-full font-black">🗣️️ 實用翻譯發音</span>
+                        <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-0.5 rounded-full font-black">🗣️ 實用翻譯發音</span>
                     </div>
                     <div class="pt-3 space-y-1">
                         <p id="display-cn" class="text-xs text-[#8c7868] font-bold">請點選下方分類與句子 ▼</p>
                         <h2 id="display-foreign" class="text-xl font-black text-[#5c4a3d] mt-1 break-words">請選擇想說的話 ✨</h2>
                     </div>
                     <div class="pt-1">
-                        <button onclick="speakCurrentPhrase()" class="bg-[#d98262] text-white px-5 py-2.5 rounded-full text-xs font-black shadow-md shadow-orange-900/10 transition active:scale-95 inline-flex items-center gap-1.5">
-                            🔊 點擊朗讀
-                        </button>
+                        <button onclick="speakCurrentPhrase()" class="bg-[#d98262] text-white px-5 py-2.5 rounded-full text-xs font-black shadow-md shadow-orange-900/10 transition active:scale-95 inline-flex items-center gap-1.5">🔊 點擊朗讀</button>
                     </div>
                 </div>
                 <div class="grid grid-cols-12 gap-3">
@@ -134,7 +116,6 @@
                     <h3 id="total-expense-twd" class="text-2xl font-black tracking-tight">NT$ 0</h3>
                     <div id="currency-breakdown" class="text-[11px] opacity-90 flex gap-3 pt-1 border-t border-white/20 flex-wrap"></div>
                 </div>
-
                 <div class="flex justify-between items-center px-1">
                     <h3 class="font-black text-[#736052] text-xs tracking-wider">💰 帳目與結算</h3>
                     <div class="flex gap-2">
@@ -142,9 +123,48 @@
                         <button onclick="openAddExpenseModal()" class="bg-gradient-to-r from-[#d98262] to-[#e69c7c] text-white text-xs px-3.5 py-2 rounded-full font-black shadow-sm transition active:scale-95">＋ 記一筆</button>
                     </div>
                 </div>
-
                 <div id="expense-list-container" class="space-y-2.5">
                     <p class="text-center text-xs text-gray-400 py-6">目前還沒有記帳，點上方按鈕開始記帳吧！✨</p>
+                </div>
+            </div>
+
+            <!-- 分頁 5：闖關成就 (全新動態偵測與稱號系統) -->
+            <div id="tab-quest" class="tab-content hidden space-y-4">
+                <!-- 成績總覽與成就進度卡片 -->
+                <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-3.5 shadow-md border-[#e2d3c3]">
+                    <div class="flex justify-between items-center">
+                        <span id="quest-project-title" class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black">🌸 冒險進行中</span>
+                        <span id="quest-total-count" class="text-xs font-black text-[#d98262]">已完成 0 / 0</span>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-black text-[#736052] mb-1">
+                            <span>整體解鎖進度</span>
+                            <span id="quest-percent">0%</span>
+                        </div>
+                        <div class="w-full bg-[#eae1d7] h-3 rounded-full overflow-hidden">
+                            <div id="quest-progress-bar" class="bg-[#d98262] h-full transition-all duration-500 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <!-- 三大稱號解鎖狀態列 -->
+                    <div class="grid grid-cols-3 gap-2 pt-1 border-t border-[#eae1d7]">
+                        <div id="badge-food" class="p-2 rounded-xl text-center bg-gray-100 text-gray-400 transition">
+                            <p class="text-[10px] font-bold">🍽️ 美食</p>
+                            <p class="text-[9px] font-black mt-0.5 truncate" id="badge-food-title">未解鎖</p>
+                        </div>
+                        <div id="badge-spot" class="p-2 rounded-xl text-center bg-gray-100 text-gray-400 transition">
+                            <p class="text-[10px] font-bold">🗺️ 景點</p>
+                            <p class="text-[9px] font-black mt-0.5 truncate" id="badge-spot-title">未解鎖</p>
+                        </div>
+                        <div id="badge-shop" class="p-2 rounded-xl text-center bg-gray-100 text-gray-400 transition">
+                            <p class="text-[10px] font-bold">🛍️ 購物</p>
+                            <p class="text-[9px] font-black mt-0.5 truncate" id="badge-shop-title">未解鎖</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 按天排序的闖關/打卡清單 -->
+                <div id="quest-list-container" class="space-y-3.5">
+                    <p class="text-center text-xs text-gray-400 py-6">正在載入闖關任務... ⏳</p>
                 </div>
             </div>
 
@@ -201,7 +221,7 @@
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base">✨ AI 智慧導入行程</h3>
-                <button onclick="closeSmartPasteModal()" class="text-gray-400 text-base font-black">✕</button>
+                <button onclick="closeSmartPasteModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
             <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。時間精準抓取，備註與營業時間內的數字絕不誤判！</p>
             <textarea id="smart-paste-input" rows="8" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none"></textarea>
@@ -217,7 +237,7 @@
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base">✏️ 手動新增行程</h3>
-                <button onclick="closeAddScheduleModal()" class="text-gray-400 text-base font-black">✕</button>
+                <button onclick="closeAddScheduleModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
             <div class="space-y-3 text-xs">
                 <div><label class="block font-bold text-gray-600 mb-1">天數（例如：Day 1）</label><input type="text" id="input-day" value="Day 1" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
@@ -237,7 +257,7 @@
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-3.5 shadow-2xl text-xs max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base">✍️ 新增記帳</h3>
-                <button onclick="closeAddExpenseModal()" class="text-gray-400 text-base font-black">✕</button>
+                <button onclick="closeAddExpenseModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
             <div>
                 <label class="block font-bold text-gray-600 mb-1">項目名稱</label>
@@ -319,12 +339,13 @@
         </div>
     </div>
 
-    <!-- 底部導覽列 -->
+    <!-- 底部導覽列 (新增「闖關」分頁) -->
     <nav id="bottom-nav" class="hidden fixed bottom-3 left-4 right-4 max-w-[448px] mx-auto bg-white/95 backdrop-blur-md border border-[#eae1d7] flex justify-around py-3 rounded-2xl shadow-xl z-50">
         <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5"><span class="text-xl">📅</span>行程</button>
         <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💡</span>提醒</button>
         <button onclick="switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🗣</span>語言</button>
         <button onclick="switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💰</span>分帳</button>
+        <button onclick="switchTab('quest')" id="nav-quest" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🎯</span>闖關</button>
     </nav>
 
     <!-- Firebase 與邏輯控制 -->
@@ -357,7 +378,7 @@
         let allExpensesData = [];
         let allMembersData = [];
         let currentSplitMode = 'equal';
-        let activeDayFilter = 'all'; // 預設顯示全部天數
+        let activeDayFilter = 'all';
 
         const languageData = {
             korea: {
@@ -675,6 +696,165 @@
             });
         }
 
+        // 🌟 闖關任務自動分類與打卡邏輯
+        function classifyScheduleItem(title) {
+            let t = title.toLowerCase();
+            // 美食餐廳咖啡廳
+            if (t.includes('餐廳') || t.includes('美食') || t.includes('咖啡') || t.includes('晚餐') || t.includes('午餐') || t.includes('早餐') || t.includes('烤肉') || t.includes('料理') || t.includes('吃') || t.includes('酒') || t.includes('茶')) {
+                return 'food';
+            }
+            // 購物
+            if (t.includes('購物') || t.includes('免稅') || t.includes('超市') || t.includes('商場') || t.includes('買') || t.includes('市場') || t.includes('outlet')) {
+                return 'shop';
+            }
+            // 預設為景點
+            return 'spot';
+        }
+
+        function renderQuestUI() {
+            const container = document.getElementById('quest-list-container');
+            const titleEl = document.getElementById('quest-project-title');
+            const countEl = document.getElementById('quest-total-count');
+            const percentEl = document.getElementById('quest-percent');
+            const progressBar = document.getElementById('quest-progress-bar');
+
+            titleEl.innerText = `🌸 ${currentProjectName} 冒險中`;
+
+            // 篩選出符合條件的任務 (美食、景點、購物)
+            let questItems = allSchedulesData.map(s => {
+                let category = classifyScheduleItem(s.title);
+                return { ...s, category };
+            });
+
+            if (questItems.length === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前行程中尚無符合的美食、景點或購物項目！✨</p>`;
+                countEl.innerText = `已完成 0 / 0`;
+                percentEl.innerText = `0%`;
+                progressBar.style.width = `0%`;
+                updateBadges(0, 0, 0, 0, 0, 0);
+                return;
+            }
+
+            let totalCount = questItems.length;
+            let completedCount = questItems.filter(item => item.completed).length;
+            let percent = Math.round((completedCount / totalCount) * 100);
+
+            countEl.innerText = `已完成 ${completedCount} / ${totalCount}`;
+            percentEl.innerText = `${percent}%`;
+            progressBar.style.width = `${percent}%`;
+
+            // 計算三大類別進度
+            let foodItems = questItems.filter(i => i.category === 'food');
+            let spotItems = questItems.filter(i => i.category === 'spot');
+            let shopItems = questItems.filter(i => i.category === 'shop');
+
+            let foodDone = foodItems.filter(i => i.completed).length;
+            let spotDone = spotItems.filter(i => i.completed).length;
+            let shopDone = shopItems.filter(i => i.completed).length;
+
+            updateBadges(foodDone, foodItems.length, spotDone, spotItems.length, shopDone, shopItems.length);
+
+            // 按天數分組渲染
+            let grouped = {};
+            questItems.forEach(item => {
+                let dayKey = item.day || 'Day 1';
+                if (!grouped[dayKey]) grouped[dayKey] = [];
+                grouped[dayKey].push(item);
+            });
+
+            container.innerHTML = '';
+            Object.keys(grouped).forEach(dayKey => {
+                let items = grouped[dayKey];
+                let dayBox = document.createElement('div');
+                dayBox.className = "cute-card overflow-hidden border border-[#eae1d7]";
+                
+                let headerHtml = `
+                    <div class="bg-[#f3e9de]/70 p-3.5 flex justify-between items-center">
+                        <h4 class="font-black text-[#5c4a3d] text-xs">📅 ${dayKey} 任務清單</h4>
+                        <span class="text-[11px] text-[#8c7868] font-bold">${items.filter(i => i.completed).length}/${items.length} 已打卡</span>
+                    </div>
+                `;
+
+                let listHtml = `<div class="p-3 space-y-2.5 bg-white">`;
+                items.forEach(s => {
+                    let cleanTitle = cleanDisplayTitle(s.title);
+                    let catName = s.category === 'food' ? '🍽️ 美食' : (s.category === 'shop' ? '🛍️ 購物' : '🗺️ 景點');
+                    let isChecked = s.completed ? 'checked' : '';
+                    let cardBg = s.completed ? 'bg-[#fffaf5] border-[#d98262]/50 opacity-90' : 'bg-white border-[#eae1d7]';
+
+                    listHtml += `
+                        <div class="p-3.5 ${cardBg} rounded-2xl border flex justify-between items-center transition">
+                            <div class="space-y-1 min-w-0 flex-1 pr-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
+                                    <span class="text-[10px] text-[#8c7868] font-bold">${catName}</span>
+                                </div>
+                                <h5 class="font-black text-gray-900 text-xs mt-0.5 truncate">${cleanTitle}</h5>
+                            </div>
+                            <label class="relative flex items-center justify-center p-2 cursor-pointer shrink-0">
+                                <input type="checkbox" ${isChecked} onchange="toggleQuestComplete('${s.id}', this.checked)" class="w-5 h-5 rounded-lg accent-[#d98262] cursor-pointer">
+                            </label>
+                        </div>
+                    `;
+                });
+                listHtml += `</div>`;
+
+                dayBox.innerHTML = headerHtml + listHtml;
+                container.appendChild(dayBox);
+            });
+        }
+
+        // 更新三大稱號狀態
+        function updateBadges(fDone, fTotal, sDone, sTotal, shDone, shTotal) {
+            const fBadge = document.getElementById('badge-food');
+            const sBadge = document.getElementById('badge-spot');
+            const shBadge = document.getElementById('badge-shop');
+
+            const fTitle = document.getElementById('badge-food-title');
+            const sTitle = document.getElementById('badge-spot-title');
+            const shTitle = document.getElementById('badge-shop-title');
+
+            // 美食稱號：美食雷達全開
+            if (fTotal > 0 && fDone === fTotal) {
+                fBadge.className = "p-2 rounded-xl text-center bg-[#f0dcd0] text-[#735848] border border-[#d98262]/40 shadow-sm transition";
+                fTitle.innerText = "美食雷達全開 🍜";
+            } else {
+                fBadge.className = "p-2 rounded-xl text-center bg-gray-100 text-gray-400 transition";
+                fTitle.innerText = `${fDone}/${fTotal} 進行中`;
+            }
+
+            // 景點稱號：深度冒險家
+            if (sTotal > 0 && sDone === sTotal) {
+                sBadge.className = "p-2 rounded-xl text-center bg-[#f0dcd0] text-[#735848] border border-[#d98262]/40 shadow-sm transition";
+                sTitle.innerText = "深度冒險家 🗺️";
+            } else {
+                sBadge.className = "p-2 rounded-xl text-center bg-gray-100 text-gray-400 transition";
+                sTitle.innerText = `${sDone}/${sTotal} 進行中`;
+            }
+
+            // 購物稱號：精品大收割
+            if (shTotal > 0 && shDone === shTotal) {
+                shBadge.className = "p-2 rounded-xl text-center bg-[#f0dcd0] text-[#735848] border border-[#d98262]/40 shadow-sm transition";
+                shTitle.innerText = "精品大收割 🛍️";
+            } else {
+                shBadge.className = "p-2 rounded-xl text-center bg-gray-100 text-gray-400 transition";
+                shTitle.innerText = `${shDone}/${shTotal} 進行中`;
+            }
+        }
+
+        // 切換任務打卡狀態並即時同步到 Firebase
+        window.toggleQuestComplete = async function(scheduleId, isCompleted) {
+            if (!currentProjectId) return;
+            try {
+                const docRef = doc(db, "projects", currentProjectId, "schedules", scheduleId);
+                await updateDoc(docRef, { completed: isCompleted });
+            } catch (e) {
+                console.error("更新打卡狀態失敗", e);
+                alert("更新失敗，請檢查網路連線");
+            }
+        }
+
+        // 記帳與分帳渲染 (保留)
         function renderExpenseUI() {
             const container = document.getElementById('expense-list-container');
             const breakdownContainer = document.getElementById('currency-breakdown');
@@ -694,7 +874,6 @@
             allExpensesData.forEach(exp => {
                 let twdVal = exp.currency === 'TWD' ? exp.amount : (exp.amount * (exp.rate || 1));
                 totalTwdSum += twdVal;
-
                 if (!currencySums[exp.currency]) currencySums[exp.currency] = 0;
                 currencySums[exp.currency] += exp.amount;
             });
@@ -798,10 +977,8 @@
         function updateExpenseModalDropdowns() {
             const payerSelect = document.getElementById('exp-payer');
             const container = document.getElementById('exp-participants-container');
-            
             payerSelect.innerHTML = '';
             container.innerHTML = '';
-
             allMembersData.forEach(m => {
                 let opt = document.createElement('option');
                 opt.value = m.name;
@@ -810,7 +987,6 @@
 
                 let div = document.createElement('div');
                 div.className = "flex justify-between items-center bg-white p-2 rounded-xl border border-[#eae1d7]";
-                
                 if (currentSplitMode === 'equal') {
                     div.innerHTML = `
                         <label class="flex items-center gap-2 font-bold text-gray-700 cursor-pointer">
@@ -922,7 +1098,6 @@
         window.openSettlementModal = function() {
             const content = document.getElementById('settlement-content');
             content.innerHTML = '';
-
             if (allExpensesData.length === 0 || allMembersData.length === 0) {
                 content.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">尚無足夠的帳目資料進行結算！</p>`;
                 document.getElementById('settlement-modal').classList.remove('hidden');
@@ -1055,7 +1230,7 @@
                 html = `
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇯🇵 日本旅遊與天氣指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">行程多以步行與大眾運輸為主，建議穿著舒適好走的布鞋，並攜帶輕便外套與雨具 🌂。</p>
+                        <p class="text-xs text-gray-600 leading-relaxed">行程多以步行與大眾運輸為主，建議穿著舒適好走的布鞋，並隨身攜帶輕便外套與雨具 🌂。</p>
                     </div>
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚆 交通與導航提醒</h3>
@@ -1197,6 +1372,7 @@
                 snapshot.forEach((docSnap) => { allSchedulesData.push({ id: docSnap.id, ...docSnap.data() }); });
                 renderDayPills();
                 renderScheduleUI();
+                renderQuestUI(); // 同時更新闖關頁面
             });
         }
 
@@ -1205,25 +1381,18 @@
             return title.replace(/^\d{1,2}[:：]\d{2}\s*/, '').trim();
         }
 
-        // 🌟 渲染頂部像手帳一樣的圓形 Day 按鈕列
         function renderDayPills() {
             const pillsContainer = document.getElementById('day-pills-container');
             pillsContainer.innerHTML = '';
-
             let grouped = {};
             allSchedulesData.forEach(item => {
                 let dayKey = item.day || 'Day 1';
                 if (!grouped[dayKey]) grouped[dayKey] = [];
                 grouped[dayKey].push(item);
             });
-
             let days = Object.keys(grouped);
-            if (days.length === 0) {
-                pillsContainer.innerHTML = '';
-                return;
-            }
+            if (days.length === 0) return;
 
-            // 「全部」按鈕
             let allBtn = document.createElement('button');
             allBtn.className = `px-4 py-2 rounded-full text-xs font-black transition shrink-0 ${activeDayFilter === 'all' ? 'bg-[#d98262] text-white shadow-sm' : 'bg-white text-[#736052] border border-[#eae1d7]'}`;
             allBtn.innerText = "全部行程";
@@ -1271,7 +1440,6 @@
 
             Object.keys(grouped).forEach((dayKey, index) => {
                 if (activeDayFilter !== 'all' && activeDayFilter !== dayKey) return;
-
                 let items = grouped[dayKey];
                 let sectionId = `day_section_${index}`;
                 let dayBox = document.createElement('div');
@@ -1283,8 +1451,7 @@
                         <span id="icon_${sectionId}" class="text-xs text-[#8c7868] font-black">▼ 展開</span>
                     </div>
                 `;
-
-                let isExpanded = activeDayFilter !== 'all'; // 若點擊特定 Day 則預設展開
+                let isExpanded = activeDayFilter !== 'all';
                 let listHtml = `<div id="${sectionId}" class="${isExpanded ? '' : 'hidden'} p-3 space-y-2.5 bg-white">`;
 
                 items.forEach(s => {
@@ -1300,7 +1467,6 @@
                     `;
                 });
                 listHtml += `</div>`;
-
                 dayBox.innerHTML = headerHtml + listHtml;
                 container.appendChild(dayBox);
             });
@@ -1417,7 +1583,7 @@
         }
 
         window.switchTab = function(tabName) {
-            ['schedule', 'ai', 'lang', 'split'].forEach(t => {
+            ['schedule', 'ai', 'lang', 'split', 'quest'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
                 document.getElementById(`nav-${t}`).className = "flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5";
             });
