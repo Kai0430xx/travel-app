@@ -62,24 +62,28 @@
             
             <!-- 分頁 1：行程 -->
             <div id="tab-schedule" class="tab-content space-y-4">
+                
+                <!-- 🌟 即將到來的行程置頂卡片 -->
+                <div id="upcoming-card-container"></div>
+
                 <!-- AI 智慧貼上卡片 -->
                 <div class="cute-card p-4 space-y-3">
                     <h2 class="font-bold text-amber-900 text-sm flex items-center gap-1.5">🪄 AI 魔法貼上行程</h2>
-                    <textarea id="smart-paste-input" rows="3" placeholder="請將多天行程貼上（自動偵測時間、Day 並聰明拆解）～" class="w-full text-xs p-3 bg-amber-50/50 border border-amber-100 rounded-xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
+                    <textarea id="smart-paste-input" rows="3" placeholder="貼上多天行程（自動過濾備註、精準拆解）～" class="w-full text-xs p-3 bg-amber-50/50 border border-amber-100 rounded-xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
                     <button onclick="parseSmartPaste()" class="w-full bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs py-2.5 rounded-xl font-bold shadow-md shadow-orange-200 transition active:scale-95">
-                        ✨ 開始聰明智慧拆解
+                        ✨ 開始魔法智慧拆解
                     </button>
                 </div>
 
                 <!-- 行程列表標題與手動新增按鈕 -->
                 <div class="flex justify-between items-center px-1">
-                    <h3 class="font-bold text-gray-600 text-xs tracking-wider">📅 精彩行程時間軸</h3>
+                    <h3 class="font-bold text-gray-600 text-xs tracking-wider">📅 完整行程時間軸（依天數分類）</h3>
                     <button onclick="openAddScheduleModal()" class="bg-amber-500 text-white text-xs px-3.5 py-2 rounded-xl font-bold shadow-sm shadow-amber-200 transition active:scale-95">
-                        ＋ 手動新增行程
+                        ＋ 手動新增
                     </button>
                 </div>
 
-                <!-- 動態行程時間軸容器 -->
+                <!-- 依天數展開/收合的時間軸容器 -->
                 <div id="schedule-container" class="space-y-3">
                     <p class="text-center text-xs text-gray-400 py-4">正在載入行程... ⏳</p>
                 </div>
@@ -89,7 +93,7 @@
             <div id="tab-ai" class="tab-content hidden space-y-4">
                 <div class="cute-card p-4 space-y-2">
                     <h3 class="font-bold text-amber-900 text-sm flex items-center gap-1.5">🌤️ 當地天氣與穿搭</h3>
-                    <p class="text-xs text-gray-600 leading-relaxed">氣溫舒服，風較大,建議攜帶防風外套與保暖配件 🧣。</p>
+                    <p class="text-xs text-gray-600 leading-relaxed">氣溫舒服，風較大，建議攜帶防風外套與保暖配件 🧣。</p>
                 </div>
             </div>
 
@@ -115,9 +119,39 @@
         </div>
     </main>
 
-    <!-- 🌸 手動新增行程的互動彈跳表單 (Modal) -->
+    <!-- 🌸 行程詳細資訊彈跳視窗 (Detail Modal) -->
+    <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-start">
+                <div>
+                    <span id="modal-day" class="text-xs bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full font-bold">Day 1</span>
+                    <span id="modal-time" class="text-xs text-gray-400 font-medium ml-2">12:00</span>
+                </div>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 text-sm font-bold">✕</button>
+            </div>
+            
+            <div>
+                <h3 id="modal-title" class="font-bold text-gray-800 text-base mt-1">行程名稱</h3>
+                <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">📍 詳細地點：<span id="modal-location" class="font-medium text-gray-700"></span></p>
+            </div>
+
+            <!-- 導航按鈕區 -->
+            <div class="pt-2 flex gap-2">
+                <a id="modal-gmap" href="#" target="_blank" class="flex-1 text-center text-xs bg-amber-50 text-amber-800 py-2.5 rounded-xl font-bold hover:bg-amber-100 transition flex items-center justify-center gap-1">
+                    🗺 Google Maps
+                </a>
+                <a id="modal-naver" href="#" target="_blank" class="flex-1 text-center text-xs bg-orange-50 text-orange-800 py-2.5 rounded-xl font-bold hover:bg-orange-100 transition flex items-center justify-center gap-1">
+                    🚗 Naver Map
+                </a>
+            </div>
+
+            <button onclick="closeDetailModal()" class="w-full bg-gray-100 text-gray-600 text-xs py-2 rounded-xl font-bold mt-2">關閉</button>
+        </div>
+    </div>
+
+    <!-- 🌸 手動新增表單 Modal -->
     <div id="schedule-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-5 space-y-4 shadow-2xl animate-fade-in">
+        <div class="cute-card bg-white w-full max-w-sm p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
                 <h3 class="font-bold text-amber-900 text-base">✏️ 手動新增行程</h3>
                 <button onclick="closeAddScheduleModal()" class="text-gray-400 hover:text-gray-600 text-sm font-bold">✕</button>
@@ -137,7 +171,7 @@
                     <input type="text" id="input-title" placeholder="例如：黑豬肉晚餐" class="w-full p-2.5 bg-amber-50/50 border border-amber-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-300">
                 </div>
                 <div>
-                    <label class="block font-bold text-gray-600 mb-1">地圖導航地點（選填，預設同行程名稱）</label>
+                    <label class="block font-bold text-gray-600 mb-1">地圖導航地點（選填）</label>
                     <input type="text" id="input-location" placeholder="例如：濟州島黑豬肉餐廳" class="w-full p-2.5 bg-amber-50/50 border border-amber-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-300">
                 </div>
             </div>
@@ -157,7 +191,7 @@
         <button onclick="switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs font-medium gap-0.5"><span class="text-lg">💰</span>分帳</button>
     </nav>
 
-    <!-- Firebase 與表單邏輯控制 -->
+    <!-- Firebase 與高階UI控制邏輯 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDoc, deleteDoc, doc, setDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -176,6 +210,7 @@
 
         let currentProjectId = null;
         let unsubscribeSchedules = null;
+        let allSchedulesData = [];
 
         function getMyProjectIds() {
             return JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
@@ -290,58 +325,146 @@
             renderProjects();
         }
 
+        // 載入與監聽行程，並進行天數分組與即將到來行程渲染
         function loadSchedules(projId) {
-            const container = document.getElementById('schedule-container');
             const schedulesRef = collection(db, "projects", projId, "schedules");
             const q = query(schedulesRef, orderBy("createdAt", "asc"));
 
             if (unsubscribeSchedules) unsubscribeSchedules();
 
             unsubscribeSchedules = onSnapshot(q, (snapshot) => {
-                container.innerHTML = '';
-                if (snapshot.empty) {
-                    container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前還沒有行程，快點擊上方按鈕新增或用 AI 貼上吧！✨</p>`;
-                    return;
-                }
-
+                allSchedulesData = [];
                 snapshot.forEach((docSnap) => {
-                    const s = docSnap.data();
-                    const sId = docSnap.id;
-
-                    const card = document.createElement('div');
-                    card.className = "cute-card p-4 border-l-4 border-l-orange-400 space-y-2 relative";
-                    card.innerHTML = `
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full font-bold">${s.time || '全天'}</span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-[11px] text-gray-400 font-medium">${s.day || 'Day 1'}</span>
-                                <button onclick="deleteSchedule('${sId}')" class="text-gray-300 hover:text-red-500 text-xs p-1">🗑️</button>
-                            </div>
-                        </div>
-                        <h4 class="font-bold text-gray-800 text-sm">${s.title}</h4>
-                        <p class="text-xs text-gray-500">📍 地點：${s.location || s.title}</p>
-                        <div class="pt-2 flex gap-2">
-                            <a href="https://maps.google.com/?q=${encodeURIComponent(s.location || s.title)}" target="_blank" class="text-xs bg-amber-50 text-amber-800 px-3 py-1.5 rounded-xl font-medium flex items-center gap-1">🗺 Google Maps</a>
-                            <a href="https://map.naver.com/v5/search/${encodeURIComponent(s.location || s.title)}" target="_blank" class="text-xs bg-orange-50 text-orange-800 px-3 py-1.5 rounded-xl font-medium flex items-center gap-1">🚗 Naver Map</a>
-                        </div>
-                    `;
-                    container.appendChild(card);
+                    allSchedulesData.push({ id: docSnap.id, ...docSnap.data() });
                 });
+
+                renderScheduleUI();
             });
         }
 
-        // 🌸 開啟手動新增表單 Modal
+        // 渲染帶有天數折疊與即將到來置頂的 UI
+        function renderScheduleUI() {
+            const container = document.getElementById('schedule-container');
+            const upcomingContainer = document.getElementById('upcoming-card-container');
+            container.innerHTML = '';
+            upcomingContainer.innerHTML = '';
+
+            if (allSchedulesData.length === 0) {
+                upcomingContainer.innerHTML = '';
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前還沒有行程，快點擊上方按鈕新增或用 AI 貼上吧！✨</p>`;
+                return;
+            }
+
+            // 1. 渲染即將到來的行程（取第一筆作為置頂預覽）
+            const nextItem = allSchedulesData[0];
+            upcomingContainer.innerHTML = `
+                <div class="cute-card p-4 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-orange-300 space-y-2 relative shadow-md">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs bg-orange-500 text-white px-2.5 py-0.5 rounded-full font-bold">🚀 即將到來</span>
+                        <span class="text-xs font-bold text-orange-700">${nextItem.day || 'Day 1'} • ${nextItem.time || '全天'}</span>
+                    </div>
+                    <h4 class="font-bold text-gray-800 text-sm">${nextItem.title}</h4>
+                    <button onclick="openDetailModal('${nextItem.id}')" class="w-full bg-white text-orange-600 text-xs py-2 rounded-xl font-bold border border-orange-200 hover:bg-orange-50 transition">
+                        🔍 點擊查看詳細資訊與地圖導航
+                    </button>
+                </div>
+            `;
+
+            // 2. 依照 Day 分組
+            let grouped = {};
+            allSchedulesData.forEach(item => {
+                let dayKey = item.day || 'Day 1';
+                if (!grouped[dayKey]) grouped[dayKey] = [];
+                grouped[dayKey].push(item);
+            });
+
+            // 3. 渲染依天數折疊的清單
+            Object.keys(grouped).forEach((dayKey, index) => {
+                let items = grouped[dayKey];
+                let sectionId = `day_section_${index}`;
+
+                let dayBox = document.createElement('div');
+                dayBox.className = "cute-card overflow-hidden border border-amber-100";
+                
+                // 天數標題列 (可點擊收合/展開)
+                let headerHtml = `
+                    <div onclick="toggleDayCollapse('${sectionId}')" class="bg-amber-100/60 p-3.5 flex justify-between items-center cursor-pointer hover:bg-amber-100 transition">
+                        <h4 class="font-bold text-amber-900 text-xs flex items-center gap-1.5">
+                            📅 ${dayKey} <span class="text-[10px] text-amber-700 font-normal">(${items.length} 個行程)</span>
+                        </h4>
+                        <span id="icon_${sectionId}" class="text-xs text-amber-800 font-bold">▼ 展開</span>
+                    </div>
+                `;
+
+                // 該天底下的行程列表 (預設收合或展開，這裡預設展開第一天，其餘收合)
+                let isExpanded = index === 0;
+                let listHtml = `<div id="${sectionId}" class="${isExpanded ? '' : 'hidden'} p-3 space-y-2.5 bg-white">`;
+
+                items.forEach(s => {
+                    listHtml += `
+                        <div onclick="openDetailModal('${s.id}')" class="p-3 bg-amber-50/40 hover:bg-amber-50 rounded-xl border border-amber-100/80 flex justify-between items-center cursor-pointer transition">
+                            <div class="space-y-0.5">
+                                <span class="text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded font-bold">${s.time || '全天'}</span>
+                                <h5 class="font-bold text-gray-800 text-xs mt-1">${s.title}</h5>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-400">詳情 ➔</span>
+                                <button onclick="event.stopPropagation(); deleteSchedule('${s.id}')" class="text-gray-300 hover:text-red-500 text-xs p-1">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                listHtml += `</div>`;
+
+                dayBox.innerHTML = headerHtml + listHtml;
+                container.appendChild(dayBox);
+            });
+        }
+
+        // 切換天數展開/收合
+        window.toggleDayCollapse = function(sectionId) {
+            const el = document.getElementById(sectionId);
+            const icon = document.getElementById(`icon_${sectionId}`);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.innerText = "▲ 收合";
+            } else {
+                el.classList.add('hidden');
+                icon.innerText = "▼ 展開";
+            }
+        }
+
+        // 開啟詳細資訊 Modal
+        window.openDetailModal = function(id) {
+            const item = allSchedulesData.find(s => s.id === id);
+            if (!item) return;
+
+            document.getElementById('modal-day').innerText = item.day || 'Day 1';
+            document.getElementById('modal-time').innerText = item.time || '全天';
+            document.getElementById('modal-title').innerText = item.title;
+            document.getElementById('modal-location').innerText = item.location || item.title;
+
+            // 設定導航連結
+            const queryText = encodeURIComponent(item.location || item.title);
+            document.getElementById('modal-gmap').href = `https://maps.google.com/?q=${queryText}`;
+            document.getElementById('modal-naver').href = `https://map.naver.com/v5/search/${queryText}`;
+
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        window.closeDetailModal = function() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
         window.openAddScheduleModal = function() {
             if (!currentProjectId) return;
             document.getElementById('schedule-modal').classList.remove('hidden');
         }
 
-        // 🌸 關閉手動新增表單 Modal
         window.closeAddScheduleModal = function() {
             document.getElementById('schedule-modal').classList.add('hidden');
         }
 
-        // 🌸 提交手動新增表單
         window.submitScheduleForm = async function() {
             if (!currentProjectId) return;
             const day = document.getElementById('input-day').value.trim() || "Day 1";
@@ -349,24 +472,15 @@
             const title = document.getElementById('input-title').value.trim();
             let location = document.getElementById('input-location').value.trim();
 
-            if (!title) {
-                alert("請填寫行程名稱！");
-                return;
-            }
-            if (!location) {
-                location = title;
-            }
+            if (!title) { alert("請填寫行程名稱！"); return; }
+            if (!location) location = title;
 
             try {
                 await addDoc(collection(db, "projects", currentProjectId, "schedules"), {
-                    day,
-                    time,
-                    title,
-                    location,
+                    day, time, title, location,
                     createdAt: Date.now()
                 });
                 closeAddScheduleModal();
-                // 清空欄位
                 document.getElementById('input-title').value = '';
                 document.getElementById('input-location').value = '';
                 alert("✨ 行程新增成功！");
@@ -381,17 +495,16 @@
             if (confirm("確定要刪除這個行程嗎？")) {
                 try {
                     await deleteDoc(doc(db, "projects", currentProjectId, "schedules", scheduleId));
-                } catch (e) {
-                    console.error("刪除失敗", e);
-                }
+                } catch (e) { console.error("刪除失敗", e); }
             }
         }
 
+        // AI 智慧貼上清洗引擎
         window.parseSmartPaste = async function() {
             const rawText = document.getElementById('smart-paste-input').value.trim();
             if(!rawText) { alert("請先輸入或貼上行程文字喔！"); return; }
 
-            alert("✨ AI 正在智慧解析與清洗文字中...");
+            alert("✨ AI 正在進行高精度智慧拆解與清洗中...");
 
             const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentDay = "Day 1";
@@ -406,7 +519,10 @@
                         line.includes("---") || 
                         line.includes("旅遊專案") || 
                         line.includes("簡介：") || 
-                        line.length < 4
+                        line.includes("備註") || 
+                        line.includes("預訂") ||
+                        /^\d{8,}$/.test(line) || 
+                        line.length < 3
                     ) {
                         continue; 
                     }
@@ -422,7 +538,7 @@
 
                     let cleanTitle = line
                         .replace(/^\d{1,2}[:：]\d{2}\s*/, '')
-                        .replace(/^[•\-\*]\s*/, '')
+                        .replace(/^[-•\*\d\.]+\s*/, '')
                         .trim();
 
                     if (!cleanTitle || cleanTitle.length < 2) continue;
@@ -443,7 +559,7 @@
                 }
 
                 document.getElementById('smart-paste-input').value = "";
-                alert(`✨ 成功！已智慧清洗並幫您加入了 ${addedCount} 筆乾淨的行程卡片！`);
+                alert(`✨ 成功！已過濾雜訊，精準幫您加入了 ${addedCount} 筆乾淨的行程卡片！`);
             } catch (e) {
                 console.error("AI 拆解失敗", e);
                 alert("解析發生錯誤，請再試一次");
