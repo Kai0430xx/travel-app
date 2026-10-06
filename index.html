@@ -6,36 +6,38 @@
     <title>我們的溫馨小旅行 ✈️</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* 套用全域可愛圓潤字型與溫柔奶茶色背景 */
         body { 
-            background-color: #faf6f0; 
+            background-color: #fcf9f2; 
             max-width: 480px; 
             margin: auto; 
             min-height: 100vh; 
             position: relative; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            letter-spacing: 0.3px;
         }
         .cute-card {
             background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(220, 180, 150, 0.12);
-            border: 1px solid #fcefe6;
+            border-radius: 24px;
+            box-shadow: 0 6px 24px rgba(220, 170, 140, 0.15);
+            border: 2px solid #fcefe6;
         }
     </style>
 </head>
-<body class="pb-24 text-gray-700">
+<body class="pb-28 text-gray-800">
 
     <!-- 頂部標題區 -->
-    <header class="bg-gradient-to-r from-amber-200 to-orange-200 text-amber-900 p-4 shadow-sm sticky top-0 z-50 flex justify-between items-center rounded-b-3xl">
+    <header class="bg-gradient-to-r from-amber-200 to-orange-200 text-amber-950 p-4.5 shadow-sm sticky top-0 z-50 flex justify-between items-center rounded-b-3xl">
         <div class="flex items-center gap-2.5">
-            <button id="back-btn" onclick="backToProjects()" class="hidden bg-white/80 hover:bg-white text-amber-900 px-2.5 py-1.5 rounded-full text-xs font-bold shadow-sm transition active:scale-95 flex items-center gap-1">
+            <button id="back-btn" onclick="backToProjects()" class="hidden bg-white/90 hover:bg-white text-amber-950 px-3 py-1.5 rounded-full text-xs font-bold shadow-sm transition active:scale-95 flex items-center gap-1">
                 ⬅️ 專案
             </button>
             <div>
-                <h1 id="header-title" class="text-base font-bold flex items-center gap-1.5">🌸 我的旅遊小專案</h1>
-                <p id="header-sub" class="text-[11px] text-amber-800 opacity-80 mt-0.5">選擇你的冒險旅程 ✨</p>
+                <h1 id="header-title" class="text-base font-black flex items-center gap-1.5">🌸 我的旅遊小專案</h1>
+                <p id="header-sub" class="text-xs text-amber-900 opacity-80 mt-0.5">選擇你的冒險旅程 ✨</p>
             </div>
         </div>
-        <button id="share-btn" onclick="shareCurrentProject()" class="hidden bg-white/85 hover:bg-white text-amber-900 text-xs px-3.5 py-1.5 rounded-full font-medium shadow-sm transition active:scale-95">
+        <button id="share-btn" onclick="shareCurrentProject()" class="hidden bg-white/90 hover:bg-white text-amber-950 text-xs px-3.5 py-2 rounded-full font-bold shadow-sm transition active:scale-95">
             ✨ 分享專案
         </button>
     </header>
@@ -46,14 +48,14 @@
         <!-- 視圖 0：專案選擇首頁 -->
         <div id="view-projects" class="space-y-4">
             <div class="flex justify-between items-center px-1">
-                <h2 class="font-bold text-amber-900 text-sm">🧳 我的旅遊專案清單</h2>
-                <button onclick="openNewProjectModal()" class="bg-orange-500 text-white text-xs px-3.5 py-2 rounded-xl font-bold shadow-md shadow-orange-200 transition active:scale-95">
+                <h2 class="font-black text-amber-950 text-sm">🧳 我的旅遊專案清單</h2>
+                <button onclick="openNewProjectModal()" class="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs px-4 py-2.5 rounded-2xl font-black shadow-md shadow-orange-200 transition active:scale-95">
                     ＋ 新增專案
                 </button>
             </div>
 
             <div id="project-list" class="space-y-3">
-                <p class="text-center text-xs text-gray-400 py-6">載入中... ☁️</p>
+                <p class="text-center text-xs text-gray-400 py-8">載入中... ☁️</p>
             </div>
         </div>
 
@@ -68,12 +70,12 @@
 
                 <!-- 行程列表標題與功能按鈕列 -->
                 <div class="flex justify-between items-center px-1">
-                    <h3 class="font-bold text-gray-600 text-xs tracking-wider">📅 完整行程時間軸</h3>
+                    <h3 class="font-black text-gray-700 text-xs tracking-wider">📅 完整行程時間軸</h3>
                     <div class="flex gap-2">
-                        <button onclick="openSmartPasteModal()" class="bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs px-3 py-2 rounded-xl font-bold shadow-sm shadow-orange-200 transition active:scale-95">
+                        <button onclick="openSmartPasteModal()" class="bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs px-3.5 py-2 rounded-2xl font-black shadow-sm shadow-orange-200 transition active:scale-95">
                             ✨ 智慧導入
                         </button>
-                        <button onclick="openAddScheduleModal()" class="bg-amber-500 text-white text-xs px-3 py-2 rounded-xl font-bold shadow-sm shadow-amber-200 transition active:scale-95">
+                        <button onclick="openAddScheduleModal()" class="bg-amber-500 text-white text-xs px-3.5 py-2 rounded-2xl font-black shadow-sm shadow-amber-200 transition active:scale-95">
                             ＋ 手動新增
                         </button>
                     </div>
@@ -81,26 +83,26 @@
 
                 <!-- 依天數展開/收合的時間軸容器 -->
                 <div id="schedule-container" class="space-y-3">
-                    <p class="text-center text-xs text-gray-400 py-4">正在載入行程... ⏳</p>
+                    <p class="text-center text-xs text-gray-400 py-6">正在載入行程... ⏳</p>
                 </div>
             </div>
 
             <!-- 分頁 2：AI 錦囊 -->
             <div id="tab-ai" class="tab-content hidden space-y-4">
-                <div class="cute-card p-4 space-y-2">
-                    <h3 class="font-bold text-amber-900 text-sm flex items-center gap-1.5">🌤️ 當地天氣與穿搭</h3>
+                <div class="cute-card p-5 space-y-2">
+                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌤️ 當地天氣與穿搭</h3>
                     <p class="text-xs text-gray-600 leading-relaxed">氣溫舒服，風較大，建議攜帶防風外套與保暖配件 🧣。</p>
                 </div>
             </div>
 
             <!-- 分頁 3：語言 -->
             <div id="tab-lang" class="tab-content hidden space-y-3">
-                <div class="cute-card p-3.5 flex justify-between items-center">
+                <div class="cute-card p-4 flex justify-between items-center">
                     <div>
-                        <p class="text-[11px] text-gray-400 font-medium">請幫我結帳</p>
-                        <p class="font-bold text-gray-800 text-sm mt-0.5">계산해주세요.</p>
+                        <p class="text-xs text-gray-400 font-medium">請幫我結帳</p>
+                        <p class="font-black text-gray-800 text-base mt-0.5">계산해주세요.</p>
                     </div>
-                    <button onclick="speakText('계산해주세요.')" class="bg-orange-50 text-orange-600 p-2.5 rounded-2xl text-base">🔊</button>
+                    <button onclick="speakText('계산해주세요.')" class="bg-orange-50 text-orange-600 p-3 rounded-2xl text-lg font-bold">🔊</button>
                 </div>
             </div>
 
@@ -117,90 +119,90 @@
 
     <!-- 🌸 行程詳細資訊彈跳視窗 (點擊任一卡片觸發) -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-5 space-y-4 shadow-2xl">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-start">
                 <div>
-                    <span id="modal-day" class="text-xs bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full font-bold">Day 1</span>
-                    <span id="modal-time" class="text-xs text-gray-400 font-medium ml-2">12:00</span>
+                    <span id="modal-day" class="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-black">Day 1</span>
+                    <span id="modal-time" class="text-xs text-gray-400 font-bold ml-2">12:00</span>
                 </div>
-                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 text-sm font-bold">✕</button>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
             
             <div>
-                <h3 id="modal-title" class="font-bold text-gray-800 text-base mt-1">行程名稱</h3>
-                <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">📍 詳細地點：<span id="modal-location" class="font-medium text-gray-700"></span></p>
+                <h3 id="modal-title" class="font-black text-gray-900 text-base mt-2">行程名稱</h3>
+                <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">📍 詳細地點：<span id="modal-location" class="font-bold text-gray-800"></span></p>
             </div>
 
             <!-- 導航按鈕區 -->
-            <div class="pt-2 flex gap-2">
-                <a id="modal-gmap" href="#" target="_blank" class="flex-1 text-center text-xs bg-amber-50 text-amber-800 py-2.5 rounded-xl font-bold hover:bg-amber-100 transition flex items-center justify-center gap-1">
+            <div class="pt-3 flex gap-2.5">
+                <a id="modal-gmap" href="#" target="_blank" class="flex-1 text-center text-xs bg-amber-50 text-amber-900 py-3 rounded-2xl font-black hover:bg-amber-100 transition flex items-center justify-center gap-1 shadow-sm">
                     🗺 Google Maps
                 </a>
-                <a id="modal-naver" href="#" target="_blank" class="flex-1 text-center text-xs bg-orange-50 text-orange-800 py-2.5 rounded-xl font-bold hover:bg-orange-100 transition flex items-center justify-center gap-1">
+                <a id="modal-naver" href="#" target="_blank" class="flex-1 text-center text-xs bg-orange-50 text-orange-900 py-3 rounded-2xl font-black hover:bg-orange-100 transition flex items-center justify-center gap-1 shadow-sm">
                     🚗 Naver Map
                 </a>
             </div>
 
-            <button onclick="closeDetailModal()" class="w-full bg-gray-100 text-gray-600 text-xs py-2 rounded-xl font-bold mt-2">關閉</button>
+            <button onclick="closeDetailModal()" class="w-full bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-bold mt-1">關閉</button>
         </div>
     </div>
 
-    <!-- 🌸 智慧導入大格子彈跳視窗 (Smart Paste Modal) -->
+    <!-- 🌸 智慧導入大格子彈跳視窗 -->
     <div id="smart-paste-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-md p-5 space-y-4 shadow-2xl">
+        <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
-                <h3 class="font-bold text-amber-900 text-base">✨ AI 智慧導入行程</h3>
-                <button onclick="closeSmartPasteModal()" class="text-gray-400 hover:text-gray-600 text-sm font-bold">✕</button>
+                <h3 class="font-black text-amber-950 text-base">✨ AI 智慧導入行程</h3>
+                <button onclick="closeSmartPasteModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
             <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。AI 會自動過濾雜訊、辨識天數與時間，並自動拆解成乾淨的時間軸卡片！</p>
-            <textarea id="smart-paste-input" rows="7" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3 bg-amber-50/50 border border-amber-100 rounded-xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
-            <div class="flex gap-2 pt-1">
-                <button onclick="closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-2.5 rounded-xl font-bold">取消</button>
-                <button onclick="parseSmartPaste()" class="flex-1 bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs py-2.5 rounded-xl font-bold shadow-md shadow-orange-200">開始智慧拆解</button>
+            <textarea id="smart-paste-input" rows="8" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3.5 bg-amber-50/50 border border-amber-100 rounded-2xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
+            <div class="flex gap-2.5 pt-1">
+                <button onclick="closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-black">取消</button>
+                <button onclick="parseSmartPaste()" class="flex-1 bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs py-3 rounded-2xl font-black shadow-md shadow-orange-200">開始智慧拆解</button>
             </div>
         </div>
     </div>
 
     <!-- 🌸 手動新增表單 Modal -->
     <div id="schedule-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-5 space-y-4 shadow-2xl">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
-                <h3 class="font-bold text-amber-900 text-base">✏️ 手動新增行程</h3>
-                <button onclick="closeAddScheduleModal()" class="text-gray-400 hover:text-gray-600 text-sm font-bold">✕</button>
+                <h3 class="font-black text-amber-950 text-base">✏️ 手動新增行程</h3>
+                <button onclick="closeAddScheduleModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
             
             <div class="space-y-3 text-xs">
                 <div>
                     <label class="block font-bold text-gray-600 mb-1">天數（例如：Day 1）</label>
-                    <input type="text" id="input-day" value="Day 1" class="w-full p-2.5 bg-amber-50/50 border border-amber-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-300">
+                    <input type="text" id="input-day" value="Day 1" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
                 </div>
                 <div>
                     <label class="block font-bold text-gray-600 mb-1">時間（例如：14:00）</label>
-                    <input type="text" id="input-time" value="10:00" class="w-full p-2.5 bg-amber-50/50 border border-amber-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-300">
+                    <input type="text" id="input-time" value="10:00" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
                 </div>
                 <div>
                     <label class="block font-bold text-gray-600 mb-1">行程名稱</label>
-                    <input type="text" id="input-title" placeholder="例如：黑豬肉晚餐" class="w-full p-2.5 bg-amber-50/50 border border-amber-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-300">
+                    <input type="text" id="input-title" placeholder="例如：黑豬肉晚餐" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
                 </div>
                 <div>
                     <label class="block font-bold text-gray-600 mb-1">地圖導航地點（選填）</label>
-                    <input type="text" id="input-location" placeholder="例如：濟州島黑豬肉餐廳" class="w-full p-2.5 bg-amber-50/50 border border-amber-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-300">
+                    <input type="text" id="input-location" placeholder="例如：濟州島黑豬肉餐廳" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
                 </div>
             </div>
 
-            <div class="flex gap-2 pt-2">
-                <button onclick="closeAddScheduleModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-2.5 rounded-xl font-bold transition active:scale-95">取消</button>
-                <button onclick="submitScheduleForm()" class="flex-1 bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs py-2.5 rounded-xl font-bold shadow-md shadow-orange-200 transition active:scale-95">確認新增</button>
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="closeAddScheduleModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-black transition active:scale-95">取消</button>
+                <button onclick="submitScheduleForm()" class="flex-1 bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs py-3 rounded-2xl font-black shadow-md shadow-orange-200 transition active:scale-95">確認新增</button>
             </div>
         </div>
     </div>
 
     <!-- 底部導覽列 -->
-    <nav id="bottom-nav" class="hidden fixed bottom-3 left-4 right-4 max-w-[448px] mx-auto bg-white/90 backdrop-blur-md border border-amber-100 flex justify-around py-3 rounded-2xl shadow-xl z-50">
-        <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-orange-500 text-xs font-bold gap-0.5"><span class="text-lg">📅</span>行程</button>
-        <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-medium gap-0.5"><span class="text-lg">🤖</span>錦囊</button>
-        <button onclick="switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs font-medium gap-0.5"><span class="text-lg">🗣️</span>語言</button>
-        <button onclick="switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs font-medium gap-0.5"><span class="text-lg">💰</span>分帳</button>
+    <nav id="bottom-nav" class="hidden fixed bottom-3 left-4 right-4 max-w-[448px] mx-auto bg-white/95 backdrop-blur-md border border-amber-100 flex justify-around py-3 rounded-2xl shadow-xl z-50">
+        <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-orange-500 text-xs font-black gap-0.5"><span class="text-xl">📅</span>行程</button>
+        <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🤖</span>錦囊</button>
+        <button onclick="switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🗣️</span>語言</button>
+        <button onclick="switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💰</span>分帳</button>
     </nav>
 
     <!-- Firebase 與邏輯控制 -->
@@ -247,7 +249,7 @@
             const myIds = getMyProjectIds();
 
             if (myIds.length === 0) {
-                list.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前沒有專案。點上方按鈕新增，或透過朋友的分享連結加入！✨</p>`;
+                list.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前沒有專案。點上方按鈕新增，或透過朋友的分享連結加入！✨</p>`;
                 return;
             }
 
@@ -259,17 +261,17 @@
                     if (docSnap.exists()) {
                         const p = docSnap.data();
                         const card = document.createElement('div');
-                        card.className = "cute-card p-4 space-y-2 relative transition hover:border-orange-300";
+                        card.className = "cute-card p-4.5 space-y-2 relative transition hover:border-orange-300";
                         card.innerHTML = `
                             <div class="flex justify-between items-center">
-                                <span class="text-xs bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full font-bold">進行中 🚗</span>
+                                <span class="text-xs bg-orange-100 text-orange-800 px-3 py-0.5 rounded-full font-black">進行中 🚗</span>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[11px] text-gray-400 font-medium">${p.dates}</span>
-                                    <button onclick="event.stopPropagation(); removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-xs p-1" title="從我的清單移除">🗑️</button>
+                                    <span class="text-xs text-gray-400 font-bold">${p.dates}</span>
+                                    <button onclick="event.stopPropagation(); removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1" title="從我的清單移除">🗑️</button>
                                 </div>
                             </div>
                             <div onclick="enterProject('${id}', '${p.name}', '${p.dates}')" class="cursor-pointer">
-                                <h3 class="font-bold text-gray-800 text-base">🌸 ${p.name}</h3>
+                                <h3 class="font-black text-gray-900 text-base mt-1">🌸 ${p.name}</h3>
                                 <p class="text-xs text-gray-500 mt-0.5">點擊進入專案行程管理 ✨</p>
                             </div>
                         `;
@@ -367,13 +369,13 @@
             // 即將到來的行程置頂
             const nextItem = allSchedulesData[0];
             upcomingContainer.innerHTML = `
-                <div onclick="openDetailModal('${nextItem.id}')" class="cute-card p-4 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-orange-300 space-y-2 relative shadow-md cursor-pointer hover:scale-[1.01] transition">
+                <div onclick="openDetailModal('${nextItem.id}')" class="cute-card p-4.5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-orange-300 space-y-2 relative shadow-md cursor-pointer hover:scale-[1.01] transition">
                     <div class="flex justify-between items-center">
-                        <span class="text-xs bg-orange-500 text-white px-2.5 py-0.5 rounded-full font-bold">🚀 即將到來</span>
-                        <span class="text-xs font-bold text-orange-700">${nextItem.day || 'Day 1'} • ${nextItem.time || '全天'}</span>
+                        <span class="text-xs bg-orange-500 text-white px-3 py-1 rounded-full font-black">🚀 即將到來</span>
+                        <span class="text-xs font-black text-orange-800">${nextItem.day || 'Day 1'} • ${nextItem.time || '全天'}</span>
                     </div>
-                    <h4 class="font-bold text-gray-800 text-sm">${nextItem.title}</h4>
-                    <p class="text-[11px] text-orange-800 opacity-80">👉 點擊卡片查看詳細地點與地圖導航</p>
+                    <h4 class="font-black text-gray-900 text-sm mt-1">${nextItem.title}</h4>
+                    <p class="text-[11px] text-orange-900 font-bold opacity-80">👉 點擊卡片查看詳細地點與地圖導航</p>
                 </div>
             `;
 
@@ -393,11 +395,11 @@
                 dayBox.className = "cute-card overflow-hidden border border-amber-100";
                 
                 let headerHtml = `
-                    <div onclick="toggleDayCollapse('${sectionId}')" class="bg-amber-100/60 p-3.5 flex justify-between items-center cursor-pointer hover:bg-amber-100 transition">
-                        <h4 class="font-bold text-amber-900 text-xs flex items-center gap-1.5">
-                            📅 ${dayKey} <span class="text-[10px] text-amber-700 font-normal">(${items.length} 個行程)</span>
+                    <div onclick="toggleDayCollapse('${sectionId}')" class="bg-amber-100/70 p-4 flex justify-between items-center cursor-pointer hover:bg-amber-100 transition">
+                        <h4 class="font-black text-amber-950 text-xs flex items-center gap-1.5">
+                            📅 ${dayKey} <span class="text-xs text-amber-800 font-bold">(${items.length} 個行程)</span>
                         </h4>
-                        <span id="icon_${sectionId}" class="text-xs text-amber-800 font-bold">▼ 展開</span>
+                        <span id="icon_${sectionId}" class="text-xs text-amber-900 font-black">▼ 展開</span>
                     </div>
                 `;
 
@@ -406,14 +408,13 @@
 
                 items.forEach(s => {
                     listHtml += `
-                        <div onclick="openDetailModal('${s.id}')" class="p-3 bg-amber-50/40 hover:bg-amber-50 rounded-xl border border-amber-100/80 flex justify-between items-center cursor-pointer transition">
-                            <div class="space-y-0.5">
-                                <span class="text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded font-bold">${s.time || '全天'}</span>
-                                <h5 class="font-bold text-gray-800 text-xs mt-1">${s.title}</h5>
+                        <div onclick="openDetailModal('${s.id}')" class="p-3.5 bg-amber-50/40 hover:bg-amber-50 rounded-2xl border border-amber-100/80 flex justify-between items-center cursor-pointer transition">
+                            <div class="space-y-1">
+                                <span class="text-[11px] bg-orange-100 text-orange-800 px-2.5 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
+                                <h5 class="font-black text-gray-900 text-sm mt-1">${s.title}</h5>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-[11px] text-gray-400">詳情 ➔</span>
-                                <button onclick="event.stopPropagation(); deleteSchedule('${s.id}')" class="text-gray-300 hover:text-red-500 text-xs p-1">🗑️</button>
+                            <div>
+                                <button onclick="event.stopPropagation(); deleteSchedule('${s.id}')" class="text-gray-300 hover:text-red-500 text-sm p-1.5">🗑️</button>
                             </div>
                         </div>
                     `;
@@ -458,7 +459,6 @@
             document.getElementById('detail-modal').classList.add('hidden');
         }
 
-        // 智慧導入 Modal 控制
         window.openSmartPasteModal = function() {
             if (!currentProjectId) return;
             document.getElementById('smart-paste-modal').classList.remove('hidden');
@@ -511,7 +511,7 @@
             }
         }
 
-        // AI 智慧導入清洗解析
+        // AI 智慧導入清洗解析 (完美剝離重複時間與雜訊)
         window.parseSmartPaste = async function() {
             const rawText = document.getElementById('smart-paste-input').value.trim();
             if(!rawText) { alert("請先輸入或貼上行程文字喔！"); return; }
@@ -548,6 +548,7 @@
                     let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
                     let timeStr = timeMatch ? timeMatch[1] : "彈性";
 
+                    // 徹底洗掉標題裡的時間與多餘符號，保證不重複
                     let cleanTitle = line
                         .replace(/^\d{1,2}[:：]\d{2}\s*/, '')
                         .replace(/^[-•\*\d\.]+\s*/, '')
@@ -590,10 +591,10 @@
         window.switchTab = function(tabName) {
             ['schedule', 'ai', 'lang', 'split'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).className = "flex flex-col items-center text-gray-400 text-xs font-medium gap-0.5";
+                document.getElementById(`nav-${t}`).className = "flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5";
             });
             document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            document.getElementById(`nav-${tabName}`).className = "flex flex-col items-center text-orange-500 text-xs font-bold gap-0.5";
+            document.getElementById(`nav-${tabName}`).className = "flex flex-col items-center text-orange-500 text-xs font-black gap-0.5";
         }
 
         window.speakText = function(text) {
