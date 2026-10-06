@@ -91,16 +91,16 @@
                 <div id="dynamic-reminders-container" class="space-y-3.5"></div>
             </div>
 
-            <!-- 分頁 3：語言 (全新擴充完整句子庫與大框互動) -->
+            <!-- 分頁 3：語言 (左分類、右純中文清單、上大框點擊顯示翻譯與發音) -->
             <div id="tab-lang" class="tab-content hidden space-y-4">
                 
-                <!-- 🌟 頂部大展示框 -->
+                <!-- 🌟 頂部大展示框 (點擊右側後才顯示該國語言與發音) -->
                 <div class="cute-card p-6 bg-gradient-to-br from-amber-50/80 to-orange-50/80 border-2 border-orange-300 space-y-3 shadow-md text-center relative">
                     <div class="absolute top-3 left-4">
                         <span class="text-[10px] bg-orange-200 text-orange-900 px-2.5 py-0.5 rounded-full font-black">🗣️ 實用翻譯發音</span>
                     </div>
                     
-                    <div class="pt-2">
+                    <div class="pt-2 space-y-1">
                         <p id="display-cn" class="text-xs text-gray-500 font-bold">請點選下方分類與句子 ▼</p>
                         <h2 id="display-foreign" class="text-xl font-black text-amber-950 mt-1 break-words">請選擇想說的話 ✨</h2>
                     </div>
@@ -112,7 +112,7 @@
                     </div>
                 </div>
 
-                <!-- 左右雙欄配置：左下分類選單、右下句子清單 -->
+                <!-- 左右雙欄配置 -->
                 <div class="grid grid-cols-12 gap-3">
                     
                     <!-- 左下：分類按鈕清單 (4欄) -->
@@ -120,7 +120,7 @@
                         <!-- 動態產生分類按鈕 -->
                     </div>
 
-                    <!-- 右下：該分類對應的中文句子清單 (8欄) -->
+                    <!-- 右下：該分類對應的「純中文」句子清單 (8欄) -->
                     <div id="lang-phrases" class="col-span-8 space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
                         <div class="cute-card p-4 text-center text-xs text-gray-400">請先點選左側分類</div>
                     </div>
@@ -266,7 +266,7 @@
     <nav id="bottom-nav" class="hidden fixed bottom-3 left-4 right-4 max-w-[448px] mx-auto bg-white/95 backdrop-blur-md border border-amber-100 flex justify-around py-3 rounded-2xl shadow-xl z-50">
         <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-orange-500 text-xs font-black gap-0.5"><span class="text-xl">📅</span>行程</button>
         <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💡</span>提醒</button>
-        <button onclick="switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🗣️️</span>語言</button>
+        <button onclick="switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🗣</span>語言</button>
         <button onclick="switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💰</span>分帳</button>
     </nav>
 
@@ -295,7 +295,7 @@
         let unsubscribeSchedules = null;
         let allSchedulesData = [];
 
-        // 🌟 擴充後的完整多國語言資料庫（包含餐廳、購物、交通、住宿、突發狀況）
+        // 🌟 擴充至極豐富的萬國語言庫（右側僅顯示中文，點擊後上方大框才顯示翻譯與發音）
         const languageData = {
             korea: {
                 langCode: 'ko-KR',
@@ -341,7 +341,7 @@
                     ],
                     emergency: [
                         { cn: "救命！我的護照（或錢包）被偷了！", foreign: "살려주세요! 여권(또는 지갑)을 도둑맞았어요!" },
-                        { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "몸이 안 좋아요. 근처에 약국이나 병원이 있어요?" },
+                        { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "몸이 안 좋아요. 근처에 병원이 있어요?" },
                         { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "실례지만 길을 잃었어요. 경찰에 신고 좀 도와주세요." }
                     ]
                 }
@@ -428,7 +428,7 @@
                         { cn: "請問離這裡最近的地鐵站（或車站）在哪裡？", foreign: "สถานีรถไฟฟ้าที่ใกล้ที่สุดอยู่ที่ไหนครับ?" },
                         { cn: "請問怎麼去這個地方？", foreign: "ไปที่นี่อย่างไรครับ?" },
                         { cn: "請問這班車會到這裡嗎？", foreign: "รถคันนี้ไปที่นี่ไหมครับ?" },
-                        { cn: "我要買一張到這裡的單程票（或來回票）。", foreign: "ขอซื้อตั๋วเที่ยวเดียว (ไป-Gลับ) ไปที่นี่ครับ" },
+                        { cn: "我要買一張到這裡的單程票（或來回票）。", foreign: "ขอซื้อตั๋วเที่ยวเดียว (ไป-กลับ) ไปที่นี่ครับ" },
                         { cn: "請載我到這個地址。", foreign: "ไปส่งที่อยู่นี้ครับ" }
                     ],
                     hotel: [
@@ -489,7 +489,7 @@
                     emergency: [
                         { cn: "救命！我的護照（或錢包）被偷了！", foreign: "Help! My passport (wallet) has been stolen!" },
                         { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "I feel sick. Is there a pharmacy or hospital nearby?" },
-                        { cn: "不好意思，我迷路了，可以幫忙報警嗎? ", foreign: "Excuse me, I'm lost. Can you help me call the police?" }
+                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "Excuse me, I'm lost. Can you help me call the police?" }
                     ]
                 }
             }
@@ -638,6 +638,7 @@
             renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
         }
 
+        // 🌟 渲染右側句子清單 (右下僅顯示中文)
         function renderPhrases(phrases) {
             const phraseContainer = document.getElementById('lang-phrases');
             phraseContainer.innerHTML = '';
@@ -648,7 +649,6 @@
                 card.innerHTML = `
                     <div>
                         <p class="text-xs text-gray-800 font-bold">${p.cn}</p>
-                        <p class="text-[11px] text-orange-700 font-black mt-0.5">${p.foreign}</p>
                     </div>
                     <span class="text-base shrink-0 ml-2">👉</span>
                 `;
