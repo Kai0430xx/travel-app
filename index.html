@@ -86,19 +86,45 @@
                 </div>
             </div>
 
-            <!-- 分頁 2：提醒 (萬國自動偵測渲染) -->
+            <!-- 分頁 2：提醒 -->
             <div id="tab-ai" class="tab-content hidden space-y-3.5">
                 <div id="dynamic-reminders-container" class="space-y-3.5"></div>
             </div>
 
-            <!-- 分頁 3：語言 -->
-            <div id="tab-lang" class="tab-content hidden space-y-3">
-                <div class="cute-card p-4 flex justify-between items-center">
-                    <div>
-                        <p class="text-xs text-gray-400 font-medium">請幫我結帳</p>
-                        <p class="font-black text-gray-800 text-base mt-0.5">계산해주세요.</p>
+            <!-- 分頁 3：語言 (全新互動式大框與左右分類清單) -->
+            <div id="tab-lang" class="tab-content hidden space-y-4">
+                
+                <!-- 🌟 頂部大展示框 -->
+                <div class="cute-card p-6 bg-gradient-to-br from-amber-50/80 to-orange-50/80 border-2 border-orange-300 space-y-3 shadow-md text-center relative">
+                    <div class="absolute top-3 left-4">
+                        <span class="text-[10px] bg-orange-200 text-orange-900 px-2.5 py-0.5 rounded-full font-black">🗣️ 實用翻譯發音</span>
                     </div>
-                    <button onclick="speakText('계산해주세요.')" class="bg-orange-50 text-orange-600 p-3 rounded-2xl text-lg font-bold">🔊</button>
+                    
+                    <div class="pt-2">
+                        <p id="display-cn" class="text-xs text-gray-500 font-bold">請點選下方分類與句子 ▼</p>
+                        <h2 id="display-foreign" class="text-2xl font-black text-amber-950 mt-1 break-words">請選擇想說的話 ✨</h2>
+                    </div>
+
+                    <div class="pt-1">
+                        <button onclick="speakCurrentPhrase()" class="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-5 py-2.5 rounded-2xl text-xs font-black shadow-md shadow-orange-200 transition active:scale-95 inline-flex items-center gap-1.5">
+                            🔊 點擊朗讀
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 左右雙欄配置：左下分類選單、右下句子清單 -->
+                <div class="grid grid-cols-12 gap-3">
+                    
+                    <!-- 左下：分類按鈕清單 (4欄) -->
+                    <div id="lang-categories" class="col-span-4 space-y-2">
+                        <!-- 動態產生分類按鈕 -->
+                    </div>
+
+                    <!-- 右下：該分類對應的中文句子清單 (8欄) -->
+                    <div id="lang-phrases" class="col-span-8 space-y-2">
+                        <div class="cute-card p-4 text-center text-xs text-gray-400">請先點選左側分類</div>
+                    </div>
+
                 </div>
             </div>
 
@@ -263,8 +289,137 @@
 
         let currentProjectId = null;
         let currentProjectName = "";
+        let currentDestinationLang = 'ko-KR'; // 預設韓文
+        let currentActivePhrase = { cn: "請選擇想說的話", foreign: "請選擇想說的話" };
+
         let unsubscribeSchedules = null;
         let allSchedulesData = [];
+
+        // 🌟 各國語言資料庫（包含餐廳、購物、交通、問路、緊急）
+        const languageData = {
+            korea: {
+                langCode: 'ko-KR',
+                categories: [
+                    { id: 'restaurant', name: '🍽️ 餐廳' },
+                    { id: 'shopping', name: '🛍️ 購物' },
+                    { id: 'transport', name: '🚗 交通' },
+                    { id: 'emergency', name: '🚨 緊急' }
+                ],
+                phrases: {
+                    restaurant: [
+                        { cn: "請幫我結帳。", foreign: "계산해주세요." },
+                        { cn: "這個多少錢？", foreign: "이거 얼마예요?" },
+                        { cn: "請問有中文菜單嗎？", foreign: "중국어 메뉴판 있어요?" },
+                        { cn: "請給我這個，謝謝。", foreign: "이거 주세요." },
+                        { cn: "請問可以刷卡嗎？", foreign: "카드 되나요?" },
+                        { cn: "很好吃，謝謝！", foreign: "잘 먹었습니다!" }
+                    ],
+                    shopping: [
+                        { cn: "可以試穿嗎？", foreign: "입어봐도 되나요?" },
+                        { cn: "請問有大一點的尺寸嗎？", foreign: "더 큰 사이즈 있어요?" },
+                        { cn: "請幫我退稅，謝謝。", foreign: "택스 프리 해주세요." },
+                        { cn: "不用了，謝謝。", foreign: "괜찮습니다." }
+                    ],
+                    transport: [
+                        { cn: "請問去這裡怎麼走？", foreign: "여기에 어떻게 가요?" },
+                        { cn: "請在這裡停車。", foreign: "여기서 세워주세요." },
+                        { cn: "機場在哪裡？", foreign: "공항이 어디예요?" }
+                    ],
+                    emergency: [
+                        { cn: "請幫幫我！", foreign: "도와주세요!" },
+                        { cn: "我迷路了。", foreign: "길을 잃었어요." },
+                        { cn: "這裡附近有醫院嗎？", foreign: "근처에 병원이 있어요?" }
+                    ]
+                }
+            },
+            japan: {
+                langCode: 'ja-JP',
+                categories: [
+                    { id: 'restaurant', name: '🍽️ 餐廳' },
+                    { id: 'shopping', name: '🛍️ 購物' },
+                    { id: 'transport', name: '🚆 交通' },
+                    { id: 'emergency', name: '🚨 緊急' }
+                ],
+                phrases: {
+                    restaurant: [
+                        { cn: "請幫我結帳。", foreign: "お会計をお願いします。" },
+                        { cn: "這個多少錢？", foreign: "これはいくらですか？" },
+                        { cn: "請問有中文菜單嗎？", foreign: "中国語のメニューはありますか？" },
+                        { cn: "請給我這個。", foreign: "これをください。" },
+                        { cn: "請問可以刷卡嗎？", foreign: "カードは使えますか？" }
+                    ],
+                    shopping: [
+                        { cn: "可以試穿嗎？", foreign: "試着してもいいですか？" },
+                        { cn: "請問有大一點的尺寸嗎？", foreign: "もっと大きいサイズはありますか？" },
+                        { cn: "請幫我辦理退稅。", foreign: "免税手続をお願いします。" }
+                    ],
+                    transport: [
+                        { cn: "請問這個車會到這裡嗎？", foreign: "この電車はここに行きますか？" },
+                        { cn: "請問車站怎麼走？", foreign: "駅はどこですか？" }
+                    ],
+                    emergency: [
+                        { cn: "請幫幫我！", foreign: "助けてください！" },
+                        { cn: "我迷路了。", foreign: "道に迷いました。" }
+                    ]
+                }
+            },
+            thailand: {
+                langCode: 'th-TH',
+                categories: [
+                    { id: 'restaurant', name: '🍽️ 餐廳' },
+                    { id: 'shopping', name: '🛍️ 購物' },
+                    { id: 'transport', name: '🛵 交通' },
+                    { id: 'emergency', name: '🚨 緊急' }
+                ],
+                phrases: {
+                    restaurant: [
+                        { cn: "請幫我結帳。", foreign: "เก็บเงินด้วยครับ (ค่ะ)" },
+                        { cn: "這個多少錢？", foreign: "อันนี้ราคาเท่าไหร่?" },
+                        { cn: "不要辣。", foreign: "ไม่เผ็ด" },
+                        { cn: "很好吃！", foreign: "อร่อยมาก!" }
+                    ],
+                    shopping: [
+                        { cn: "可以便宜一點嗎？", foreign: "ลดหน่อยได้ไหม?" },
+                        { cn: "這個怎麼賣？", foreign: "ขายยังไง?" }
+                    ],
+                    transport: [
+                        { cn: "去這裡多少錢？", foreign: "ไปที่นี่เท่าไหร่?" },
+                        { cn: "請在這裡停。", foreign: "จอดตรงนี้ครับ" }
+                    ],
+                    emergency: [
+                        { cn: "請幫幫我！", foreign: "ช่วยด้วย!" },
+                        { cn: "我迷路了。", foreign: "ฉันหลงทาง" }
+                    ]
+                }
+            },
+            general: {
+                langCode: 'en-US',
+                categories: [
+                    { id: 'restaurant', name: '🍽️️ 餐廳' },
+                    { id: 'shopping', name: '🛍️ 購物' },
+                    { id: 'transport', name: '🚕 交通' },
+                    { id: 'emergency', name: '🚨 緊急' }
+                ],
+                phrases: {
+                    restaurant: [
+                        { cn: "請幫我結帳。", foreign: "Check, please." },
+                        { cn: "這個多少錢？", foreign: "How much is this?" },
+                        { cn: "請問可以刷卡嗎？", foreign: "Do you take cards?" }
+                    ],
+                    shopping: [
+                        { cn: "可以試穿嗎？", foreign: "Can I try this on?" },
+                        { cn: "請問有大一點的尺寸嗎？", foreign: "Do you have a larger size?" }
+                    ],
+                    transport: [
+                        { cn: "請問機場怎麼去？", foreign: "How do I get to the airport?" }
+                    ],
+                    emergency: [
+                        { cn: "請幫幫我！", foreign: "Help me!" },
+                        { cn: "我需要警察。", foreign: "I need a police." }
+                    ]
+                }
+            }
+        };
 
         function getMyProjectIds() {
             return JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
@@ -324,7 +479,7 @@
         }
 
         window.openNewProjectModal = async function() {
-            const name = prompt("請輸入新旅遊專案名稱（例如：英國倫敦自由行、越南富國島）：");
+            const name = prompt("請輸入新旅遊專案名稱（例如：濟州島自駕、東京自由行）：");
             if (!name) return;
             const dates = prompt("請輸入旅遊日期區間（例如：11/23 - 11/27）：", "11/23 - 11/27");
             
@@ -363,17 +518,97 @@
             document.getElementById('header-title').innerText = `🌸 ${projectName}`;
             document.getElementById('header-sub').innerText = `日期：${dateRange} ✨`;
             
+            // 1. 自動偵測提醒
             renderRemindersByRules(projectName);
+            // 2. 自動初始化語言模組
+            initLanguageModule(projectName);
             
             switchTab('schedule');
             loadSchedules(id);
         }
 
-        // 🌟 萬國通用動態智慧規則引擎（內建韓、日、泰、港澳、美加歐、東南亞與萬國預設）
+        // 🌟 根據專案名稱初始化語言模組
+        function initLanguageModule(projectName) {
+            let nameLower = projectName.toLowerCase();
+            let destKey = 'general';
+
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
+                destKey = 'korea';
+            } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都') || nameLower.includes('沖繩') || nameLower.includes('北海道') || nameLower.includes('名古屋')) {
+                destKey = 'japan';
+            } else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁') || nameLower.includes('普吉')) {
+                destKey = 'thailand';
+            }
+
+            const currentLangPack = languageData[destKey];
+            currentDestinationLang = currentLangPack.langCode;
+
+            // 預設大框顯示歡迎提示
+            currentActivePhrase = { cn: "請點選左側分類與右側句子", foreign: "Ready to Speak ✨" };
+            document.getElementById('display-cn').innerText = currentActivePhrase.cn;
+            document.getElementById('display-foreign').innerText = currentActivePhrase.foreign;
+
+            // 渲染左側分類
+            const catContainer = document.getElementById('lang-categories');
+            catContainer.innerHTML = '';
+            currentLangPack.categories.forEach((cat, idx) => {
+                let btn = document.createElement('button');
+                btn.className = `w-full text-left text-xs font-black p-3 rounded-2xl transition border ${idx === 0 ? 'bg-orange-500 text-white border-orange-500 shadow-sm' : 'bg-white text-gray-700 border-amber-100 hover:bg-amber-50'}`;
+                btn.innerText = cat.name;
+                btn.onclick = () => {
+                    // 切換按鈕樣式
+                    document.querySelectorAll('#lang-categories button').forEach(b => {
+                        b.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-white text-gray-700 border-amber-100 hover:bg-amber-50";
+                    });
+                    btn.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-orange-500 text-white border-orange-500 shadow-sm";
+                    
+                    // 渲染右側句子
+                    renderPhrases(currentLangPack.phrases[cat.id]);
+                };
+                catContainer.appendChild(btn);
+            });
+
+            // 預設載入第一個分類的句子
+            renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
+        }
+
+        // 渲染右側句子清單
+        function renderPhrases(phrases) {
+            const phraseContainer = document.getElementById('lang-phrases');
+            phraseContainer.innerHTML = '';
+
+            phrases.forEach(p => {
+                let card = document.createElement('div');
+                card.className = "cute-card p-3.5 bg-amber-50/40 hover:bg-amber-50 border border-amber-100/80 cursor-pointer transition flex justify-between items-center";
+                card.innerHTML = `
+                    <div>
+                        <p class="text-xs text-gray-800 font-bold">${p.cn}</p>
+                        <p class="text-[11px] text-orange-700 font-black mt-0.5">${p.foreign}</p>
+                    </div>
+                    <span class="text-base">👉</span>
+                `;
+                card.onclick = () => {
+                    currentActivePhrase = p;
+                    document.getElementById('display-cn').innerText = p.cn;
+                    document.getElementById('display-foreign').innerText = p.foreign;
+                    speakCurrentPhrase(); // 點擊自動朗讀
+                };
+                phraseContainer.appendChild(card);
+            });
+        }
+
+        // 朗讀當前句子
+        window.speakCurrentPhrase = function() {
+            if (!currentActivePhrase || !currentActivePhrase.foreign) return;
+            const utterance = new SpeechSynthesisUtterance(currentActivePhrase.foreign);
+            utterance.lang = currentDestinationLang;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // 🌟 提醒內容動態規則引擎
         function renderRemindersByRules(projectName) {
             const container = document.getElementById('dynamic-reminders-container');
             let nameLower = projectName.toLowerCase();
-            
             let html = '';
 
             if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
@@ -385,7 +620,7 @@
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
                         <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>導航 App：強烈建議使用 Naver Map 或 Kakao Map，以電話號碼查詢最準確！</li>
+                            <li>導航 App：強烈建議使用 Naver Map 或 Kakao Map，以電話號碼查詢景點最準確！</li>
                             <li>測速照相：道路速限嚴格，沿途有大量測速照相，務必依速限行駛。</li>
                             <li>加油還車：多為自助/半人工，記得確認租車規定（通常為滿油出借還車）。</li>
                         </ul>
@@ -458,77 +693,11 @@
                         </ul>
                     </div>
                 `;
-            } else if (nameLower.includes('香港') || nameLower.includes('澳門') || nameLower.includes('港澳')) {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇭🇰 港澳旅遊與出行指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">步調快、步行多，建議穿著舒適布鞋。室內冷氣強，建議帶件薄外套。</p>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚆 交通與支付</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>建議準備八達通卡（Octopus）或手機虛擬八達通，搭車購物極方便。</li>
-                            <li>插頭：英式三腳方型插頭（電壓 220V），需準備轉接頭。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
-                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>緊急求助電話（警察/消防/救護）：999</li>
-                        </ul>
-                    </div>
-                `;
-            } else if (nameLower.includes('越南') || nameLower.includes('富國島') || nameLower.includes('峴港') || nameLower.includes('河內') || nameLower.includes('胡志明')) {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇻🇳 越南旅遊指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">氣候炎熱潮濕，請做好防曬與防蚊準備。</p>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🛵 交通與支付</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>叫車強烈建議使用 Grab，價格透明安全。消費以越南盾為主，注意計算位數。</li>
-                            <li>插頭：電壓 220V，多為雙孔圓形或扁平。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
-                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>警察局：113 | 救護車：115 | 火警：114</li>
-                        </ul>
-                    </div>
-                `;
             } else {
-                // 🌟 萬國通用智能備用方案（不管去英國、法國、美國、冰島或任何新地方，自動啟動這套完整指南！）
                 html = `
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">
-                            偵測到這是一個精彩的新目的地！為確保旅途平安順利，請留意以下國際通用行前提醒：
-                        </p>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🛂 證件與行前準備</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>護照效期：確認自回國日起算還有 6 個月以上效期，並檢查是否需要提前辦理當地簽證或電子簽證（e-Visa）。</li>
-                            <li>網卡與離線地圖：建議備妥當地上網網卡或 eSIM，並提前下載 Google Maps 離線地圖以防收訊不穩。</li>
-                            <li>個人藥品：準備常用藥品（如常備腸胃藥、止痛藥、感冒藥及個人處方籤）。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 財務、電器與保險</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>多元支付與現金：建議攜帶海外回饋良好的信用卡，並準備適量當地外幣現金或美金備用。</li>
-                            <li>萬國轉接頭與變壓器：出國前務必確認當地的插頭形狀（歐規、英規、美規等）與電壓。</li>
-                            <li>海外旅遊平安險：建議出發前投保包含「海外醫療險與不便險」的旅遊險，多一層安心保障。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急求助萬國指南</h3>
-                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>多數國家通用緊急求助電話：歐洲/多國 <strong>112</strong>、北美 <strong>911</strong>。</li>
-                            <li>出國前請查詢並記錄我國駐當地代表處（辦事處）的緊急聯絡電話與地址。</li>
-                        </ul>
+                        <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥當地網卡、萬用轉接頭與海外旅遊平安險。</p>
                     </div>
                 `;
             }
@@ -839,7 +1008,7 @@
                     await addDoc(collection(db, "projects", currentProjectId, "schedules"), parsedItems[i]);
                 }
 
-                document.getElementById('smart-paste-input-input').value = "";
+                document.getElementById('smart-paste-input').value = "";
                 closeSmartPasteModal();
                 alert(`✨ 成功！已智慧導入 ${parsedItems.length} 筆行程！`);
             } catch (e) {
