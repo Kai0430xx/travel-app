@@ -65,16 +65,16 @@
                 <!-- AI 智慧貼上卡片 -->
                 <div class="cute-card p-4 space-y-3">
                     <h2 class="font-bold text-amber-900 text-sm flex items-center gap-1.5">🪄 AI 魔法貼上行程</h2>
-                    <textarea id="smart-paste-input" rows="4" placeholder="請將多天詳細行程整段貼上來（支援自動辨識 Day 1、時間與景點），AI 會幫你自動拆解成多張行程卡片～" class="w-full text-xs p-3 bg-amber-50/50 border border-amber-100 rounded-xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
+                    <textarea id="smart-paste-input" rows="3" placeholder="請將多天行程貼上（自動偵測時間、Day 並聰明拆解）～" class="w-full text-xs p-3 bg-amber-50/50 border border-amber-100 rounded-xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
                     <button onclick="parseSmartPaste()" class="w-full bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs py-2.5 rounded-xl font-bold shadow-md shadow-orange-200 transition active:scale-95">
-                        ✨ 開始魔法智慧拆解
+                        ✨ 開始聰明智慧拆解
                     </button>
                 </div>
 
                 <!-- 行程列表標題與手動新增按鈕 -->
                 <div class="flex justify-between items-center px-1">
                     <h3 class="font-bold text-gray-600 text-xs tracking-wider">📅 精彩行程時間軸</h3>
-                    <button onclick="openAddScheduleModal()" class="bg-amber-500 text-white text-xs px-3 py-1.5 rounded-xl font-bold shadow-sm shadow-amber-200 transition active:scale-95">
+                    <button onclick="openAddScheduleModal()" class="bg-amber-500 text-white text-xs px-3.5 py-2 rounded-xl font-bold shadow-sm shadow-amber-200 transition active:scale-95">
                         ＋ 手動新增行程
                     </button>
                 </div>
@@ -89,7 +89,7 @@
             <div id="tab-ai" class="tab-content hidden space-y-4">
                 <div class="cute-card p-4 space-y-2">
                     <h3 class="font-bold text-amber-900 text-sm flex items-center gap-1.5">🌤️ 當地天氣與穿搭</h3>
-                    <p class="text-xs text-gray-600 leading-relaxed">氣溫舒服，風較大，建議攜帶防風外套與保暖配件 🧣。</p>
+                    <p class="text-xs text-gray-600 leading-relaxed">氣溫舒服，風較大,建議攜帶防風外套與保暖配件 🧣。</p>
                 </div>
             </div>
 
@@ -115,6 +115,40 @@
         </div>
     </main>
 
+    <!-- 🌸 手動新增行程的互動彈跳表單 (Modal) -->
+    <div id="schedule-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-5 space-y-4 shadow-2xl animate-fade-in">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-amber-900 text-base">✏️ 手動新增行程</h3>
+                <button onclick="closeAddScheduleModal()" class="text-gray-400 hover:text-gray-600 text-sm font-bold">✕</button>
+            </div>
+            
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">天數（例如：Day 1）</label>
+                    <input type="text" id="input-day" value="Day 1" class="w-full p-2.5 bg-amber-50/50 border border-amber-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-300">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">時間（例如：14:00）</label>
+                    <input type="text" id="input-time" value="10:00" class="w-full p-2.5 bg-amber-50/50 border border-amber-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-300">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">行程名稱</label>
+                    <input type="text" id="input-title" placeholder="例如：黑豬肉晚餐" class="w-full p-2.5 bg-amber-50/50 border border-amber-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-300">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">地圖導航地點（選填，預設同行程名稱）</label>
+                    <input type="text" id="input-location" placeholder="例如：濟州島黑豬肉餐廳" class="w-full p-2.5 bg-amber-50/50 border border-amber-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-300">
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeAddScheduleModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-2.5 rounded-xl font-bold transition active:scale-95">取消</button>
+                <button onclick="submitScheduleForm()" class="flex-1 bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs py-2.5 rounded-xl font-bold shadow-md shadow-orange-200 transition active:scale-95">確認新增</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 底部導覽列 -->
     <nav id="bottom-nav" class="hidden fixed bottom-3 left-4 right-4 max-w-[448px] mx-auto bg-white/90 backdrop-blur-md border border-amber-100 flex justify-around py-3 rounded-2xl shadow-xl z-50">
         <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-orange-500 text-xs font-bold gap-0.5"><span class="text-lg">📅</span>行程</button>
@@ -123,7 +157,7 @@
         <button onclick="switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs font-medium gap-0.5"><span class="text-lg">💰</span>分帳</button>
     </nav>
 
-    <!-- Firebase 與智慧拆解邏輯控制 -->
+    <!-- Firebase 與表單邏輯控制 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDoc, deleteDoc, doc, setDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -296,27 +330,49 @@
             });
         }
 
-        window.openAddScheduleModal = async function() {
+        // 🌸 開啟手動新增表單 Modal
+        window.openAddScheduleModal = function() {
             if (!currentProjectId) return;
-            const time = prompt("請輸入時間（例如：14:00）：", "10:00");
-            if (!time) return;
-            const title = prompt("請輸入行程名稱（例如：漢拏山拍照）：");
-            if (!title) return;
-            const location = prompt("請輸入詳細地點或導航關鍵字（例如：濟州島漢拏山）：", title);
-            const day = prompt("是第幾天？（例如：Day 1）：", "Day 1");
+            document.getElementById('schedule-modal').classList.remove('hidden');
+        }
+
+        // 🌸 關閉手動新增表單 Modal
+        window.closeAddScheduleModal = function() {
+            document.getElementById('schedule-modal').classList.add('hidden');
+        }
+
+        // 🌸 提交手動新增表單
+        window.submitScheduleForm = async function() {
+            if (!currentProjectId) return;
+            const day = document.getElementById('input-day').value.trim() || "Day 1";
+            const time = document.getElementById('input-time').value.trim() || "10:00";
+            const title = document.getElementById('input-title').value.trim();
+            let location = document.getElementById('input-location').value.trim();
+
+            if (!title) {
+                alert("請填寫行程名稱！");
+                return;
+            }
+            if (!location) {
+                location = title;
+            }
 
             try {
                 await addDoc(collection(db, "projects", currentProjectId, "schedules"), {
+                    day,
                     time,
                     title,
                     location,
-                    day,
                     createdAt: Date.now()
                 });
+                closeAddScheduleModal();
+                // 清空欄位
+                document.getElementById('input-title').value = '';
+                document.getElementById('input-location').value = '';
                 alert("✨ 行程新增成功！");
             } catch (e) {
                 console.error("新增行程失敗", e);
-                alert("新增失敗，請檢查網路");
+                alert("新增失敗，請檢查網路連線");
             }
         }
 
@@ -331,48 +387,63 @@
             }
         }
 
-        // 🪄 升級版：AI 智慧文字拆解器 (自動把長篇行程切成多筆獨立卡片)
         window.parseSmartPaste = async function() {
             const rawText = document.getElementById('smart-paste-input').value.trim();
             if(!rawText) { alert("請先輸入或貼上行程文字喔！"); return; }
 
-            alert("✨ AI 正在努力分析您的多天行程，並自動切換成獨立卡片中...");
+            alert("✨ AI 正在智慧解析與清洗文字中...");
 
-            // 智慧解析邏輯：依照換行或句號、Day 關鍵字進行拆解
-            const lines = rawText.split('\n').filter(line => line.trim().length > 0);
+            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentDay = "Day 1";
             let addedCount = 0;
 
             try {
                 for (let i = 0; i < lines.length; i++) {
-                    let line = lines[i].trim();
+                    let line = lines[i];
 
-                    // 偵測是否包含天數關鍵字（例如 Day 1, 第一天等）
-                    if (line.includes("Day") || line.includes("第") && (line.includes("天") || line.includes("日"))) {
-                        currentDay = line.substring(0, 10); // 簡單抓取天數標題
+                    if (
+                        line.includes("===") || 
+                        line.includes("---") || 
+                        line.includes("旅遊專案") || 
+                        line.includes("簡介：") || 
+                        line.length < 4
+                    ) {
+                        continue; 
+                    }
+
+                    let dayMatch = line.match(/(Day\s*\d+|第[一二三四五六七八九十]+天)/i);
+                    if (dayMatch) {
+                        currentDay = dayMatch[0];
                         continue;
                     }
 
-                    // 簡易時間偵測（例如 09:00 或 14點）
                     let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
-                    let timeStr = timeMatch ? timeMatch[1] : `行程 ${++addedCount}`;
+                    let timeStr = timeMatch ? timeMatch[1] : "彈性";
 
-                    // 清理文字作為標題與地點
-                    let title = line;
-                    let location = line;
+                    let cleanTitle = line
+                        .replace(/^\d{1,2}[:：]\d{2}\s*/, '')
+                        .replace(/^[•\-\*]\s*/, '')
+                        .trim();
+
+                    if (!cleanTitle || cleanTitle.length < 2) continue;
+
+                    let cleanLocation = cleanTitle
+                        .replace(/\[.*?\]/g, '')
+                        .trim();
+                    if (!cleanLocation) cleanLocation = cleanTitle;
 
                     await addDoc(collection(db, "projects", currentProjectId, "schedules"), {
                         time: timeStr,
-                        title: title,
-                        location: location,
+                        title: cleanTitle,
+                        location: cleanLocation,
                         day: currentDay,
-                        createdAt: Date.now() + addedCount // 確保順序
+                        createdAt: Date.now() + addedCount
                     });
                     addedCount++;
                 }
 
                 document.getElementById('smart-paste-input').value = "";
-                alert(`✨ 成功！AI 幫您自動拆解並加入了 ${addedCount} 筆行程卡片到時間軸中！`);
+                alert(`✨ 成功！已智慧清洗並幫您加入了 ${addedCount} 筆乾淨的行程卡片！`);
             } catch (e) {
                 console.error("AI 拆解失敗", e);
                 alert("解析發生錯誤，請再試一次");
