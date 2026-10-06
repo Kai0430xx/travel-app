@@ -27,7 +27,6 @@
     <!-- 頂部標題區 -->
     <header class="bg-gradient-to-r from-amber-200 to-orange-200 text-amber-900 p-4 shadow-sm sticky top-0 z-50 flex justify-between items-center rounded-b-3xl">
         <div class="flex items-center gap-2.5">
-            <!-- 返回專案列表按鈕 (預設隱藏，進入專案後顯示) -->
             <button id="back-btn" onclick="backToProjects()" class="hidden bg-white/80 hover:bg-white text-amber-900 px-2.5 py-1.5 rounded-full text-xs font-bold shadow-sm transition active:scale-95 flex items-center gap-1">
                 ⬅️ 專案
             </button>
@@ -53,16 +52,9 @@
                 </button>
             </div>
 
-            <!-- 專案列表容器 -->
+            <!-- 專案列表容器 (動態渲染，最新的在最上面) -->
             <div id="project-list" class="space-y-3">
-                <div onclick="enterProject('濟州島自駕遊', '11/23 - 11/27')" class="cute-card p-4 space-y-2 cursor-pointer hover:border-orange-300 transition">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full font-bold">進行中 🚗</span>
-                        <span class="text-[11px] text-gray-400 font-medium">11/23 - 11/27</span>
-                    </div>
-                    <h3 class="font-bold text-gray-800 text-base">🌸 濟州島自駕小旅行</h3>
-                    <p class="text-xs text-gray-500">成員：你與好朋友 ✨</p>
-                </div>
+                <!-- 專案會由 JavaScript 自動帶入 -->
             </div>
         </div>
 
@@ -81,16 +73,22 @@
 
                 <div class="space-y-3">
                     <h3 class="font-bold text-gray-600 text-xs tracking-wider px-1">📅 精彩行程時間軸</h3>
-                    <div class="cute-card p-4 border-l-4 border-l-orange-400 space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full font-bold">14:00</span>
-                            <span class="text-[11px] text-gray-400 font-medium">Day 1 🚗</span>
-                        </div>
-                        <h4 class="font-bold text-gray-800 text-sm">領車與機場出發發車囉！</h4>
-                        <p class="text-xs text-gray-500">📍 地點：Lotte Rent-a-car 濟州機場店</p>
-                        <div class="pt-2 flex gap-2">
-                            <a href="https://maps.google.com/?q=Lotte+Rent-a-car+Jeju" target="_blank" class="text-xs bg-amber-50 text-amber-800 px-3 py-1.5 rounded-xl font-medium flex items-center gap-1">🗺 Google Maps</a>
-                            <a href="#" class="text-xs bg-orange-50 text-orange-800 px-3 py-1.5 rounded-xl font-medium flex items-center gap-1">🚗 Naver Map</a>
+                    <div id="schedule-container" class="space-y-3">
+                        <!-- 行程範例 -->
+                        <div class="cute-card p-4 border-l-4 border-l-orange-400 space-y-2 relative">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full font-bold">14:00</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[11px] text-gray-400 font-medium">Day 1 🚗</span>
+                                    <button onclick="alert('刪除範例行程')" class="text-gray-300 hover:text-red-500 text-xs">🗑️</button>
+                                </div>
+                            </div>
+                            <h4 class="font-bold text-gray-800 text-sm">領車與機場出發發車囉！</h4>
+                            <p class="text-xs text-gray-500">📍 地點：Lotte Rent-a-car 濟州機場店</p>
+                            <div class="pt-2 flex gap-2">
+                                <a href="https://maps.google.com/?q=Lotte+Rent-a-car+Jeju" target="_blank" class="text-xs bg-amber-50 text-amber-800 px-3 py-1.5 rounded-xl font-medium flex items-center gap-1">🗺 Google Maps</a>
+                                <a href="#" class="text-xs bg-orange-50 text-orange-800 px-3 py-1.5 rounded-xl font-medium flex items-center gap-1">🚗 Naver Map</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -126,7 +124,7 @@
         </div>
     </main>
 
-    <!-- 底部導覽列 (僅在進入專案後顯示) -->
+    <!-- 底部導覽列 -->
     <nav id="bottom-nav" class="hidden fixed bottom-3 left-4 right-4 max-w-[448px] mx-auto bg-white/90 backdrop-blur-md border border-amber-100 flex justify-around py-3 rounded-2xl shadow-xl z-50">
         <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-orange-500 text-xs font-bold gap-0.5"><span class="text-lg">📅</span>行程</button>
         <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-medium gap-0.5"><span class="text-lg">🤖</span>錦囊</button>
@@ -134,28 +132,73 @@
         <button onclick="switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs font-medium gap-0.5"><span class="text-lg">💰</span>分帳</button>
     </nav>
 
-    <!-- Firebase 邏輯與頁面切換控制 -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <!-- 邏輯與資料儲存控制 -->
+    <script>
+        // 使用 localStorage 暫存專案，確保重新整理資料不會不見，後續可完全對應 Firebase
+        let projects = JSON.parse(localStorage.getItem('travel_projects')) || [
+            { id: '1', name: '濟州島自駕遊', dates: '11/23 - 11/27', createdAt: Date.now() - 1000 }
+        ];
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBcKmZhJaZn5emOlHRV95-uC9q01wFxt4M",
-            authDomain: "my-travel-app-6e00c.firebaseapp.com",
-            projectId: "my-travel-app-6e00c",
-            storageBucket: "my-travel-app-6e00c.firebasestorage.app",
-            messagingSenderId: "135860333246",
-            appId: "1:135860333246:web:a25402eb743d6cebc9ccef"
-        };
+        // 渲染專案列表（最新建立的排在最上面）
+        function renderProjects() {
+            const list = document.getElementById('project-list');
+            list.innerHTML = '';
+            
+            // 依時間排序：大的（最新的）在前面
+            projects.sort((a, b) => b.createdAt - a.createdAt);
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+            projects.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "cute-card p-4 space-y-2 relative transition hover:border-orange-300";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full font-bold">進行中 🚗</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] text-gray-400 font-medium">${p.dates}</span>
+                            <button onclick="event.stopPropagation(); deleteProject('${p.id}')" class="text-gray-400 hover:text-red-500 text-xs p-1">🗑️</button>
+                        </div>
+                    </div>
+                    <div onclick="enterProject('${p.id}', '${p.name}', '${p.dates}')" class="cursor-pointer">
+                        <h3 class="font-bold text-gray-800 text-base">🌸 ${p.name}</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">點擊進入專案行程管理 ✨</p>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+            localStorage.setItem('travel_projects', JSON.stringify(projects));
+        }
 
-        window.enterProject = function(projectName, dateRange) {
+        // 新增專案
+        window.openNewProjectModal = function() {
+            const name = prompt("請輸入新旅遊專案名稱（例如：東京賞櫻行）：");
+            if (!name) return;
+            const dates = prompt("請輸入旅遊日期區間（例如：4/19 - 4/25）：", "未定日期");
+            
+            const newProj = {
+                id: Date.now().toString(),
+                name: name,
+                dates: dates,
+                createdAt: Date.now() // 記錄當前時間，確保排在最上方
+            };
+            
+            projects.push(newProj);
+            renderProjects();
+            alert("✨ 新專案建立成功，已經幫你排在最上方囉！");
+        }
+
+        // 刪除專案
+        window.deleteProject = function(id) {
+            if (confirm("確定要刪除這個旅遊專案嗎？")) {
+                projects = projects.filter(p => p.id !== id);
+                renderProjects();
+            }
+        }
+
+        window.enterProject = function(id, projectName, dateRange) {
             document.getElementById('view-projects').classList.add('hidden');
             document.getElementById('view-workspace').classList.remove('hidden');
             document.getElementById('bottom-nav').classList.remove('hidden');
-            document.getElementById('back-btn').classList.remove('hidden'); // 顯示返回按鈕
+            document.getElementById('back-btn').classList.remove('hidden');
             
             document.getElementById('header-title').innerText = `🌸 ${projectName}`;
             document.getElementById('header-sub').innerText = `日期：${dateRange} ✨`;
@@ -165,32 +208,11 @@
         window.backToProjects = function() {
             document.getElementById('view-workspace').classList.add('hidden');
             document.getElementById('bottom-nav').classList.add('hidden');
-            document.getElementById('back-btn').classList.add('hidden'); // 隱藏返回按鈕
+            document.getElementById('back-btn').classList.add('hidden');
             document.getElementById('view-projects').classList.remove('hidden');
             
             document.getElementById('header-title').innerText = "🌸 我的旅遊小專案";
             document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
-        }
-
-        window.openNewProjectModal = function() {
-            const name = prompt("請輸入新旅遊專案名稱（例如：東京賞櫻行）：");
-            if (!name) return;
-            const dates = prompt("請輸入旅遊日期區間（例如：4/19 - 4/25）：", "未定日期");
-            
-            const list = document.getElementById('project-list');
-            const newCard = document.createElement('div');
-            newCard.className = "cute-card p-4 space-y-2 cursor-pointer hover:border-orange-300 transition";
-            newCard.onclick = () => enterProject(name, dates);
-            newCard.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <span class="text-xs bg-pink-100 text-pink-700 px-2.5 py-0.5 rounded-full font-bold">準備中 ✈️</span>
-                    <span class="text-[11px] text-gray-400 font-medium">${dates}</span>
-                </div>
-                <h3 class="font-bold text-gray-800 text-base">🗼 ${name}</h3>
-                <p class="text-xs text-gray-500">點擊進入專案行程管理 ✨</p>
-            `;
-            list.prepend(newCard);
-            alert("✨ 新專案建立成功！");
         }
 
         window.switchTab = function(tabName) {
@@ -219,6 +241,9 @@
             alert("✨ AI 魔法解析成功！行程已經加入囉～");
             document.getElementById('smart-paste-input').value = "";
         }
+
+        // 初始化載入專案列表
+        renderProjects();
     </script>
 </body>
 </html>
