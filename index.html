@@ -86,11 +86,23 @@
                 </div>
             </div>
 
-            <!-- 分頁 2：AI 錦囊 -->
-            <div id="tab-ai" class="tab-content hidden space-y-4">
-                <div class="cute-card p-5 space-y-2">
-                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌤 當地天氣與穿搭</h3>
-                    <p class="text-xs text-gray-600 leading-relaxed">氣溫舒服，風較大，建議攜帶防風外套與保暖配件 🧣。</p>
+            <!-- 分頁 2：提醒 (已由錦囊更名，並擴充天氣與入境相關內容) -->
+            <div id="tab-ai" class="tab-content hidden space-y-3.5">
+                <div class="cute-card p-5 space-y-2.5">
+                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌤 當地天氣與穿搭指南</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        秋末冬初氣溫約在 10°C 至 18°C 之間。早晚溫差大且風大，建議採取**洋蔥式穿搭**：內搭發熱衣、外加保暖毛衣，並務必攜帶防風外套或大衣、圍巾與毛帽 🧣。
+                    </p>
+                </div>
+
+                <div class="cute-card p-5 space-y-2.5">
+                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🛂 入境與行前重要提醒</h3>
+                    <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                        <li>**護照效期：** 確保護照有效期限自回國當日起算還有 6 個月以上。</li>
+                        <li>**網卡與交通：** 建議提前購買好網卡（eSIM 或實體卡），並確認租車所需要的**國際駕照**與**台灣駕照**正本是否已備妥 🚗。</li>
+                        <li>**海關申報：** 機上發放的入境卡與海關申報單請確實填寫。禁止攜帶肉製品入境，違者罰款相當嚴格！</li>
+                        <li>**插頭與電壓：** 當地電壓為 220V，插頭為**圓形雙孔（歐規/韓規）**，記得攜帶萬用轉接頭與行動電源 🔌。</li>
+                    </ul>
                 </div>
             </div>
 
@@ -239,10 +251,10 @@
         </div>
     </div>
 
-    <!-- 底部導覽列 -->
+    <!-- 底部導覽列 (已將「錦囊」正名為「提醒」) -->
     <nav id="bottom-nav" class="hidden fixed bottom-3 left-4 right-4 max-w-[448px] mx-auto bg-white/95 backdrop-blur-md border border-amber-100 flex justify-around py-3 rounded-2xl shadow-xl z-50">
         <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-orange-500 text-xs font-black gap-0.5"><span class="text-xl">📅</span>行程</button>
-        <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🤖</span>錦囊</button>
+        <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💡</span>提醒</button>
         <button onclick="switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🗣️</span>語言</button>
         <button onclick="switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💰</span>分帳</button>
     </nav>
@@ -608,12 +620,11 @@
             }
         }
 
-        // 🌟 雙重防呆完美版 AI 智慧解析引擎：精準抓時間，且絕對不會把帶有時間的備註（如營業時間）誤判為行程
         window.parseSmartPaste = async function() {
             const rawText = document.getElementById('smart-paste-input').value.trim();
             if(!rawText) { alert("請先輸入或貼上行程文字喔！"); return; }
 
-            alert("✨ AI 正在以雙重防呆機制精準拆解行程與備註中...");
+            alert("✨ AI 正在進行智慧拆解與備註配對中...");
 
             const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentDay = "Day 1";
@@ -624,7 +635,6 @@
                 for (let i = 0; i < lines.length; i++) {
                     let line = lines[i];
 
-                    // 1. 偵測天數
                     let dayMatch = line.match(/(Day\s*\d+|第[一二三四五六七八九十]+天)/i);
                     if (dayMatch) {
                         if (currentItem) {
@@ -635,9 +645,6 @@
                         continue;
                     }
 
-                    // 2. 雙重防呆判斷：
-                    // 條件 A：必須包含時間格式（如 07:55）
-                    // 條件 B：整行絕對不能包含「備註」或「營業時間」（防止備註內的營業時間數字被誤判）
                     let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
                     let hasNoteKeyword = line.includes("備註") || line.includes("營業時間") || line.includes("預訂");
                     let isNewItem = timeMatch && !hasNoteKeyword && (line.includes("•") || line.startsWith("•") || line.match(/^\s*•?\s*\d{1,2}[:：]\d{2}/));
@@ -647,7 +654,7 @@
                             parsedItems.push(currentItem);
                         }
 
-                        let timeStr = timeMatch[1]; // 確實抓取時間
+                        let timeStr = timeMatch[1];
                         let cleanTitle = line
                             .replace(/^\s*•?\s*\d{1,2}[:：]\d{2}\s*/, '')
                             .replace(/^[-•\*\d\.]+\s*/, '')
@@ -655,14 +662,12 @@
 
                         currentItem = {
                             day: currentDay,
-                            time: timeStr,  // 正確存入時間
+                            time: timeStr,
                             title: cleanTitle,
-                            location: "",   // 儲存備註
+                            location: "",
                             createdAt: Date.now() + parsedItems.length
                         };
-                    } 
-                    // 3. 如果不符合新行程條件，全部安全當作目前行程的備註！
-                    else if (currentItem) {
+                    } else if (currentItem) {
                         currentItem.location = currentItem.location ? (currentItem.location + "\n" + line) : line;
                     }
                 }
@@ -676,14 +681,13 @@
                     return;
                 }
 
-                // 批次寫入 Firebase
                 for (let i = 0; i < parsedItems.length; i++) {
                     await addDoc(collection(db, "projects", currentProjectId, "schedules"), parsedItems[i]);
                 }
 
                 document.getElementById('smart-paste-input').value = "";
                 closeSmartPasteModal();
-                alert(`✨ 成功！已智慧導入 ${parsedItems.length} 筆行程（時間、備註、營業時間皆完美收納）！`);
+                alert(`✨ 成功！已智慧導入 ${parsedItems.length} 筆行程！`);
             } catch (e) {
                 console.error("AI 拆解失敗", e);
                 alert("解析發生錯誤，請再試一次");
