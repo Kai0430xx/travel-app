@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>我們的溫馨小旅行 ✈</title>
+    <title>放風 ✈</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
@@ -48,11 +48,11 @@
     <!-- 頂部標題區 -->
     <header class="bg-[#f3e9de] text-[#5c4a3d] px-4 py-4 shadow-sm sticky top-0 z-50 flex justify-between items-center rounded-b-[24px] border-b border-[#eae1d7]">
         <div class="flex items-center gap-2 min-w-0 pr-2">
-            <button id="back-btn" onclick="backToProjects()" class="hidden bg-white/90 hover:bg-white text-[#5c4a3d] px-3 py-1.5 rounded-full text-xs font-bold shadow-sm transition active:scale-95 shrink-0 flex items-center gap-1 border border-[#eae1d7]">
+            <button id="back-btn" onclick="backToProjects()" class="hidden bg-white/90 hover:bg-white text-[#5c4a3d] px-3 py-1.5 rounded-full text-xs font-bold shadow-sm transition active:scale-95 shrink-0 border border-[#eae1d7]">
                 專案
             </button>
             <div class="min-w-0">
-                <h1 id="header-title" class="text-sm font-black truncate flex items-center gap-1">🌸 我的旅遊小專案</h1>
+                <h1 id="header-title" class="text-sm font-black truncate flex items-center gap-1">放風 ✈</h1>
                 <p id="header-sub" class="text-[11px] text-[#8c7868] opacity-90 truncate mt-0.5">選擇你的冒險旅程 ✨</p>
             </div>
         </div>
@@ -145,17 +145,17 @@
                 </div>
             </div>
 
-            <!-- 分頁 5：闖關成就 -->
+            <!-- 分頁 5：闖關 -->
             <div id="tab-quest" class="tab-content hidden space-y-4">
                 <!-- 成績總覽與圓形布章區 -->
                 <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-4 shadow-md border-[#e2d3c3]">
                     <div class="flex justify-between items-center">
-                        <span id="quest-project-title" class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black">🌸 冒險進行中</span>
-                        <button onclick="openPhotoGalleryModal()" class="bg-[#d98262] text-white text-[11px] px-3 py-1 rounded-full font-black shadow-sm transition active:scale-95">📸 回憶寫真冊</button>
+                        <span id="quest-total-count" class="text-xs font-black text-[#d98262]">已打卡 0 / 0</span>
+                        <button onclick="openPhotoGalleryModal()" class="bg-[#d98262] text-white text-[11px] px-3.5 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">📸 旅程回憶寫真冊</button>
                     </div>
                     <div>
                         <div class="flex justify-between text-xs font-black text-[#736052] mb-1">
-                            <span id="quest-total-count">已打卡 0 / 0</span>
+                            <span>整體解鎖進度</span>
                             <span id="quest-percent">0%</span>
                         </div>
                         <div class="w-full bg-[#eae1d7] h-3 rounded-full overflow-hidden">
@@ -163,7 +163,7 @@
                         </div>
                     </div>
 
-                    <!-- 圓形布章區 (三大稱號) -->
+                    <!-- 圓形布章區 -->
                     <div class="grid grid-cols-3 gap-3 pt-2 border-t border-[#eae1d7] text-center">
                         <div class="flex flex-col items-center">
                             <div id="badge-food" class="badge-circle">
@@ -189,8 +189,8 @@
                     </div>
                 </div>
 
-                <!-- 任務清單 (按天排序) -->
-                <div id="quest-list-container" class="space-y-3.5">
+                <!-- 任務清單 (按天數折疊收合) -->
+                <div id="quest-list-container" class="space-y-3">
                     <p class="text-center text-xs text-gray-400 py-6">正在載入闖關任務... ⏳</p>
                 </div>
             </div>
@@ -205,14 +205,13 @@
                 <h3 class="font-black text-[#5c4a3d] text-base" id="quest-modal-title">📸 打卡上傳</h3>
                 <button onclick="closeQuestPhotoModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
-            <p class="text-gray-500 font-bold">必須上傳現場照片才能打卡成功喔！✨</p>
             
             <div id="quest-photo-preview-container" class="hidden w-full h-40 bg-gray-50 rounded-2xl border border-[#eae1d7] overflow-hidden flex items-center justify-center">
                 <img id="quest-photo-preview" src="" alt="預覽照片" class="w-full h-full object-cover">
             </div>
 
             <div>
-                <label class="block font-bold text-gray-600 mb-1">選擇照片</label>
+                <label class="block font-bold text-gray-600 mb-1">選擇照片 (必須上傳才能打卡)</label>
                 <input type="file" id="quest-file-input" accept="image/*" onchange="previewQuestPhoto(event)" class="w-full text-xs p-2.5 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
             </div>
 
@@ -223,23 +222,47 @@
         </div>
     </div>
 
-    <!-- 🌸 照片回憶寫真冊 Modal (統整所有打卡照片分享給朋友) -->
+    <!-- 🌸 已打卡項目管理 Modal (可更換照片或取消打卡) -->
+    <div id="quest-edit-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-[#5c4a3d] text-base" id="edit-quest-modal-title">✨ 已打卡項目管理</h3>
+                <button onclick="closeQuestEditModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <p class="text-gray-500 font-bold">您可以選擇更換照片，或是取消打卡晚點再上傳！</p>
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="openChangePhotoFromEdit()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">📷 更換照片</button>
+                <button onclick="cancelQuestCheckin()" class="flex-1 bg-red-100 text-red-600 py-3 rounded-full font-black">❌ 取消打卡</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌸 照片回憶寫真冊 Modal (雲端協作，所有人可見，支援手機相冊下載) -->
     <div id="photo-gallery-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center shrink-0">
-                <h3 class="font-black text-[#5c4a3d] text-base">📸 旅程回憶寫真冊</h3>
+                <h3 class="font-black text-[#5c4a3d] text-base">📸 旅伴共同寫真冊</h3>
                 <button onclick="closePhotoGalleryModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
-            <p class="text-gray-500 font-bold shrink-0">這裡統整了所有已打卡的精彩回憶，可以複製連結分享給朋友！✨</p>
+            <p class="text-gray-500 font-bold shrink-0">這裡統整了所有旅伴上傳的打卡照片，點擊即可下載至手機相冊！✨</p>
 
             <div id="photo-gallery-grid" class="grid grid-cols-2 gap-3 overflow-y-auto pr-1 flex-1">
                 <!-- 動態照片網格 -->
             </div>
 
-            <div class="pt-2 shrink-0 flex gap-2">
-                <button onclick="shareCurrentProject()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">🔗 複製相冊/專案連結</button>
-                <button onclick="closePhotoGalleryModal()" class="bg-gray-100 text-gray-600 px-5 py-3 rounded-full font-black">關閉</button>
+            <div class="pt-2 shrink-0">
+                <button onclick="closePhotoGalleryModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button>
             </div>
+        </div>
+    </div>
+
+    <!-- 🌸 旅伴名稱登入 Modal -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
+            <h3 class="font-black text-[#5c4a3d] text-base text-center">🌸 歡迎加入放風之旅</h3>
+            <p class="text-gray-500 font-bold text-center">請輸入您的名字，讓大家在分帳與寫真冊中認識你！✨</p>
+            <input type="text" id="login-name-input" placeholder="例如：小明" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-center text-sm">
+            <button onclick="submitLoginName()" class="w-full bg-[#d98262] text-white py-3.5 rounded-full font-black shadow-md">進入旅程 🚀</button>
         </div>
     </div>
 
@@ -273,7 +296,7 @@
             <div id="modal-edit-mode" class="hidden space-y-3 text-xs">
                 <div class="flex justify-between items-center">
                     <h3 class="font-black text-[#5c4a3d] text-base">✏️ 編輯行程內容</h3>
-                    <button onclick="closeDetailModal()" class="text-gray-400 text-base font-black">✕</button>
+                    <button onclick="closeDetailModal()" class="text-gray-400 font-black text-base">✕</button>
                 </div>
                 <input type="hidden" id="edit-schedule-id">
                 <div><label class="block font-bold text-gray-600 mb-1">天數</label><input type="text" id="edit-day" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
@@ -409,6 +432,7 @@
 
         let currentProjectId = null;
         let currentProjectName = "";
+        let currentMyName = localStorage.getItem('my_travel_nickname') || "";
         let currentDestinationLang = 'ko-KR';
         let currentActivePhrase = { cn: "請選擇想說的話", foreign: "請選擇想說的話" };
 
@@ -666,7 +690,6 @@
                             </div>
                             <div onclick="enterProject('${id}', '${p.name}', '${p.dates}')" class="cursor-pointer space-y-1">
                                 <h3 class="font-black text-gray-900 text-base break-words">🌸 ${p.name}</h3>
-                                <p class="text-xs text-gray-500">點擊進入專案行程管理 ✨</p>
                             </div>
                         `;
                         list.appendChild(card);
@@ -682,7 +705,6 @@
             try {
                 const newId = 'proj_' + Date.now();
                 await setDoc(doc(db, "projects", newId), { name, dates, createdAt: Date.now() });
-                await setDoc(doc(db, "projects", newId, "members", "m1"), { name: "我" });
                 saveMyProjectId(newId);
                 renderProjects();
                 alert("✨ 新專案建立成功！");
@@ -699,6 +721,32 @@
         window.enterProject = function(id, projectName, dateRange) {
             currentProjectId = id;
             currentProjectName = projectName;
+
+            // 檢查是否已登入名字
+            if (!currentMyName) {
+                document.getElementById('login-modal').classList.remove('hidden');
+                return;
+            }
+
+            proceedEnterProject(id, projectName, dateRange);
+        }
+
+        window.submitLoginName = async function() {
+            const name = document.getElementById('login-name-input').value.trim();
+            if (!name) { alert("請輸入您的名字！"); return; }
+            currentMyName = name;
+            localStorage.setItem('my_travel_nickname', name);
+            document.getElementById('login-modal').classList.add('hidden');
+
+            // 自動將自己加入專案成員名單
+            try {
+                await addDoc(collection(db, "projects", currentProjectId, "members"), { name: currentMyName });
+            } catch (e) {}
+
+            proceedEnterProject(currentProjectId, currentProjectName, "");
+        }
+
+        function proceedEnterProject(id, projectName, dateRange) {
             document.getElementById('view-projects').classList.add('hidden');
             document.getElementById('view-workspace').classList.remove('hidden');
             document.getElementById('bottom-nav').classList.remove('hidden');
@@ -706,7 +754,7 @@
             document.getElementById('share-btn').classList.remove('hidden');
             
             document.getElementById('header-title').innerText = `🌸 ${projectName}`;
-            document.getElementById('header-sub').innerText = `日期：${dateRange} ✨`;
+            document.getElementById('header-sub').innerText = dateRange ? `日期：${dateRange} ✨` : `旅伴：${currentMyName} ✨`;
             
             renderRemindersByRules(projectName);
             initLanguageModule(projectName);
@@ -739,7 +787,7 @@
             });
         }
 
-        // 🌟 嚴格分類：排除交通與住宿，玩樂歸在景點，美食/購物獨立
+        // 🌟 嚴格分類：排除交通與住宿，玩樂歸景點，美食與購物獨立
         function classifyScheduleItem(title) {
             let t = title.toLowerCase();
             if (t.includes('交通') || t.includes('機場') || t.includes('租車') || t.includes('還車') || t.includes('出發') || t.includes('前往') || t.includes('搭車') || t.includes('班機') || t.includes('住宿') || t.includes('飯店') || t.includes('民宿') || t.includes('check-in') || t.includes('check in')) {
@@ -751,18 +799,14 @@
             if (t.includes('購物') || t.includes('免稅') || t.includes('超市') || t.includes('商場') || t.includes('買') || t.includes('市場') || t.includes('outlet')) {
                 return 'shop';
             }
-            // 玩樂、景點皆歸在景點
             return 'spot';
         }
 
         function renderQuestUI() {
             const container = document.getElementById('quest-list-container');
-            const titleEl = document.getElementById('quest-project-title');
             const countEl = document.getElementById('quest-total-count');
             const percentEl = document.getElementById('quest-percent');
             const progressBar = document.getElementById('quest-progress-bar');
-
-            titleEl.innerText = `🌸 ${currentProjectName} 冒險中`;
 
             let questItems = [];
             allSchedulesData.forEach(s => {
@@ -773,7 +817,7 @@
             });
 
             if (questItems.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前行程中尚無符合的美食、景點或購物任務！✨</p>`;
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前行程中尚無符合的任務！✨</p>`;
                 countEl.innerText = `已打卡 0 / 0`;
                 percentEl.innerText = `0%`;
                 progressBar.style.width = `0%`;
@@ -807,33 +851,34 @@
             });
 
             container.innerHTML = '';
-            Object.keys(grouped).forEach(dayKey => {
+            Object.keys(grouped).forEach((dayKey, index) => {
                 let items = grouped[dayKey];
+                let sectionId = `quest_section_${index}`;
                 let dayBox = document.createElement('div');
                 dayBox.className = "cute-card overflow-hidden border border-[#eae1d7]";
                 
                 let headerHtml = `
-                    <div class="bg-[#f3e9de]/70 p-3.5 flex justify-between items-center">
-                        <h4 class="font-black text-[#5c4a3d] text-xs">📅 ${dayKey} 任務清單</h4>
-                        <span class="text-[11px] text-[#8c7868] font-bold">${items.filter(i => i.completed).length}/${items.length} 已打卡</span>
+                    <div onclick="toggleQuestCollapse('${sectionId}')" class="bg-[#f3e9de]/70 p-3.5 flex justify-between items-center cursor-pointer hover:bg-[#f3e9de] transition">
+                        <h4 class="font-black text-[#5c4a3d] text-xs">📅 ${dayKey} 任務清單 <span class="text-[11px] text-[#8c7868] font-bold">(${items.filter(i => i.completed).length}/${items.length})</span></h4>
+                        <span id="icon_${sectionId}" class="text-xs text-[#8c7868] font-black">▼ 展開</span>
                     </div>
                 `;
 
-                let listHtml = `<div class="p-3 space-y-2.5 bg-white">`;
+                let listHtml = `<div id="${sectionId}" class="hidden p-3 space-y-2.5 bg-white">`;
                 items.forEach(s => {
                     let cleanTitle = cleanDisplayTitle(s.title);
-                    let catName = s.category === 'food' ? '🍽️ 美食' : (s.category === 'shop' ? '🛍️ 購物' : '🗺️ 景點');
-                    let statusBadge = s.completed ? `<span class="text-[10px] bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-black">✔️ 已打卡</span>` : `<span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-1 rounded-full font-black">打卡</span>`;
+                    let statusBadge = s.completed ? 
+                        `<span onclick="event.stopPropagation(); openQuestEditModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-black cursor-pointer hover:bg-green-200">✔️ 已打卡</span>` : 
+                        `<span onclick="openQuestPhotoModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-1 rounded-full font-black cursor-pointer hover:bg-[#e2c8b8]">打卡</span>`;
+                    
                     let photoThumbnail = s.photoUrl ? `<img src="${s.photoUrl}" class="w-10 h-10 rounded-xl object-cover border border-[#eae1d7] shrink-0">` : '';
 
                     listHtml += `
-                        <div onclick="openQuestPhotoModal('${s.id}', '${cleanTitle}')" class="p-3.5 bg-[#fffaf5] hover:bg-[#fbf2e9] rounded-2xl border border-[#eae1d7] flex justify-between items-center cursor-pointer transition">
+                        <div class="p-3.5 bg-[#fffaf5] rounded-2xl border border-[#eae1d7] flex justify-between items-center transition">
                             <div class="space-y-1 min-w-0 flex-1 pr-2">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
-                                    <span class="text-[10px] text-[#8c7868] font-bold">${catName}</span>
-                                </div>
-                                <h5 class="font-black text-gray-900 text-xs mt-0.5 truncate">${cleanTitle}</h5>
+                                <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
+                                <h5 class="font-black text-gray-900 text-xs mt-1 truncate">${cleanTitle}</h5>
+                                ${s.uploader ? `<p class="text-[9px] text-gray-400 font-bold">👤 拍攝者: ${s.uploader}</p>` : ''}
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
                                 ${photoThumbnail}
@@ -848,42 +893,41 @@
             });
         }
 
-        // 更新圓形布章解鎖狀態
+        window.toggleQuestCollapse = function(sectionId) {
+            const el = document.getElementById(sectionId);
+            const icon = document.getElementById(`icon_${sectionId}`);
+            if (el.classList.contains('hidden')) { el.classList.remove('hidden'); icon.innerText = "▲ 收合"; }
+            else { el.classList.add('hidden'); icon.innerText = "▼ 展開"; }
+        }
+
         function updateBadges(fDone, fTotal, sDone, sTotal, shDone, shTotal) {
             const fBadge = document.getElementById('badge-food');
             const sBadge = document.getElementById('badge-spot');
             const shBadge = document.getElementById('badge-shop');
-
             const fTitle = document.getElementById('badge-food-title');
             const sTitle = document.getElementById('badge-spot-title');
             const shTitle = document.getElementById('badge-shop-title');
 
             if (fTotal > 0 && fDone === fTotal) {
-                fBadge.className = "badge-circle unlocked";
-                fTitle.innerText = "美食雷達全開";
+                fBadge.className = "badge-circle unlocked"; fTitle.innerText = "美食雷達全開";
             } else {
-                fBadge.className = "badge-circle";
-                fTitle.innerText = `美食 (${fDone}/${fTotal})`;
+                fBadge.className = "badge-circle"; fTitle.innerText = `美食 (${fDone}/${fTotal})`;
             }
 
             if (sTotal > 0 && sDone === sTotal) {
-                sBadge.className = "badge-circle unlocked";
-                sTitle.innerText = "深度冒險家";
+                sBadge.className = "badge-circle unlocked"; sTitle.innerText = "深度冒險家";
             } else {
-                sBadge.className = "badge-circle";
-                sTitle.innerText = `景點 (${sDone}/${sTotal})`;
+                sBadge.className = "badge-circle"; sTitle.innerText = `景點 (${sDone}/${sTotal})`;
             }
 
             if (shTotal > 0 && shDone === shTotal) {
-                shBadge.className = "badge-circle unlocked";
-                shTitle.innerText = "精品大收割";
+                shBadge.className = "badge-circle unlocked"; shTitle.innerText = "精品大收割";
             } else {
-                shBadge.className = "badge-circle";
-                shTitle.innerText = `購物 (${shDone}/${shTotal})`;
+                shBadge.className = "badge-circle"; shTitle.innerText = `購物 (${shDone}/${shTotal})`;
             }
         }
 
-        // 拍照打卡 Modal 邏輯
+        // 拍照打卡與已打卡管理邏輯
         window.openQuestPhotoModal = function(scheduleId, title) {
             currentQuestTargetId = scheduleId;
             document.getElementById('quest-modal-title').innerText = `📸 打卡：${title}`;
@@ -895,6 +939,35 @@
         window.closeQuestPhotoModal = function() {
             document.getElementById('quest-photo-modal').classList.add('hidden');
             currentQuestTargetId = null;
+        }
+
+        window.openQuestEditModal = function(scheduleId, title) {
+            currentQuestTargetId = scheduleId;
+            document.getElementById('edit-quest-modal-title').innerText = `✨ 已打卡：${title}`;
+            document.getElementById('quest-edit-modal').classList.remove('hidden');
+        }
+        window.closeQuestEditModal = function() {
+            document.getElementById('quest-edit-modal').classList.add('hidden');
+            currentQuestTargetId = null;
+        }
+
+        window.openChangePhotoFromEdit = function() {
+            let sId = currentQuestTargetId;
+            let item = allSchedulesData.find(s => s.id === sId);
+            closeQuestEditModal();
+            if (item) openQuestPhotoModal(sId, cleanDisplayTitle(item.title));
+        }
+
+        window.cancelQuestCheckin = async function() {
+            if (!currentProjectId || !currentQuestTargetId) return;
+            if (confirm("確定要取消打卡嗎？照片將被移除，您可以晚點再上傳！")) {
+                try {
+                    const docRef = doc(db, "projects", currentProjectId, "schedules", currentQuestTargetId);
+                    await updateDoc(docRef, { completed: false, photoUrl: "", uploader: "" });
+                    closeQuestEditModal();
+                    alert("✨ 已成功取消打卡！");
+                } catch (e) { alert("操作失敗"); }
+            }
         }
 
         window.previewQuestPhoto = function(event) {
@@ -919,7 +992,7 @@
 
             try {
                 const docRef = doc(db, "projects", currentProjectId, "schedules", currentQuestTargetId);
-                await updateDoc(docRef, { completed: true, photoUrl: previewSrc });
+                await updateDoc(docRef, { completed: true, photoUrl: previewSrc, uploader: currentMyName });
                 closeQuestPhotoModal();
                 alert("✨ 打卡成功！");
             } catch (e) {
@@ -928,22 +1001,25 @@
             }
         }
 
-        // 照片回憶寫真冊 Modal 邏輯
+        // 照片寫真冊 (支援下載至手機相冊)
         window.openPhotoGalleryModal = function() {
             const grid = document.getElementById('photo-gallery-grid');
             grid.innerHTML = '';
 
             let photos = allSchedulesData.filter(s => s.photoUrl);
             if (photos.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center text-xs text-gray-400 py-8">目前還沒有上傳任何打卡照片喔！✨</div>`;
+                grid.innerHTML = `<div class="col-span-2 text-center text-xs text-gray-400 py-8">目前還沒有旅伴上傳打卡照片喔！✨</div>`;
             } else {
                 photos.forEach(p => {
                     let div = document.createElement('div');
-                    div.className = "cute-card overflow-hidden bg-white border border-[#eae1d7] p-2 space-y-1.5";
+                    div.className = "cute-card overflow-hidden bg-white border border-[#eae1d7] p-2 space-y-1.5 flex flex-col justify-between";
                     div.innerHTML = `
-                        <img src="${p.photoUrl}" class="w-full h-28 object-cover rounded-xl">
-                        <p class="text-[11px] font-black text-gray-800 truncate">${cleanDisplayTitle(p.title)}</p>
-                        <p class="text-[9px] text-gray-400 font-bold">${p.day || 'Day 1'}</p>
+                        <div>
+                            <img src="${p.photoUrl}" class="w-full h-28 object-cover rounded-xl">
+                            <p class="text-[11px] font-black text-gray-800 truncate mt-1">${cleanDisplayTitle(p.title)}</p>
+                            <p class="text-[9px] text-gray-400 font-bold">👤 ${p.uploader || '夥伴'} | ${p.day || 'Day 1'}</p>
+                        </div>
+                        <a href="${p.photoUrl}" download="travel_photo_${p.id}.jpg" class="w-full text-center bg-[#f0dcd0] text-[#735848] text-[10px] py-1.5 rounded-lg font-black hover:bg-[#e2c8b8] transition">📥 下載到手機相冊</a>
                     `;
                     grid.appendChild(div);
                 });
@@ -954,7 +1030,7 @@
             document.getElementById('photo-gallery-modal').classList.add('hidden');
         }
 
-        // 記帳與分帳渲染 (保留)
+        // 記帳與分帳渲染 (自動帶入 currentMyName)
         function renderExpenseUI() {
             const container = document.getElementById('expense-list-container');
             const breakdownContainer = document.getElementById('currency-breakdown');
@@ -1083,6 +1159,7 @@
                 let opt = document.createElement('option');
                 opt.value = m.name;
                 opt.innerText = m.name;
+                if (m.name === currentMyName) opt.selected = true; // 自動預設選中自己
                 payerSelect.appendChild(opt);
 
                 let div = document.createElement('div');
@@ -1458,7 +1535,7 @@
             document.getElementById('back-btn').classList.add('hidden');
             document.getElementById('share-btn').classList.add('hidden');
             document.getElementById('view-projects').classList.remove('hidden');
-            document.getElementById('header-title').innerText = "🌸 我的旅遊小專案";
+            document.getElementById('header-title').innerText = "放風 ✈";
             document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
             renderProjects();
         }
@@ -1547,7 +1624,7 @@
                 
                 let headerHtml = `
                     <div onclick="toggleDayCollapse('${sectionId}')" class="bg-[#f3e9de]/70 p-3.5 flex justify-between items-center cursor-pointer hover:bg-[#f3e9de] transition">
-                        <h4 class="font-black text-[#5c4a3d] text-xs">📅 ${dayKey} <span class="text-[11px] text-[#8c7868] font-bold">(${items.length} 個行程)</span></h4>
+                        <h4 class="font-black text-[#5c4a3d] text-xs">${dayKey} <span class="text-[11px] text-[#8c7868] font-bold">(${items.length} 個行程)</span></h4>
                         <span id="icon_${sectionId}" class="text-xs text-[#8c7868] font-black">▼ 展開</span>
                     </div>
                 `;
