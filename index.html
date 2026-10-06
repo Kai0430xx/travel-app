@@ -86,7 +86,7 @@
                 </div>
             </div>
 
-            <!-- 分頁 2：提醒 (已由錦囊更名，並擴充天氣與入境相關內容) -->
+            <!-- 分頁 2：提醒 (已全面擴充實用指南) -->
             <div id="tab-ai" class="tab-content hidden space-y-3.5">
                 <div class="cute-card p-5 space-y-2.5">
                     <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌤 當地天氣與穿搭指南</h3>
@@ -96,12 +96,28 @@
                 </div>
 
                 <div class="cute-card p-5 space-y-2.5">
-                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🛂 入境與行前重要提醒</h3>
+                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚗 濟州島自駕與導航提醒</h3>
                     <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                        <li>**護照效期：** 確保護照有效期限自回國當日起算還有 6 個月以上。</li>
-                        <li>**網卡與交通：** 建議提前購買好網卡（eSIM 或實體卡），並確認租車所需要的**國際駕照**與**台灣駕照**正本是否已備妥 🚗。</li>
-                        <li>**海關申報：** 機上發放的入境卡與海關申報單請確實填寫。禁止攜帶肉製品入境，違者罰款相當嚴格！</li>
-                        <li>**插頭與電壓：** 當地電壓為 220V，插頭為**圓形雙孔（歐規/韓規）**，記得攜帶萬用轉接頭與行動電源 🔌。</li>
+                        <li>**導航 App：** 強烈建議下載 **Naver Map** 或 **Kakao Map**，搜尋時以**電話號碼 (Phone Number)** 查詢最準確不迷路！</li>
+                        <li>**測速與速限：** 道路速限嚴格（市區 50、一般道路 60-70），沿途有大量固定與移動式測速，務必依速限行駛。</li>
+                        <li>**加油還車：** 多為自助或半人工，租車通常規定「滿油出借、滿油還車」，出發前記得確認油種（通常為汽油 汽油/Gasoline）。</li>
+                    </ul>
+                </div>
+
+                <div class="cute-card p-5 space-y-2.5">
+                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與行前重要提醒</h3>
+                    <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                        <li>**護照與駕照：** 護照效期需滿 6 個月以上；自駕務必攜帶**台灣駕照正本**與**國際駕照**。</li>
+                        <li>**支付工具：** 韓國幾乎全面普及刷卡與行動支付（Apple Pay/Google Pay），但建議身上備妥 5~10 萬韓元現金以備不時之需。</li>
+                        <li>**插頭規格：** 當地電壓 220V，為**圓形雙孔（歐規/韓規）**，記得攜帶萬用轉接頭。</li>
+                    </ul>
+                </div>
+
+                <div class="cute-card p-5 space-y-2.5">
+                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                    <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                        <li>**警察局：** 112 | **救護車/消防：** 119</li>
+                        <li>**韓國旅遊諮詢熱線（中文服務）：** 1330</li>
                     </ul>
                 </div>
             </div>
@@ -251,7 +267,7 @@
         </div>
     </div>
 
-    <!-- 底部導覽列 (已將「錦囊」正名為「提醒」) -->
+    <!-- 底部導覽列 -->
     <nav id="bottom-nav" class="hidden fixed bottom-3 left-4 right-4 max-w-[448px] mx-auto bg-white/95 backdrop-blur-md border border-amber-100 flex justify-around py-3 rounded-2xl shadow-xl z-50">
         <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-orange-500 text-xs font-black gap-0.5"><span class="text-xl">📅</span>行程</button>
         <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💡</span>提醒</button>
