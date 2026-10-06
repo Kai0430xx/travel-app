@@ -76,7 +76,7 @@
                 </div>
             </div>
 
-            <!-- 分頁 2：提醒 (已恢復完整豐富的指南內容) -->
+            <!-- 分頁 2：提醒 -->
             <div id="tab-ai" class="tab-content hidden space-y-3.5">
                 <div id="dynamic-reminders-container" class="space-y-3.5"></div>
             </div>
@@ -105,15 +105,18 @@
 
             <!-- 分頁 4：分帳 -->
             <div id="tab-split" class="tab-content hidden space-y-4">
+                
+                <!-- 總覽卡片 -->
                 <div class="bg-gradient-to-r from-orange-400 to-pink-400 text-white p-5 rounded-3xl shadow-lg shadow-orange-200/50 space-y-2">
                     <div class="flex justify-between items-center">
-                        <p class="text-xs opacity-90 font-medium">✨ 總花費金額 (折合台幣)</p>
+                        <p class="text-xs opacity-90 font-medium">✨ 旅程總花費 (折合台幣)</p>
                         <button onclick="openAddMemberModal()" class="bg-white/20 hover:bg-white/30 text-white text-[11px] px-3 py-1.5 rounded-full font-bold transition">＋ 管理成員</button>
                     </div>
                     <h3 id="total-expense-twd" class="text-2xl font-black tracking-tight">NT$ 0</h3>
                     <div id="currency-breakdown" class="text-[11px] opacity-90 flex gap-3 pt-1 border-t border-white/20 flex-wrap"></div>
                 </div>
 
+                <!-- 功能按鈕列 -->
                 <div class="flex justify-between items-center px-1">
                     <h3 class="font-black text-gray-700 text-xs tracking-wider">💰 帳目與結算</h3>
                     <div class="flex gap-2">
@@ -122,6 +125,7 @@
                     </div>
                 </div>
 
+                <!-- 帳目明細列表 -->
                 <div id="expense-list-container" class="space-y-2.5">
                     <p class="text-center text-xs text-gray-400 py-6">目前還沒有記帳，點上方按鈕開始記帳吧！✨</p>
                 </div>
@@ -137,18 +141,20 @@
                 <h3 class="font-black text-amber-950 text-base">✍️ 新增記帳</h3>
                 <button onclick="closeAddExpenseModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
+            
             <div>
                 <label class="block font-bold text-gray-600 mb-1">項目名稱</label>
-                <input type="text" id="exp-title" placeholder="例如：黑豬肉晚餐、計程車" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold">
+                <input type="text" id="exp-title" placeholder="例如：黑豬肉晚餐、計程車" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
             </div>
+
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block font-bold text-gray-600 mb-1">金額</label>
-                    <input type="number" id="exp-amount" placeholder="例如：50000" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold">
+                    <input type="number" id="exp-amount" placeholder="例如：50000" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
                 </div>
                 <div>
                     <label class="block font-bold text-gray-600 mb-1">幣別</label>
-                    <select id="exp-currency" onchange="toggleExchangeRate()" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold">
+                    <select id="exp-currency" onchange="toggleExchangeRate()" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
                         <option value="TWD">TWD (台幣)</option>
                         <option value="KRW" selected>KRW (韓元)</option>
                         <option value="JPY">JPY (日圓)</option>
@@ -157,21 +163,25 @@
                     </select>
                 </div>
             </div>
+
             <div id="rate-box">
-                <label class="block font-bold text-gray-600 mb-1">對台幣匯率</label>
-                <input type="number" id="exp-rate" value="0.024" step="0.0001" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold">
+                <label class="block font-bold text-gray-600 mb-1">對台幣匯率 (例如 1 韓元 = 0.024 台幣)</label>
+                <input type="number" id="exp-rate" value="0.024" step="0.0001" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
             </div>
+
             <div>
                 <label class="block font-bold text-gray-600 mb-1">誰先付錢的？</label>
-                <select id="exp-payer" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold"></select>
+                <select id="exp-payer" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold"></select>
             </div>
+
             <div>
                 <label class="block font-bold text-gray-600 mb-1">你想收回什麼幣別？</label>
-                <select id="exp-settle-currency" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold">
+                <select id="exp-settle-currency" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
                     <option value="ORIGINAL">依原幣別收回 (例如繼續收外幣現金)</option>
                     <option value="TWD">折合台幣收回 (幫大家換算成台幣給付)</option>
                 </select>
             </div>
+
             <div>
                 <div class="flex justify-between items-center mb-1">
                     <label class="font-bold text-gray-600">分攤模式與金額</label>
@@ -182,6 +192,7 @@
                 </div>
                 <div id="exp-participants-container" class="space-y-2 p-2.5 bg-amber-50/30 border border-amber-100 rounded-2xl max-h-40 overflow-y-auto"></div>
             </div>
+
             <div class="flex gap-2.5 pt-2">
                 <button onclick="closeAddExpenseModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-2xl font-black">取消</button>
                 <button onclick="submitExpense()" class="flex-1 bg-gradient-to-r from-orange-400 to-amber-400 text-white py-3 rounded-2xl font-black shadow-md shadow-orange-200">確認記帳</button>
@@ -280,7 +291,7 @@
 
     <!-- 手動新增行程 Modal -->
     <div id="schedule-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
+        <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-amber-950 text-base">✏️ 手動新增行程</h3>
                 <button onclick="closeAddScheduleModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
@@ -390,7 +401,7 @@
             japan: {
                 langCode: 'ja-JP',
                 categories: [
-                    { id: 'restaurant', name: '🍽️️ 餐廳' },
+                    { id: 'restaurant', name: '🍽️ 餐廳' },
                     { id: 'shopping', name: '🛍️ 購物' },
                     { id: 'transport', name: '🚆 交通' },
                     { id: 'hotel', name: '🏨 住宿' },
@@ -426,7 +437,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -488,8 +499,8 @@
             general: {
                 langCode: 'en-US',
                 categories: [
-                    { id: 'restaurant', name: '🍽️️ 餐廳' },
-                    { id: 'shopping', name: '🛍️ 購物' },
+                    { id: 'restaurant', name: '🍽️ 餐廳' },
+                    { id: 'shopping', name: '🛍️️ 購物' },
                     { id: 'transport', name: '🚕 交通' },
                     { id: 'hotel', name: '🏨 住宿' },
                     { id: 'emergency', name: '🚨 突發' }
@@ -653,7 +664,7 @@
             });
         }
 
-        // 🌟 完整流暢的記帳明細列表渲染
+        // 🌟 渲染分帳明細總覽（含刪除按鈕）
         function renderExpenseUI() {
             const container = document.getElementById('expense-list-container');
             const breakdownContainer = document.getElementById('currency-breakdown');
@@ -709,13 +720,30 @@
                             ${count} 人分攤 (${exp.settleCurrency === 'TWD' ? '折合台幣結算' : '原幣別結算'})
                         </p>
                     </div>
-                    <div class="text-right shrink-0">
-                        <p class="text-sm font-black text-orange-600">${exp.currency} ${exp.amount.toLocaleString()}</p>
-                        <p class="text-[10px] text-gray-400 font-bold">≈ NT$ ${twdVal.toLocaleString()}</p>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <div class="text-right">
+                            <p class="text-sm font-black text-orange-600">${exp.currency} ${exp.amount.toLocaleString()}</p>
+                            <p class="text-[10px] text-gray-400 font-bold">≈ NT$ ${twdVal.toLocaleString()}</p>
+                        </div>
+                        <button onclick="deleteExpense('${exp.id}')" class="text-gray-300 hover:text-red-500 text-sm p-1.5 transition" title="刪除此筆記帳">🗑️</button>
                     </div>
                 `;
                 container.appendChild(card);
             });
+        }
+
+        // 刪除記帳項目
+        window.deleteExpense = async function(expenseId) {
+            if (!currentProjectId) return;
+            if (confirm("確定要刪除這筆記帳嗎？")) {
+                try {
+                    await deleteDoc(doc(db, "projects", currentProjectId, "expenses", expenseId));
+                    alert("✨ 刪除成功！");
+                } catch (e) {
+                    console.error("刪除失敗", e);
+                    alert("刪除失敗，請檢查網路連線");
+                }
+            }
         }
 
         window.openAddExpenseModal = function() {
@@ -987,7 +1015,7 @@
         }
         window.closeSettlementModal = function() { document.getElementById('settlement-modal').classList.add('hidden'); }
 
-        // 🌟 完整強大的提醒規則引擎（包含濟州島/韓國、日本、泰國與萬國通用）
+        // 提醒規則引擎
         function renderRemindersByRules(projectName) {
             const container = document.getElementById('dynamic-reminders-container');
             let nameLower = projectName.toLowerCase();
@@ -1087,7 +1115,7 @@
             container.innerHTML = html;
         }
 
-        // 語言模組初始化 (保留)
+        // 語言模組
         function initLanguageModule(projectName) {
             let nameLower = projectName.toLowerCase();
             let destKey = 'general';
