@@ -196,7 +196,7 @@
                 <h3 class="font-black text-amber-950 text-base">✨ AI 智慧導入行程</h3>
                 <button onclick="closeSmartPasteModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
-            <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。跨行的備註與代碼會完美收納在對應卡片內！</p>
+            <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。AI 會自動抓取「備註：」後方的文字與跨行代碼收納至卡片內！</p>
             <textarea id="smart-paste-input" rows="8" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3.5 bg-amber-50/50 border border-amber-100 rounded-2xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
             <div class="flex gap-2.5 pt-1">
                 <button onclick="closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-black">取消</button>
@@ -607,12 +607,12 @@
             }
         }
 
-        // 🌟 絕對精準的區塊智慧解析引擎 (完美支援跨行備註與代碼)
+        // 🌟 終極修正版 AI 智慧導入解析引擎 (透過關鍵字精準抓取備註)
         window.parseSmartPaste = async function() {
             const rawText = document.getElementById('smart-paste-input').value.trim();
             if(!rawText) { alert("請先輸入或貼上行程文字喔！"); return; }
 
-            alert("✨ AI 正在執行區塊智慧配對中...");
+            alert("✨ AI 正在精準分析行程與備註中...");
 
             const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentDay = "Day 1";
@@ -657,7 +657,7 @@
                             createdAt: Date.now() + parsedItems.length
                         };
                     } 
-                    // 3. 如果不是新行程開頭，代表這是上一項行程的「跨行備註或代碼」！
+                    // 3. 如果不是新行程開頭，檢查是不是包含「備註」或是純代碼，直接當作目前行程的備註！
                     else if (currentItem) {
                         let noteText = line.replace(/^備註[：:]\s*/, '').trim();
                         if (noteText) {
@@ -682,7 +682,7 @@
 
                 document.getElementById('smart-paste-input').value = "";
                 closeSmartPasteModal();
-                alert(`✨ 成功！已智慧導入 ${parsedItems.length} 筆行程，跨行備註與代碼已完美收納！`);
+                alert(`✨ 成功！已智慧導入 ${parsedItems.length} 筆行程，備註與代碼已完美收納至卡片內！`);
             } catch (e) {
                 console.error("AI 拆解失敗", e);
                 alert("解析發生錯誤，請再試一次");
