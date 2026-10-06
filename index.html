@@ -64,7 +64,7 @@
             <!-- 分頁 1：行程 -->
             <div id="tab-schedule" class="tab-content space-y-4">
                 
-                <!-- 🌟 即將到來的行程置頂卡片 -->
+                <!-- 🌟 即將到來的行程置頂卡片 (已優化留白與排版) -->
                 <div id="upcoming-card-container"></div>
 
                 <!-- 行程列表標題與功能按鈕列 -->
@@ -120,7 +120,7 @@
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             
-            <!-- 檢視模式 (預設顯示) -->
+            <!-- 檢視模式 -->
             <div id="modal-view-mode" class="space-y-4">
                 <div class="flex justify-between items-start">
                     <div>
@@ -132,7 +132,7 @@
                 
                 <div>
                     <h3 id="modal-title" class="font-black text-gray-900 text-base mt-2">行程名稱</h3>
-                    <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">📍 詳細地點：<span id="modal-location" class="font-bold text-gray-800"></span></p>
+                    <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">📝 備註：<span id="modal-location" class="font-bold text-gray-800"></span></p>
                 </div>
 
                 <div class="pt-2 flex gap-2.5">
@@ -150,7 +150,7 @@
                 </div>
             </div>
 
-            <!-- 編輯模式 (預設隱藏) -->
+            <!-- 編輯模式 -->
             <div id="modal-edit-mode" class="hidden space-y-3 text-xs">
                 <div class="flex justify-between items-center">
                     <h3 class="font-black text-amber-950 text-base">✏️ 編輯行程內容</h3>
@@ -172,7 +172,7 @@
                     <input type="text" id="edit-title" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
                 </div>
                 <div>
-                    <label class="block font-bold text-gray-600 mb-1">地圖導航地點</label>
+                    <label class="block font-bold text-gray-600 mb-1">備註</label>
                     <input type="text" id="edit-location" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
                 </div>
 
@@ -205,7 +205,7 @@
     <div id="schedule-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
-                <h3 class="font-black text-amber-950 text-base">✏️️ 手動新增行程</h3>
+                <h3 class="font-black text-amber-950 text-base">✏️ 手動新增行程</h3>
                 <button onclick="closeAddScheduleModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
             
@@ -223,8 +223,8 @@
                     <input type="text" id="input-title" placeholder="例如：黑豬肉晚餐" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
                 </div>
                 <div>
-                    <label class="block font-bold text-gray-600 mb-1">地圖導航地點（選填）</label>
-                    <input type="text" id="input-location" placeholder="例如：濟州島黑豬肉餐廳" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                    <label class="block font-bold text-gray-600 mb-1">備註（選填）</label>
+                    <input type="text" id="input-location" placeholder="例如：餐廳預訂代碼或補充說明" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
                 </div>
             </div>
 
@@ -305,7 +305,7 @@
                                 <span class="text-xs bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-black shrink-0">進行中 🚗</span>
                                 <div class="flex items-center gap-2 shrink-0">
                                     <span class="text-xs text-gray-500 font-bold">${p.dates || '未定日期'}</span>
-                                    <button onclick="event.stopPropagation(); removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1 shrink-0" title="從我的清單移除">🗑️️</button>
+                                    <button onclick="event.stopPropagation(); removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1 shrink-0" title="從我的清單移除">🗑️</button>
                                 </div>
                             </div>
                             <div onclick="enterProject('${id}', '${p.name}', '${p.dates}')" class="cursor-pointer space-y-1">
@@ -392,7 +392,6 @@
             });
         }
 
-        // 清洗黑字標題，強制確保不帶時間
         function cleanDisplayTitle(title) {
             if (!title) return '';
             return title.replace(/^\d{1,2}[:：]\d{2}\s*/, '').trim();
@@ -410,16 +409,16 @@
                 return;
             }
 
-            // 即將到來的行程置頂 (已套用 cleanDisplayTitle 確保不帶時間)
+            // 🌟 即將到來的行程置頂 (調整 padding 為 p-5 解決文字擠在一起的問題)
             const nextItem = allSchedulesData[0];
             const cleanNextTitle = cleanDisplayTitle(nextItem.title);
             upcomingContainer.innerHTML = `
-                <div onclick="openDetailModal('${nextItem.id}')" class="cute-card p-4.5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-orange-300 space-y-1 relative shadow-md cursor-pointer hover:scale-[1.01] transition">
+                <div onclick="openDetailModal('${nextItem.id}')" class="cute-card p-5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-orange-300 space-y-2 relative shadow-md cursor-pointer hover:scale-[1.01] transition">
                     <div class="flex justify-between items-center">
                         <span class="text-xs bg-orange-500 text-white px-3 py-1 rounded-full font-black">🚀 即將到來</span>
                         <span class="text-xs font-black text-orange-800">${nextItem.day || 'Day 1'} • ${nextItem.time || '全天'}</span>
                     </div>
-                    <h4 class="font-black text-gray-900 text-sm mt-1">${cleanNextTitle}</h4>
+                    <h4 class="font-black text-gray-900 text-sm pt-0.5">${cleanNextTitle}</h4>
                 </div>
             `;
 
@@ -483,7 +482,7 @@
             }
         }
 
-        // 開啟詳情 Modal (固定為檢視模式)
+        // 開啟詳情 Modal
         window.openDetailModal = function(id) {
             const item = allSchedulesData.find(s => s.id === id);
             if (!item) return;
@@ -491,7 +490,7 @@
             document.getElementById('modal-day').innerText = item.day || 'Day 1';
             document.getElementById('modal-time').innerText = item.time || '全天';
             document.getElementById('modal-title').innerText = cleanDisplayTitle(item.title);
-            document.getElementById('modal-location').innerText = item.location || cleanDisplayTitle(item.title);
+            document.getElementById('modal-location').innerText = item.location || '無備註';
 
             const queryText = encodeURIComponent(item.location || cleanDisplayTitle(item.title));
             document.getElementById('modal-gmap').href = `https://maps.google.com/?q=${queryText}`;
@@ -501,7 +500,7 @@
             document.getElementById('edit-day').value = item.day || 'Day 1';
             document.getElementById('edit-time').value = item.time || '10:00';
             document.getElementById('edit-title').value = cleanDisplayTitle(item.title);
-            document.getElementById('edit-location').value = item.location || cleanDisplayTitle(item.title);
+            document.getElementById('edit-location').value = item.location || '';
 
             document.getElementById('modal-view-mode').classList.remove('hidden');
             document.getElementById('modal-edit-mode').classList.add('hidden');
@@ -532,7 +531,6 @@
             let location = document.getElementById('edit-location').value.trim();
 
             if (!title) { alert("請填寫行程名稱！"); return; }
-            if (!location) location = title;
 
             try {
                 const docRef = doc(db, "projects", currentProjectId, "schedules", scheduleId);
@@ -571,7 +569,6 @@
             let location = document.getElementById('input-location').value.trim();
 
             if (!title) { alert("請填寫行程名稱！"); return; }
-            if (!location) location = title;
 
             try {
                 await addDoc(collection(db, "projects", currentProjectId, "schedules"), {
@@ -643,7 +640,6 @@
                     let cleanLocation = cleanTitle
                         .replace(/\[.*?\]/g, '')
                         .trim();
-                    if (!cleanLocation) cleanLocation = cleanTitle;
 
                     await addDoc(collection(db, "projects", currentProjectId, "schedules"), {
                         time: timeStr,
