@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>我們的溫馨小旅行 ✈️️</title>
+    <title>我們的溫馨小旅行 ✈️</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
@@ -196,7 +196,7 @@
                 <h3 class="font-black text-amber-950 text-base">✨ AI 智慧導入行程</h3>
                 <button onclick="closeSmartPasteModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
-            <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。備註與營業時間內的減號絕不會被誤判！</p>
+            <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。時間與備註將完美同時到位！</p>
             <textarea id="smart-paste-input" rows="8" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3.5 bg-amber-50/50 border border-amber-100 rounded-2xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
             <div class="flex gap-2.5 pt-1">
                 <button onclick="closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-black">取消</button>
@@ -455,7 +455,7 @@
 
                 items.forEach(s => {
                     let cleanTitle = cleanDisplayTitle(s.title);
-                    let timeLabel = s.time || '彈性';
+                    let timeLabel = s.time || '全天';
                     listHtml += `
                         <div onclick="openDetailModal('${s.id}')" class="p-3.5 bg-amber-50/40 hover:bg-amber-50 rounded-2xl border border-amber-100/80 flex justify-between items-center cursor-pointer transition">
                             <div class="space-y-1">
@@ -608,12 +608,12 @@
             }
         }
 
-        // 🌟 最終完美版 AI 智慧解析引擎：只認行首「標準時間格式（如 07:55）或 •」當作新行程，徹底排除減號干擾
+        // 🌟 完美修復版 AI 智慧解析引擎：同時精準抓取時間與備註
         window.parseSmartPaste = async function() {
             const rawText = document.getElementById('smart-paste-input').value.trim();
             if(!rawText) { alert("請先輸入或貼上行程文字喔！"); return; }
 
-            alert("✨ AI 正在以行首時間進行精準拆解與備註收納中...");
+            alert("✨ AI 正在精準抓取時間與備註中...");
 
             const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentDay = "Day 1";
@@ -635,8 +635,7 @@
                         continue;
                     }
 
-                    // 2. 嚴格行首時間判定：必須是整行「開頭」就是時間（如 07:55）或是以 • 開頭才算新行程！
-                    // 絕對不使用 "-" 或其他容易出現在營業時間裡的符號來判斷。
+                    // 2. 偵測是否為新行程開頭（行首含有時間格式如 07:55 或 •）
                     let timeMatch = line.match(/^(\d{1,2}[:：]\d{2})/);
                     let isNewItem = timeMatch || line.startsWith("•");
 
@@ -653,13 +652,13 @@
 
                         currentItem = {
                             day: currentDay,
-                            time: timeStr,
+                            time: timeStr,  // 確保正確存入時間
                             title: cleanTitle,
-                            location: "", // 儲存備註
+                            location: "",   // 儲存備註
                             createdAt: Date.now() + parsedItems.length
                         };
                     } 
-                    // 3. 如果開頭不是時間，全部安全當作目前行程的備註！
+                    // 3. 如果不是新行程，全部安全當作目前行程的備註
                     else if (currentItem) {
                         currentItem.location = currentItem.location ? (currentItem.location + "\n" + line) : line;
                     }
@@ -681,7 +680,7 @@
 
                 document.getElementById('smart-paste-input').value = "";
                 closeSmartPasteModal();
-                alert(`✨ 成功！已智慧導入 ${parsedItems.length} 筆行程（時間與備註已完美歸位）！`);
+                alert(`✨ 成功！已智慧導入 ${parsedItems.length} 筆行程（時間與備註完美到位）！`);
             } catch (e) {
                 console.error("AI 拆解失敗", e);
                 alert("解析發生錯誤，請再試一次");
