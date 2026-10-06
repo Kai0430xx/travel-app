@@ -91,10 +91,10 @@
                 <div id="dynamic-reminders-container" class="space-y-3.5"></div>
             </div>
 
-            <!-- 分頁 3：語言 (左分類、右純中文清單、上大框點擊顯示翻譯與發音) -->
+            <!-- 分頁 3：語言 (右側已無手指圖案) -->
             <div id="tab-lang" class="tab-content hidden space-y-4">
                 
-                <!-- 🌟 頂部大展示框 (點擊右側後才顯示該國語言與發音) -->
+                <!-- 🌟 頂部大展示框 -->
                 <div class="cute-card p-6 bg-gradient-to-br from-amber-50/80 to-orange-50/80 border-2 border-orange-300 space-y-3 shadow-md text-center relative">
                     <div class="absolute top-3 left-4">
                         <span class="text-[10px] bg-orange-200 text-orange-900 px-2.5 py-0.5 rounded-full font-black">🗣️ 實用翻譯發音</span>
@@ -120,7 +120,7 @@
                         <!-- 動態產生分類按鈕 -->
                     </div>
 
-                    <!-- 右下：該分類對應的「純中文」句子清單 (8欄) -->
+                    <!-- 右下：該分類對應的純中文句子清單 (8欄，無手指圖案) -->
                     <div id="lang-phrases" class="col-span-8 space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
                         <div class="cute-card p-4 text-center text-xs text-gray-400">請先點選左側分類</div>
                     </div>
@@ -295,7 +295,7 @@
         let unsubscribeSchedules = null;
         let allSchedulesData = [];
 
-        // 🌟 擴充至極豐富的萬國語言庫（右側僅顯示中文，點擊後上方大框才顯示翻譯與發音）
+        // 🌟 擴充至極豐富的萬國語言庫（右側僅顯示中文）
         const languageData = {
             korea: {
                 langCode: 'ko-KR',
@@ -638,7 +638,7 @@
             renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
         }
 
-        // 🌟 渲染右側句子清單 (右下僅顯示中文)
+        // 🌟 渲染右側句子清單 (右下僅顯示中文，拿掉手指圖案)
         function renderPhrases(phrases) {
             const phraseContainer = document.getElementById('lang-phrases');
             phraseContainer.innerHTML = '';
@@ -650,7 +650,6 @@
                     <div>
                         <p class="text-xs text-gray-800 font-bold">${p.cn}</p>
                     </div>
-                    <span class="text-base shrink-0 ml-2">👉</span>
                 `;
                 card.onclick = () => {
                     currentActivePhrase = p;
@@ -713,7 +712,7 @@
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚆 交通與導航提醒</h3>
                         <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>導航：推薦使用 Google Maps 或 乗換案內 查詢地鐵。</li>
+                            <li>導航：推薦使用 Google Maps 或 乗換案内 查詢地鐵。</li>
                             <li>IC 卡：建議事先將 Suica 或 Pasmo 加入手機錢包（Apple Pay）。</li>
                         </ul>
                     </div>
