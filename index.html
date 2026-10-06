@@ -25,11 +25,11 @@
 </head>
 <body class="pb-28 text-gray-800">
 
-    <!-- 頂部標題區 (已修復高度與排版，絕不超出格子) -->
+    <!-- 頂部標題區 -->
     <header class="bg-gradient-to-r from-amber-200 to-orange-200 text-amber-950 px-4 py-3.5 shadow-sm sticky top-0 z-50 flex justify-between items-center rounded-b-3xl">
         <div class="flex items-center gap-2 min-w-0 pr-2">
             <button id="back-btn" onclick="backToProjects()" class="hidden bg-white/90 hover:bg-white text-amber-950 px-2.5 py-1.5 rounded-full text-xs font-bold shadow-sm transition active:scale-95 shrink-0 flex items-center gap-1">
-                ⬅️️ 專案
+                ⬅ 專案
             </button>
             <div class="min-w-0">
                 <h1 id="header-title" class="text-sm font-black truncate flex items-center gap-1">🌸 我的旅遊小專案</h1>
@@ -53,7 +53,7 @@
                 </button>
             </div>
 
-            <div id="project-list" class="space-y-3">
+            <div id="project-list" class="space-y-3.5">
                 <p class="text-center text-xs text-gray-400 py-8">載入中... ☁️</p>
             </div>
         </div>
@@ -71,10 +71,10 @@
                 <div class="flex justify-between items-center px-1">
                     <h3 class="font-black text-gray-700 text-xs tracking-wider">📅 完整行程時間軸</h3>
                     <div class="flex gap-2">
-                        <button onclick="openSmartPasteModal()" class="bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs px-3 py-2 rounded-2xl font-black shadow-sm shadow-orange-200 transition active:scale-95">
+                        <button onclick="openSmartPasteModal()" class="bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs px-3.5 py-2 rounded-2xl font-black shadow-sm shadow-orange-200 transition active:scale-95">
                             ✨ 智慧導入
                         </button>
-                        <button onclick="openAddScheduleModal()" class="bg-amber-500 text-white text-xs px-3 py-2 rounded-2xl font-black shadow-sm shadow-amber-200 transition active:scale-95">
+                        <button onclick="openAddScheduleModal()" class="bg-amber-500 text-white text-xs px-3.5 py-2 rounded-2xl font-black shadow-sm shadow-amber-200 transition active:scale-95">
                             ＋ 手動新增
                         </button>
                     </div>
@@ -89,7 +89,7 @@
             <!-- 分頁 2：AI 錦囊 -->
             <div id="tab-ai" class="tab-content hidden space-y-4">
                 <div class="cute-card p-5 space-y-2">
-                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌤️️ 當地天氣與穿搭</h3>
+                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌤 當地天氣與穿搭</h3>
                     <p class="text-xs text-gray-600 leading-relaxed">氣溫舒服，風較大，建議攜帶防風外套與保暖配件 🧣。</p>
                 </div>
             </div>
@@ -116,7 +116,7 @@
         </div>
     </main>
 
-    <!-- 🌸 行程詳細資訊彈跳視窗 (點擊任一卡片觸發) -->
+    <!-- 🌸 行程詳細資訊彈跳視窗 -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-start">
@@ -132,7 +132,6 @@
                 <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">📍 詳細地點：<span id="modal-location" class="font-bold text-gray-800"></span></p>
             </div>
 
-            <!-- 導航按鈕區 -->
             <div class="pt-3 flex gap-2.5">
                 <a id="modal-gmap" href="#" target="_blank" class="flex-1 text-center text-xs bg-amber-50 text-amber-900 py-3 rounded-2xl font-black hover:bg-amber-100 transition flex items-center justify-center gap-1 shadow-sm">
                     🗺 Google Maps
@@ -260,18 +259,19 @@
                     if (docSnap.exists()) {
                         const p = docSnap.data();
                         const card = document.createElement('div');
-                        card.className = "cute-card p-4.5 space-y-2 relative transition hover:border-orange-300";
+                        // 🌟 優化卡片排版與留白，確保日期與刪除按鈕不擠壓
+                        card.className = "cute-card p-5 space-y-3 relative transition hover:border-orange-300";
                         card.innerHTML = `
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs bg-orange-100 text-orange-800 px-3 py-0.5 rounded-full font-black">進行中 🚗</span>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs text-gray-400 font-bold">${p.dates}</span>
-                                    <button onclick="event.stopPropagation(); removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1" title="從我的清單移除">🗑️</button>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-xs bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-black shrink-0">進行中 🚗</span>
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <span class="text-xs text-gray-500 font-bold truncate">${p.dates}</span>
+                                    <button onclick="event.stopPropagation(); removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1 shrink-0" title="從我的清單移除">🗑️</button>
                                 </div>
                             </div>
-                            <div onclick="enterProject('${id}', '${p.name}', '${p.dates}')" class="cursor-pointer">
-                                <h3 class="font-black text-gray-900 text-base mt-1">🌸 ${p.name}</h3>
-                                <p class="text-xs text-gray-500 mt-0.5">點擊進入專案行程管理 ✨</p>
+                            <div onclick="enterProject('${id}', '${p.name}', '${p.dates}')" class="cursor-pointer space-y-1">
+                                <h3 class="font-black text-gray-900 text-base">🌸 ${p.name}</h3>
+                                <p class="text-xs text-gray-500">點擊進入專案行程管理 ✨</p>
                             </div>
                         `;
                         list.appendChild(card);
@@ -368,7 +368,7 @@
             // 即將到來的行程置頂
             const nextItem = allSchedulesData[0];
             upcomingContainer.innerHTML = `
-                <div onclick="openDetailModal('${nextItem.id}')" class="cute-card p-4.5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-orange-300 space-y-2 relative shadow-md cursor-pointer hover:scale-[1.01] transition">
+                <div onclick="openDetailModal('${nextItem.id}')" class="cute-card p-5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-orange-300 space-y-2.5 relative shadow-md cursor-pointer hover:scale-[1.01] transition">
                     <div class="flex justify-between items-center">
                         <span class="text-xs bg-orange-500 text-white px-3 py-1 rounded-full font-black">🚀 即將到來</span>
                         <span class="text-xs font-black text-orange-800">${nextItem.day || 'Day 1'} • ${nextItem.time || '全天'}</span>
