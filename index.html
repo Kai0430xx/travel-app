@@ -145,17 +145,17 @@
                 </div>
             </div>
 
-            <!-- 分頁 5：闖關成就 (圓形布章與拍照打卡) -->
+            <!-- 分頁 5：闖關成就 -->
             <div id="tab-quest" class="tab-content hidden space-y-4">
                 <!-- 成績總覽與圓形布章區 -->
                 <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-4 shadow-md border-[#e2d3c3]">
                     <div class="flex justify-between items-center">
                         <span id="quest-project-title" class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black">🌸 冒險進行中</span>
-                        <span id="quest-total-count" class="text-xs font-black text-[#d98262]">已打卡 0 / 0</span>
+                        <button onclick="openPhotoGalleryModal()" class="bg-[#d98262] text-white text-[11px] px-3 py-1 rounded-full font-black shadow-sm transition active:scale-95">📸 回憶寫真冊</button>
                     </div>
                     <div>
                         <div class="flex justify-between text-xs font-black text-[#736052] mb-1">
-                            <span>整體解鎖進度</span>
+                            <span id="quest-total-count">已打卡 0 / 0</span>
                             <span id="quest-percent">0%</span>
                         </div>
                         <div class="w-full bg-[#eae1d7] h-3 rounded-full overflow-hidden">
@@ -202,23 +202,43 @@
     <div id="quest-photo-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base" id="quest-modal-title">📸 景點打卡上傳</h3>
+                <h3 class="font-black text-[#5c4a3d] text-base" id="quest-modal-title">📸 打卡上傳</h3>
                 <button onclick="closeQuestPhotoModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
-            <p class="text-gray-500 font-bold">上傳你的現場照片或記錄，即完成此項任務打卡！✨</p>
+            <p class="text-gray-500 font-bold">必須上傳現場照片才能打卡成功喔！✨</p>
             
             <div id="quest-photo-preview-container" class="hidden w-full h-40 bg-gray-50 rounded-2xl border border-[#eae1d7] overflow-hidden flex items-center justify-center">
                 <img id="quest-photo-preview" src="" alt="預覽照片" class="w-full h-full object-cover">
             </div>
 
             <div>
-                <label class="block font-bold text-gray-600 mb-1">選擇上傳照片</label>
+                <label class="block font-bold text-gray-600 mb-1">選擇照片</label>
                 <input type="file" id="quest-file-input" accept="image/*" onchange="previewQuestPhoto(event)" class="w-full text-xs p-2.5 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
             </div>
 
             <div class="flex gap-2.5 pt-2">
                 <button onclick="closeQuestPhotoModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="submitQuestPhoto()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認打卡完成</button>
+                <button onclick="submitQuestPhoto()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認打卡</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌸 照片回憶寫真冊 Modal (統整所有打卡照片分享給朋友) -->
+    <div id="photo-gallery-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center shrink-0">
+                <h3 class="font-black text-[#5c4a3d] text-base">📸 旅程回憶寫真冊</h3>
+                <button onclick="closePhotoGalleryModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <p class="text-gray-500 font-bold shrink-0">這裡統整了所有已打卡的精彩回憶，可以複製連結分享給朋友！✨</p>
+
+            <div id="photo-gallery-grid" class="grid grid-cols-2 gap-3 overflow-y-auto pr-1 flex-1">
+                <!-- 動態照片網格 -->
+            </div>
+
+            <div class="pt-2 shrink-0 flex gap-2">
+                <button onclick="shareCurrentProject()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">🔗 複製相冊/專案連結</button>
+                <button onclick="closePhotoGalleryModal()" class="bg-gray-100 text-gray-600 px-5 py-3 rounded-full font-black">關閉</button>
             </div>
         </div>
     </div>
@@ -401,7 +421,7 @@
         let allMembersData = [];
         let currentSplitMode = 'equal';
         let activeDayFilter = 'all';
-        let currentQuestTargetId = null; // 當前正在拍照打卡的行程 ID
+        let currentQuestTargetId = null;
 
         const languageData = {
             korea: {
@@ -456,7 +476,7 @@
             japan: {
                 langCode: 'ja-JP',
                 categories: [
-                    { id: 'restaurant', name: '🍽️️ 餐廳' },
+                    { id: 'restaurant', name: '🍽️ 餐廳' },
                     { id: 'shopping', name: '🛍️ 購物' },
                     { id: 'transport', name: '🚆 交通' },
                     { id: 'hotel', name: '🏨 住宿' },
@@ -719,11 +739,11 @@
             });
         }
 
-        // 🌟 嚴格分類：只抓取美食/餐廳/咖啡廳、景點、購物，排除交通等其他項目
+        // 🌟 嚴格分類：排除交通與住宿，玩樂歸在景點，美食/購物獨立
         function classifyScheduleItem(title) {
             let t = title.toLowerCase();
-            if (t.includes('交通') || t.includes('機場') || t.includes('租車') || t.includes('還車') || t.includes('出發') || t.includes('前往') || t.includes('搭車') || t.includes('班機')) {
-                return null; // 不在闖關範圍
+            if (t.includes('交通') || t.includes('機場') || t.includes('租車') || t.includes('還車') || t.includes('出發') || t.includes('前往') || t.includes('搭車') || t.includes('班機') || t.includes('住宿') || t.includes('飯店') || t.includes('民宿') || t.includes('check-in') || t.includes('check in')) {
+                return null;
             }
             if (t.includes('餐廳') || t.includes('美食') || t.includes('咖啡') || t.includes('晚餐') || t.includes('午餐') || t.includes('早餐') || t.includes('烤肉') || t.includes('料理') || t.includes('吃') || t.includes('酒') || t.includes('茶')) {
                 return 'food';
@@ -731,7 +751,7 @@
             if (t.includes('購物') || t.includes('免稅') || t.includes('超市') || t.includes('商場') || t.includes('買') || t.includes('市場') || t.includes('outlet')) {
                 return 'shop';
             }
-            // 預設為景點
+            // 玩樂、景點皆歸在景點
             return 'spot';
         }
 
@@ -803,7 +823,7 @@
                 items.forEach(s => {
                     let cleanTitle = cleanDisplayTitle(s.title);
                     let catName = s.category === 'food' ? '🍽️ 美食' : (s.category === 'shop' ? '🛍️ 購物' : '🗺️ 景點');
-                    let statusBadge = s.completed ? `<span class="text-[10px] bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-black">✔️ 已打卡</span>` : `<span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-1 rounded-full font-black">📸 點擊打卡</span>`;
+                    let statusBadge = s.completed ? `<span class="text-[10px] bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-black">✔️ 已打卡</span>` : `<span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-1 rounded-full font-black">打卡</span>`;
                     let photoThumbnail = s.photoUrl ? `<img src="${s.photoUrl}" class="w-10 h-10 rounded-xl object-cover border border-[#eae1d7] shrink-0">` : '';
 
                     listHtml += `
@@ -823,7 +843,6 @@
                     `;
                 });
                 listHtml += `</div>`;
-
                 dayBox.innerHTML = headerHtml + listHtml;
                 container.appendChild(dayBox);
             });
@@ -864,7 +883,7 @@
             }
         }
 
-        // 開啟闖關拍照打卡 Modal
+        // 拍照打卡 Modal 邏輯
         window.openQuestPhotoModal = function(scheduleId, title) {
             currentQuestTargetId = scheduleId;
             document.getElementById('quest-modal-title').innerText = `📸 打卡：${title}`;
@@ -893,8 +912,8 @@
         window.submitQuestPhoto = async function() {
             if (!currentProjectId || !currentQuestTargetId) return;
             const previewSrc = document.getElementById('quest-photo-preview').src;
-            if (!previewSrc) {
-                alert("請先選擇或拍攝打卡照片！");
+            if (!previewSrc || previewSrc === window.location.href) {
+                alert("必須上傳照片才能打卡成功喔！");
                 return;
             }
 
@@ -902,11 +921,37 @@
                 const docRef = doc(db, "projects", currentProjectId, "schedules", currentQuestTargetId);
                 await updateDoc(docRef, { completed: true, photoUrl: previewSrc });
                 closeQuestPhotoModal();
-                alert("✨ 打卡成功！已解鎖成就！");
+                alert("✨ 打卡成功！");
             } catch (e) {
                 console.error("打卡失敗", e);
                 alert("打卡失敗，請檢查網路連線");
             }
+        }
+
+        // 照片回憶寫真冊 Modal 邏輯
+        window.openPhotoGalleryModal = function() {
+            const grid = document.getElementById('photo-gallery-grid');
+            grid.innerHTML = '';
+
+            let photos = allSchedulesData.filter(s => s.photoUrl);
+            if (photos.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-center text-xs text-gray-400 py-8">目前還沒有上傳任何打卡照片喔！✨</div>`;
+            } else {
+                photos.forEach(p => {
+                    let div = document.createElement('div');
+                    div.className = "cute-card overflow-hidden bg-white border border-[#eae1d7] p-2 space-y-1.5";
+                    div.innerHTML = `
+                        <img src="${p.photoUrl}" class="w-full h-28 object-cover rounded-xl">
+                        <p class="text-[11px] font-black text-gray-800 truncate">${cleanDisplayTitle(p.title)}</p>
+                        <p class="text-[9px] text-gray-400 font-bold">${p.day || 'Day 1'}</p>
+                    `;
+                    grid.appendChild(div);
+                });
+            }
+            document.getElementById('photo-gallery-modal').classList.remove('hidden');
+        }
+        window.closePhotoGalleryModal = function() {
+            document.getElementById('photo-gallery-modal').classList.add('hidden');
         }
 
         // 記帳與分帳渲染 (保留)
