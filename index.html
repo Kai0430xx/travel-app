@@ -434,6 +434,7 @@
         </div>
     </div>
 
+    <!-- 成員管理 Modal (新增刪除成員按鈕) -->
     <div id="member-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <div class="flex justify-between items-center"><h3 class="font-black text-[#5c4a3d] text-base">👥 成員管理</h3><button onclick="closeAddMemberModal()" class="text-gray-400 font-black">✕</button></div>
@@ -548,7 +549,7 @@
             japan: {
                 langCode: 'ja-JP',
                 categories: [
-                    { id: 'restaurant', name: '🍽️ 餐廳' },
+                    { id: 'restaurant', name: '🍽️️ 餐廳' },
                     { id: 'shopping', name: '🛍️ 購物' },
                     { id: 'transport', name: '🚆 交通' },
                     { id: 'hotel', name: '🏨 住宿' },
@@ -1346,13 +1347,30 @@
             } catch (e) { alert("新增成員失敗"); }
         }
 
+        // 🌟 刪除成員功能
+        window.deleteMember = async function(memberId, memberName) {
+            if (!currentProjectId) return;
+            if (confirm(`確定要將成員【${memberName}】從此專案中移除嗎？`)) {
+                try {
+                    await deleteDoc(doc(db, "projects", currentProjectId, "members", memberId));
+                    alert("✨ 成員已移除！");
+                } catch (e) {
+                    console.error("刪除成員失敗", e);
+                    alert("刪除失敗");
+                }
+            }
+        }
+
         function renderMemberListUI() {
             const container = document.getElementById('member-list-display');
             container.innerHTML = '';
             allMembersData.forEach(m => {
                 let div = document.createElement('div');
                 div.className = "flex justify-between items-center p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl font-bold";
-                div.innerHTML = `<span>👤 ${m.name}</span>`;
+                div.innerHTML = `
+                    <span>👤 ${m.name}</span>
+                    <button onclick="deleteMember('${m.id}', '${m.name}')" class="text-gray-400 hover:text-red-500 text-xs px-2 py-1 transition">🗑️ 刪除</button>
+                `;
                 container.appendChild(div);
             });
         }
