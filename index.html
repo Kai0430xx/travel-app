@@ -132,9 +132,10 @@
                 
                 <div>
                     <h3 id="modal-title" class="font-black text-gray-900 text-base mt-2">行程名稱</h3>
-                    <!-- 只有當備註有內容時才顯示備註區塊，否則隱藏 -->
-                    <div id="modal-location-container" class="mt-2 hidden">
-                        <p class="text-xs text-gray-500 flex items-start gap-1">📍 備註：<span id="modal-location" class="font-bold text-gray-800 whitespace-pre-line"></span></p>
+                    <!-- 備註區塊：有內容才顯示 -->
+                    <div id="modal-location-container" class="mt-2 hidden bg-amber-50/50 p-3 rounded-2xl border border-amber-100">
+                        <p class="text-xs text-gray-600 font-bold mb-0.5">📝 備註：</p>
+                        <p id="modal-location" class="text-xs text-gray-800 whitespace-pre-line font-medium"></p>
                     </div>
                 </div>
 
@@ -195,7 +196,7 @@
                 <h3 class="font-black text-amber-950 text-base">✨ AI 智慧導入行程</h3>
                 <button onclick="closeSmartPasteModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
-            <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。AI 會自動抓取時間、行程與下方備註，自動拆解成乾淨卡片！</p>
+            <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。AI 會自動對應時間、行程與下方備註，沒備註的會保持空白！</p>
             <textarea id="smart-paste-input" rows="8" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3.5 bg-amber-50/50 border border-amber-100 rounded-2xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
             <div class="flex gap-2.5 pt-1">
                 <button onclick="closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-black">取消</button>
@@ -494,7 +495,6 @@
             document.getElementById('modal-time').innerText = item.time || '全天';
             document.getElementById('modal-title').innerText = cleanDisplayTitle(item.title);
             
-            // 處理備註顯示：如果有備註就顯示，沒有就隱藏整個備註區塊
             const locContainer = document.getElementById('modal-location-container');
             const locSpan = document.getElementById('modal-location');
             if (item.location && item.location.trim() !== '') {
@@ -607,7 +607,7 @@
             }
         }
 
-        // 🌟 升級版 AI 智慧導入解析引擎：完美對應備註與空白
+        // 🌟 完美修復版 AI 智慧導入解析引擎：絕不把備註獨立成卡片
         window.parseSmartPaste = async function() {
             const rawText = document.getElementById('smart-paste-input').value.trim();
             if(!rawText) { alert("請先輸入或貼上行程文字喔！"); return; }
@@ -617,15 +617,14 @@
             const lines = rawText.split('\n').map(l => l.trim());
             let currentDay = "Day 1";
             let addedCount = 0;
+            let currentItem = null;
 
             try {
-                let currentItem = null;
-
                 for (let i = 0; i < lines.length; i++) {
                     let line = lines[i];
                     if (!line) continue;
 
-                    // 1. 偵測天數 (例如 【 Day 1 (11/23) 】 或 Day 1)
+                    // 1. 偵測天數
                     let dayMatch = line.match(/(Day\s*\d+|第[一二三四五六七八九十]+天)/i);
                     if (dayMatch) {
                         if (currentItem) {
@@ -637,10 +636,10 @@
                         continue;
                     }
 
-                    // 2. 偵測是否為新行程開頭 (包含時間或項目符號)
+                    // 2. 偵測是否為新行程開頭 (含時間或 • / -)
                     let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
                     if (timeMatch || line.startsWith("•") || line.startsWith("-")) {
-                        // 先存入上一個行程
+                        // 先儲存上一個行程
                         if (currentItem) {
                             await saveParsedItem(currentProjectId, currentItem);
                             addedCount++;
@@ -656,23 +655,22 @@
                             day: currentDay,
                             time: timeStr,
                             title: cleanTitle,
-                            location: "", // 這裡當作備註
+                            location: "", // 這裡存放備註
                             createdAt: Date.now() + addedCount
                         };
                     } 
-                    // 3. 偵測是否為備註行 (包含「備註：」或緊跟在行程後方的補充文字)
+                    // 3. 如果當前有行程，且這一行是補充說明或備註，則歸屬於當前行程的備註！
                     else if (currentItem) {
                         if (line.includes("備註：") || line.includes("備註:")) {
                             let noteText = line.replace(/.*備註[：:]\s*/, '').trim();
                             currentItem.location = currentItem.location ? (currentItem.location + "\n" + noteText) : noteText;
                         } else if (!line.includes("===") && !line.includes("---") && line.length > 0) {
-                            // 如果沒有寫「備註：」但剛好在下一行，也可以自動串接（例如多行數字代碼）
                             currentItem.location = currentItem.location ? (currentItem.location + "\n" + line) : line;
                         }
                     }
                 }
 
-                // 存入最後一個行程
+                // 儲存最後一個行程
                 if (currentItem) {
                     await saveParsedItem(currentProjectId, currentItem);
                     addedCount++;
@@ -680,7 +678,7 @@
 
                 document.getElementById('smart-paste-input').value = "";
                 closeSmartPasteModal();
-                alert(`✨ 成功！已智慧導入 ${addedCount} 筆行程，無備註的欄位已自動保持空白！`);
+                alert(`✨ 成功！已智慧導入 ${addedCount} 筆行程，備註已自動歸納至對應卡片中！`);
             } catch (e) {
                 console.error("AI 拆解失敗", e);
                 alert("解析發生錯誤，請再試一次");
@@ -693,7 +691,7 @@
                 day: item.day,
                 time: item.time,
                 title: cleanDisplayTitle(item.title),
-                location: item.location || "", // 沒有就保持空白
+                location: item.location || "", // 沒備註就保持空白
                 createdAt: item.createdAt
             });
         }
