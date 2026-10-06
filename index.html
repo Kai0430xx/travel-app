@@ -64,7 +64,7 @@
             <!-- 分頁 1：行程 -->
             <div id="tab-schedule" class="tab-content space-y-4">
                 
-                <!-- 🌟 即將到來的行程置頂卡片 -->
+                <!-- 🌟 即將到來的行程置頂卡片 (已拿掉下方提示字) -->
                 <div id="upcoming-card-container"></div>
 
                 <!-- 行程列表標題與功能按鈕列 -->
@@ -116,32 +116,49 @@
         </div>
     </main>
 
-    <!-- 🌸 行程詳細資訊彈跳視窗 -->
+    <!-- 🌸 行程詳細資訊與編輯視窗 (點擊卡片觸發) -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-start">
-                <div>
-                    <span id="modal-day" class="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-black">Day 1</span>
-                    <span id="modal-time" class="text-xs text-gray-400 font-bold ml-2">12:00</span>
-                </div>
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-amber-950 text-base">✨ 行程詳細與修改</h3>
                 <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
             
-            <div>
-                <h3 id="modal-title" class="font-black text-gray-900 text-base mt-2">行程名稱</h3>
-                <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">📍 詳細地點：<span id="modal-location" class="font-bold text-gray-800"></span></p>
+            <input type="hidden" id="edit-schedule-id">
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">天數</label>
+                    <input type="text" id="edit-day" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">時間</label>
+                    <input type="text" id="edit-time" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">行程名稱</label>
+                    <input type="text" id="edit-title" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">地圖導航地點</label>
+                    <input type="text" id="edit-location" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                </div>
             </div>
 
-            <div class="pt-3 flex gap-2.5">
-                <a id="modal-gmap" href="#" target="_blank" class="flex-1 text-center text-xs bg-amber-50 text-amber-900 py-3 rounded-2xl font-black hover:bg-amber-100 transition flex items-center justify-center gap-1 shadow-sm">
+            <!-- 導航按鈕區 -->
+            <div class="pt-1 flex gap-2.5">
+                <a id="modal-gmap" href="#" target="_blank" class="flex-1 text-center text-xs bg-amber-50 text-amber-900 py-2.5 rounded-2xl font-black hover:bg-amber-100 transition flex items-center justify-center gap-1 shadow-sm">
                     🗺 Google Maps
                 </a>
-                <a id="modal-naver" href="#" target="_blank" class="flex-1 text-center text-xs bg-orange-50 text-orange-900 py-3 rounded-2xl font-black hover:bg-orange-100 transition flex items-center justify-center gap-1 shadow-sm">
+                <a id="modal-naver" href="#" target="_blank" class="flex-1 text-center text-xs bg-orange-50 text-orange-900 py-2.5 rounded-2xl font-black hover:bg-orange-100 transition flex items-center justify-center gap-1 shadow-sm">
                     🚗 Naver Map
                 </a>
             </div>
 
-            <button onclick="closeDetailModal()" class="w-full bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-bold mt-1">關閉</button>
+            <div class="flex gap-2.5 pt-1">
+                <button onclick="closeDetailModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-black">取消</button>
+                <button onclick="saveScheduleEdit()" class="flex-1 bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs py-3 rounded-2xl font-black shadow-md shadow-orange-200">儲存修改</button>
+            </div>
         </div>
     </div>
 
@@ -206,7 +223,7 @@
     <!-- Firebase 與邏輯控制 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDoc, deleteDoc, doc, setDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDoc, deleteDoc, doc, setDoc, updateDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBcKmZhJaZn5emOlHRV95-uC9q01wFxt4M",
@@ -259,7 +276,6 @@
                     if (docSnap.exists()) {
                         const p = docSnap.data();
                         const card = document.createElement('div');
-                        // 🌟 優化卡片排版與留白，確保日期與刪除按鈕不擠壓
                         card.className = "cute-card p-5 space-y-3 relative transition hover:border-orange-300";
                         card.innerHTML = `
                             <div class="flex justify-between items-center gap-2">
@@ -365,16 +381,15 @@
                 return;
             }
 
-            // 即將到來的行程置頂
+            // 即將到來的行程置頂 (已拿掉下方提示字)
             const nextItem = allSchedulesData[0];
             upcomingContainer.innerHTML = `
-                <div onclick="openDetailModal('${nextItem.id}')" class="cute-card p-5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-orange-300 space-y-2.5 relative shadow-md cursor-pointer hover:scale-[1.01] transition">
+                <div onclick="openDetailModal('${nextItem.id}')" class="cute-card p-4.5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-orange-300 space-y-1 relative shadow-md cursor-pointer hover:scale-[1.01] transition">
                     <div class="flex justify-between items-center">
                         <span class="text-xs bg-orange-500 text-white px-3 py-1 rounded-full font-black">🚀 即將到來</span>
                         <span class="text-xs font-black text-orange-800">${nextItem.day || 'Day 1'} • ${nextItem.time || '全天'}</span>
                     </div>
                     <h4 class="font-black text-gray-900 text-sm mt-1">${nextItem.title}</h4>
-                    <p class="text-[11px] text-orange-900 font-bold opacity-80">👉 點擊卡片查看詳細地點與地圖導航</p>
                 </div>
             `;
 
@@ -437,15 +452,16 @@
             }
         }
 
-        // 開啟詳情 Modal
+        // 開啟詳情與修改 Modal
         window.openDetailModal = function(id) {
             const item = allSchedulesData.find(s => s.id === id);
             if (!item) return;
 
-            document.getElementById('modal-day').innerText = item.day || 'Day 1';
-            document.getElementById('modal-time').innerText = item.time || '全天';
-            document.getElementById('modal-title').innerText = item.title;
-            document.getElementById('modal-location').innerText = item.location || item.title;
+            document.getElementById('edit-schedule-id').value = item.id;
+            document.getElementById('edit-day').value = item.day || 'Day 1';
+            document.getElementById('edit-time').value = item.time || '10:00';
+            document.getElementById('edit-title').value = item.title;
+            document.getElementById('edit-location').value = item.location || item.title;
 
             const queryText = encodeURIComponent(item.location || item.title);
             document.getElementById('modal-gmap').href = `https://maps.google.com/?q=${queryText}`;
@@ -456,6 +472,29 @@
 
         window.closeDetailModal = function() {
             document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        // 儲存修改後的行程
+        window.saveScheduleEdit = async function() {
+            if (!currentProjectId) return;
+            const scheduleId = document.getElementById('edit-schedule-id').value;
+            const day = document.getElementById('edit-day').value.trim();
+            const time = document.getElementById('edit-time').value.trim();
+            const title = document.getElementById('edit-title').value.trim();
+            let location = document.getElementById('edit-location').value.trim();
+
+            if (!title) { alert("請填寫行程名稱！"); return; }
+            if (!location) location = title;
+
+            try {
+                const docRef = doc(db, "projects", currentProjectId, "schedules", scheduleId);
+                await updateDoc(docRef, { day, time, title, location });
+                closeDetailModal();
+                alert("✨ 行程修改成功！");
+            } catch (e) {
+                console.error("修改失敗", e);
+                alert("修改失敗，請檢查網路連線");
+            }
         }
 
         window.openSmartPasteModal = function() {
@@ -510,7 +549,7 @@
             }
         }
 
-        // AI 智慧導入清洗解析
+        // AI 智慧導入清洗解析 (已完美剝離黑色文字中的時間與重複字眼)
         window.parseSmartPaste = async function() {
             const rawText = document.getElementById('smart-paste-input').value.trim();
             if(!rawText) { alert("請先輸入或貼上行程文字喔！"); return; }
@@ -547,6 +586,7 @@
                     let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
                     let timeStr = timeMatch ? timeMatch[1] : "彈性";
 
+                    // 徹底洗掉標題裡的時間與多餘符號，確保黑色文字乾淨
                     let cleanTitle = line
                         .replace(/^\d{1,2}[:：]\d{2}\s*/, '')
                         .replace(/^[-•\*\d\.]+\s*/, '')
