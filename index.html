@@ -86,7 +86,7 @@
                 </div>
             </div>
 
-            <!-- 分頁 2：提醒 (依規則自動偵測渲染) -->
+            <!-- 分頁 2：提醒 (萬國自動偵測渲染) -->
             <div id="tab-ai" class="tab-content hidden space-y-3.5">
                 <div id="dynamic-reminders-container" class="space-y-3.5"></div>
             </div>
@@ -324,7 +324,7 @@
         }
 
         window.openNewProjectModal = async function() {
-            const name = prompt("請輸入新旅遊專案名稱（例如：濟州島自駕遊、東京自由行）：");
+            const name = prompt("請輸入新旅遊專案名稱（例如：英國倫敦自由行、越南富國島）：");
             if (!name) return;
             const dates = prompt("請輸入旅遊日期區間（例如：11/23 - 11/27）：", "11/23 - 11/27");
             
@@ -363,82 +363,66 @@
             document.getElementById('header-title').innerText = `🌸 ${projectName}`;
             document.getElementById('header-sub').innerText = `日期：${dateRange} ✨`;
             
-            // 透過規則引擎自動分析專案地點並產生提醒
             renderRemindersByRules(projectName);
             
             switchTab('schedule');
             loadSchedules(id);
         }
 
-        // 🌟 智慧地點偵測與規則引擎 (Rule-based Reminders Engine)
+        // 🌟 萬國通用動態智慧規則引擎（內建韓、日、泰、港澳、美加歐、東南亞與萬國預設）
         function renderRemindersByRules(projectName) {
             const container = document.getElementById('dynamic-reminders-container');
             let nameLower = projectName.toLowerCase();
             
-            let destinationType = "general"; // 預設類型
-
-            // 規則庫判定
-            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
-                destinationType = "korea";
-            } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都') || nameLower.includes('沖繩') || nameLower.includes('北海道')) {
-                destinationType = "japan";
-            }
-
             let html = '';
 
-            if (destinationType === "korea") {
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
                 html = `
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">
-                            當地早晚溫差較大且風大，建議穿著長袖、針織衫或帽T，並準備一件防風外套或輕風衣來擋風 🧥。
-                        </p>
+                        <p class="text-xs text-gray-600 leading-relaxed">當地早晚溫差較大且風大，建議穿著長袖、針織衫或帽T，並準備防風外套 🧥。</p>
                     </div>
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
                         <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>導航 App：強烈建議使用 Naver Map 或 Kakao Map，以電話號碼 (Phone Number) 查詢景點最準確！</li>
+                            <li>導航 App：強烈建議使用 Naver Map 或 Kakao Map，以電話號碼查詢最準確！</li>
                             <li>測速照相：道路速限嚴格，沿途有大量測速照相，務必依速限行駛。</li>
-                            <li>加油還車：多為自助/半人工，記得確認租車規定（通常為滿油出借、滿油還車）。</li>
+                            <li>加油還車：多為自助/半人工，記得確認租車規定（通常為滿油出借還車）。</li>
                         </ul>
                     </div>
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
                         <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>駕照證件：務必備妥台灣駕照正本與國際駕照。</li>
-                            <li>行動支付：信用卡與行動支付極為普及，建議身上備妥 5~10 萬韓元現金備用。</li>
-                            <li>插頭規格：電壓 220V，為圓形雙孔（歐規/韓規）。</li>
+                            <li>證件：務必備妥台灣駕照正本與國際駕照。</li>
+                            <li>支付：信用卡普及，建議身上備妥 5~10 萬韓元現金備用。</li>
+                            <li>插頭：電壓 220V，圓形雙孔（歐規/韓規）。</li>
                         </ul>
                     </div>
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
                         <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>警察局：112 | 救護車/消防：119</li>
-                            <li>韓國旅遊諮詢熱線（中文）：1330</li>
+                            <li>警察局：112 | 救護車/消防：119 | 中文旅遊熱線：1330</li>
                         </ul>
                     </div>
                 `;
-            } else if (destinationType === "japan") {
+            } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都') || nameLower.includes('沖繩') || nameLower.includes('北海道') || nameLower.includes('名古屋')) {
                 html = `
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇯🇵 日本旅遊與天氣指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">
-                            行程多以步行與搭乘大眾運輸為主，建議穿著舒適好走的布鞋，並隨身攜帶輕便外套與雨具 🌂。
-                        </p>
+                        <p class="text-xs text-gray-600 leading-relaxed">行程多以步行與大眾運輸為主，建議穿著舒適好走的布鞋，並攜帶輕便外套與雨具 🌂。</p>
                     </div>
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚆 交通與導航提醒</h3>
                         <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>導航 App：推薦使用 Google Maps 或 乗換案內 查詢地鐵轉乘與班次。</li>
-                            <li>IC 卡：建議事先將 Suica 或 Pasmo 卡加入手機錢包（Apple Pay），搭車刷卡超方便。</li>
+                            <li>導航：推薦使用 Google Maps 或 乗換案內 查詢地鐵。</li>
+                            <li>IC 卡：建議事先將 Suica 或 Pasmo 加入手機錢包（Apple Pay）。</li>
                         </ul>
                     </div>
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
                         <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>護照效期：確認效期大於 6 個月。</li>
-                            <li>現金備用：部分傳統小店或拉麵販賣機仍需現金，建議備妥適量日幣。</li>
-                            <li>插頭規格：電壓 100V，為雙孔扁平插頭（與台灣相同）。</li>
+                            <li>護照效期需大於 6 個月。部分小店或拉麵機仍需現金，建議備妥適量日幣。</li>
+                            <li>插頭：電壓 100V，雙孔扁平插頭（與台灣相同）。</li>
                         </ul>
                     </div>
                     <div class="cute-card p-5 space-y-2.5">
@@ -448,14 +432,102 @@
                         </ul>
                     </div>
                 `;
-            } else {
+            } else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁') || nameLower.includes('普吉') || nameLower.includes('芭達雅')) {
                 html = `
                     <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌍 通用行前準備指南</h3>
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇹🇭 泰國旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">終年炎熱，建議穿著輕薄透氣衣物，備好防曬與雨具。進出寺廟衣著需端莊（不可露肩短褲）。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🛵 交通與叫車提醒</h3>
                         <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>證件確認：檢查護照效期是否大於 6 個月，並備妥機票、住宿預訂憑證。</li>
-                            <li>網卡與通訊：提前確認網卡或 eSIM 已啟用，並下載離線地圖。</li>
-                            <li>隨身藥品：準備常備藥品（如腸胃藥、止痛藥、暈車藥）。</li>
+                            <li>叫車：推薦使用 Grab 或 Bolt。市區可多利用 BTS/MRT 避開塞車。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與小費</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>夜市小吃多收現金，可至當地 SuperRich 換匯。按摩或服務良好建議給 20-100 銖小費。</li>
+                            <li>插頭：電壓 220V，圓形或扁平兩用。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>觀光警察：1155 | 警察局：191 | 醫療：1669</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (nameLower.includes('香港') || nameLower.includes('澳門') || nameLower.includes('港澳')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇭🇰 港澳旅遊與出行指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">步調快、步行多，建議穿著舒適布鞋。室內冷氣強，建議帶件薄外套。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚆 交通與支付</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>建議準備八達通卡（Octopus）或手機虛擬八達通，搭車購物極方便。</li>
+                            <li>插頭：英式三腳方型插頭（電壓 220V），需準備轉接頭。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>緊急求助電話（警察/消防/救護）：999</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (nameLower.includes('越南') || nameLower.includes('富國島') || nameLower.includes('峴港') || nameLower.includes('河內') || nameLower.includes('胡志明')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇻🇳 越南旅遊指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">氣候炎熱潮濕，請做好防曬與防蚊準備。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🛵 交通與支付</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>叫車強烈建議使用 Grab，價格透明安全。消費以越南盾為主，注意計算位數。</li>
+                            <li>插頭：電壓 220V，多為雙孔圓形或扁平。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>警察局：113 | 救護車：115 | 火警：114</li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                // 🌟 萬國通用智能備用方案（不管去英國、法國、美國、冰島或任何新地方，自動啟動這套完整指南！）
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">
+                            偵測到這是一個精彩的新目的地！為確保旅途平安順利，請留意以下國際通用行前提醒：
+                        </p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🛂 證件與行前準備</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>護照效期：確認自回國日起算還有 6 個月以上效期，並檢查是否需要提前辦理當地簽證或電子簽證（e-Visa）。</li>
+                            <li>網卡與離線地圖：建議備妥當地上網網卡或 eSIM，並提前下載 Google Maps 離線地圖以防收訊不穩。</li>
+                            <li>個人藥品：準備常用藥品（如常備腸胃藥、止痛藥、感冒藥及個人處方籤）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 財務、電器與保險</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>多元支付與現金：建議攜帶海外回饋良好的信用卡，並準備適量當地外幣現金或美金備用。</li>
+                            <li>萬國轉接頭與變壓器：出國前務必確認當地的插頭形狀（歐規、英規、美規等）與電壓。</li>
+                            <li>海外旅遊平安險：建議出發前投保包含「海外醫療險與不便險」的旅遊險，多一層安心保障。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急求助萬國指南</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>多數國家通用緊急求助電話：歐洲/多國 <strong>112</strong>、北美 <strong>911</strong>。</li>
+                            <li>出國前請查詢並記錄我國駐當地代表處（辦事處）的緊急聯絡電話與地址。</li>
                         </ul>
                     </div>
                 `;
@@ -767,7 +839,7 @@
                     await addDoc(collection(db, "projects", currentProjectId, "schedules"), parsedItems[i]);
                 }
 
-                document.getElementById('smart-paste-input').value = "";
+                document.getElementById('smart-paste-input-input').value = "";
                 closeSmartPasteModal();
                 alert(`✨ 成功！已智慧導入 ${parsedItems.length} 筆行程！`);
             } catch (e) {
