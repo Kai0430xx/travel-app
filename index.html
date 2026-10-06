@@ -26,14 +26,17 @@
 
     <!-- 頂部標題區 -->
     <header class="bg-gradient-to-r from-amber-200 to-orange-200 text-amber-900 p-4 shadow-sm sticky top-0 z-50 flex justify-between items-center rounded-b-3xl">
-        <div class="flex items-center gap-2">
-            <button id="back-btn" onclick="backToProjects()" class="hidden bg-white/70 hover:bg-white p-1.5 rounded-full text-xs font-bold transition">🏠</button>
+        <div class="flex items-center gap-2.5">
+            <!-- 返回專案列表按鈕 (預設隱藏，進入專案後顯示) -->
+            <button id="back-btn" onclick="backToProjects()" class="hidden bg-white/80 hover:bg-white text-amber-900 px-2.5 py-1.5 rounded-full text-xs font-bold shadow-sm transition active:scale-95 flex items-center gap-1">
+                ⬅️ 專案
+            </button>
             <div>
                 <h1 id="header-title" class="text-base font-bold flex items-center gap-1.5">🌸 我的旅遊小專案</h1>
                 <p id="header-sub" class="text-[11px] text-amber-800 opacity-80 mt-0.5">選擇你的冒險旅程 ✨</p>
             </div>
         </div>
-        <button onclick="shareProject()" class="bg-white/85 hover:bg-white text-amber-900 text-xs px-3 py-1.5 rounded-full font-medium shadow-sm transition active:scale-95">
+        <button onclick="shareProject()" class="bg-white/85 hover:bg-white text-amber-900 text-xs px-3.5 py-1.5 rounded-full font-medium shadow-sm transition active:scale-95">
             ✨ 分享
         </button>
     </header>
@@ -41,18 +44,17 @@
     <!-- 內容容器 -->
     <main class="p-4 space-y-4">
         
-        <!-- 视图 0：專案選擇首頁 -->
+        <!-- 視圖 0：專案選擇首頁 -->
         <div id="view-projects" class="space-y-4">
             <div class="flex justify-between items-center px-1">
                 <h2 class="font-bold text-amber-900 text-sm">🧳 所有旅遊專案</h2>
-                <button onclick="openNewProjectModal()" class="bg-orange-500 text-white text-xs px-3 py-1.5 rounded-xl font-bold shadow-md shadow-orange-200 transition active:scale-95">
+                <button onclick="openNewProjectModal()" class="bg-orange-500 text-white text-xs px-3.5 py-2 rounded-xl font-bold shadow-md shadow-orange-200 transition active:scale-95">
                     ＋ 新增專案
                 </button>
             </div>
 
             <!-- 專案列表容器 -->
             <div id="project-list" class="space-y-3">
-                <!-- 預設範例專案卡片 -->
                 <div onclick="enterProject('濟州島自駕遊', '11/23 - 11/27')" class="cute-card p-4 space-y-2 cursor-pointer hover:border-orange-300 transition">
                     <div class="flex justify-between items-center">
                         <span class="text-xs bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full font-bold">進行中 🚗</span>
@@ -64,7 +66,7 @@
             </div>
         </div>
 
-        <!-- 视图 1：專案內部功能 (預設隱藏，點擊專案後顯示) -->
+        <!-- 視圖 1：專案內部功能 (預設隱藏) -->
         <div id="view-workspace" class="hidden space-y-4">
             
             <!-- 分頁 1：行程 -->
@@ -149,36 +151,32 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 進入特定專案
         window.enterProject = function(projectName, dateRange) {
             document.getElementById('view-projects').classList.add('hidden');
             document.getElementById('view-workspace').classList.remove('hidden');
             document.getElementById('bottom-nav').classList.remove('hidden');
-            document.getElementById('back-btn').classList.remove('hidden');
+            document.getElementById('back-btn').classList.remove('hidden'); // 顯示返回按鈕
             
             document.getElementById('header-title').innerText = `🌸 ${projectName}`;
             document.getElementById('header-sub').innerText = `日期：${dateRange} ✨`;
             switchTab('schedule');
         }
 
-        // 回到專案列表
         window.backToProjects = function() {
             document.getElementById('view-workspace').classList.add('hidden');
             document.getElementById('bottom-nav').classList.add('hidden');
-            document.getElementById('back-btn').classList.add('hidden');
+            document.getElementById('back-btn').classList.add('hidden'); // 隱藏返回按鈕
             document.getElementById('view-projects').classList.remove('hidden');
             
             document.getElementById('header-title').innerText = "🌸 我的旅遊小專案";
             document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
         }
 
-        // 新增專案互動
         window.openNewProjectModal = function() {
             const name = prompt("請輸入新旅遊專案名稱（例如：東京賞櫻行）：");
             if (!name) return;
             const dates = prompt("請輸入旅遊日期區間（例如：4/19 - 4/25）：", "未定日期");
             
-            // 動態新增一張專案卡片到畫面上
             const list = document.getElementById('project-list');
             const newCard = document.createElement('div');
             newCard.className = "cute-card p-4 space-y-2 cursor-pointer hover:border-orange-300 transition";
