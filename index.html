@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>我們的溫馨小旅行 ✈️</title>
+    <title>我們的溫馨小旅行 ✈</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
@@ -63,24 +63,14 @@
             
             <!-- 分頁 1：行程 -->
             <div id="tab-schedule" class="tab-content space-y-4">
-                
-                <!-- 🌟 即將到來的行程置頂卡片 -->
                 <div id="upcoming-card-container"></div>
-
-                <!-- 行程列表標題與功能按鈕列 -->
                 <div class="flex justify-between items-center px-1">
                     <h3 class="font-black text-gray-700 text-xs tracking-wider">📅 完整行程時間軸</h3>
                     <div class="flex gap-2">
-                        <button onclick="openSmartPasteModal()" class="bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs px-3.5 py-2 rounded-2xl font-black shadow-sm shadow-orange-200 transition active:scale-95">
-                            ✨ 智慧導入
-                        </button>
-                        <button onclick="openAddScheduleModal()" class="bg-amber-500 text-white text-xs px-3.5 py-2 rounded-2xl font-black shadow-sm shadow-amber-200 transition active:scale-95">
-                            ＋ 手動新增
-                        </button>
+                        <button onclick="openSmartPasteModal()" class="bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs px-3.5 py-2 rounded-2xl font-black shadow-sm shadow-orange-200 transition active:scale-95">✨ 智慧導入</button>
+                        <button onclick="openAddScheduleModal()" class="bg-amber-500 text-white text-xs px-3.5 py-2 rounded-2xl font-black shadow-sm shadow-amber-200 transition active:scale-95">＋ 手動新增</button>
                     </div>
                 </div>
-
-                <!-- 依天數展開/收合的時間軸容器 -->
                 <div id="schedule-container" class="space-y-3">
                     <p class="text-center text-xs text-gray-400 py-6">正在載入行程... ⏳</p>
                 </div>
@@ -91,59 +81,169 @@
                 <div id="dynamic-reminders-container" class="space-y-3.5"></div>
             </div>
 
-            <!-- 分頁 3：語言 (右側已無手指圖案) -->
+            <!-- 分頁 3：語言 -->
             <div id="tab-lang" class="tab-content hidden space-y-4">
-                
-                <!-- 🌟 頂部大展示框 -->
                 <div class="cute-card p-6 bg-gradient-to-br from-amber-50/80 to-orange-50/80 border-2 border-orange-300 space-y-3 shadow-md text-center relative">
                     <div class="absolute top-3 left-4">
                         <span class="text-[10px] bg-orange-200 text-orange-900 px-2.5 py-0.5 rounded-full font-black">🗣️ 實用翻譯發音</span>
                     </div>
-                    
                     <div class="pt-2 space-y-1">
                         <p id="display-cn" class="text-xs text-gray-500 font-bold">請點選下方分類與句子 ▼</p>
                         <h2 id="display-foreign" class="text-xl font-black text-amber-950 mt-1 break-words">請選擇想說的話 ✨</h2>
                     </div>
-
                     <div class="pt-1">
-                        <button onclick="speakCurrentPhrase()" class="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-5 py-2.5 rounded-2xl text-xs font-black shadow-md shadow-orange-200 transition active:scale-95 inline-flex items-center gap-1.5">
-                            🔊 點擊朗讀
-                        </button>
+                        <button onclick="speakCurrentPhrase()" class="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-5 py-2.5 rounded-2xl text-xs font-black shadow-md shadow-orange-200 transition active:scale-95 inline-flex items-center gap-1.5">🔊 點擊朗讀</button>
                     </div>
                 </div>
-
-                <!-- 左右雙欄配置 -->
                 <div class="grid grid-cols-12 gap-3">
-                    
-                    <!-- 左下：分類按鈕清單 (4欄) -->
-                    <div id="lang-categories" class="col-span-4 space-y-2">
-                        <!-- 動態產生分類按鈕 -->
-                    </div>
-
-                    <!-- 右下：該分類對應的純中文句子清單 (8欄，無手指圖案) -->
+                    <div id="lang-categories" class="col-span-4 space-y-2"></div>
                     <div id="lang-phrases" class="col-span-8 space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
                         <div class="cute-card p-4 text-center text-xs text-gray-400">請先點選左側分類</div>
                     </div>
-
                 </div>
             </div>
 
-            <!-- 分頁 4：分帳 -->
+            <!-- 分頁 4：智慧多幣別分帳 (完美升級版) -->
             <div id="tab-split" class="tab-content hidden space-y-4">
-                <div class="bg-gradient-to-r from-orange-400 to-pink-400 text-white p-5 rounded-3xl shadow-lg shadow-orange-200/50 space-y-1">
-                    <p class="text-xs opacity-90 font-medium">✨ 總花費金額</p>
-                    <h3 class="text-2xl font-black tracking-tight">NT$ 24,500</h3>
+                
+                <!-- 總覽卡片 -->
+                <div class="bg-gradient-to-r from-orange-400 to-pink-400 text-white p-5 rounded-3xl shadow-lg shadow-orange-200/50 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <p class="text-xs opacity-90 font-medium">✨ 旅程總花費 (折合台幣)</p>
+                        <button onclick="openAddMemberModal()" class="bg-white/20 hover:bg-white/30 text-white text-[11px] px-3 py-1.5 rounded-full font-bold transition">＋ 管理成員</button>
+                    </div>
+                    <h3 id="total-expense-twd" class="text-2xl font-black tracking-tight">NT$ 0</h3>
+                    <div id="currency-breakdown" class="text-[11px] opacity-90 flex gap-3 pt-1 border-t border-white/20 flex-wrap">
+                        <!-- 各幣別總計 -->
+                    </div>
+                </div>
+
+                <!-- 功能按鈕列 -->
+                <div class="flex justify-between items-center px-1">
+                    <h3 class="font-black text-gray-700 text-xs tracking-wider">💰 帳目與結算</h3>
+                    <div class="flex gap-2">
+                        <button onclick="openSettlementModal()" class="bg-amber-100 text-amber-900 text-xs px-3.5 py-2 rounded-2xl font-black shadow-sm transition active:scale-95">📊 查看結算</button>
+                        <button onclick="openAddExpenseModal()" class="bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs px-3.5 py-2 rounded-2xl font-black shadow-sm shadow-orange-200 transition active:scale-95">＋ 記一筆</button>
+                    </div>
+                </div>
+
+                <!-- 帳目明細列表 -->
+                <div id="expense-list-container" class="space-y-2.5">
+                    <p class="text-center text-xs text-gray-400 py-6">目前還沒有記帳，點上方按鈕開始記帳吧！✨</p>
                 </div>
             </div>
 
         </div>
     </main>
 
-    <!-- 🌸 行程詳細資訊與切換修改視窗 -->
+    <!-- 🌸 記帳 Modal (支援幣別選擇、收款偏好與手動/均攤分攤模式) -->
+    <div id="expense-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-md p-6 space-y-3.5 shadow-2xl text-xs max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-amber-950 text-base">✍️ 新增記帳</h3>
+                <button onclick="closeAddExpenseModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
+            </div>
+            
+            <div>
+                <label class="block font-bold text-gray-600 mb-1">項目名稱</label>
+                <input type="text" id="exp-title" placeholder="例如：黑豬肉晚餐、計程車" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">金額</label>
+                    <input type="number" id="exp-amount" oninput="recalcSplit()" placeholder="例如：50000" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">幣別</label>
+                    <select id="exp-currency" onchange="toggleExchangeRate(); recalcSplit();" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                        <option value="TWD">TWD (台幣)</option>
+                        <option value="KRW" selected>KRW (韓元)</option>
+                        <option value="JPY">JPY (日圓)</option>
+                        <option value="THB">THB (泰銖)</option>
+                        <option value="USD">USD (美元)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="rate-box">
+                <label class="block font-bold text-gray-600 mb-1">對台幣匯率 (例如 1 韓元 = 0.024 台幣)</label>
+                <input type="number" id="exp-rate" value="0.024" step="0.0001" oninput="recalcSplit()" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+            </div>
+
+            <div>
+                <label class="block font-bold text-gray-600 mb-1">誰先付錢的？</label>
+                <select id="exp-payer" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                    <!-- 動態帶入成員 -->
+                </select>
+            </div>
+
+            <div>
+                <label class="block font-bold text-gray-600 mb-1">你想收回什麼幣別？</label>
+                <select id="exp-settle-currency" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                    <option value="ORIGINAL">依原幣別收回 (例如繼續收外幣現金)</option>
+                    <option value="TWD">折合台幣收回 (幫大家換算成台幣給付)</option>
+                </select>
+            </div>
+
+            <div>
+                <div class="flex justify-between items-center mb-1">
+                    <label class="font-bold text-gray-600">分攤模式與金額</label>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="setSplitMode('equal')" id="btn-mode-equal" class="text-[10px] px-2.5 py-1 rounded-full font-black bg-orange-500 text-white transition">均攤</button>
+                        <button type="button" onclick="setSplitMode('custom')" id="btn-mode-custom" class="text-[10px] px-2.5 py-1 rounded-full font-black bg-gray-100 text-gray-600 transition">自訂金額</button>
+                    </div>
+                </div>
+                <div id="exp-participants-container" class="space-y-2 p-2.5 bg-amber-50/30 border border-amber-100 rounded-2xl max-h-40 overflow-y-auto">
+                    <!-- 動態產生分攤清單 -->
+                </div>
+            </div>
+
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="closeAddExpenseModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-2xl font-black">取消</button>
+                <button onclick="submitExpense()" class="flex-1 bg-gradient-to-r from-orange-400 to-amber-400 text-white py-3 rounded-2xl font-black shadow-md shadow-orange-200">確認記帳</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌸 成員管理 Modal -->
+    <div id="member-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-amber-950 text-base">👥 旅伴成員管理</h3>
+                <button onclick="closeAddMemberModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
+            </div>
+            
+            <div class="flex gap-2">
+                <input type="text" id="new-member-name" placeholder="輸入成員名字（例如：小明）" class="flex-1 p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold">
+                <button onclick="addMember()" class="bg-amber-500 text-white px-4 py-3 rounded-2xl font-black shadow-sm">新增</button>
+            </div>
+
+            <div id="member-list-display" class="space-y-2 max-h-48 overflow-y-auto"></div>
+
+            <button onclick="closeAddMemberModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-2xl font-black">完成</button>
+        </div>
+    </div>
+
+    <!-- 🌸 結算結果 Modal (支援外幣與台幣雙軌結算清單) -->
+    <div id="settlement-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-amber-950 text-base">📊 分帳結算與還款清單</h3>
+                <button onclick="closeSettlementModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
+            </div>
+
+            <div id="settlement-content" class="space-y-3 max-h-72 overflow-y-auto pr-1">
+                <!-- 結算結果 -->
+            </div>
+
+            <button onclick="closeSettlementModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-2xl font-black">關閉</button>
+        </div>
+    </div>
+
+    <!-- 行程詳細與智慧導入 Modal (保留原本) -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
-            
-            <!-- 檢視模式 -->
             <div id="modal-view-mode" class="space-y-4">
                 <div class="flex justify-between items-start">
                     <div>
@@ -152,67 +252,41 @@
                     </div>
                     <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
                 </div>
-                
                 <div>
                     <h3 id="modal-title" class="font-black text-gray-900 text-base mt-2">行程名稱</h3>
-                    <!-- 備註區塊 -->
                     <div id="modal-location-container" class="mt-2 hidden bg-amber-50/50 p-3 rounded-2xl border border-amber-100">
                         <p class="text-xs text-gray-600 font-bold mb-0.5">📝 備註：</p>
                         <p id="modal-location" class="text-xs text-gray-800 whitespace-pre-line font-medium"></p>
                     </div>
                 </div>
-
                 <div class="pt-2 flex gap-2.5">
-                    <a id="modal-gmap" href="#" target="_blank" class="flex-1 text-center text-xs bg-amber-50 text-amber-900 py-3 rounded-2xl font-black hover:bg-amber-100 transition flex items-center justify-center gap-1 shadow-sm">
-                        🗺 Google Maps
-                    </a>
-                    <a id="modal-naver" href="#" target="_blank" class="flex-1 text-center text-xs bg-orange-50 text-orange-900 py-3 rounded-2xl font-black hover:bg-orange-100 transition flex items-center justify-center gap-1 shadow-sm">
-                        🚗 Naver Map
-                    </a>
+                    <a id="modal-gmap" href="#" target="_blank" class="flex-1 text-center text-xs bg-amber-50 text-amber-900 py-3 rounded-2xl font-black hover:bg-amber-100 transition flex items-center justify-center gap-1 shadow-sm">🗺 Google Maps</a>
+                    <a id="modal-naver" href="#" target="_blank" class="flex-1 text-center text-xs bg-orange-50 text-orange-900 py-3 rounded-2xl font-black hover:bg-orange-100 transition flex items-center justify-center gap-1 shadow-sm">🚗 Naver Map</a>
                 </div>
-
                 <div class="pt-2 flex gap-2.5">
                     <button onclick="switchToEditMode()" class="flex-1 bg-amber-100 text-amber-900 text-xs py-3 rounded-2xl font-black hover:bg-amber-200 transition">✏️ 修改行程</button>
                     <button onclick="closeDetailModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-bold">關閉</button>
                 </div>
             </div>
-
-            <!-- 編輯模式 -->
             <div id="modal-edit-mode" class="hidden space-y-3 text-xs">
                 <div class="flex justify-between items-center">
                     <h3 class="font-black text-amber-950 text-base">✏️ 編輯行程內容</h3>
                     <button onclick="closeDetailModal()" class="text-gray-400 text-base font-black">✕</button>
                 </div>
-                
                 <input type="hidden" id="edit-schedule-id">
-
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">天數</label>
-                    <input type="text" id="edit-day" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
-                </div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">時間</label>
-                    <input type="text" id="edit-time" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
-                </div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">行程名稱</label>
-                    <input type="text" id="edit-title" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
-                </div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">備註</label>
-                    <textarea id="edit-location" rows="3" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold resize-none" placeholder="輸入備註或預訂代碼..."></textarea>
-                </div>
-
+                <div><label class="block font-bold text-gray-600 mb-1">天數</label><input type="text" id="edit-day" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold"></div>
+                <div><label class="block font-bold text-gray-600 mb-1">時間</label><input type="text" id="edit-time" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold"></div>
+                <div><label class="block font-bold text-gray-600 mb-1">行程名稱</label><input type="text" id="edit-title" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold"></div>
+                <div><label class="block font-bold text-gray-600 mb-1">備註</label><textarea id="edit-location" rows="3" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none resize-none font-bold" placeholder="輸入備註或預訂代碼..."></textarea></div>
                 <div class="flex gap-2.5 pt-2">
                     <button onclick="switchToViewMode()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-black">返回</button>
                     <button onclick="saveScheduleEdit()" class="flex-1 bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs py-3 rounded-2xl font-black shadow-md shadow-orange-200">儲存修改</button>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <!-- 🌸 智慧導入大格子彈跳視窗 -->
+    <!-- 智慧導入 Modal -->
     <div id="smart-paste-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
@@ -220,7 +294,7 @@
                 <button onclick="closeSmartPasteModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
             <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。時間精準抓取，備註與營業時間內的數字絕不誤判！</p>
-            <textarea id="smart-paste-input" rows="8" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3.5 bg-amber-50/50 border border-amber-100 rounded-2xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
+            <textarea id="smart-paste-input" rows="8" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3.5 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none resize-none placeholder:text-gray-400"></textarea>
             <div class="flex gap-2.5 pt-1">
                 <button onclick="closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-black">取消</button>
                 <button onclick="parseSmartPaste()" class="flex-1 bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs py-3 rounded-2xl font-black shadow-md shadow-orange-200">開始智慧拆解</button>
@@ -228,36 +302,22 @@
         </div>
     </div>
 
-    <!-- 🌸 手動新增表單 Modal -->
+    <!-- 手動新增行程 Modal -->
     <div id="schedule-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-amber-950 text-base">✏️ 手動新增行程</h3>
                 <button onclick="closeAddScheduleModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
-            
             <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">天數（例如：Day 1）</label>
-                    <input type="text" id="input-day" value="Day 1" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
-                </div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">時間（例如：14:00）</label>
-                    <input type="text" id="input-time" value="10:00" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
-                </div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">行程名稱</label>
-                    <input type="text" id="input-title" placeholder="例如：黑豬肉晚餐" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
-                </div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">備註（選填）</label>
-                    <textarea id="input-location" rows="3" placeholder="例如：餐廳預訂代碼或補充說明" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold resize-none"></textarea>
-                </div>
+                <div><label class="block font-bold text-gray-600 mb-1">天數（例如：Day 1）</label><input type="text" id="input-day" value="Day 1" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold"></div>
+                <div><label class="block font-bold text-gray-600 mb-1">時間（例如：14:00）</label><input type="text" id="input-time" value="10:00" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold"></div>
+                <div><label class="block font-bold text-gray-600 mb-1">行程名稱</label><input type="text" id="input-title" placeholder="例如：黑豬肉晚餐" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold"></div>
+                <div><label class="block font-bold text-gray-600 mb-1">備註（選填）</label><textarea id="input-location" rows="3" placeholder="例如：餐廳預訂代碼或補充說明" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none resize-none font-bold"></textarea></div>
             </div>
-
             <div class="flex gap-2.5 pt-2">
-                <button onclick="closeAddScheduleModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-black transition active:scale-95">取消</button>
-                <button onclick="submitScheduleForm()" class="flex-1 bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs py-3 rounded-2xl font-black shadow-md shadow-orange-200 transition active:scale-95">確認新增</button>
+                <button onclick="closeAddScheduleModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-black">取消</button>
+                <button onclick="submitScheduleForm()" class="flex-1 bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs py-3 rounded-2xl font-black shadow-md shadow-orange-200">確認新增</button>
             </div>
         </div>
     </div>
@@ -293,9 +353,14 @@
         let currentActivePhrase = { cn: "請選擇想說的話", foreign: "請選擇想說的話" };
 
         let unsubscribeSchedules = null;
-        let allSchedulesData = [];
+        let unsubscribeExpenses = null;
+        let unsubscribeMembers = null;
 
-        // 🌟 擴充至極豐富的萬國語言庫（右側僅顯示中文）
+        let allSchedulesData = [];
+        let allExpensesData = [];
+        let allMembersData = [];
+        let currentSplitMode = 'equal'; // 'equal' 均攤 或 'custom' 自訂
+
         const languageData = {
             korea: {
                 langCode: 'ko-KR',
@@ -516,12 +581,10 @@
         async function renderProjects() {
             const list = document.getElementById('project-list');
             const myIds = getMyProjectIds();
-
             if (myIds.length === 0) {
                 list.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前沒有專案。點上方按鈕新增，或透過朋友的分享連結加入！✨</p>`;
                 return;
             }
-
             list.innerHTML = '';
             for (let id of myIds) {
                 try {
@@ -546,9 +609,7 @@
                         `;
                         list.appendChild(card);
                     }
-                } catch (e) {
-                    console.error("載入專案錯誤", e);
-                }
+                } catch (e) { console.error("載入專案錯誤", e); }
             }
         }
 
@@ -556,21 +617,14 @@
             const name = prompt("請輸入新旅遊專案名稱（例如：濟州島自駕、曼谷自由行）：");
             if (!name) return;
             const dates = prompt("請輸入旅遊日期區間（例如：11/23 - 11/27）：", "11/23 - 11/27");
-            
             try {
                 const newId = 'proj_' + Date.now();
-                await setDoc(doc(db, "projects", newId), {
-                    name: name,
-                    dates: dates,
-                    createdAt: Date.now()
-                });
+                await setDoc(doc(db, "projects", newId), { name, dates, createdAt: Date.now() });
+                await setDoc(doc(db, "projects", newId, "members", "m1"), { name: "我" });
                 saveMyProjectId(newId);
                 renderProjects();
                 alert("✨ 新專案建立成功！");
-            } catch (e) {
-                console.error("新增失敗: ", e);
-                alert("新增失敗，請檢查網路連線");
-            }
+            } catch (e) { alert("新增失敗"); }
         }
 
         window.removeProjectFromMyList = function(id) {
@@ -594,27 +648,405 @@
             
             renderRemindersByRules(projectName);
             initLanguageModule(projectName);
+            loadMembersAndExpenses(id);
             
             switchTab('schedule');
             loadSchedules(id);
         }
 
-        // 🌟 初始化語言模組
+        // 載入成員與分帳資料
+        function loadMembersAndExpenses(projId) {
+            const membersRef = collection(db, "projects", projId, "members");
+            if (unsubscribeMembers) unsubscribeMembers();
+            unsubscribeMembers = onSnapshot(membersRef, (snapshot) => {
+                allMembersData = [];
+                snapshot.forEach(docSnap => {
+                    allMembersData.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderMemberListUI();
+                updateExpenseModalDropdowns();
+            });
+
+            const expensesRef = collection(db, "projects", projId, "expenses");
+            if (unsubscribeExpenses) unsubscribeExpenses();
+            unsubscribeExpenses = onSnapshot(query(expensesRef, orderBy("createdAt", "desc")), (snapshot) => {
+                allExpensesData = [];
+                snapshot.forEach(docSnap => {
+                    allExpensesData.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderExpenseUI();
+            });
+        }
+
+        // 渲染記帳與分帳總覽
+        function renderExpenseUI() {
+            const container = document.getElementById('expense-list-container');
+            const breakdownContainer = document.getElementById('currency-breakdown');
+            const totalTwdEl = document.getElementById('total-expense-twd');
+            
+            container.innerHTML = '';
+            if (allExpensesData.length === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前還沒有記帳，點上方按鈕開始記帳吧！✨</p>`;
+                totalTwdEl.innerText = "NT$ 0";
+                breakdownContainer.innerHTML = "尚無花費記錄";
+                return;
+            }
+
+            let totalTwdSum = 0;
+            let currencySums = {};
+
+            allExpensesData.forEach(exp => {
+                let twdVal = exp.currency === 'TWD' ? exp.amount : (exp.amount * (exp.rate || 1));
+                totalTwdSum += twdVal;
+
+                if (!currencySums[exp.currency]) currencySums[exp.currency] = 0;
+                currencySums[exp.currency] += exp.amount;
+            });
+
+            totalTwdSum = Math.round(totalTwdSum);
+            totalTwdEl.innerText = `NT$ ${totalTwdSum.toLocaleString()}`;
+
+            let breakdownHtml = '';
+            Object.keys(currencySums).forEach(cur => {
+                breakdownHtml += `<span>${cur}: ${currencySums[cur].toLocaleString()}</span>`;
+            });
+            breakdownContainer.innerHTML = breakdownHtml;
+
+            allExpensesData.forEach(exp => {
+                let twdVal = Math.round(exp.currency === 'TWD' ? exp.amount : (exp.amount * (exp.rate || 1)));
+                let card = document.createElement('div');
+                card.className = "cute-card p-4 bg-white border border-amber-100 flex justify-between items-center";
+                
+                let splitDetails = "";
+                if (exp.shares) {
+                    let partsText = [];
+                    Object.keys(exp.shares).forEach(mName => {
+                        let sh = exp.shares[mName];
+                        if (sh > 0) partsText.push(`${mName}: ${exp.currency === 'TWD' || exp.settleCurrency === 'TWD' ? 'NT$' : exp.currency} ${sh}`);
+                    });
+                    splitDetails = partsText.join(', ');
+                } else {
+                    splitDetails = exp.participants ? exp.participants.join(', ') : '全體';
+                }
+
+                card.innerHTML = `
+                    <div class="space-y-0.5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-gray-900">${exp.title}</span>
+                            <span class="text-[10px] bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full font-bold">${exp.payer} 付款</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400 font-bold">分攤方式: ${splitDetails} (${exp.settleCurrency === 'TWD' ? '折合台幣結算' : '原幣別結算'})</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-black text-orange-600">${exp.currency} ${exp.amount.toLocaleString()}</p>
+                        <p class="text-[10px] text-gray-400 font-bold">≈ NT$ ${twdVal.toLocaleString()}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 開啟/關閉記帳 Modal
+        window.openAddExpenseModal = function() {
+            if (allMembersData.length === 0) {
+                alert("請先至成員管理新增至少一位成員！");
+                openAddMemberModal();
+                return;
+            }
+            document.getElementById('exp-title').value = '';
+            document.getElementById('exp-amount').value = '';
+            setSplitMode('equal');
+            document.getElementById('expense-modal').classList.remove('hidden');
+        }
+        window.closeAddExpenseModal = function() { document.getElementById('expense-modal').classList.add('hidden'); }
+
+        window.toggleExchangeRate = function() {
+            let cur = document.getElementById('exp-currency').value;
+            let rateBox = document.getElementById('rate-box');
+            let rateInput = document.getElementById('exp-rate');
+            if (cur === 'TWD') {
+                rateBox.classList.add('hidden');
+                rateInput.value = 1;
+            } else {
+                rateBox.classList.remove('hidden');
+                if (cur === 'KRW') rateInput.value = 0.024;
+                else if (cur === 'JPY') rateInput.value = 0.21;
+                else if (cur === 'THB') rateInput.value = 0.92;
+                else if (cur === 'USD') rateInput.value = 32.5;
+            }
+        }
+
+        // 切換分攤模式 (equal 均攤 / custom 自訂)
+        window.setSplitMode = function(mode) {
+            currentSplitMode = mode;
+            const btnEq = document.getElementById('btn-mode-equal');
+            const btnCu = document.getElementById('btn-mode-custom');
+            if (mode === 'equal') {
+                btnEq.className = "text-[10px] px-2.5 py-1 rounded-full font-black bg-orange-500 text-white transition";
+                btnCu.className = "text-[10px] px-2.5 py-1 rounded-full font-black bg-gray-100 text-gray-600 transition";
+            } else {
+                btnCu.className = "text-[10px] px-2.5 py-1 rounded-full font-black bg-orange-500 text-white transition";
+                btnEq.className = "text-[10px] px-2.5 py-1 rounded-full font-black bg-gray-100 text-gray-600 transition";
+            }
+            updateExpenseModalDropdowns();
+        }
+
+        // 更新記帳 Modal 內的成員選項與分攤輸入框
+        function updateExpenseModalDropdowns() {
+            const payerSelect = document.getElementById('exp-payer');
+            const container = document.getElementById('exp-participants-container');
+            
+            payerSelect.innerHTML = '';
+            container.innerHTML = '';
+
+            allMembersData.forEach(m => {
+                let opt = document.createElement('option');
+                opt.value = m.name;
+                opt.innerText = m.name;
+                payerSelect.appendChild(opt);
+
+                let div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-white p-2 rounded-xl border border-amber-100";
+                
+                if (currentSplitMode === 'equal') {
+                    div.innerHTML = `
+                        <label class="flex items-center gap-2 font-bold text-gray-700 cursor-pointer">
+                            <input type="checkbox" name="participant" value="${m.name}" checked class="rounded accent-orange-500"> ${m.name}
+                        </label>
+                        <span class="text-gray-400 font-bold text-[11px]">參與均攤</span>
+                    `;
+                } else {
+                    div.innerHTML = `
+                        <label class="flex items-center gap-2 font-bold text-gray-700">
+                            <input type="checkbox" name="participant" value="${m.name}" checked onchange="toggleCustomInput(this)" class="rounded accent-orange-500"> ${m.name}
+                        </label>
+                        <input type="number" name="custom-share-${m.name}" placeholder="分攤金額" value="" class="w-24 p-1.5 bg-amber-50/50 border border-amber-100 rounded-lg outline-none font-bold text-right">
+                    `;
+                }
+                container.appendChild(div);
+            });
+            recalcSplit();
+        }
+
+        window.toggleCustomInput = function(cb) {
+            let input = cb.parentElement.parentElement.querySelector('input[type="number"]');
+            if (input) {
+                input.disabled = !cb.checked;
+                if (!cb.checked) input.value = '';
+            }
+        }
+
+        window.recalcSplit = function() {
+            if (currentSplitMode !== 'equal') return;
+            let totalAmount = parseFloat(document.getElementById('exp-amount').value) || 0;
+            let checkedBoxes = document.querySelectorAll('input[name="participant"]:checked');
+            if (checkedBoxes.length === 0) return;
+            let share = Math.round((totalAmount / checkedBoxes.length) * 100) / 100;
+            // 均攤時可以在介面提示或直接在背景計算
+        }
+
+        window.submitExpense = async function() {
+            if (!currentProjectId) return;
+            const title = document.getElementById('exp-title').value.trim();
+            const amount = parseFloat(document.getElementById('exp-amount').value);
+            const currency = document.getElementById('exp-currency').value;
+            const rate = parseFloat(document.getElementById('exp-rate').value) || 1;
+            const payer = document.getElementById('exp-payer').value;
+            const settleCurrency = document.getElementById('exp-settle-currency').value; // 'ORIGINAL' 或 'TWD'
+
+            if (!title || isNaN(amount) || amount <= 0) {
+                alert("請填寫有效的項目名稱與金額！");
+                return;
+            }
+
+            let shares = {};
+            let participants = [];
+
+            if (currentSplitMode === 'equal') {
+                let checkedBoxes = document.querySelectorAll('input[name="participant"]:checked');
+                checkedBoxes.forEach(cb => participants.push(cb.value));
+                if (participants.length === 0) {
+                    alert("請至少選擇一位參與分攤的成員！");
+                    return;
+                }
+                let shareAmount = Math.round((amount / participants.length) * 100) / 100;
+                participants.forEach(p => { shares[p] = shareAmount; });
+            } else {
+                let sumCustom = 0;
+                allMembersData.forEach(m => {
+                    let cb = document.querySelector(`input[name="participant"][value="${m.name}"]`);
+                    if (cb && cb.checked) {
+                        let input = document.querySelector(`input[name="custom-share-${m.name}"]`);
+                        let val = parseFloat(input.value) || 0;
+                        shares[m.name] = val;
+                        sumCustom += val;
+                        participants.push(m.name);
+                    } else {
+                        shares[m.name] = 0;
+                    }
+                });
+
+                if (Math.abs(sumCustom - amount) > 1) {
+                    alert(`自訂分攤總金額 (${sumCustom}) 與總支出金額 (${amount}) 不符，請重新確認！`);
+                    return;
+                }
+            }
+
+            try {
+                await addDoc(collection(db, "projects", currentProjectId, "expenses"), {
+                    title, amount, currency, rate, payer, settleCurrency, shares, participants, createdAt: Date.now()
+                });
+                closeAddExpenseModal();
+                alert("✨ 記帳成功！");
+            } catch (e) {
+                console.error("記帳失敗", e);
+                alert("記帳失敗，請檢查網路連線");
+            }
+        }
+
+        // 成員管理 Modal
+        window.openAddMemberModal = function() { document.getElementById('member-modal').classList.remove('hidden'); }
+        window.closeAddMemberModal = function() { document.getElementById('member-modal').classList.add('hidden'); }
+
+        window.addMember = async function() {
+            if (!currentProjectId) return;
+            const nameInput = document.getElementById('new-member-name');
+            const name = nameInput.value.trim();
+            if (!name) return;
+
+            try {
+                await addDoc(collection(db, "projects", currentProjectId, "members"), { name });
+                nameInput.value = '';
+            } catch (e) { alert("新增成員失敗"); }
+        }
+
+        function renderMemberListUI() {
+            const container = document.getElementById('member-list-display');
+            container.innerHTML = '';
+            allMembersData.forEach(m => {
+                let div = document.createElement('div');
+                div.className = "flex justify-between items-center p-3 bg-amber-50/50 border border-amber-100 rounded-2xl font-bold";
+                div.innerHTML = `<span>👤 ${m.name}</span>`;
+                container.appendChild(div);
+            });
+        }
+
+        // 📊 智慧結算試算（精準支援外幣與台幣雙軌結算）
+        window.openSettlementModal = function() {
+            const content = document.getElementById('settlement-content');
+            content.innerHTML = '';
+
+            if (allExpensesData.length === 0 || allMembersData.length === 0) {
+                content.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">尚無足夠的帳目資料進行結算！</p>`;
+                document.getElementById('settlement-modal').classList.remove('hidden');
+                return;
+            }
+
+            // 統計每個成員在各幣別的收支淨額
+            let balances = {}; // { 成員名: { TWD: 數字, KRW: 數字, JPY: 數字... } }
+            allMembersData.forEach(m => { balances[m.name] = {}; });
+
+            allExpensesData.forEach(exp => {
+                let cur = exp.currency;
+                let settleCur = exp.settleCurrency || 'ORIGINAL';
+                let effectiveCur = (settleCur === 'TWD') ? 'TWD' : cur;
+                
+                let totalAmt = exp.amount;
+                let rate = exp.rate || 1;
+
+                // 若選擇折合台幣結算，將總金額轉成台幣
+                if (effectiveCur === 'TWD' && cur !== 'TWD') {
+                    totalAmt = totalAmt * rate;
+                }
+
+                // 確保結算幣別初始化
+                allMembersData.forEach(m => {
+                    if (!balances[m.name][effectiveCur]) balances[m.name][effectiveCur] = 0;
+                });
+
+                // 付款人增加應收
+                balances[exp.payer][effectiveCur] += totalAmt;
+
+                // 各成員分攤扣除
+                let shares = exp.shares || {};
+                Object.keys(shares).forEach(mName => {
+                    let sh = shares[mName];
+                    if (effectiveCur === 'TWD' && cur !== 'TWD') {
+                        sh = sh * rate;
+                    }
+                    if (balances[mName] !== undefined) {
+                        if (!balances[mName][effectiveCur]) balances[mName][effectiveCur] = 0;
+                        balances[mName][effectiveCur] -= sh;
+                    }
+                });
+            });
+
+            // 針對每個幣別計算誰該給誰多少
+            let html = `<p class="text-xs text-gray-500 font-bold mb-2">以下為各幣別的最簡化還款建議：</p>`;
+            let hasTransaction = false;
+
+            // 收集所有出現過的幣別
+            let activeCurrencies = new Set();
+            Object.keys(balances).forEach(name => {
+                Object.keys(balances[name]).forEach(c => activeCurrencies.add(c));
+            });
+
+            activeCurrencies.forEach(cur => {
+                let debtors = [];
+                let creditors = [];
+
+                Object.keys(balances).forEach(name => {
+                    let val = Math.round((balances[name][cur] || 0) * 100) / 100;
+                    if (val < 0) debtors.push({ name, amount: -val });
+                    else if (val > 0) creditors.push({ name, amount: val });
+                });
+
+                let dIdx = 0, cIdx = 0;
+                while (dIdx < debtors.length && cIdx < creditors.length) {
+                    let debtor = debtors[dIdx];
+                    let creditor = creditors[cIdx];
+                    let amt = Math.min(debtor.amount, creditor.amount);
+                    amt = Math.round(amt * 100) / 100;
+
+                    if (amt > 0) {
+                        hasTransaction = true;
+                        let prefix = (cur === 'TWD') ? 'NT$' : cur;
+                        html += `
+                            <div class="p-3 bg-amber-50/60 border border-amber-100 rounded-2xl mb-2">
+                                👉 <strong>${debtor.name}</strong> 需支付給 <strong>${creditor.name}</strong>： 
+                                <span class="text-orange-600 font-black">${prefix} ${amt.toLocaleString()}</span>
+                            </div>
+                        `;
+                    }
+
+                    debtor.amount -= amt;
+                    creditor.amount -= amt;
+
+                    if (debtor.amount <= 0) dIdx++;
+                    if (creditor.amount <= 0) cIdx++;
+                }
+            });
+
+            if (!hasTransaction) {
+                content.innerHTML = `<p class="text-center text-xs text-gray-600 py-6 font-bold">✨ 大家剛好互不欠帳，完美平分！</p>`;
+            } else {
+                content.innerHTML = html;
+            }
+
+            document.getElementById('settlement-modal').classList.remove('hidden');
+        }
+        window.closeSettlementModal = function() { document.getElementById('settlement-modal').classList.add('hidden'); }
+
+        // 語言與提醒模組 (保留原本)
         function initLanguageModule(projectName) {
             let nameLower = projectName.toLowerCase();
             let destKey = 'general';
-
-            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
-                destKey = 'korea';
-            } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都') || nameLower.includes('沖繩') || nameLower.includes('北海道') || nameLower.includes('名古屋')) {
-                destKey = 'japan';
-            } else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁') || nameLower.includes('普吉')) {
-                destKey = 'thailand';
-            }
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) destKey = 'korea';
+            else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都')) destKey = 'japan';
+            else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁')) destKey = 'thailand';
 
             const currentLangPack = languageData[destKey];
             currentDestinationLang = currentLangPack.langCode;
-
             currentActivePhrase = { cn: "請點選左側分類與右側句子", foreign: "Ready to Speak ✨" };
             document.getElementById('display-cn').innerText = currentActivePhrase.cn;
             document.getElementById('display-foreign').innerText = currentActivePhrase.foreign;
@@ -634,23 +1066,16 @@
                 };
                 catContainer.appendChild(btn);
             });
-
             renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
         }
 
-        // 🌟 渲染右側句子清單 (右下僅顯示中文，拿掉手指圖案)
         function renderPhrases(phrases) {
             const phraseContainer = document.getElementById('lang-phrases');
             phraseContainer.innerHTML = '';
-
             phrases.forEach(p => {
                 let card = document.createElement('div');
                 card.className = "cute-card p-3.5 bg-amber-50/40 hover:bg-amber-50 border border-amber-100/80 cursor-pointer transition flex justify-between items-center";
-                card.innerHTML = `
-                    <div>
-                        <p class="text-xs text-gray-800 font-bold">${p.cn}</p>
-                    </div>
-                `;
+                card.innerHTML = `<div><p class="text-xs text-gray-800 font-bold">${p.cn}</p></div>`;
                 card.onclick = () => {
                     currentActivePhrase = p;
                     document.getElementById('display-cn').innerText = p.cn;
@@ -668,103 +1093,17 @@
             window.speechSynthesis.speak(utterance);
         }
 
-        // 🌟 提醒內容動態規則引擎
         function renderRemindersByRules(projectName) {
             const container = document.getElementById('dynamic-reminders-container');
             let nameLower = projectName.toLowerCase();
             let html = '';
-
-            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">當地早晚溫差較大且風大，建議穿著長袖、針織衫或帽T，並準備防風外套 🧥。</p>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>導航 App：強烈建議使用 Naver Map 或 Kakao Map，以電話號碼查詢景點最準確！</li>
-                            <li>測速照相：道路速限嚴格，沿途有大量測速照相，務必依速限行駛。</li>
-                            <li>加油還車：多為自助/半人工，記得確認租車規定（通常為滿油出借還車）。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>證件：務必備妥台灣駕照正本與國際駕照。</li>
-                            <li>支付：信用卡普及，建議身上備妥 5~10 萬韓元現金備用。</li>
-                            <li>插頭：電壓 220V，圓形雙孔（歐規/韓規）。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
-                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>警察局：112 | 救護車/消防：119 | 中文旅遊熱線：1330</li>
-                        </ul>
-                    </div>
-                `;
-            } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都') || nameLower.includes('沖繩') || nameLower.includes('北海道') || nameLower.includes('名古屋')) {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇯🇵 日本旅遊與天氣指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">行程多以步行與大眾運輸為主，建議穿著舒適好走的布鞋，並攜帶輕便外套與雨具 🌂。</p>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚆 交通與導航提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>導航：推薦使用 Google Maps 或 乗換案内 查詢地鐵。</li>
-                            <li>IC 卡：建議事先將 Suica 或 Pasmo 加入手機錢包（Apple Pay）。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>護照效期需大於 6 個月。部分小店或拉麵機仍需現金，建議備妥適量日幣。</li>
-                            <li>插頭：電壓 100V，雙孔扁平插頭（與台灣相同）。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
-                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>警察局：110 | 救護車/消防：119</li>
-                        </ul>
-                    </div>
-                `;
-            } else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁') || nameLower.includes('普吉') || nameLower.includes('芭達雅')) {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇹🇭 泰國旅遊與天氣指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">終年炎熱，建議穿著輕薄透氣衣物，備好防曬與雨具。進出寺廟衣著需端莊（不可露肩短褲）。</p>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🛵 交通與叫車提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>叫車：推薦使用 Grab 或 Bolt。市區可多利用 BTS/MRT 避開塞車。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與小費</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>夜市小吃多收現金，可至當地 SuperRich 換匯。按摩或服務良好建議給 20-100 銖小費。</li>
-                            <li>插頭：電壓 220V，圓形或扁平兩用。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
-                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>觀光警察：1155 | 警察局：191 | 醫療：1669</li>
-                        </ul>
-                    </div>
-                `;
+            if (nameLower.includes('濟州') || nameLower.includes('韓國')) {
+                html = `<div class="cute-card p-5 space-y-2.5"><h3 class="font-black text-amber-950 text-sm">🇰🇷 韓國旅遊指南</h3><p class="text-xs text-gray-600">早晚溫差大且風大，建議長袖與防風外套 🧥。</p></div>`;
+            } else if (nameLower.includes('東京') || nameLower.includes('日本')) {
+                html = `<div class="cute-card p-5 space-y-2.5"><h3 class="font-black text-amber-950 text-sm">🇯🇵 日本旅遊指南</h3><p class="text-xs text-gray-600">步行較多，建議穿著舒適布鞋 🌂。</p></div>`;
             } else {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥當地網卡、萬用轉接頭與海外旅遊平安險。</p>
-                    </div>
-                `;
+                html = `<div class="cute-card p-5 space-y-2.5"><h3 class="font-black text-amber-950 text-sm">🌍 國際通用指南</h3><p class="text-xs text-gray-600">請留意護照效期與當地網卡。</p></div>`;
             }
-
             container.innerHTML = html;
         }
 
@@ -772,12 +1111,13 @@
             currentProjectId = null;
             currentProjectName = "";
             if (unsubscribeSchedules) unsubscribeSchedules();
+            if (unsubscribeExpenses) unsubscribeExpenses();
+            if (unsubscribeMembers) unsubscribeMembers();
             document.getElementById('view-workspace').classList.add('hidden');
             document.getElementById('bottom-nav').classList.add('hidden');
             document.getElementById('back-btn').classList.add('hidden');
             document.getElementById('share-btn').classList.add('hidden');
             document.getElementById('view-projects').classList.remove('hidden');
-            
             document.getElementById('header-title').innerText = "🌸 我的旅遊小專案";
             document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
             renderProjects();
@@ -786,14 +1126,10 @@
         function loadSchedules(projId) {
             const schedulesRef = collection(db, "projects", projId, "schedules");
             const q = query(schedulesRef, orderBy("createdAt", "asc"));
-
             if (unsubscribeSchedules) unsubscribeSchedules();
-
             unsubscribeSchedules = onSnapshot(q, (snapshot) => {
                 allSchedulesData = [];
-                snapshot.forEach((docSnap) => {
-                    allSchedulesData.push({ id: docSnap.id, ...docSnap.data() });
-                });
+                snapshot.forEach((docSnap) => { allSchedulesData.push({ id: docSnap.id, ...docSnap.data() }); });
                 renderScheduleUI();
             });
         }
@@ -806,27 +1142,15 @@
         function renderScheduleUI() {
             const container = document.getElementById('schedule-container');
             const upcomingContainer = document.getElementById('upcoming-card-container');
-            container.innerHTML = '';
-            upcomingContainer.innerHTML = '';
-
+            container.innerHTML = ''; upcomingContainer.innerHTML = '';
             if (allSchedulesData.length === 0) {
-                upcomingContainer.innerHTML = '';
                 container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前還沒有行程，快點擊上方按鈕新增或智慧導入吧！✨</p>`;
                 return;
             }
-
             const nextItem = allSchedulesData[0];
             const cleanNextTitle = cleanDisplayTitle(nextItem.title);
-            upcomingContainer.innerHTML = `
-                <div onclick="openDetailModal('${nextItem.id}')" class="cute-card p-5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-orange-300 space-y-2 relative shadow-md cursor-pointer hover:scale-[1.01] transition">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs bg-orange-500 text-white px-3 py-1 rounded-full font-black">🚀 即將到來</span>
-                        <span class="text-xs font-black text-orange-800">${nextItem.day || 'Day 1'} • ${nextItem.time || '全天'}</span>
-                    </div>
-                    <h4 class="font-black text-gray-900 text-sm pt-0.5">${cleanNextTitle}</h4>
-                </div>
-            `;
-
+            upcomingContainer.innerHTML = `<div onclick="openDetailModal('${nextItem.id}')" class="cute-card p-5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-orange-300 space-y-2 relative shadow-md cursor-pointer"><div class="flex justify-between items-center"><span class="text-xs bg-orange-500 text-white px-3 py-1 rounded-full font-black">🚀 即將到來</span><span class="text-xs font-black text-orange-800">${nextItem.day || 'Day 1'} • ${nextItem.time || '全天'}</span></div><h4 class="font-black text-gray-900 text-sm">${cleanNextTitle}</h4></div>`;
+            
             let grouped = {};
             allSchedulesData.forEach(item => {
                 let dayKey = item.day || 'Day 1';
@@ -839,36 +1163,13 @@
                 let sectionId = `day_section_${index}`;
                 let dayBox = document.createElement('div');
                 dayBox.className = "cute-card overflow-hidden border border-amber-100";
-                
-                let headerHtml = `
-                    <div onclick="toggleDayCollapse('${sectionId}')" class="bg-amber-100/70 p-4 flex justify-between items-center cursor-pointer hover:bg-amber-100 transition">
-                        <h4 class="font-black text-amber-950 text-xs flex items-center gap-1.5">
-                            📅 ${dayKey} <span class="text-xs text-amber-800 font-bold">(${items.length} 個行程)</span>
-                        </h4>
-                        <span id="icon_${sectionId}" class="text-xs text-amber-900 font-black">▼ 展開</span>
-                    </div>
-                `;
-
-                let isExpanded = false;
-                let listHtml = `<div id="${sectionId}" class="${isExpanded ? '' : 'hidden'} p-3 space-y-2.5 bg-white">`;
-
+                let headerHtml = `<div onclick="toggleDayCollapse('${sectionId}')" class="bg-amber-100/70 p-4 flex justify-between items-center cursor-pointer hover:bg-amber-100 transition"><h4 class="font-black text-amber-950 text-xs">📅 ${dayKey} (${items.length} 個行程)</h4><span id="icon_${sectionId}" class="text-xs text-amber-900 font-black">▼ 展開</span></div>`;
+                let listHtml = `<div id="${sectionId}" class="hidden p-3 space-y-2.5 bg-white">`;
                 items.forEach(s => {
                     let cleanTitle = cleanDisplayTitle(s.title);
-                    let timeLabel = s.time || '全天';
-                    listHtml += `
-                        <div onclick="openDetailModal('${s.id}')" class="p-3.5 bg-amber-50/40 hover:bg-amber-50 rounded-2xl border border-amber-100/80 flex justify-between items-center cursor-pointer transition">
-                            <div class="space-y-1">
-                                <span class="text-[11px] bg-orange-100 text-orange-800 px-2.5 py-0.5 rounded-md font-black">${timeLabel}</span>
-                                <h5 class="font-black text-gray-900 text-sm mt-1">${cleanTitle}</h5>
-                            </div>
-                            <div>
-                                <button onclick="event.stopPropagation(); deleteSchedule('${s.id}')" class="text-gray-300 hover:text-red-500 text-sm p-1.5">🗑️</button>
-                            </div>
-                        </div>
-                    `;
+                    listHtml += `<div onclick="openDetailModal('${s.id}')" class="p-3.5 bg-amber-50/40 hover:bg-amber-50 rounded-2xl border border-amber-100 flex justify-between items-center cursor-pointer"><div><span class="text-[11px] bg-orange-100 text-orange-800 px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span><h5 class="font-black text-gray-900 text-sm mt-1">${cleanTitle}</h5></div></div>`;
                 });
                 listHtml += `</div>`;
-
                 dayBox.innerHTML = headerHtml + listHtml;
                 container.appendChild(dayBox);
             });
@@ -877,62 +1178,32 @@
         window.toggleDayCollapse = function(sectionId) {
             const el = document.getElementById(sectionId);
             const icon = document.getElementById(`icon_${sectionId}`);
-            if (el.classList.contains('hidden')) {
-                el.classList.remove('hidden');
-                icon.innerText = "▲ 收合";
-            } else {
-                el.classList.add('hidden');
-                icon.innerText = "▼ 展開";
-            }
+            if (el.classList.contains('hidden')) { el.classList.remove('hidden'); icon.innerText = "▲ 收合"; }
+            else { el.classList.add('hidden'); icon.innerText = "▼ 展開"; }
         }
 
         window.openDetailModal = function(id) {
             const item = allSchedulesData.find(s => s.id === id);
             if (!item) return;
-
             document.getElementById('modal-day').innerText = item.day || 'Day 1';
             document.getElementById('modal-time').innerText = item.time || '全天';
             document.getElementById('modal-title').innerText = cleanDisplayTitle(item.title);
-            
             const locContainer = document.getElementById('modal-location-container');
             const locSpan = document.getElementById('modal-location');
-            if (item.location && item.location.trim() !== '') {
-                locSpan.innerText = item.location;
-                locContainer.classList.remove('hidden');
-            } else {
-                locSpan.innerText = '';
-                locContainer.classList.add('hidden');
-            }
-
-            const queryText = encodeURIComponent(cleanDisplayTitle(item.title));
-            document.getElementById('modal-gmap').href = `https://maps.google.com/?q=${queryText}`;
-            document.getElementById('modal-naver').href = `https://map.naver.com/v5/search/${queryText}`;
-
+            if (item.location && item.location.trim() !== '') { locSpan.innerText = item.location; locContainer.classList.remove('hidden'); }
+            else { locSpan.innerText = ''; locContainer.classList.add('hidden'); }
             document.getElementById('edit-schedule-id').value = item.id;
             document.getElementById('edit-day').value = item.day || 'Day 1';
             document.getElementById('edit-time').value = item.time || '10:00';
             document.getElementById('edit-title').value = cleanDisplayTitle(item.title);
             document.getElementById('edit-location').value = item.location || '';
-
             document.getElementById('modal-view-mode').classList.remove('hidden');
             document.getElementById('modal-edit-mode').classList.add('hidden');
-
             document.getElementById('detail-modal').classList.remove('hidden');
         }
-
-        window.closeDetailModal = function() {
-            document.getElementById('detail-modal').classList.add('hidden');
-        }
-
-        window.switchToEditMode = function() {
-            document.getElementById('modal-view-mode').classList.add('hidden');
-            document.getElementById('modal-edit-mode').classList.remove('hidden');
-        }
-
-        window.switchToViewMode = function() {
-            document.getElementById('modal-edit-mode').classList.add('hidden');
-            document.getElementById('modal-view-mode').classList.remove('hidden');
-        }
+        window.closeDetailModal = function() { document.getElementById('detail-modal').classList.add('hidden'); }
+        window.switchToEditMode = function() { document.getElementById('modal-view-mode').classList.add('hidden'); document.getElementById('modal-edit-mode').classList.remove('hidden'); }
+        window.switchToViewMode = function() { document.getElementById('modal-edit-mode').classList.add('hidden'); document.getElementById('modal-view-mode').classList.remove('hidden'); }
 
         window.saveScheduleEdit = async function() {
             if (!currentProjectId) return;
@@ -941,37 +1212,18 @@
             const time = document.getElementById('edit-time').value.trim();
             const title = document.getElementById('edit-title').value.trim();
             let location = document.getElementById('edit-location').value.trim();
-
             if (!title) { alert("請填寫行程名稱！"); return; }
-
             try {
-                const docRef = doc(db, "projects", currentProjectId, "schedules", scheduleId);
-                await updateDoc(docRef, { day, time, title, location });
+                await updateDoc(doc(db, "projects", currentProjectId, "schedules", scheduleId), { day, time, title, location });
                 closeDetailModal();
                 alert("✨ 行程修改成功！");
-            } catch (e) {
-                console.error("修改失敗", e);
-                alert("修改失敗，請檢查網路連線");
-            }
+            } catch (e) { alert("修改失敗"); }
         }
 
-        window.openSmartPasteModal = function() {
-            if (!currentProjectId) return;
-            document.getElementById('smart-paste-modal').classList.remove('hidden');
-        }
-
-        window.closeSmartPasteModal = function() {
-            document.getElementById('smart-paste-modal').classList.add('hidden');
-        }
-
-        window.openAddScheduleModal = function() {
-            if (!currentProjectId) return;
-            document.getElementById('schedule-modal').classList.remove('hidden');
-        }
-
-        window.closeAddScheduleModal = function() {
-            document.getElementById('schedule-modal').classList.add('hidden');
-        }
+        window.openSmartPasteModal = function() { if (currentProjectId) document.getElementById('smart-paste-modal').classList.remove('hidden'); }
+        window.closeSmartPasteModal = function() { document.getElementById('smart-paste-modal').classList.add('hidden'); }
+        window.openAddScheduleModal = function() { if (currentProjectId) document.getElementById('schedule-modal').classList.remove('hidden'); }
+        window.closeAddScheduleModal = function() { document.getElementById('schedule-modal').classList.add('hidden'); }
 
         window.submitScheduleForm = async function() {
             if (!currentProjectId) return;
@@ -979,113 +1231,53 @@
             const time = document.getElementById('input-time').value.trim() || "10:00";
             const title = document.getElementById('input-title').value.trim();
             let location = document.getElementById('input-location').value.trim();
-
             if (!title) { alert("請填寫行程名稱！"); return; }
-
             try {
-                await addDoc(collection(db, "projects", currentProjectId, "schedules"), {
-                    day, time, title, location,
-                    createdAt: Date.now()
-                });
+                await addDoc(collection(db, "projects", currentProjectId, "schedules"), { day, time, title, location, createdAt: Date.now() });
                 closeAddScheduleModal();
-                document.getElementById('input-title').value = '';
-                document.getElementById('input-location').value = '';
                 alert("✨ 行程新增成功！");
-            } catch (e) {
-                console.error("新增失敗", e);
-                alert("新增失敗，請檢查網路連線");
-            }
-        }
-
-        window.deleteSchedule = async function(scheduleId) {
-            if (!currentProjectId) return;
-            if (confirm("確定要刪除這個行程嗎？")) {
-                try {
-                    await deleteDoc(doc(db, "projects", currentProjectId, "schedules", scheduleId));
-                } catch (e) { console.error("刪除失敗", e); }
-            }
+            } catch (e) { alert("新增失敗"); }
         }
 
         window.parseSmartPaste = async function() {
             const rawText = document.getElementById('smart-paste-input').value.trim();
-            if(!rawText) { alert("請先輸入或貼上行程文字喔！"); return; }
-
-            alert("✨ AI 正在進行智慧拆解與備註配對中...");
-
+            if(!rawText) { alert("請先輸入行程！"); return; }
+            alert("✨ AI 正在拆解行程...");
             const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentDay = "Day 1";
             let parsedItems = [];
             let currentItem = null;
-
-            try {
-                for (let i = 0; i < lines.length; i++) {
-                    let line = lines[i];
-
-                    let dayMatch = line.match(/(Day\s*\d+|第[一二三四五六七八九十]+天)/i);
-                    if (dayMatch) {
-                        if (currentItem) {
-                            parsedItems.push(currentItem);
-                            currentItem = null;
-                        }
-                        currentDay = dayMatch[0];
-                        continue;
-                    }
-
-                    let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
-                    let hasNoteKeyword = line.includes("備註") || line.includes("營業時間") || line.includes("預訂");
-                    let isNewItem = timeMatch && !hasNoteKeyword && (line.includes("•") || line.startsWith("•") || line.match(/^\s*•?\s*\d{1,2}[:：]\d{2}/));
-
-                    if (isNewItem) {
-                        if (currentItem) {
-                            parsedItems.push(currentItem);
-                        }
-
-                        let timeStr = timeMatch[1];
-                        let cleanTitle = line
-                            .replace(/^\s*•?\s*\d{1,2}[:：]\d{2}\s*/, '')
-                            .replace(/^[-•\*\d\.]+\s*/, '')
-                            .trim();
-
-                        currentItem = {
-                            day: currentDay,
-                            time: timeStr,
-                            title: cleanTitle,
-                            location: "",
-                            createdAt: Date.now() + parsedItems.length
-                        };
-                    } else if (currentItem) {
-                        currentItem.location = currentItem.location ? (currentItem.location + "\n" + line) : line;
-                    }
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                let dayMatch = line.match(/(Day\s*\d+|第[一二三四五六七八九十]+天)/i);
+                if (dayMatch) {
+                    if (currentItem) { parsedItems.push(currentItem); currentItem = null; }
+                    currentDay = dayMatch[0];
+                    continue;
                 }
-
-                if (currentItem) {
-                    parsedItems.push(currentItem);
+                let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
+                let hasNoteKeyword = line.includes("備註") || line.includes("營業時間");
+                let isNewItem = timeMatch && !hasNoteKeyword;
+                if (isNewItem) {
+                    if (currentItem) parsedItems.push(currentItem);
+                    currentItem = { day: currentDay, time: timeMatch[1], title: line.replace(/^\s*•?\s*\d{1,2}[:：]\d{2}\s*/, '').trim(), location: "", createdAt: Date.now() + parsedItems.length };
+                } else if (currentItem) {
+                    currentItem.location = currentItem.location ? (currentItem.location + "\n" + line) : line;
                 }
-
-                if (parsedItems.length === 0) {
-                    alert("沒有解析到有效行程，請檢查格式喔！");
-                    return;
-                }
-
-                for (let i = 0; i < parsedItems.length; i++) {
-                    await addDoc(collection(db, "projects", currentProjectId, "schedules"), parsedItems[i]);
-                }
-
-                document.getElementById('smart-paste-input').value = "";
-                closeSmartPasteModal();
-                alert(`✨ 成功！已智慧導入 ${parsedItems.length} 筆行程！`);
-            } catch (e) {
-                console.error("AI 拆解失敗", e);
-                alert("解析發生錯誤，請再試一次");
             }
+            if (currentItem) parsedItems.push(currentItem);
+            for (let i = 0; i < parsedItems.length; i++) {
+                await addDoc(collection(db, "projects", currentProjectId, "schedules"), parsedItems[i]);
+            }
+            closeSmartPasteModal();
+            alert(`✨ 成功導入 ${parsedItems.length} 筆行程！`);
         }
 
         window.shareCurrentProject = function() {
             if (!currentProjectId) return;
-            const baseUrl = window.location.href.split('?')[0];
-            const shareUrl = `${baseUrl}?project=${currentProjectId}`;
+            const shareUrl = `${window.location.href.split('?')[0]}?project=${currentProjectId}`;
             navigator.clipboard.writeText(shareUrl);
-            alert("🌸 專屬分享網址已複製！朋友點開後會自動將這個專案加入清單中！");
+            alert("🌸 專屬分享網址已複製！");
         }
 
         window.switchTab = function(tabName) {
@@ -1106,7 +1298,6 @@
         async function initApp() {
             const urlParams = new URLSearchParams(window.location.search);
             const sharedProjId = urlParams.get('project');
-
             if (sharedProjId) {
                 saveMyProjectId(sharedProjId);
                 window.history.replaceState({}, document.title, window.location.pathname);
