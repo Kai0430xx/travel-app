@@ -76,7 +76,7 @@
                 </div>
             </div>
 
-            <!-- 分頁 2：提醒 -->
+            <!-- 分頁 2：提醒 (已恢復完整豐富的指南內容) -->
             <div id="tab-ai" class="tab-content hidden space-y-3.5">
                 <div id="dynamic-reminders-container" class="space-y-3.5"></div>
             </div>
@@ -103,22 +103,17 @@
                 </div>
             </div>
 
-            <!-- 分頁 4：智慧多幣別分帳 (完美升級版) -->
+            <!-- 分頁 4：分帳 -->
             <div id="tab-split" class="tab-content hidden space-y-4">
-                
-                <!-- 總覽卡片 -->
                 <div class="bg-gradient-to-r from-orange-400 to-pink-400 text-white p-5 rounded-3xl shadow-lg shadow-orange-200/50 space-y-2">
                     <div class="flex justify-between items-center">
-                        <p class="text-xs opacity-90 font-medium">✨ 旅程總花費 (折合台幣)</p>
+                        <p class="text-xs opacity-90 font-medium">✨ 總花費金額 (折合台幣)</p>
                         <button onclick="openAddMemberModal()" class="bg-white/20 hover:bg-white/30 text-white text-[11px] px-3 py-1.5 rounded-full font-bold transition">＋ 管理成員</button>
                     </div>
                     <h3 id="total-expense-twd" class="text-2xl font-black tracking-tight">NT$ 0</h3>
-                    <div id="currency-breakdown" class="text-[11px] opacity-90 flex gap-3 pt-1 border-t border-white/20 flex-wrap">
-                        <!-- 各幣別總計 -->
-                    </div>
+                    <div id="currency-breakdown" class="text-[11px] opacity-90 flex gap-3 pt-1 border-t border-white/20 flex-wrap"></div>
                 </div>
 
-                <!-- 功能按鈕列 -->
                 <div class="flex justify-between items-center px-1">
                     <h3 class="font-black text-gray-700 text-xs tracking-wider">💰 帳目與結算</h3>
                     <div class="flex gap-2">
@@ -127,7 +122,6 @@
                     </div>
                 </div>
 
-                <!-- 帳目明細列表 -->
                 <div id="expense-list-container" class="space-y-2.5">
                     <p class="text-center text-xs text-gray-400 py-6">目前還沒有記帳，點上方按鈕開始記帳吧！✨</p>
                 </div>
@@ -136,27 +130,25 @@
         </div>
     </main>
 
-    <!-- 🌸 記帳 Modal (支援幣別選擇、收款偏好與手動/均攤分攤模式) -->
+    <!-- 🌸 記帳 Modal -->
     <div id="expense-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-3.5 shadow-2xl text-xs max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-amber-950 text-base">✍️ 新增記帳</h3>
                 <button onclick="closeAddExpenseModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
-            
             <div>
                 <label class="block font-bold text-gray-600 mb-1">項目名稱</label>
-                <input type="text" id="exp-title" placeholder="例如：黑豬肉晚餐、計程車" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                <input type="text" id="exp-title" placeholder="例如：黑豬肉晚餐、計程車" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold">
             </div>
-
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block font-bold text-gray-600 mb-1">金額</label>
-                    <input type="number" id="exp-amount" oninput="recalcSplit()" placeholder="例如：50000" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                    <input type="number" id="exp-amount" placeholder="例如：50000" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold">
                 </div>
                 <div>
                     <label class="block font-bold text-gray-600 mb-1">幣別</label>
-                    <select id="exp-currency" onchange="toggleExchangeRate(); recalcSplit();" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                    <select id="exp-currency" onchange="toggleExchangeRate()" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold">
                         <option value="TWD">TWD (台幣)</option>
                         <option value="KRW" selected>KRW (韓元)</option>
                         <option value="JPY">JPY (日圓)</option>
@@ -165,27 +157,21 @@
                     </select>
                 </div>
             </div>
-
             <div id="rate-box">
-                <label class="block font-bold text-gray-600 mb-1">對台幣匯率 (例如 1 韓元 = 0.024 台幣)</label>
-                <input type="number" id="exp-rate" value="0.024" step="0.0001" oninput="recalcSplit()" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                <label class="block font-bold text-gray-600 mb-1">對台幣匯率</label>
+                <input type="number" id="exp-rate" value="0.024" step="0.0001" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold">
             </div>
-
             <div>
                 <label class="block font-bold text-gray-600 mb-1">誰先付錢的？</label>
-                <select id="exp-payer" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
-                    <!-- 動態帶入成員 -->
-                </select>
+                <select id="exp-payer" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold"></select>
             </div>
-
             <div>
                 <label class="block font-bold text-gray-600 mb-1">你想收回什麼幣別？</label>
-                <select id="exp-settle-currency" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                <select id="exp-settle-currency" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold">
                     <option value="ORIGINAL">依原幣別收回 (例如繼續收外幣現金)</option>
                     <option value="TWD">折合台幣收回 (幫大家換算成台幣給付)</option>
                 </select>
             </div>
-
             <div>
                 <div class="flex justify-between items-center mb-1">
                     <label class="font-bold text-gray-600">分攤模式與金額</label>
@@ -194,11 +180,8 @@
                         <button type="button" onclick="setSplitMode('custom')" id="btn-mode-custom" class="text-[10px] px-2.5 py-1 rounded-full font-black bg-gray-100 text-gray-600 transition">自訂金額</button>
                     </div>
                 </div>
-                <div id="exp-participants-container" class="space-y-2 p-2.5 bg-amber-50/30 border border-amber-100 rounded-2xl max-h-40 overflow-y-auto">
-                    <!-- 動態產生分攤清單 -->
-                </div>
+                <div id="exp-participants-container" class="space-y-2 p-2.5 bg-amber-50/30 border border-amber-100 rounded-2xl max-h-40 overflow-y-auto"></div>
             </div>
-
             <div class="flex gap-2.5 pt-2">
                 <button onclick="closeAddExpenseModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-2xl font-black">取消</button>
                 <button onclick="submitExpense()" class="flex-1 bg-gradient-to-r from-orange-400 to-amber-400 text-white py-3 rounded-2xl font-black shadow-md shadow-orange-200">確認記帳</button>
@@ -213,35 +196,28 @@
                 <h3 class="font-black text-amber-950 text-base">👥 旅伴成員管理</h3>
                 <button onclick="closeAddMemberModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
-            
             <div class="flex gap-2">
                 <input type="text" id="new-member-name" placeholder="輸入成員名字（例如：小明）" class="flex-1 p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none font-bold">
                 <button onclick="addMember()" class="bg-amber-500 text-white px-4 py-3 rounded-2xl font-black shadow-sm">新增</button>
             </div>
-
             <div id="member-list-display" class="space-y-2 max-h-48 overflow-y-auto"></div>
-
             <button onclick="closeAddMemberModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-2xl font-black">完成</button>
         </div>
     </div>
 
-    <!-- 🌸 結算結果 Modal (支援外幣與台幣雙軌結算清單) -->
+    <!-- 🌸 結算結果 Modal -->
     <div id="settlement-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-amber-950 text-base">📊 分帳結算與還款清單</h3>
                 <button onclick="closeSettlementModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
-
-            <div id="settlement-content" class="space-y-3 max-h-72 overflow-y-auto pr-1">
-                <!-- 結算結果 -->
-            </div>
-
+            <div id="settlement-content" class="space-y-3 max-h-72 overflow-y-auto pr-1"></div>
             <button onclick="closeSettlementModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-2xl font-black">關閉</button>
         </div>
     </div>
 
-    <!-- 行程詳細與智慧導入 Modal (保留原本) -->
+    <!-- 行程詳細與智慧導入 Modal (保留) -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             <div id="modal-view-mode" class="space-y-4">
@@ -359,7 +335,7 @@
         let allSchedulesData = [];
         let allExpensesData = [];
         let allMembersData = [];
-        let currentSplitMode = 'equal'; // 'equal' 均攤 或 'custom' 自訂
+        let currentSplitMode = 'equal';
 
         const languageData = {
             korea: {
@@ -414,7 +390,7 @@
             japan: {
                 langCode: 'ja-JP',
                 categories: [
-                    { id: 'restaurant', name: '🍽️ 餐廳' },
+                    { id: 'restaurant', name: '🍽️️ 餐廳' },
                     { id: 'shopping', name: '🛍️ 購物' },
                     { id: 'transport', name: '🚆 交通' },
                     { id: 'hotel', name: '🏨 住宿' },
@@ -450,7 +426,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -512,7 +488,7 @@
             general: {
                 langCode: 'en-US',
                 categories: [
-                    { id: 'restaurant', name: '🍽️ 餐廳' },
+                    { id: 'restaurant', name: '🍽️️ 餐廳' },
                     { id: 'shopping', name: '🛍️ 購物' },
                     { id: 'transport', name: '🚕 交通' },
                     { id: 'hotel', name: '🏨 住宿' },
@@ -654,7 +630,6 @@
             loadSchedules(id);
         }
 
-        // 載入成員與分帳資料
         function loadMembersAndExpenses(projId) {
             const membersRef = collection(db, "projects", projId, "members");
             if (unsubscribeMembers) unsubscribeMembers();
@@ -678,7 +653,7 @@
             });
         }
 
-        // 渲染記帳與分帳總覽
+        // 🌟 完整流暢的記帳明細列表渲染
         function renderExpenseUI() {
             const container = document.getElementById('expense-list-container');
             const breakdownContainer = document.getElementById('currency-breakdown');
@@ -715,29 +690,26 @@
             allExpensesData.forEach(exp => {
                 let twdVal = Math.round(exp.currency === 'TWD' ? exp.amount : (exp.amount * (exp.rate || 1)));
                 let card = document.createElement('div');
-                card.className = "cute-card p-4 bg-white border border-amber-100 flex justify-between items-center";
+                card.className = "cute-card p-4 bg-white border border-amber-100 flex justify-between items-center gap-3";
                 
-                let splitDetails = "";
+                let count = 0;
                 if (exp.shares) {
-                    let partsText = [];
-                    Object.keys(exp.shares).forEach(mName => {
-                        let sh = exp.shares[mName];
-                        if (sh > 0) partsText.push(`${mName}: ${exp.currency === 'TWD' || exp.settleCurrency === 'TWD' ? 'NT$' : exp.currency} ${sh}`);
-                    });
-                    splitDetails = partsText.join(', ');
-                } else {
-                    splitDetails = exp.participants ? exp.participants.join(', ') : '全體';
+                    Object.keys(exp.shares).forEach(m => { if (exp.shares[m] > 0) count++; });
+                } else if (exp.participants) {
+                    count = exp.participants.length;
                 }
 
                 card.innerHTML = `
-                    <div class="space-y-0.5">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-black text-gray-900">${exp.title}</span>
-                            <span class="text-[10px] bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full font-bold">${exp.payer} 付款</span>
+                    <div class="space-y-1 min-w-0 flex-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-xs font-black text-gray-900 truncate">${exp.title}</span>
+                            <span class="text-[10px] bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full font-bold shrink-0">${exp.payer} 付款</span>
                         </div>
-                        <p class="text-[11px] text-gray-400 font-bold">分攤方式: ${splitDetails} (${exp.settleCurrency === 'TWD' ? '折合台幣結算' : '原幣別結算'})</p>
+                        <p class="text-[11px] text-gray-400 font-bold">
+                            ${count} 人分攤 (${exp.settleCurrency === 'TWD' ? '折合台幣結算' : '原幣別結算'})
+                        </p>
                     </div>
-                    <div class="text-right">
+                    <div class="text-right shrink-0">
                         <p class="text-sm font-black text-orange-600">${exp.currency} ${exp.amount.toLocaleString()}</p>
                         <p class="text-[10px] text-gray-400 font-bold">≈ NT$ ${twdVal.toLocaleString()}</p>
                     </div>
@@ -746,7 +718,6 @@
             });
         }
 
-        // 開啟/關閉記帳 Modal
         window.openAddExpenseModal = function() {
             if (allMembersData.length === 0) {
                 alert("請先至成員管理新增至少一位成員！");
@@ -776,7 +747,6 @@
             }
         }
 
-        // 切換分攤模式 (equal 均攤 / custom 自訂)
         window.setSplitMode = function(mode) {
             currentSplitMode = mode;
             const btnEq = document.getElementById('btn-mode-equal');
@@ -791,7 +761,6 @@
             updateExpenseModalDropdowns();
         }
 
-        // 更新記帳 Modal 內的成員選項與分攤輸入框
         function updateExpenseModalDropdowns() {
             const payerSelect = document.getElementById('exp-payer');
             const container = document.getElementById('exp-participants-container');
@@ -825,7 +794,6 @@
                 }
                 container.appendChild(div);
             });
-            recalcSplit();
         }
 
         window.toggleCustomInput = function(cb) {
@@ -836,15 +804,6 @@
             }
         }
 
-        window.recalcSplit = function() {
-            if (currentSplitMode !== 'equal') return;
-            let totalAmount = parseFloat(document.getElementById('exp-amount').value) || 0;
-            let checkedBoxes = document.querySelectorAll('input[name="participant"]:checked');
-            if (checkedBoxes.length === 0) return;
-            let share = Math.round((totalAmount / checkedBoxes.length) * 100) / 100;
-            // 均攤時可以在介面提示或直接在背景計算
-        }
-
         window.submitExpense = async function() {
             if (!currentProjectId) return;
             const title = document.getElementById('exp-title').value.trim();
@@ -852,7 +811,7 @@
             const currency = document.getElementById('exp-currency').value;
             const rate = parseFloat(document.getElementById('exp-rate').value) || 1;
             const payer = document.getElementById('exp-payer').value;
-            const settleCurrency = document.getElementById('exp-settle-currency').value; // 'ORIGINAL' 或 'TWD'
+            const settleCurrency = document.getElementById('exp-settle-currency').value;
 
             if (!title || isNaN(amount) || amount <= 0) {
                 alert("請填寫有效的項目名稱與金額！");
@@ -904,7 +863,6 @@
             }
         }
 
-        // 成員管理 Modal
         window.openAddMemberModal = function() { document.getElementById('member-modal').classList.remove('hidden'); }
         window.closeAddMemberModal = function() { document.getElementById('member-modal').classList.add('hidden'); }
 
@@ -931,7 +889,6 @@
             });
         }
 
-        // 📊 智慧結算試算（精準支援外幣與台幣雙軌結算）
         window.openSettlementModal = function() {
             const content = document.getElementById('settlement-content');
             content.innerHTML = '';
@@ -942,8 +899,7 @@
                 return;
             }
 
-            // 統計每個成員在各幣別的收支淨額
-            let balances = {}; // { 成員名: { TWD: 數字, KRW: 數字, JPY: 數字... } }
+            let balances = {};
             allMembersData.forEach(m => { balances[m.name] = {}; });
 
             allExpensesData.forEach(exp => {
@@ -954,20 +910,16 @@
                 let totalAmt = exp.amount;
                 let rate = exp.rate || 1;
 
-                // 若選擇折合台幣結算，將總金額轉成台幣
                 if (effectiveCur === 'TWD' && cur !== 'TWD') {
                     totalAmt = totalAmt * rate;
                 }
 
-                // 確保結算幣別初始化
                 allMembersData.forEach(m => {
                     if (!balances[m.name][effectiveCur]) balances[m.name][effectiveCur] = 0;
                 });
 
-                // 付款人增加應收
                 balances[exp.payer][effectiveCur] += totalAmt;
 
-                // 各成員分攤扣除
                 let shares = exp.shares || {};
                 Object.keys(shares).forEach(mName => {
                     let sh = shares[mName];
@@ -981,11 +933,9 @@
                 });
             });
 
-            // 針對每個幣別計算誰該給誰多少
             let html = `<p class="text-xs text-gray-500 font-bold mb-2">以下為各幣別的最簡化還款建議：</p>`;
             let hasTransaction = false;
 
-            // 收集所有出現過的幣別
             let activeCurrencies = new Set();
             Object.keys(balances).forEach(name => {
                 Object.keys(balances[name]).forEach(c => activeCurrencies.add(c));
@@ -1037,7 +987,107 @@
         }
         window.closeSettlementModal = function() { document.getElementById('settlement-modal').classList.add('hidden'); }
 
-        // 語言與提醒模組 (保留原本)
+        // 🌟 完整強大的提醒規則引擎（包含濟州島/韓國、日本、泰國與萬國通用）
+        function renderRemindersByRules(projectName) {
+            const container = document.getElementById('dynamic-reminders-container');
+            let nameLower = projectName.toLowerCase();
+            let html = '';
+
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">當地早晚溫差較大且風大，建議穿著長袖、針織衫或帽T，並準備防風外套 🧥。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>導航 App：強烈建議使用 Naver Map 或 Kakao Map，以電話號碼查詢景點最準確！</li>
+                            <li>測速照相：道路速限嚴格，沿途有大量測速照相，務必依速限行駛。</li>
+                            <li>加油還車：多為自助/半人工，記得確認租車規定（通常為滿油出借還車）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>證件：務必備妥台灣駕照正本與國際駕照。</li>
+                            <li>支付：信用卡普及，建議身上備妥 5~10 萬韓元現金備用。</li>
+                            <li>插頭：電壓 220V，圓形雙孔（歐規/韓規）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>警察局：112 | 救護車/消防：119 | 中文旅遊熱線：1330</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都') || nameLower.includes('沖繩') || nameLower.includes('北海道') || nameLower.includes('名古屋')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇯🇵 日本旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">行程多以步行與大眾運輸為主，建議穿著舒適好走的布鞋，並攜帶輕便外套與雨具 🌂。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚆 交通與導航提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>導航：推薦使用 Google Maps 或 乗換案內 查詢地鐵。</li>
+                            <li>IC 卡：建議事先將 Suica 或 Pasmo 加入手機錢包（Apple Pay）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>護照效期需大於 6 個月。部分小店或拉麵機仍需現金，建議備妥適量日幣。</li>
+                            <li>插頭：電壓 100V，雙孔扁平插頭（與台灣相同）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>警察局：110 | 救護車/消防：119</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁') || nameLower.includes('普吉') || nameLower.includes('芭達雅')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇹🇭 泰國旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">終年炎熱，建議穿著輕薄透氣衣物，備好防曬與雨具。進出寺廟衣著需端莊（不可露肩短褲）。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🛵 交通與叫車提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>叫車：推薦使用 Grab 或 Bolt。市區可多利用 BTS/MRT 避開塞車。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與小費</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>夜市小吃多收現金，可至當地 SuperRich 換匯。按摩或服務良好建議給 20-100 銖小費。</li>
+                            <li>插頭：電壓 220V，圓形或扁平兩用。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>觀光警察：1155 | 警察局：191 | 醫療：1669</li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥當地網卡、萬用轉接頭與海外旅遊平安險。</p>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // 語言模組初始化 (保留)
         function initLanguageModule(projectName) {
             let nameLower = projectName.toLowerCase();
             let destKey = 'general';
@@ -1091,20 +1141,6 @@
             const utterance = new SpeechSynthesisUtterance(currentActivePhrase.foreign);
             utterance.lang = currentDestinationLang;
             window.speechSynthesis.speak(utterance);
-        }
-
-        function renderRemindersByRules(projectName) {
-            const container = document.getElementById('dynamic-reminders-container');
-            let nameLower = projectName.toLowerCase();
-            let html = '';
-            if (nameLower.includes('濟州') || nameLower.includes('韓國')) {
-                html = `<div class="cute-card p-5 space-y-2.5"><h3 class="font-black text-amber-950 text-sm">🇰🇷 韓國旅遊指南</h3><p class="text-xs text-gray-600">早晚溫差大且風大，建議長袖與防風外套 🧥。</p></div>`;
-            } else if (nameLower.includes('東京') || nameLower.includes('日本')) {
-                html = `<div class="cute-card p-5 space-y-2.5"><h3 class="font-black text-amber-950 text-sm">🇯🇵 日本旅遊指南</h3><p class="text-xs text-gray-600">步行較多，建議穿著舒適布鞋 🌂。</p></div>`;
-            } else {
-                html = `<div class="cute-card p-5 space-y-2.5"><h3 class="font-black text-amber-950 text-sm">🌍 國際通用指南</h3><p class="text-xs text-gray-600">請留意護照效期與當地網卡。</p></div>`;
-            }
-            container.innerHTML = html;
         }
 
         window.backToProjects = function() {
