@@ -196,7 +196,7 @@
                 <h3 class="font-black text-amber-950 text-base">✨ AI 智慧導入行程</h3>
                 <button onclick="closeSmartPasteModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
-            <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。AI 會自動對應時間、行程與下方備註，沒備註的會保持空白！</p>
+            <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。AI 會自動將備註歸納至對應行程中，絕不會獨立成卡片！</p>
             <textarea id="smart-paste-input" rows="8" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3.5 bg-amber-50/50 border border-amber-100 rounded-2xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
             <div class="flex gap-2.5 pt-1">
                 <button onclick="closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-black">取消</button>
@@ -607,12 +607,12 @@
             }
         }
 
-        // 🌟 完美修復版 AI 智慧導入解析引擎：絕不把備註獨立成卡片
+        // 🌟 嚴格綁定行程與備註的 AI 智慧導入解析引擎
         window.parseSmartPaste = async function() {
             const rawText = document.getElementById('smart-paste-input').value.trim();
             if(!rawText) { alert("請先輸入或貼上行程文字喔！"); return; }
 
-            alert("✨ AI 正在進行智慧拆解與備註配對中...");
+            alert("✨ AI 正在精準解析行程與備註中...");
 
             const lines = rawText.split('\n').map(l => l.trim());
             let currentDay = "Day 1";
@@ -624,11 +624,11 @@
                     let line = lines[i];
                     if (!line) continue;
 
-                    // 1. 偵測天數
+                    // 1. 偵測天數 (如 【 Day 1 (11/23) 】 或 Day 1)
                     let dayMatch = line.match(/(Day\s*\d+|第[一二三四五六七八九十]+天)/i);
                     if (dayMatch) {
                         if (currentItem) {
-                            await saveParsedItem(currentProjectId, currentItem);
+                            await addDoc(collection(db, "projects", currentProjectId, "schedules"), currentItem);
                             addedCount++;
                             currentItem = null;
                         }
@@ -636,12 +636,12 @@
                         continue;
                     }
 
-                    // 2. 偵測是否為新行程開頭 (含時間或 • / -)
+                    // 2. 偵測是否為「新行程開頭」（包含時間或項目符號 •, -）
                     let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
                     if (timeMatch || line.startsWith("•") || line.startsWith("-")) {
-                        // 先儲存上一個行程
+                        // 先把上一個累積的行程存入資料庫
                         if (currentItem) {
-                            await saveParsedItem(currentProjectId, currentItem);
+                            await addDoc(collection(db, "projects", currentProjectId, "schedules"), currentItem);
                             addedCount++;
                         }
 
@@ -651,49 +651,37 @@
                             .replace(/^[-•\*\d\.]+\s*/, '')
                             .trim();
 
+                        // 建立新的行程物件，初始備註為空
                         currentItem = {
                             day: currentDay,
                             time: timeStr,
                             title: cleanTitle,
-                            location: "", // 這裡存放備註
+                            location: "", 
                             createdAt: Date.now() + addedCount
                         };
                     } 
-                    // 3. 如果當前有行程，且這一行是補充說明或備註，則歸屬於當前行程的備註！
+                    // 3. 如果不是新行程，且目前有作用中的行程，則這一行絕對是它的「備註」或「預訂代碼」！
                     else if (currentItem) {
-                        if (line.includes("備註：") || line.includes("備註:")) {
-                            let noteText = line.replace(/.*備註[：:]\s*/, '').trim();
+                        let noteText = line.replace(/.*備註[：:]\s*/, '').trim();
+                        if (noteText) {
                             currentItem.location = currentItem.location ? (currentItem.location + "\n" + noteText) : noteText;
-                        } else if (!line.includes("===") && !line.includes("---") && line.length > 0) {
-                            currentItem.location = currentItem.location ? (currentItem.location + "\n" + line) : line;
                         }
                     }
                 }
 
-                // 儲存最後一個行程
+                // 迴圈結束後，別忘了存入最後一個行程
                 if (currentItem) {
-                    await saveParsedItem(currentProjectId, currentItem);
+                    await addDoc(collection(db, "projects", currentProjectId, "schedules"), currentItem);
                     addedCount++;
                 }
 
                 document.getElementById('smart-paste-input').value = "";
                 closeSmartPasteModal();
-                alert(`✨ 成功！已智慧導入 ${addedCount} 筆行程，備註已自動歸納至對應卡片中！`);
+                alert(`✨ 成功！已智慧導入 ${addedCount} 筆行程，備註皆已正確歸納至卡片內！`);
             } catch (e) {
                 console.error("AI 拆解失敗", e);
                 alert("解析發生錯誤，請再試一次");
             }
-        }
-
-        async function saveParsedItem(projId, item) {
-            if (!item.title || item.title.length < 2) return;
-            await addDoc(collection(db, "projects", projId, "schedules"), {
-                day: item.day,
-                time: item.time,
-                title: cleanDisplayTitle(item.title),
-                location: item.location || "", // 沒備註就保持空白
-                createdAt: item.createdAt
-            });
         }
 
         window.shareCurrentProject = function() {
