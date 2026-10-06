@@ -3,45 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>我的旅遊協作 App</title>
-    <!-- Tailwind CSS 讓手機排版好看 -->
+    <title>我們的溫馨小旅行 ✈️</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #f3f4f6; max-width: 480px; margin: auto; min-height: 100vh; position: relative; }
+        body { 
+            background-color: #faf6f0; /* 溫柔奶茶色背景 */
+            max-width: 480px; 
+            margin: auto; 
+            min-height: 100vh; 
+            position: relative; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        /* 自訂柔和捲軸與圓角陰影 */
+        .cute-card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(220, 180, 150, 0.12);
+            border: 1px solid #fcefe6;
+        }
     </style>
 </head>
-<body class="pb-20">
+<body class="pb-24 text-gray-700">
 
-    <!-- 頂部標題區 -->
-    <header class="bg-blue-600 text-white p-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
-        <h1 id="app-title" class="text-lg font-bold">✈️ 11/23 濟州島自駕遊</h1>
-        <button onclick="shareProject()" class="bg-blue-700 text-xs px-3 py-1.5 rounded-full">分享專案</button>
+    <!-- 頂部標題區 (溫柔粉橘色系) -->
+    <header class="bg-gradient-to-r from-amber-200 to-orange-200 text-amber-900 p-4 shadow-sm sticky top-0 z-50 flex justify-between items-center rounded-b-3xl">
+        <div>
+            <h1 id="app-title" class="text-base font-bold flex items-center gap-1.5">🌸 11/23 濟州島自駕小旅行</h1>
+            <p class="text-[11px] text-amber-800 opacity-80 mt-0.5">跟好朋友一起的快樂冒險 ✨</p>
+        </div>
+        <button onclick="shareProject()" class="bg-white/80 hover:bg-white text-amber-900 text-xs px-3.5 py-1.5 rounded-full font-medium shadow-sm transition active:scale-95">
+            ✨ 分享專案
+        </button>
     </header>
 
-    <!-- 內容容器 (依分頁切換) -->
-    <main class="p-4">
+    <!-- 內容容器 -->
+    <main class="p-4 space-y-4">
+        
         <!-- 分頁 1：行程 -->
         <div id="tab-schedule" class="tab-content space-y-4">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="font-bold text-gray-800 mb-2">🪄 AI 智慧貼上解析</h2>
-                <textarea id="smart-paste-input" rows="3" placeholder="請貼上LINE對話或部落格行程文字..." class="w-full text-sm p-2 border rounded-lg mb-2 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
-                <button onclick="parseSmartPaste()" class="w-full bg-blue-600 text-white text-sm py-2 rounded-lg font-medium">開始 AI 解析並加入行程</button>
+            <!-- 智慧貼上卡片 -->
+            <div class="cute-card p-4 space-y-3">
+                <h2 class="font-bold text-amber-900 text-sm flex items-center gap-1.5">
+                    🪄 AI 魔法貼上行程
+                </h2>
+                <textarea id="smart-paste-input" rows="3" placeholder="把 LINE 亂亂的對話或部落格複製貼上來，AI 幫你整理好～" class="w-full text-xs p-3 bg-amber-50/50 border border-amber-100 rounded-xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
+                <button onclick="parseSmartPaste()" class="w-full bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs py-2.5 rounded-xl font-bold shadow-md shadow-orange-200 transition active:scale-95">
+                    ✨ 開始魔法整理
+                </button>
             </div>
 
+            <!-- 每日時間軸列表 -->
             <div class="space-y-3">
-                <h3 class="font-bold text-gray-700 text-sm">📅 每日行程時間軸</h3>
-                <!-- 動態行程列表會顯示在這裡 -->
-                <div id="schedule-list" class="space-y-3">
-                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500">
-                        <div class="flex justify-between items-start">
-                            <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">14:00</span>
-                            <span class="text-xs text-gray-400">Day 1</span>
-                        </div>
-                        <h4 class="font-bold text-gray-800 mt-1">🚗 領車與機場出發</h4>
-                        <p class="text-xs text-gray-500 mt-1">地點：Lotte Rent-a-car 濟州機場店</p>
-                        <div class="mt-3 flex gap-2">
-                            <a href="https://maps.google.com/?q=Lotte+Rent-a-car+Jeju" target="_blank" class="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md flex items-center gap-1">🗺️ Google Maps</a>
-                        </div>
+                <h3 class="font-bold text-gray-600 text-xs tracking-wider px-1">📅 精彩行程時間軸</h3>
+                
+                <div class="cute-card p-4 border-l-4 border-l-orange-400 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full font-bold">14:00</span>
+                        <span class="text-[11px] text-gray-400 font-medium">Day 1 🚗</span>
+                    </div>
+                    <h4 class="font-bold text-gray-800 text-sm">領車與機場出發發車囉！</h4>
+                    <p class="text-xs text-gray-500">📍 地點：Lotte Rent-a-car 濟州機場店</p>
+                    <div class="pt-2 flex gap-2">
+                        <a href="https://maps.google.com/?q=Lotte+Rent-a-car+Jeju" target="_blank" class="text-xs bg-amber-50 text-amber-800 px-3 py-1.5 rounded-xl font-medium flex items-center gap-1 hover:bg-amber-100 transition">
+                            🗺️️ Google Maps
+                        </a>
+                        <a href="#" class="text-xs bg-orange-50 text-orange-800 px-3 py-1.5 rounded-xl font-medium flex items-center gap-1 hover:bg-orange-100 transition">
+                            🚗 Naver Map
+                        </a>
                     </div>
                 </div>
             </div>
@@ -49,61 +78,76 @@
 
         <!-- 分頁 2：AI 錦囊 -->
         <div id="tab-ai" class="tab-content hidden space-y-4">
-            <div class="bg-white p-4 rounded-xl shadow-sm border">
-                <h3 class="font-bold text-gray-800 mb-2">🌤️ 天氣與穿搭建議</h3>
-                <p class="text-xs text-gray-600 leading-relaxed">11月濟州島氣溫約 10°C ~ 15°C，風大。建議洋蔥式穿法，務必攜帶防風外套與毛帽。</p>
+            <div class="cute-card p-4 space-y-2">
+                <h3 class="font-bold text-amber-900 text-sm flex items-center gap-1.5">🌤️ 天氣與穿搭小建議</h3>
+                <p class="text-xs text-gray-600 leading-relaxed">
+                    11月濟州島氣溫大約在 10°C ~ 15°C 之間，海風會比較大喔！建議採用<b>洋蔥式穿法</b>，一定要帶防風外套跟可愛毛帽才不會著涼 🧣。
+                </p>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border">
-                <h3 class="font-bold text-gray-800 mb-2">🚗 自駕與導航須知</h3>
-                <p class="text-xs text-gray-600 leading-relaxed">韓國右駕。導航請愛用 <b>Naver Map</b>，當地測速照相多且精準，Google Maps 容易漏掉。</p>
+            <div class="cute-card p-4 space-y-2">
+                <h3 class="font-bold text-amber-900 text-sm flex items-center gap-1.5">🚗 自駕開車小叮嚀</h3>
+                <p class="text-xs text-gray-600 leading-relaxed">
+                    韓國是右駕（跟台灣一樣）。導航強烈推薦使用 <b>Naver Map</b>，測速照相非常精準，Google Maps 在當地容易漏掉小路喔！
+                </p>
             </div>
         </div>
 
         <!-- 分頁 3：語言 -->
         <div id="tab-lang" class="tab-content hidden space-y-3">
-            <div class="bg-white p-3 rounded-xl shadow-sm border flex justify-between items-center">
+            <div class="cute-card p-3.5 flex justify-between items-center">
                 <div>
-                    <p class="text-xs text-gray-400">請幫我結帳</p>
-                    <p class="font-bold text-gray-800 text-base">계산해주세요.</p>
+                    <p class="text-[11px] text-gray-400 font-medium">請幫我結帳</p>
+                    <p class="font-bold text-gray-800 text-sm mt-0.5">계산해주세요.</p>
                 </div>
-                <button onclick="speakText('계산해주세요.')" class="bg-blue-50 text-blue-600 p-2.5 rounded-full text-lg">🔊</button>
+                <button onclick="speakText('계산해주세요.')" class="bg-orange-50 text-orange-600 p-2.5 rounded-2xl text-base hover:bg-orange-100 transition active:scale-95">
+                    🔊
+                </button>
             </div>
-            <div class="bg-white p-3 rounded-xl shadow-sm border flex justify-between items-center">
+            <div class="cute-card p-3.5 flex justify-between items-center">
                 <div>
-                    <p class="text-xs text-gray-400">這個請不要放辣，謝謝</p>
-                    <p class="font-bold text-gray-800 text-base">이거 안 맵게 해주세요.</p>
+                    <p class="text-[11px] text-gray-400 font-medium">這個請不要放辣，謝謝</p>
+                    <p class="font-bold text-gray-800 text-sm mt-0.5">이거 안 맵게 해주세요.</p>
                 </div>
-                <button onclick="speakText('이거 안 맵게 해주세요.')" class="bg-blue-50 text-blue-600 p-2.5 rounded-full text-lg">🔊</button>
+                <button onclick="speakText('이거 안 맵게 해주세요.')" class="bg-orange-50 text-orange-600 p-2.5 rounded-2xl text-base hover:bg-orange-100 transition active:scale-95">
+                    🔊
+                </button>
             </div>
         </div>
 
         <!-- 分頁 4：分帳 -->
         <div id="tab-split" class="tab-content hidden space-y-4">
-            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-4 rounded-2xl shadow-md">
-                <p class="text-xs opacity-80">總支出金額</p>
-                <h3 class="text-2xl font-bold mt-1">NT$ 24,500</h3>
+            <div class="bg-gradient-to-r from-orange-400 to-pink-400 text-white p-5 rounded-3xl shadow-lg shadow-orange-200/50 space-y-1">
+                <p class="text-xs opacity-90 font-medium">✨ 大家的總花費金額</p>
+                <h3 class="text-2xl font-black tracking-tight">NT$ 24,500</h3>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border">
-                <h3 class="font-bold text-gray-800 mb-2 text-sm">💡 結算建議</h3>
-                <p class="text-xs text-gray-600">小美 需支付給 小明 <span class="font-bold text-blue-600">NT$ 3,200</span></p>
+            <div class="cute-card p-4 space-y-2">
+                <h3 class="font-bold text-amber-900 text-sm">💡 最省事的結算建議</h3>
+                <p class="text-xs text-gray-600">小美 需支付給 小明 <span class="font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-lg">NT$ 3,200</span></p>
             </div>
         </div>
     </main>
 
-    <!-- 底部固定導覽列 (Mobile Nav) -->
-    <nav class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-white border-t border-gray-200 flex justify-around py-2.5 shadow-lg z-50">
-        <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-blue-600 text-xs font-bold">📅 行程</button>
-        <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs">🤖 錦囊</button>
-        <button onclick="switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs">🗣️ 語言</button>
-        <button onclick="switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs">💰 分帳</button>
+    <!-- 底部圓角可愛導覽列 -->
+    <nav class="fixed bottom-3 left-4 right-4 max-w-[448px] mx-auto bg-white/90 backdrop-blur-md border border-amber-100 flex justify-around py-3 rounded-2xl shadow-xl z-50">
+        <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-orange-500 text-xs font-bold gap-0.5">
+            <span class="text-lg">📅</span>行程
+        </button>
+        <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-medium gap-0.5">
+            <span class="text-lg">🤖</span>錦囊
+        </button>
+        <button onclick="switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs font-medium gap-0.5">
+            <span class="text-lg">🗣️</span>語言
+        </button>
+        <button onclick="switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs font-medium gap-0.5">
+            <span class="text-lg">💰</span>分帳
+        </button>
     </nav>
 
-    <!-- Firebase 核心 SDK 與邏輯 -->
+    <!-- Firebase 邏輯 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // 你的真實 Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBcKmZhJaZn5emOlHRV95-uC9q01wFxt4M",
             authDomain: "my-travel-app-6e00c.firebaseapp.com",
@@ -116,33 +160,30 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 頁籤切換邏輯
         window.switchTab = function(tabName) {
             ['schedule', 'ai', 'lang', 'split'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).className = "flex flex-col items-center text-gray-400 text-xs";
+                document.getElementById(`nav-${t}`).className = "flex flex-col items-center text-gray-400 text-xs font-medium gap-0.5";
             });
             document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            document.getElementById(`nav-${tabName}`).className = "flex flex-col items-center text-blue-600 text-xs font-bold";
+            document.getElementById(`nav-${tabName}`).className = "flex flex-col items-center text-orange-500 text-xs font-bold gap-0.5";
         }
 
-        // 語音播放功能
         window.speakText = function(text) {
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ko-KR'; // 設為韓文發音
+            utterance.lang = 'ko-KR';
             window.speechSynthesis.speak(utterance);
         }
 
         window.shareProject = function() {
             navigator.clipboard.writeText(window.location.href);
-            alert("網址已複製！可以傳給朋友一起加入囉！");
+            alert("🌸 網址已複製！快傳給朋友一起加入可愛的小旅行吧！");
         }
 
-        // 模擬智慧貼上解析
         window.parseSmartPaste = function() {
             const text = document.getElementById('smart-paste-input').value;
-            if(!text) { alert("請先輸入或貼上文字！"); return; }
-            alert("AI 智慧解析成功！（此為展示版，未來可串接 Gemini API 自動切換欄位）");
+            if(!text) { alert("請先輸入或貼上行程文字喔！"); return; }
+            alert("✨ AI 魔法解析成功！行程已經加入囉～（展示版）");
             document.getElementById('smart-paste-input').value = "";
         }
     </script>
