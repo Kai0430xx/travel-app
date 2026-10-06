@@ -86,39 +86,10 @@
                 </div>
             </div>
 
-            <!-- 分頁 2：提醒 (已全面擴充實用指南) -->
+            <!-- 分頁 2：提醒 (會根據專案名稱自動偵測並切換內容) -->
             <div id="tab-ai" class="tab-content hidden space-y-3.5">
-                <div class="cute-card p-5 space-y-2.5">
-                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌤 當地天氣與穿搭指南</h3>
-                    <p class="text-xs text-gray-600 leading-relaxed">
-                        秋末冬初氣溫約在 10°C 至 18°C 之間。早晚溫差大且風大，建議採取**洋蔥式穿搭**：內搭發熱衣、外加保暖毛衣，並務必攜帶防風外套或大衣、圍巾與毛帽 🧣。
-                    </p>
-                </div>
-
-                <div class="cute-card p-5 space-y-2.5">
-                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚗 濟州島自駕與導航提醒</h3>
-                    <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                        <li>**導航 App：** 強烈建議下載 **Naver Map** 或 **Kakao Map**，搜尋時以**電話號碼 (Phone Number)** 查詢最準確不迷路！</li>
-                        <li>**測速與速限：** 道路速限嚴格（市區 50、一般道路 60-70），沿途有大量固定與移動式測速，務必依速限行駛。</li>
-                        <li>**加油還車：** 多為自助或半人工，租車通常規定「滿油出借、滿油還車」，出發前記得確認油種（通常為汽油 汽油/Gasoline）。</li>
-                    </ul>
-                </div>
-
-                <div class="cute-card p-5 space-y-2.5">
-                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與行前重要提醒</h3>
-                    <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                        <li>**護照與駕照：** 護照效期需滿 6 個月以上；自駕務必攜帶**台灣駕照正本**與**國際駕照**。</li>
-                        <li>**支付工具：** 韓國幾乎全面普及刷卡與行動支付（Apple Pay/Google Pay），但建議身上備妥 5~10 萬韓元現金以備不時之需。</li>
-                        <li>**插頭規格：** 當地電壓 220V，為**圓形雙孔（歐規/韓規）**，記得攜帶萬用轉接頭。</li>
-                    </ul>
-                </div>
-
-                <div class="cute-card p-5 space-y-2.5">
-                    <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
-                    <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                        <li>**警察局：** 112 | **救護車/消防：** 119</li>
-                        <li>**韓國旅遊諮詢熱線（中文服務）：** 1330</li>
-                    </ul>
+                <div id="dynamic-reminders-container" class="space-y-3.5">
+                    <!-- 這裡會由 JS 根據專案名稱動態填入對應國家的提醒 -->
                 </div>
             </div>
 
@@ -177,7 +148,7 @@
                 </div>
 
                 <div class="pt-2 flex gap-2.5">
-                    <button onclick="switchToEditMode()" class="flex-1 bg-amber-100 text-amber-900 text-xs py-3 rounded-2xl font-black hover:bg-amber-200 transition">✏️ 修改行程</button>
+                    <button onclick="switchToEditMode()" class="flex-1 bg-amber-100 text-amber-900 text-xs py-3 rounded-2xl font-black hover:bg-amber-200 transition">✏️️ 修改行程</button>
                     <button onclick="closeDetailModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-bold">關閉</button>
                 </div>
             </div>
@@ -293,6 +264,7 @@
         const db = getFirestore(app);
 
         let currentProjectId = null;
+        let currentProjectName = "";
         let unsubscribeSchedules = null;
         let allSchedulesData = [];
 
@@ -354,7 +326,7 @@
         }
 
         window.openNewProjectModal = async function() {
-            const name = prompt("請輸入新旅遊專案名稱（例如：濟州島自駕遊）：");
+            const name = prompt("請輸入新旅遊專案名稱（例如：濟州島自駕遊、東京自由行）：");
             if (!name) return;
             const dates = prompt("請輸入旅遊日期區間（例如：11/23 - 11/27）：", "11/23 - 11/27");
             
@@ -383,6 +355,7 @@
 
         window.enterProject = function(id, projectName, dateRange) {
             currentProjectId = id;
+            currentProjectName = projectName;
             document.getElementById('view-projects').classList.add('hidden');
             document.getElementById('view-workspace').classList.remove('hidden');
             document.getElementById('bottom-nav').classList.remove('hidden');
@@ -391,12 +364,105 @@
             
             document.getElementById('header-title').innerText = `🌸 ${projectName}`;
             document.getElementById('header-sub').innerText = `日期：${dateRange} ✨`;
+            
+            // 根據專案名稱動態渲染提醒內容
+            renderReminders(projectName);
+            
             switchTab('schedule');
             loadSchedules(id);
         }
 
+        // 🌟 智慧根據專案名稱偵測並產生對應提醒
+        function renderReminders(projectName) {
+            const container = document.getElementById('dynamic-reminders-container');
+            let nameLower = projectName.toLowerCase();
+            
+            let html = '';
+
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山')) {
+                // 韓國 / 濟州島專屬提醒
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">
+                            當地早晚溫差大且風較大，建議採取**洋蔥式穿搭**（內搭發熱衣＋毛衣＋防風外套/大衣、圍巾與毛帽 🧣）。
+                        </p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>**導航 App：** 強烈建議使用 **Naver Map** 或 **Kakao Map**，以**電話號碼 (Phone Number)** 查詢最準確！</li>
+                            <li>**測速照相：** 道路速限嚴格，沿途有大量測速照相，務必依速限行駛。</li>
+                            <li>**加油還車：** 多為自助/半人工，記得確認租車規定（通常為滿油出借、滿油還車）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>**駕照證件：** 務必備妥**台灣駕照正本**與**國際駕照**。</li>
+                            <li>**行動支付：** 信用卡與行動支付極為普及，建議身上備妥 5~10 萬韓元現金備用。</li>
+                            <li>**插頭規格：** 電壓 220V，為**圓形雙孔（歐規/韓規）**。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>**警察局：** 112 | **救護車/消防：** 119</li>
+                            <li>**韓國旅遊諮詢熱線（中文）：** 1330</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都')) {
+                // 日本 / 東京專屬提醒
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🇯🇵 日本旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">
+                            行程多以步行與搭乘大鐵路為主，建議穿著舒適好走的布鞋，並攜帶輕便防風外套與雨具 🌂。
+                        </p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚆 交通與導航提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>**導航 App：** 推薦使用 **Google Maps** 或 **乗換案內** 查詢地鐵轉乘與班次。</li>
+                            <li>**IC 卡：** 建議事先將 Suica 或 Pasmo 卡加入手機錢包（Apple Pay），搭車刷卡超方便。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>**護照效期：** 確認效期大於 6 個月。</li>
+                            <li>**現金備用：** 部分傳統小店或拉麵販賣機仍需現金，建議備妥適量日幣。</li>
+                            <li>**插頭規格：** 電壓 100V，為**雙孔扁平插頭**（與台灣相同）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>**警察局：** 110 | **救護車/消防：** 119</li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                // 預設通用提醒
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-amber-950 text-sm flex items-center gap-1.5">🌍 通用行前準備指南</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>**證件確認：** 檢查護照效期是否大於 6 個月，並備妥機票、住宿預訂憑證。</li>
+                            <li>**網卡與通訊：** 提前確認網卡或 eSIM 已啟用，並下載離線地圖。</li>
+                            <li>**隨身藥品：** 準備常備藥品（如腸胃藥、止痛藥、暈車藥）。</li>
+                        </ul>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
         window.backToProjects = function() {
             currentProjectId = null;
+            currentProjectName = "";
             if (unsubscribeSchedules) unsubscribeSchedules();
             document.getElementById('view-workspace').classList.add('hidden');
             document.getElementById('bottom-nav').classList.add('hidden');
@@ -441,7 +507,6 @@
                 return;
             }
 
-            // 即將到來的行程置頂
             const nextItem = allSchedulesData[0];
             const cleanNextTitle = cleanDisplayTitle(nextItem.title);
             upcomingContainer.innerHTML = `
@@ -454,7 +519,6 @@
                 </div>
             `;
 
-            // 依天數分組
             let grouped = {};
             allSchedulesData.forEach(item => {
                 let dayKey = item.day || 'Day 1';
@@ -462,7 +526,6 @@
                 grouped[dayKey].push(item);
             });
 
-            // 渲染折疊清單
             Object.keys(grouped).forEach((dayKey, index) => {
                 let items = grouped[dayKey];
                 let sectionId = `day_section_${index}`;
@@ -515,7 +578,6 @@
             }
         }
 
-        // 開啟詳情 Modal
         window.openDetailModal = function(id) {
             const item = allSchedulesData.find(s => s.id === id);
             if (!item) return;
