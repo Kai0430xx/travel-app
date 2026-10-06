@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>放風 ✈</title>
+    <!-- PWA 手機桌面 App 圖標與全螢幕設定 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="放風 ✈">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
@@ -67,7 +74,7 @@
         <!-- 視圖 0：專案選擇首頁 -->
         <div id="view-projects" class="space-y-4">
             <div class="flex justify-between items-center px-1">
-                <h2 class="font-black text-[#5c4a3d] text-sm tracking-wide">🧳 我的旅遊專案清單</h2>
+                <h2 class="font-black text-[#5c4a3d] text-sm tracking-wide">🧳 我的旅遊小專案 ✈</h2>
                 <button onclick="openNewProjectModal()" class="bg-gradient-to-r from-[#d98262] to-[#e69c7c] text-white text-xs px-4 py-2.5 rounded-full font-black shadow-md shadow-orange-900/10 transition active:scale-95">
                     ＋ 新增專案
                 </button>
@@ -105,7 +112,7 @@
             <div id="tab-lang" class="tab-content hidden space-y-4">
                 <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-3 shadow-md text-center relative border-[#e2d3c3]">
                     <div class="absolute top-3 left-4">
-                        <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-0.5 rounded-full font-black">🗣️ 實用翻譯發音</span>
+                        <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-0.5 rounded-full font-black">🗣️️ 實用翻譯發音</span>
                     </div>
                     <div class="pt-3 space-y-1">
                         <p id="display-cn" class="text-xs text-[#8c7868] font-bold">請點選下方分類與句子 ▼</p>
@@ -222,7 +229,7 @@
         </div>
     </div>
 
-    <!-- 🌸 已打卡項目管理 Modal (可更換照片或取消打卡) -->
+    <!-- 🌸 已打卡項目管理 Modal -->
     <div id="quest-edit-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <div class="flex justify-between items-center">
@@ -237,7 +244,7 @@
         </div>
     </div>
 
-    <!-- 🌸 照片回憶寫真冊 Modal (雲端協作，所有人可見，支援手機相冊下載) -->
+    <!-- 🌸 照片回憶寫真冊 Modal -->
     <div id="photo-gallery-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center shrink-0">
@@ -246,9 +253,7 @@
             </div>
             <p class="text-gray-500 font-bold shrink-0">這裡統整了所有旅伴上傳的打卡照片，點擊即可下載至手機相冊！✨</p>
 
-            <div id="photo-gallery-grid" class="grid grid-cols-2 gap-3 overflow-y-auto pr-1 flex-1">
-                <!-- 動態照片網格 -->
-            </div>
+            <div id="photo-gallery-grid" class="grid grid-cols-2 gap-3 overflow-y-auto pr-1 flex-1"></div>
 
             <div class="pt-2 shrink-0">
                 <button onclick="closePhotoGalleryModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button>
@@ -311,7 +316,7 @@
         </div>
     </div>
 
-    <!-- 智慧導入與手動新增 Modal (保留) -->
+    <!-- 智慧導入與手動新增 Modal -->
     <div id="smart-paste-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
@@ -345,7 +350,7 @@
         </div>
     </div>
 
-    <!-- 記帳與結算 Modal (保留) -->
+    <!-- 記帳與結算 Modal -->
     <div id="expense-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-3.5 shadow-2xl text-xs max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
@@ -549,7 +554,7 @@
             thailand: {
                 langCode: 'th-TH',
                 categories: [
-                    { id: 'restaurant', name: '🍽️ 餐廳' },
+                    { id: 'restaurant', name: '🍽️️ 餐廳' },
                     { id: 'shopping', name: '🛍️ 購物' },
                     { id: 'transport', name: '🛵 交通' },
                     { id: 'hotel', name: '🏨 住宿' },
@@ -722,7 +727,6 @@
             currentProjectId = id;
             currentProjectName = projectName;
 
-            // 檢查是否已登入名字
             if (!currentMyName) {
                 document.getElementById('login-modal').classList.remove('hidden');
                 return;
@@ -738,7 +742,6 @@
             localStorage.setItem('my_travel_nickname', name);
             document.getElementById('login-modal').classList.add('hidden');
 
-            // 自動將自己加入專案成員名單
             try {
                 await addDoc(collection(db, "projects", currentProjectId, "members"), { name: currentMyName });
             } catch (e) {}
@@ -859,7 +862,7 @@
                 
                 let headerHtml = `
                     <div onclick="toggleQuestCollapse('${sectionId}')" class="bg-[#f3e9de]/70 p-3.5 flex justify-between items-center cursor-pointer hover:bg-[#f3e9de] transition">
-                        <h4 class="font-black text-[#5c4a3d] text-xs">📅 ${dayKey} 任務清單 <span class="text-[11px] text-[#8c7868] font-bold">(${items.filter(i => i.completed).length}/${items.length})</span></h4>
+                        <h4 class="font-black text-[#5c4a3d] text-xs">${dayKey} 任務清單 <span class="text-[11px] text-[#8c7868] font-bold">(${items.filter(i => i.completed).length}/${items.length})</span></h4>
                         <span id="icon_${sectionId}" class="text-xs text-[#8c7868] font-black">▼ 展開</span>
                     </div>
                 `;
@@ -927,7 +930,6 @@
             }
         }
 
-        // 拍照打卡與已打卡管理邏輯
         window.openQuestPhotoModal = function(scheduleId, title) {
             currentQuestTargetId = scheduleId;
             document.getElementById('quest-modal-title').innerText = `📸 打卡：${title}`;
@@ -1001,7 +1003,7 @@
             }
         }
 
-        // 照片寫真冊 (支援下載至手機相冊)
+        // 寫真冊 (支援直接下載到手機相冊)
         window.openPhotoGalleryModal = function() {
             const grid = document.getElementById('photo-gallery-grid');
             grid.innerHTML = '';
@@ -1024,13 +1026,13 @@
                     grid.appendChild(div);
                 });
             }
+            document.getElementById('photo-gallery-modal').classList.add('hidden'); // 先重設
             document.getElementById('photo-gallery-modal').classList.remove('hidden');
         }
         window.closePhotoGalleryModal = function() {
             document.getElementById('photo-gallery-modal').classList.add('hidden');
         }
 
-        // 記帳與分帳渲染 (自動帶入 currentMyName)
         function renderExpenseUI() {
             const container = document.getElementById('expense-list-container');
             const breakdownContainer = document.getElementById('currency-breakdown');
@@ -1159,7 +1161,7 @@
                 let opt = document.createElement('option');
                 opt.value = m.name;
                 opt.innerText = m.name;
-                if (m.name === currentMyName) opt.selected = true; // 自動預設選中自己
+                if (m.name === currentMyName) opt.selected = true;
                 payerSelect.appendChild(opt);
 
                 let div = document.createElement('div');
