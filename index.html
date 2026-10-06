@@ -64,7 +64,7 @@
             <!-- 分頁 1：行程 -->
             <div id="tab-schedule" class="tab-content space-y-4">
                 
-                <!-- 🌟 即將到來的行程置頂卡片 (已優化留白與排版) -->
+                <!-- 🌟 即將到來的行程置頂卡片 -->
                 <div id="upcoming-card-container"></div>
 
                 <!-- 行程列表標題與功能按鈕列 -->
@@ -132,7 +132,10 @@
                 
                 <div>
                     <h3 id="modal-title" class="font-black text-gray-900 text-base mt-2">行程名稱</h3>
-                    <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">📝 備註：<span id="modal-location" class="font-bold text-gray-800"></span></p>
+                    <!-- 只有當備註有內容時才顯示備註區塊，否則隱藏 -->
+                    <div id="modal-location-container" class="mt-2 hidden">
+                        <p class="text-xs text-gray-500 flex items-start gap-1">📍 備註：<span id="modal-location" class="font-bold text-gray-800 whitespace-pre-line"></span></p>
+                    </div>
                 </div>
 
                 <div class="pt-2 flex gap-2.5">
@@ -173,7 +176,7 @@
                 </div>
                 <div>
                     <label class="block font-bold text-gray-600 mb-1">備註</label>
-                    <input type="text" id="edit-location" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                    <textarea id="edit-location" rows="3" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold resize-none" placeholder="輸入備註或預訂代碼..."></textarea>
                 </div>
 
                 <div class="flex gap-2.5 pt-2">
@@ -192,7 +195,7 @@
                 <h3 class="font-black text-amber-950 text-base">✨ AI 智慧導入行程</h3>
                 <button onclick="closeSmartPasteModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
             </div>
-            <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。AI 會自動過濾雜訊、辨識天數與時間，並自動拆解成乾淨的時間軸卡片！</p>
+            <p class="text-xs text-gray-500 leading-relaxed">請將多天行程整段貼在下方。AI 會自動抓取時間、行程與下方備註，自動拆解成乾淨卡片！</p>
             <textarea id="smart-paste-input" rows="8" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3.5 bg-amber-50/50 border border-amber-100 rounded-2xl focus:ring-2 focus:ring-orange-300 outline-none resize-none placeholder:text-gray-400"></textarea>
             <div class="flex gap-2.5 pt-1">
                 <button onclick="closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-2xl font-black">取消</button>
@@ -224,7 +227,7 @@
                 </div>
                 <div>
                     <label class="block font-bold text-gray-600 mb-1">備註（選填）</label>
-                    <input type="text" id="input-location" placeholder="例如：餐廳預訂代碼或補充說明" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold">
+                    <textarea id="input-location" rows="3" placeholder="例如：餐廳預訂代碼或補充說明" class="w-full p-3 bg-amber-50/50 border border-amber-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-300 font-bold resize-none"></textarea>
                 </div>
             </div>
 
@@ -409,7 +412,7 @@
                 return;
             }
 
-            // 🌟 即將到來的行程置頂 (調整 padding 為 p-5 解決文字擠在一起的問題)
+            // 即將到來的行程置頂
             const nextItem = allSchedulesData[0];
             const cleanNextTitle = cleanDisplayTitle(nextItem.title);
             upcomingContainer.innerHTML = `
@@ -490,9 +493,19 @@
             document.getElementById('modal-day').innerText = item.day || 'Day 1';
             document.getElementById('modal-time').innerText = item.time || '全天';
             document.getElementById('modal-title').innerText = cleanDisplayTitle(item.title);
-            document.getElementById('modal-location').innerText = item.location || '無備註';
+            
+            // 處理備註顯示：如果有備註就顯示，沒有就隱藏整個備註區塊
+            const locContainer = document.getElementById('modal-location-container');
+            const locSpan = document.getElementById('modal-location');
+            if (item.location && item.location.trim() !== '') {
+                locSpan.innerText = item.location;
+                locContainer.classList.remove('hidden');
+            } else {
+                locSpan.innerText = '';
+                locContainer.classList.add('hidden');
+            }
 
-            const queryText = encodeURIComponent(item.location || cleanDisplayTitle(item.title));
+            const queryText = encodeURIComponent(cleanDisplayTitle(item.title));
             document.getElementById('modal-gmap').href = `https://maps.google.com/?q=${queryText}`;
             document.getElementById('modal-naver').href = `https://map.naver.com/v5/search/${queryText}`;
 
@@ -594,70 +607,95 @@
             }
         }
 
+        // 🌟 升級版 AI 智慧導入解析引擎：完美對應備註與空白
         window.parseSmartPaste = async function() {
             const rawText = document.getElementById('smart-paste-input').value.trim();
             if(!rawText) { alert("請先輸入或貼上行程文字喔！"); return; }
 
-            alert("✨ AI 正在進行智慧拆解與清洗中...");
+            alert("✨ AI 正在進行智慧拆解與備註配對中...");
 
-            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const lines = rawText.split('\n').map(l => l.trim());
             let currentDay = "Day 1";
             let addedCount = 0;
 
             try {
+                let currentItem = null;
+
                 for (let i = 0; i < lines.length; i++) {
                     let line = lines[i];
+                    if (!line) continue;
 
-                    if (
-                        line.includes("===") || 
-                        line.includes("---") || 
-                        line.includes("旅遊專案") || 
-                        line.includes("簡介：") || 
-                        line.includes("備註") || 
-                        line.includes("預訂") ||
-                        /^\d{8,}$/.test(line) || 
-                        line.length < 3
-                    ) {
-                        continue; 
-                    }
-
+                    // 1. 偵測天數 (例如 【 Day 1 (11/23) 】 或 Day 1)
                     let dayMatch = line.match(/(Day\s*\d+|第[一二三四五六七八九十]+天)/i);
                     if (dayMatch) {
+                        if (currentItem) {
+                            await saveParsedItem(currentProjectId, currentItem);
+                            addedCount++;
+                            currentItem = null;
+                        }
                         currentDay = dayMatch[0];
                         continue;
                     }
 
+                    // 2. 偵測是否為新行程開頭 (包含時間或項目符號)
                     let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
-                    let timeStr = timeMatch ? timeMatch[1] : "彈性";
+                    if (timeMatch || line.startsWith("•") || line.startsWith("-")) {
+                        // 先存入上一個行程
+                        if (currentItem) {
+                            await saveParsedItem(currentProjectId, currentItem);
+                            addedCount++;
+                        }
 
-                    let cleanTitle = line
-                        .replace(/^\d{1,2}[:：]\d{2}\s*/, '')
-                        .replace(/^[-•\*\d\.]+\s*/, '')
-                        .trim();
+                        let timeStr = timeMatch ? timeMatch[1] : "彈性";
+                        let cleanTitle = line
+                            .replace(/^\d{1,2}[:：]\d{2}\s*/, '')
+                            .replace(/^[-•\*\d\.]+\s*/, '')
+                            .trim();
 
-                    if (!cleanTitle || cleanTitle.length < 2) continue;
+                        currentItem = {
+                            day: currentDay,
+                            time: timeStr,
+                            title: cleanTitle,
+                            location: "", // 這裡當作備註
+                            createdAt: Date.now() + addedCount
+                        };
+                    } 
+                    // 3. 偵測是否為備註行 (包含「備註：」或緊跟在行程後方的補充文字)
+                    else if (currentItem) {
+                        if (line.includes("備註：") || line.includes("備註:")) {
+                            let noteText = line.replace(/.*備註[：:]\s*/, '').trim();
+                            currentItem.location = currentItem.location ? (currentItem.location + "\n" + noteText) : noteText;
+                        } else if (!line.includes("===") && !line.includes("---") && line.length > 0) {
+                            // 如果沒有寫「備註：」但剛好在下一行，也可以自動串接（例如多行數字代碼）
+                            currentItem.location = currentItem.location ? (currentItem.location + "\n" + line) : line;
+                        }
+                    }
+                }
 
-                    let cleanLocation = cleanTitle
-                        .replace(/\[.*?\]/g, '')
-                        .trim();
-
-                    await addDoc(collection(db, "projects", currentProjectId, "schedules"), {
-                        time: timeStr,
-                        title: cleanTitle,
-                        location: cleanLocation,
-                        day: currentDay,
-                        createdAt: Date.now() + addedCount
-                    });
+                // 存入最後一個行程
+                if (currentItem) {
+                    await saveParsedItem(currentProjectId, currentItem);
                     addedCount++;
                 }
 
                 document.getElementById('smart-paste-input').value = "";
                 closeSmartPasteModal();
-                alert(`✨ 成功！已過濾雜訊，精準幫您加入了 ${addedCount} 筆行程卡片！`);
+                alert(`✨ 成功！已智慧導入 ${addedCount} 筆行程，無備註的欄位已自動保持空白！`);
             } catch (e) {
                 console.error("AI 拆解失敗", e);
                 alert("解析發生錯誤，請再試一次");
             }
+        }
+
+        async function saveParsedItem(projId, item) {
+            if (!item.title || item.title.length < 2) return;
+            await addDoc(collection(db, "projects", projId, "schedules"), {
+                day: item.day,
+                time: item.time,
+                title: cleanDisplayTitle(item.title),
+                location: item.location || "", // 沒有就保持空白
+                createdAt: item.createdAt
+            });
         }
 
         window.shareCurrentProject = function() {
