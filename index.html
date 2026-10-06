@@ -75,9 +75,14 @@
         <div id="view-projects" class="space-y-4">
             <div class="flex justify-between items-center px-1">
                 <h2 class="font-black text-[#5c4a3d] text-sm tracking-wide">我的旅遊小專案 ✈</h2>
-                <button onclick="openNewProjectModal()" class="bg-gradient-to-r from-[#d98262] to-[#e69c7c] text-white text-xs px-4 py-2.5 rounded-full font-black shadow-md shadow-orange-900/10 transition active:scale-95">
-                    ＋ 新增專案
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="openImportProjectModal()" class="bg-white text-[#d98262] border border-[#d98262]/40 text-xs px-3 py-2.5 rounded-full font-black shadow-sm transition active:scale-95">
+                        📥 導入專案
+                    </button>
+                    <button onclick="openNewProjectModal()" class="bg-gradient-to-r from-[#d98262] to-[#e69c7c] text-white text-xs px-4 py-2.5 rounded-full font-black shadow-md shadow-orange-900/10 transition active:scale-95">
+                        ＋ 新增專案
+                    </button>
+                </div>
             </div>
             <div id="project-list" class="space-y-3.5">
                 <p class="text-center text-xs text-gray-400 py-8">載入中... ☁️</p>
@@ -112,7 +117,7 @@
             <div id="tab-lang" class="tab-content hidden space-y-4">
                 <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-3 shadow-md text-center relative border-[#e2d3c3]">
                     <div class="absolute top-3 left-4">
-                        <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-0.5 rounded-full font-black">🗣️️ 實用翻譯發音</span>
+                        <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-0.5 rounded-full font-black">🗣 實用翻譯發音</span>
                     </div>
                     <div class="pt-3 space-y-1">
                         <p id="display-cn" class="text-xs text-[#8c7868] font-bold">請點選下方分類與句子 ▼</p>
@@ -204,6 +209,43 @@
 
         </div>
     </main>
+
+    <!-- 🌸 6位數專案導入 Modal -->
+    <div id="import-project-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-[#5c4a3d] text-base">📥 輸入 6 位數專案號碼</h3>
+                <button onclick="closeImportProjectModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <p class="text-gray-500 font-bold">請輸入朋友給你的 6 位數專案代碼，即可將行程加入你的 App 中！✨</p>
+            <input type="text" id="import-code-input" maxlength="6" placeholder="例如：883921" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-center text-lg tracking-widest">
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="closeImportProjectModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
+                <button onclick="submitImportProject()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認導入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌸 分享選項 Modal -->
+    <div id="share-choice-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs text-center">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-[#5c4a3d] text-base">✨ 分享此專案</h3>
+                <button onclick="closeShareModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <p class="text-gray-500 font-bold">請選擇你要分享給朋友的方式：</p>
+            
+            <div class="p-4 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl space-y-1">
+                <p class="text-[11px] text-gray-400 font-bold">專案 6 位數代碼 (適合桌面 App)</p>
+                <p id="share-modal-pin" class="text-2xl font-black text-[#d98262] tracking-widest">------</p>
+                <button onclick="copySharePin()" class="mt-2 w-full bg-[#f0dcd0] text-[#735848] py-2 rounded-xl font-black">📋 複製 6 位數代碼</button>
+            </div>
+
+            <div class="pt-1">
+                <button onclick="copyShareUrl()" class="w-full bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">🔗 複製專屬網址</button>
+            </div>
+        </div>
+    </div>
 
     <!-- 🌸 闖關拍照打卡 Modal -->
     <div id="quest-photo-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -421,7 +463,7 @@
     <!-- Firebase 與邏輯控制 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDoc, deleteDoc, doc, setDoc, updateDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDoc, getDocs, deleteDoc, doc, setDoc, updateDoc, onSnapshot, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBcKmZhJaZn5emOlHRV95-uC9q01wFxt4M",
@@ -437,6 +479,7 @@
 
         let currentProjectId = null;
         let currentProjectName = "";
+        let currentProjectPin = "";
         let currentMyName = localStorage.getItem('my_travel_nickname') || "";
         let currentDestinationLang = 'ko-KR';
         let currentActivePhrase = { cn: "請選擇想說的話", foreign: "請選擇想說的話" };
@@ -505,7 +548,7 @@
             japan: {
                 langCode: 'ja-JP',
                 categories: [
-                    { id: 'restaurant', name: '🍽️ 餐廳' },
+                    { id: 'restaurant', name: '🍽️️ 餐廳' },
                     { id: 'shopping', name: '🛍️ 購物' },
                     { id: 'transport', name: '🚆 交通' },
                     { id: 'hotel', name: '🏨 住宿' },
@@ -541,7 +584,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -554,8 +597,8 @@
             thailand: {
                 langCode: 'th-TH',
                 categories: [
-                    { id: 'restaurant', name: '🍽️️ 餐廳' },
-                    { id: 'shopping', name: '🛍️ 購物' },
+                    { id: 'restaurant', name: '🍽️ 餐廳' },
+                    { id: 'shopping', name: '🛍️️ 購物' },
                     { id: 'transport', name: '🛵 交通' },
                     { id: 'hotel', name: '🏨 住宿' },
                     { id: 'emergency', name: '🚨 突發' }
@@ -673,7 +716,7 @@
             const list = document.getElementById('project-list');
             const myIds = getMyProjectIds();
             if (myIds.length === 0) {
-                list.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前沒有專案。點上方按鈕新增，或透過朋友的分享連結加入！✨</p>`;
+                list.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前沒有專案。點上方按鈕新增，或輸入 6 位數專案號碼導入！✨</p>`;
                 return;
             }
             list.innerHTML = '';
@@ -687,13 +730,13 @@
                         card.className = "cute-card p-5 space-y-3 relative transition hover:border-[#d98262] overflow-hidden";
                         card.innerHTML = `
                             <div class="flex justify-between items-center gap-2 w-full">
-                                <span class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black shrink-0">進行中 🚗</span>
+                                <span class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black shrink-0">代碼: ${p.pin || '------'}</span>
                                 <div class="flex items-center gap-2 shrink-0">
                                     <span class="text-xs text-gray-500 font-bold">${p.dates || '未定日期'}</span>
                                     <button onclick="event.stopPropagation(); removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1 shrink-0" title="從我的清單移除">🗑️</button>
                                 </div>
                             </div>
-                            <div onclick="enterProject('${id}', '${p.name}', '${p.dates}')" class="cursor-pointer space-y-1">
+                            <div onclick="enterProject('${id}', '${p.name}', '${p.dates}', '${p.pin || ''}')" class="cursor-pointer space-y-1">
                                 <h3 class="font-black text-gray-900 text-base break-words">🌸 ${p.name}</h3>
                             </div>
                         `;
@@ -709,11 +752,52 @@
             const dates = prompt("請輸入旅遊日期區間（例如：11/23 - 11/27）：", "11/23 - 11/27");
             try {
                 const newId = 'proj_' + Date.now();
-                await setDoc(doc(db, "projects", newId), { name, dates, createdAt: Date.now() });
+                const randomPin = Math.floor(100000 + Math.random() * 900000).toString();
+                await setDoc(doc(db, "projects", newId), { name, dates, pin: randomPin, createdAt: Date.now() });
                 saveMyProjectId(newId);
                 renderProjects();
-                alert("✨ 新專案建立成功！");
+                alert(`✨ 新專案建立成功！專案 6 位數代碼為：【${randomPin}】`);
             } catch (e) { alert("新增失敗"); }
+        }
+
+        window.openImportProjectModal = function() {
+            document.getElementById('import-code-input').value = '';
+            document.getElementById('import-project-modal').classList.remove('hidden');
+        }
+        window.closeImportProjectModal = function() {
+            document.getElementById('import-project-modal').classList.add('hidden');
+        }
+
+        window.submitImportProject = async function() {
+            const pinCode = document.getElementById('import-code-input').value.trim();
+            if (pinCode.length !== 6) {
+                alert("請輸入正確的 6 位數專案代碼！");
+                return;
+            }
+
+            try {
+                const q = query(collection(db, "projects"), where("pin", "==", pinCode));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    alert("找不到此專案代碼，請確認號碼是否正確！");
+                    return;
+                }
+
+                let foundId = null;
+                querySnapshot.forEach((docSnap) => {
+                    foundId = docSnap.id;
+                });
+
+                if (foundId) {
+                    saveMyProjectId(foundId);
+                    closeImportProjectModal();
+                    renderProjects();
+                    alert("✨ 成功導入專案！");
+                }
+            } catch (e) {
+                console.error("導入失敗", e);
+                alert("導入失敗，請檢查網路連線");
+            }
         }
 
         window.removeProjectFromMyList = function(id) {
@@ -723,9 +807,10 @@
             }
         }
 
-        window.enterProject = function(id, projectName, dateRange) {
+        window.enterProject = function(id, projectName, dateRange, pin) {
             currentProjectId = id;
             currentProjectName = projectName;
+            currentProjectPin = pin;
 
             if (!currentMyName) {
                 document.getElementById('login-modal').classList.remove('hidden');
@@ -790,7 +875,6 @@
             });
         }
 
-        // 🌟 嚴格分類：排除交通與住宿，玩樂歸景點，美食與購物獨立
         function classifyScheduleItem(title) {
             let t = title.toLowerCase();
             if (t.includes('交通') || t.includes('機場') || t.includes('租車') || t.includes('還車') || t.includes('出發') || t.includes('前往') || t.includes('搭車') || t.includes('班機') || t.includes('住宿') || t.includes('飯店') || t.includes('民宿') || t.includes('check-in') || t.includes('check in')) {
@@ -1003,7 +1087,6 @@
             }
         }
 
-        // 寫真冊 (支援直接下載到手機相冊)
         window.openPhotoGalleryModal = function() {
             const grid = document.getElementById('photo-gallery-grid');
             grid.innerHTML = '';
@@ -1026,7 +1109,7 @@
                     grid.appendChild(div);
                 });
             }
-            document.getElementById('photo-gallery-modal').classList.add('hidden'); // 先重設
+            document.getElementById('photo-gallery-modal').classList.add('hidden');
             document.getElementById('photo-gallery-modal').classList.remove('hidden');
         }
         window.closePhotoGalleryModal = function() {
@@ -1529,6 +1612,7 @@
         window.backToProjects = function() {
             currentProjectId = null;
             currentProjectName = "";
+            currentProjectPin = "";
             if (unsubscribeSchedules) unsubscribeSchedules();
             if (unsubscribeExpenses) unsubscribeExpenses();
             if (unsubscribeMembers) unsubscribeMembers();
@@ -1537,7 +1621,7 @@
             document.getElementById('back-btn').classList.add('hidden');
             document.getElementById('share-btn').classList.add('hidden');
             document.getElementById('view-projects').classList.remove('hidden');
-            document.getElementById('header-title').innerText = "放風 ✈";
+            document.getElementById('header-title').innerText = "🧳 我的旅遊專案清單";
             document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
             renderProjects();
         }
@@ -1755,9 +1839,23 @@
 
         window.shareCurrentProject = function() {
             if (!currentProjectId) return;
+            document.getElementById('share-modal-pin').innerText = currentProjectPin || '未設定';
+            document.getElementById('share-choice-modal').classList.remove('hidden');
+        }
+        window.closeShareModal = function() {
+            document.getElementById('share-choice-modal').classList.add('hidden');
+        }
+        window.copySharePin = function() {
+            if (!currentProjectPin) return;
+            navigator.clipboard.writeText(currentProjectPin);
+            alert(`📋 專案 6 位數代碼【${currentProjectPin}】已複製！`);
+            closeShareModal();
+        }
+        window.copyShareUrl = function() {
             const shareUrl = `${window.location.href.split('?')[0]}?project=${currentProjectId}`;
             navigator.clipboard.writeText(shareUrl);
             alert("🌸 專屬分享網址已複製！");
+            closeShareModal();
         }
 
         window.switchTab = function(tabName) {
