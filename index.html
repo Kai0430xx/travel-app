@@ -260,7 +260,7 @@
             </div>
 
             <div>
-                <label class="block font-bold text-gray-600 mb-1">選擇照片 (必須上傳才能打卡)</label>
+                <label class="block font-bold text-gray-600 mb-1">選擇照片 (會自動優化壓縮)</label>
                 <input type="file" id="quest-file-input" accept="image/*" onchange="previewQuestPhoto(event)" class="w-full text-xs p-2.5 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
             </div>
 
@@ -434,7 +434,7 @@
         </div>
     </div>
 
-    <!-- 成員管理 Modal (新增刪除成員按鈕) -->
+    <!-- 成員管理 Modal -->
     <div id="member-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <div class="flex justify-between items-center"><h3 class="font-black text-[#5c4a3d] text-base">👥 成員管理</h3><button onclick="closeAddMemberModal()" class="text-gray-400 font-black">✕</button></div>
@@ -484,6 +484,7 @@
         let currentMyName = localStorage.getItem('my_travel_nickname') || "";
         let currentDestinationLang = 'ko-KR';
         let currentActivePhrase = { cn: "請選擇想說的話", foreign: "請選擇想說的話" };
+        let compressedPhotoBase64 = ""; // 儲存壓縮後的圖片
 
         let unsubscribeSchedules = null;
         let unsubscribeExpenses = null;
@@ -549,7 +550,7 @@
             japan: {
                 langCode: 'ja-JP',
                 categories: [
-                    { id: 'restaurant', name: '🍽️️ 餐廳' },
+                    { id: 'restaurant', name: '🍽️ 餐廳' },
                     { id: 'shopping', name: '🛍️ 購物' },
                     { id: 'transport', name: '🚆 交通' },
                     { id: 'hotel', name: '🏨 住宿' },
@@ -591,7 +592,7 @@
                     emergency: [
                         { cn: "救命！我的護照（或錢包）被偷了！", foreign: "助けてください！パスポート（または財布）が盗まれました！" },
                         { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "体調が悪いのですが、近くに薬局や病院はありますか？" },
-                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "すみません、道に迷いました。警察を呼んでいただけますか？" }
+                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "すみません、道に迷いました。警察를 呼んでいただけますか？" }
                     ]
                 }
             },
@@ -1017,6 +1018,7 @@
 
         window.openQuestPhotoModal = function(scheduleId, title) {
             currentQuestTargetId = scheduleId;
+            compressedPhotoBase64 = ""; // 重設
             document.getElementById('quest-modal-title').innerText = `📸 打卡：${title}`;
             document.getElementById('quest-file-input').value = '';
             document.getElementById('quest-photo-preview-container').classList.add('hidden');
@@ -1057,29 +1059,55 @@
             }
         }
 
+        // 🌟 自動壓縮照片，確保上傳絕對不失敗
         window.previewQuestPhoto = function(event) {
             const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('quest-photo-preview').src = e.target.result;
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    // 限制最大寬高 800px 以內
+                    const maxDim = 800;
+                    if (width > height && width > maxDim) {
+                        height = Math.round((height * maxDim) / width);
+                        width = maxDim;
+                    } else if (height > maxDim) {
+                        width = Math.round((width * maxDim) / height);
+                        height = maxDim;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // 壓縮成品質 0.7 的 JPEG 格式
+                    compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+                    document.getElementById('quest-photo-preview').src = compressedPhotoBase64;
                     document.getElementById('quest-photo-preview-container').classList.remove('hidden');
-                }
-                reader.readAsDataURL(file);
-            }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         window.submitQuestPhoto = async function() {
             if (!currentProjectId || !currentQuestTargetId) return;
-            const previewSrc = document.getElementById('quest-photo-preview').src;
-            if (!previewSrc || previewSrc === window.location.href) {
-                alert("必須上傳照片才能打卡成功喔！");
+            if (!compressedPhotoBase64) {
+                alert("請先選擇要上傳的照片！");
                 return;
             }
 
             try {
                 const docRef = doc(db, "projects", currentProjectId, "schedules", currentQuestTargetId);
-                await updateDoc(docRef, { completed: true, photoUrl: previewSrc, uploader: currentMyName });
+                await updateDoc(docRef, { completed: true, photoUrl: compressedPhotoBase64, uploader: currentMyName });
                 closeQuestPhotoModal();
                 alert("✨ 打卡成功！");
             } catch (e) {
@@ -1347,7 +1375,6 @@
             } catch (e) { alert("新增成員失敗"); }
         }
 
-        // 🌟 刪除成員功能
         window.deleteMember = async function(memberId, memberName) {
             if (!currentProjectId) return;
             if (confirm(`確定要將成員【${memberName}】從此專案中移除嗎？`)) {
