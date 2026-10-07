@@ -157,7 +157,7 @@
                 </div>
             </div>
 
-            <!-- 分頁 5：闖關 (純標準打卡模式) -->
+            <!-- 分頁 5：闖關 -->
             <div id="tab-quest" class="tab-content hidden space-y-4">
                 <!-- 成績總覽與圓形布章區 -->
                 <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-4 shadow-md border-[#e2d3c3]">
@@ -286,7 +286,7 @@
         </div>
     </div>
 
-    <!-- 🌸 照片回憶寫真冊 Modal -->
+    <!-- 🌸 照片回憶寫真冊 Modal (排版優化：照片完整呈現、文字不擠壓) -->
     <div id="photo-gallery-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center shrink-0">
@@ -587,7 +587,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -1210,6 +1210,7 @@
             }
         }
 
+        // 🌟 寫真冊排版優化：照片保持原始比例不裁切、文字與下載按鈕完美呈現
         window.openPhotoGalleryModal = async function() {
             const grid = document.getElementById('photo-gallery-grid');
             grid.innerHTML = '<p class="col-span-2 text-center text-xs text-gray-400 py-4">載入寫真中... 📸</p>';
@@ -1232,14 +1233,16 @@
                         let day = scheduleItem ? (scheduleItem.day || 'Day 1') : 'Day 1';
 
                         let div = document.createElement('div');
-                        div.className = "cute-card overflow-hidden bg-white border border-[#eae1d7] p-2 space-y-1.5 flex flex-col justify-between";
+                        div.className = "cute-card overflow-hidden bg-white border border-[#eae1d7] p-3 space-y-2 flex flex-col justify-between";
                         div.innerHTML = `
-                            <div>
-                                <img src="${p.photoUrl}" class="w-full h-28 object-cover rounded-xl">
-                                <p class="text-[11px] font-black text-gray-800 truncate mt-1">${title}</p>
-                                <p class="text-[9px] text-gray-400 font-bold">👤 ${p.uploader || '夥伴'} | ${day}</p>
+                            <div class="space-y-1.5">
+                                <div class="w-full bg-[#f7f3ee] rounded-xl overflow-hidden flex items-center justify-center border border-[#eae1d7]">
+                                    <img src="${p.photoUrl}" class="w-full h-auto object-contain max-h-48">
+                                </div>
+                                <p class="text-xs font-black text-gray-900 leading-snug">${title}</p>
+                                <p class="text-[10px] text-gray-400 font-bold">👤 ${p.uploader || '夥伴'} • ${day}</p>
                             </div>
-                            <a href="${p.photoUrl}" download="travel_photo_${p.scheduleId}.jpg" class="w-full text-center bg-[#f0dcd0] text-[#735848] text-[10px] py-1.5 rounded-lg font-black hover:bg-[#e2c8b8] transition">📥 下載到手機相冊</a>
+                            <a href="${p.photoUrl}" download="travel_photo_${p.scheduleId}.jpg" class="w-full text-center bg-[#f0dcd0] text-[#735848] text-xs py-2 rounded-xl font-black hover:bg-[#e2c8b8] transition inline-block">📥 下載到手機相冊</a>
                         `;
                         grid.appendChild(div);
                     });
