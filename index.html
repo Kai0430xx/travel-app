@@ -157,17 +157,16 @@
                 </div>
             </div>
 
-            <!-- 分頁 5：闖關 -->
+            <!-- 分頁 5：闖關 (支援 標準打卡 / 足跡佔領) -->
             <div id="tab-quest" class="tab-content hidden space-y-4">
-                <!-- 成績總覽與圓形布章區 -->
                 <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-4 shadow-md border-[#e2d3c3]">
                     <div class="flex justify-between items-center">
-                        <span id="quest-total-count" class="text-xs font-black text-[#d98262]">已打卡 0 / 0</span>
+                        <span id="quest-total-count" class="text-xs font-black text-[#d98262]">已解鎖 0 / 0</span>
                         <button onclick="openPhotoGalleryModal()" class="bg-[#d98262] text-white text-[11px] px-3.5 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">📸 旅程回憶寫真冊</button>
                     </div>
                     <div>
                         <div class="flex justify-between text-xs font-black text-[#736052] mb-1">
-                            <span>整體解鎖進度</span>
+                            <span id="quest-mode-label">整體解鎖進度</span>
                             <span id="quest-percent">0%</span>
                         </div>
                         <div class="w-full bg-[#eae1d7] h-3 rounded-full overflow-hidden">
@@ -175,8 +174,8 @@
                         </div>
                     </div>
 
-                    <!-- 圓形布章區 -->
-                    <div class="grid grid-cols-3 gap-3 pt-2 border-t border-[#eae1d7] text-center">
+                    <!-- 圓形布章區 (僅標準模式顯示) -->
+                    <div id="badge-container-box" class="grid grid-cols-3 gap-3 pt-2 border-t border-[#eae1d7] text-center">
                         <div class="flex flex-col items-center">
                             <div id="badge-food" class="badge-circle">
                                 <span class="text-lg">🍽️</span>
@@ -201,7 +200,7 @@
                     </div>
                 </div>
 
-                <!-- 任務清單 (按天數折疊收合) -->
+                <!-- 任務或足跡領地清單 -->
                 <div id="quest-list-container" class="space-y-3">
                     <p class="text-center text-xs text-gray-400 py-6">正在載入闖關任務... ⏳</p>
                 </div>
@@ -247,7 +246,7 @@
         </div>
     </div>
 
-    <!-- 🌸 闖關拍照打卡 Modal -->
+    <!-- 🌸 拍照打卡 Modal -->
     <div id="quest-photo-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <div class="flex justify-between items-center">
@@ -303,7 +302,7 @@
         </div>
     </div>
 
-    <!-- 🌸 旅伴名稱登入 Modal (綁定雲端專案清單) -->
+    <!-- 🌸 旅伴名稱登入 Modal -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <h3 class="font-black text-[#5c4a3d] text-base text-center">🌸 歡迎加入放風之旅</h3>
@@ -480,6 +479,7 @@
         let currentProjectId = null;
         let currentProjectName = "";
         let currentProjectPin = "";
+        let currentProjectMode = "standard"; // 'standard' 或 'territory'
         let currentMyName = localStorage.getItem('my_travel_nickname') || "";
         let currentDestinationLang = 'ko-KR';
         let currentActivePhrase = { cn: "請選擇想說的話", foreign: "請選擇想說的話" };
@@ -587,13 +587,13 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
                         { cn: "救命！我的護照（或錢包）被偷了！", foreign: "助けてください！パスポート（または財布）が盗まれました！" },
                         { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "体調が悪いのですが、近くに薬局や病院はありますか？" },
-                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "すみません、道に迷いました。警察를 呼んでいただけますか？" }
+                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "すみません、道に迷いました。警察を呼んでいただけますか？" }
                     ]
                 }
             },
@@ -697,7 +697,6 @@
             }
         };
 
-        // 🌟 改良：將專案清單與名字綁定存入 Firebase 雲端
         async function getMyProjectIds() {
             if (!currentMyName) return JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
             try {
@@ -758,7 +757,7 @@
                                     <button onclick="event.stopPropagation(); removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1 shrink-0" title="從我的清單移除">🗑️</button>
                                 </div>
                             </div>
-                            <div onclick="enterProject('${id}', '${p.name}', '${p.dates}', '${p.pin || ''}')" class="cursor-pointer space-y-1">
+                            <div onclick="enterProject('${id}')" class="cursor-pointer space-y-1">
                                 <h3 class="font-black text-gray-900 text-base break-words">🌸 ${p.name}</h3>
                             </div>
                         `;
@@ -768,14 +767,18 @@
             }
         }
 
+        // 🌟 創建專案時可選擇模式
         window.openNewProjectModal = async function() {
             const name = prompt("請輸入新旅遊專案名稱（例如：濟州島自駕、曼谷自由行）：");
             if (!name) return;
             const dates = prompt("請輸入旅遊日期區間（例如：11/23 - 11/27）：", "11/23 - 11/27");
+            const modeInput = prompt("請選擇闖關模式：\n請輸入數字 1 或 2\n1. 標準行程任務打卡\n2. 足跡領地佔領戰", "1");
+            const mode = (modeInput === "2") ? "territory" : "standard";
+
             try {
                 const newId = 'proj_' + Date.now();
                 const randomPin = Math.floor(100000 + Math.random() * 900000).toString();
-                await setDoc(doc(db, "projects", newId), { name, dates, pin: randomPin, createdAt: Date.now() });
+                await setDoc(doc(db, "projects", newId), { name, dates, pin: randomPin, mode, createdAt: Date.now() });
                 await saveMyProjectId(newId);
                 renderProjects();
                 alert(`✨ 新專案建立成功！專案 6 位數代碼為：【${randomPin}】`);
@@ -829,17 +832,25 @@
             }
         }
 
-        window.enterProject = function(id, projectName, dateRange, pin) {
+        // 🌟 進入專案時自動從雲端撈取最新 pin 碼，確保分享絕對不會失效
+        window.enterProject = async function(id) {
             currentProjectId = id;
-            currentProjectName = projectName;
-            currentProjectPin = pin;
+            try {
+                const docSnap = await getDoc(doc(db, "projects", id));
+                if (docSnap.exists()) {
+                    const p = docSnap.data();
+                    currentProjectName = p.name;
+                    currentProjectPin = p.pin || "";
+                    currentProjectMode = p.mode || "standard";
+                }
+            } catch (e) {}
 
             if (!currentMyName) {
                 document.getElementById('login-modal').classList.remove('hidden');
                 return;
             }
 
-            proceedEnterProject(id, projectName, dateRange);
+            proceedEnterProject();
         }
 
         window.submitLoginName = async function() {
@@ -850,7 +861,6 @@
             document.getElementById('login-modal').classList.add('hidden');
 
             try {
-                // 同步雲端個人資料與專案清單
                 const userDocRef = doc(db, "user_profiles", currentMyName);
                 const userSnap = await getDoc(userDocRef);
                 if (userSnap.exists()) {
@@ -867,26 +877,26 @@
                 await addDoc(collection(db, "projects", currentProjectId, "members"), { name: currentMyName });
             } catch (e) {}
 
-            proceedEnterProject(currentProjectId, currentProjectName, "");
+            proceedEnterProject();
         }
 
-        function proceedEnterProject(id, projectName, dateRange) {
+        function proceedEnterProject() {
             document.getElementById('view-projects').classList.add('hidden');
             document.getElementById('view-workspace').classList.remove('hidden');
             document.getElementById('bottom-nav').classList.remove('hidden');
             document.getElementById('back-btn').classList.remove('hidden');
             document.getElementById('share-btn').classList.remove('hidden');
             
-            document.getElementById('header-title').innerText = `🌸 ${projectName}`;
-            document.getElementById('header-sub').innerText = dateRange ? `日期：${dateRange} ✨` : `旅伴：${currentMyName} ✨`;
+            document.getElementById('header-title').innerText = `🌸 ${currentProjectName}`;
+            document.getElementById('header-sub').innerText = `旅伴：${currentMyName} ✨`;
             
-            renderRemindersByRules(projectName);
-            initLanguageModule(projectName);
-            loadMembersAndExpenses(id);
-            loadCheckins(id);
+            renderRemindersByRules(currentProjectName);
+            initLanguageModule(currentProjectName);
+            loadMembersAndExpenses(currentProjectId);
+            loadCheckins(currentProjectId);
             
             switchTab('schedule');
-            loadSchedules(id);
+            loadSchedules(currentProjectId);
         }
 
         function loadMembersAndExpenses(projId) {
@@ -941,101 +951,156 @@
             return 'spot';
         }
 
+        // 🌟 核心：支援標準任務模式與足跡佔領模式的渲染
         function renderQuestUI() {
             const container = document.getElementById('quest-list-container');
             const countEl = document.getElementById('quest-total-count');
             const percentEl = document.getElementById('quest-percent');
             const progressBar = document.getElementById('quest-progress-bar');
+            const modeLabel = document.getElementById('quest-mode-label');
+            const badgeBox = document.getElementById('badge-container-box');
 
-            let questItems = [];
-            allSchedulesData.forEach(s => {
-                let category = classifyScheduleItem(s.title);
-                if (category !== null) {
-                    let myCheckin = allCheckinsData[s.id];
-                    questItems.push({ 
-                        ...s, 
-                        category, 
-                        completed: !!myCheckin, 
-                        photoUrl: myCheckin ? myCheckin.photoUrl : '',
-                        uploader: myCheckin ? myCheckin.uploader : ''
-                    });
+            if (currentProjectMode === 'territory') {
+                // 🗺️ 模式 B：足跡領地佔領戰 (以天數/區域為單位)
+                badgeBox.classList.add('hidden');
+                modeLabel.innerText = "領地佔領進度";
+
+                let groupedDays = {};
+                allSchedulesData.forEach(s => {
+                    let dayKey = s.day || 'Day 1';
+                    if (!groupedDays[dayKey]) groupedDays[dayKey] = [];
+                    groupedDays[dayKey].push(s);
+                });
+
+                let dayKeys = Object.keys(groupedDays);
+                if (dayKeys.length === 0) {
+                    container.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前尚無行程可以佔領！✨</p>`;
+                    countEl.innerText = `已佔領 0 / 0`;
+                    percentEl.innerText = `0%`;
+                    progressBar.style.width = `0%`;
+                    return;
                 }
-            });
 
-            if (questItems.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前行程中尚無符合的任務！✨</p>`;
-                countEl.innerText = `已打卡 0 / 0`;
-                percentEl.innerText = `0%`;
-                progressBar.style.width = `0%`;
-                updateBadges(0, 0, 0, 0, 0, 0);
-                return;
-            }
+                let totalZones = dayKeys.length;
+                let conqueredZones = 0;
 
-            let totalCount = questItems.length;
-            let completedCount = questItems.filter(item => item.completed).length;
-            let percent = Math.round((completedCount / totalCount) * 100);
+                container.innerHTML = '';
+                dayKeys.forEach(dayKey => {
+                    let items = groupedDays[dayKey];
+                    // 只要該天內有任何一個行程打卡了，就算佔領該區域
+                    let isConquered = items.some(item => allCheckinsData[item.id]);
+                    if (isConquered) conqueredZones++;
 
-            countEl.innerText = `已打卡 ${completedCount} / ${totalCount}`;
-            percentEl.innerText = `${percent}%`;
-            progressBar.style.width = `${percent}%`;
-
-            let foodItems = questItems.filter(i => i.category === 'food');
-            let spotItems = questItems.filter(i => i.category === 'spot');
-            let shopItems = questItems.filter(i => i.category === 'shop');
-
-            let foodDone = foodItems.filter(i => i.completed).length;
-            let spotDone = spotItems.filter(i => i.completed).length;
-            let shopDone = shopItems.filter(i => i.completed).length;
-
-            updateBadges(foodDone, foodItems.length, spotDone, spotItems.length, shopDone, shopItems.length);
-
-            let grouped = {};
-            questItems.forEach(item => {
-                let dayKey = item.day || 'Day 1';
-                if (!grouped[dayKey]) grouped[dayKey] = [];
-                grouped[dayKey].push(item);
-            });
-
-            container.innerHTML = '';
-            Object.keys(grouped).forEach((dayKey, index) => {
-                let items = grouped[dayKey];
-                let sectionId = `quest_section_${index}`;
-                let dayBox = document.createElement('div');
-                dayBox.className = "cute-card overflow-hidden border border-[#eae1d7]";
-                
-                let headerHtml = `
-                    <div onclick="toggleQuestCollapse('${sectionId}')" class="bg-[#f3e9de]/70 p-3.5 flex justify-between items-center cursor-pointer hover:bg-[#f3e9de] transition">
-                        <h4 class="font-black text-[#5c4a3d] text-xs">${dayKey} 任務清單 <span class="text-[11px] text-[#8c7868] font-bold">(${items.filter(i => i.completed).length}/${items.length})</span></h4>
-                        <span id="icon_${sectionId}" class="text-xs text-[#8c7868] font-black">▼ 展開</span>
-                    </div>
-                `;
-
-                let listHtml = `<div id="${sectionId}" class="hidden p-3 space-y-2.5 bg-white">`;
-                items.forEach(s => {
-                    let cleanTitle = cleanDisplayTitle(s.title);
-                    let statusBadge = s.completed ? 
-                        `<span onclick="event.stopPropagation(); openQuestEditModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-black cursor-pointer hover:bg-green-200">✔️ 已打卡</span>` : 
-                        `<span onclick="openQuestPhotoModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-1 rounded-full font-black cursor-pointer hover:bg-[#e2c8b8]">打卡</span>`;
-                    
-                    let photoThumbnail = s.photoUrl ? `<img src="${s.photoUrl}" class="w-10 h-10 rounded-xl object-cover border border-[#eae1d7] shrink-0">` : '';
-
-                    listHtml += `
-                        <div class="p-3.5 bg-[#fffaf5] rounded-2xl border border-[#eae1d7] flex justify-between items-center transition">
-                            <div class="space-y-1 min-w-0 flex-1 pr-2">
-                                <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
-                                <h5 class="font-black text-gray-900 text-xs mt-1 truncate">${cleanTitle}</h5>
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                ${photoThumbnail}
-                                ${statusBadge}
-                            </div>
+                    let card = document.createElement('div');
+                    card.className = `cute-card p-4 border transition flex justify-between items-center ${isConquered ? 'bg-[#fffaf5] border-[#d98262]' : 'bg-gray-50 border-[#eae1d7]'}`;
+                    card.innerHTML = `
+                        <div class="space-y-1">
+                            <span class="text-[10px] px-2 py-0.5 rounded-md font-black ${isConquered ? 'bg-[#d98262] text-white' : 'bg-gray-200 text-gray-600'}">
+                                ${isConquered ? '🚩 已插旗佔領' : '🔒 尚未佔領'}
+                            </span>
+                            <h4 class="font-black text-gray-900 text-sm mt-1">${dayKey} 探索領地</h4>
+                            <p class="text-[10px] text-gray-400 font-bold">包含 ${items.length} 個探索點，於其中完成打卡即可點亮領地！</p>
                         </div>
                     `;
+                    container.appendChild(card);
                 });
-                listHtml += `</div>`;
-                dayBox.innerHTML = headerHtml + listHtml;
-                container.appendChild(dayBox);
-            });
+
+                let percent = Math.round((conqueredZones / totalZones) * 100);
+                countEl.innerText = `已佔領 ${conqueredZones} / ${totalZones} 領地`;
+                percentEl.innerText = `${percent}%`;
+                progressBar.style.width = `${percent}%`;
+
+            } else {
+                // 🎯 模式 A：標準行程任務打卡
+                badgeBox.classList.remove('hidden');
+                modeLabel.innerText = "整體解鎖進度";
+
+                let questItems = [];
+                allSchedulesData.forEach(s => {
+                    let category = classifyScheduleItem(s.title);
+                    if (category !== null) {
+                        let myCheckin = allCheckinsData[s.id];
+                        questItems.push({ 
+                            ...s, 
+                            category, 
+                            completed: !!myCheckin, 
+                            photoUrl: myCheckin ? myCheckin.photoUrl : '',
+                            uploader: myCheckin ? myCheckin.uploader : ''
+                        });
+                    }
+                });
+
+                if (questItems.length === 0) {
+                    container.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前行程中尚無符合的任務！✨</p>`;
+                    countEl.innerText = `已打卡 0 / 0`;
+                    percentEl.innerText = `0%`;
+                    progressBar.style.width = `0%`;
+                    updateBadges(0, 0, 0, 0, 0, 0);
+                    return;
+                }
+
+                let totalCount = questItems.length;
+                let completedCount = questItems.filter(item => item.completed).length;
+                let percent = Math.round((completedCount / totalCount) * 100);
+
+                countEl.innerText = `已打卡 ${completedCount} / ${totalCount}`;
+                percentEl.innerText = `${percent}%`;
+                progressBar.style.width = `${percent}%`;
+
+                let foodItems = questItems.filter(i => i.category === 'food');
+                let spotItems = questItems.filter(i => i.category === 'spot');
+                let shopItems = questItems.filter(i => i.category === 'shop');
+
+                updateBadges(foodItems.filter(i => i.completed).length, foodItems.length, spotItems.filter(i => i.completed).length, spotItems.length, shopItems.filter(i => i.completed).length, shopItems.length);
+
+                let grouped = {};
+                questItems.forEach(item => {
+                    let dayKey = item.day || 'Day 1';
+                    if (!grouped[dayKey]) grouped[dayKey] = [];
+                    grouped[dayKey].push(item);
+                });
+
+                container.innerHTML = '';
+                Object.keys(grouped).forEach((dayKey, index) => {
+                    let items = grouped[dayKey];
+                    let sectionId = `quest_section_${index}`;
+                    let dayBox = document.createElement('div');
+                    dayBox.className = "cute-card overflow-hidden border border-[#eae1d7]";
+                    
+                    let headerHtml = `
+                        <div onclick="toggleQuestCollapse('${sectionId}')" class="bg-[#f3e9de]/70 p-3.5 flex justify-between items-center cursor-pointer hover:bg-[#f3e9de] transition">
+                            <h4 class="font-black text-[#5c4a3d] text-xs">${dayKey} 任務清單 <span class="text-[11px] text-[#8c7868] font-bold">(${items.filter(i => i.completed).length}/${items.length})</span></h4>
+                            <span id="icon_${sectionId}" class="text-xs text-[#8c7868] font-black">▼ 展開</span>
+                        </div>
+                    `;
+
+                    let listHtml = `<div id="${sectionId}" class="hidden p-3 space-y-2.5 bg-white">`;
+                    items.forEach(s => {
+                        let cleanTitle = cleanDisplayTitle(s.title);
+                        let statusBadge = s.completed ? 
+                            `<span onclick="event.stopPropagation(); openQuestEditModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-black cursor-pointer hover:bg-green-200">✔️ 已打卡</span>` : 
+                            `<span onclick="openQuestPhotoModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-1 rounded-full font-black cursor-pointer hover:bg-[#e2c8b8]">打卡</span>`;
+                        
+                        let photoThumbnail = s.photoUrl ? `<img src="${s.photoUrl}" class="w-10 h-10 rounded-xl object-cover border border-[#eae1d7] shrink-0">` : '';
+
+                        listHtml += `
+                            <div class="p-3.5 bg-[#fffaf5] rounded-2xl border border-[#eae1d7] flex justify-between items-center transition">
+                                <div class="space-y-1 min-w-0 flex-1 pr-2">
+                                    <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
+                                    <h5 class="font-black text-gray-900 text-xs mt-1 truncate">${cleanTitle}</h5>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    ${photoThumbnail}
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    listHtml += `</div>`;
+                    dayBox.innerHTML = headerHtml + listHtml;
+                    container.appendChild(dayBox);
+                });
+            }
         }
 
         window.toggleQuestCollapse = function(sectionId) {
@@ -1751,6 +1816,7 @@
             currentProjectId = null;
             currentProjectName = "";
             currentProjectPin = "";
+            currentProjectMode = "standard";
             if (unsubscribeSchedules) unsubscribeSchedules();
             if (unsubscribeExpenses) unsubscribeExpenses();
             if (unsubscribeMembers) unsubscribeMembers();
