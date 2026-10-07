@@ -303,7 +303,7 @@
         </div>
     </div>
 
-    <!-- 🌸 旅伴名稱登入 Modal -->
+    <!-- 🌸 旅伴名稱登入 Modal (綁定雲端專案清單) -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <h3 class="font-black text-[#5c4a3d] text-base text-center">🌸 歡迎加入放風之旅</h3>
@@ -446,7 +446,6 @@
 
     <div id="settlement-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs">
-            <div class="flex justify-between items-center"><h3 class="font-black text-[#5c4a3d] text-base">📊 分帳結算</h3><button onclick="closeSettlementModal()" class="text-gray-400 font-black">✕</button></div>
             <div id="settlement-content" class="space-y-3 max-h-72 overflow-y-auto pr-1"></div>
             <button onclick="closeSettlementModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button>
         </div>
@@ -484,15 +483,17 @@
         let currentMyName = localStorage.getItem('my_travel_nickname') || "";
         let currentDestinationLang = 'ko-KR';
         let currentActivePhrase = { cn: "請選擇想說的話", foreign: "請選擇想說的話" };
-        let compressedPhotoBase64 = ""; // 儲存壓縮後的圖片
+        let compressedPhotoBase64 = "";
 
         let unsubscribeSchedules = null;
         let unsubscribeExpenses = null;
         let unsubscribeMembers = null;
+        let unsubscribeCheckins = null;
 
         let allSchedulesData = [];
         let allExpensesData = [];
         let allMembersData = [];
+        let allCheckinsData = {}; 
         let currentSplitMode = 'equal';
         let activeDayFilter = 'all';
         let currentQuestTargetId = null;
@@ -586,7 +587,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -696,27 +697,46 @@
             }
         };
 
-        function getMyProjectIds() {
+        // 🌟 改良：將專案清單與名字綁定存入 Firebase 雲端
+        async function getMyProjectIds() {
+            if (!currentMyName) return JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
+            try {
+                const docRef = doc(db, "user_profiles", currentMyName);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    return docSnap.data().projects || [];
+                }
+            } catch (e) {}
             return JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
         }
 
-        function saveMyProjectId(id) {
-            let list = getMyProjectIds();
+        async function saveMyProjectId(id) {
+            let list = await getMyProjectIds();
             if (!list.includes(id)) {
                 list.unshift(id);
                 localStorage.setItem('my_subscribed_projects', JSON.stringify(list));
+                if (currentMyName) {
+                    try {
+                        await setDoc(doc(db, "user_profiles", currentMyName), { projects: list }, { merge: true });
+                    } catch (e) {}
+                }
             }
         }
 
-        function removeMyProjectId(id) {
-            let list = getMyProjectIds();
+        async function removeMyProjectId(id) {
+            let list = await getMyProjectIds();
             list = list.filter(item => item !== id);
             localStorage.setItem('my_subscribed_projects', JSON.stringify(list));
+            if (currentMyName) {
+                try {
+                    await setDoc(doc(db, "user_profiles", currentMyName), { projects: list }, { merge: true });
+                } catch (e) {}
+            }
         }
 
         async function renderProjects() {
             const list = document.getElementById('project-list');
-            const myIds = getMyProjectIds();
+            const myIds = await getMyProjectIds();
             if (myIds.length === 0) {
                 list.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前沒有專案。點上方按鈕新增，或輸入 6 位數專案號碼導入！✨</p>`;
                 return;
@@ -756,7 +776,7 @@
                 const newId = 'proj_' + Date.now();
                 const randomPin = Math.floor(100000 + Math.random() * 900000).toString();
                 await setDoc(doc(db, "projects", newId), { name, dates, pin: randomPin, createdAt: Date.now() });
-                saveMyProjectId(newId);
+                await saveMyProjectId(newId);
                 renderProjects();
                 alert(`✨ 新專案建立成功！專案 6 位數代碼為：【${randomPin}】`);
             } catch (e) { alert("新增失敗"); }
@@ -791,7 +811,7 @@
                 });
 
                 if (foundId) {
-                    saveMyProjectId(foundId);
+                    await saveMyProjectId(foundId);
                     closeImportProjectModal();
                     renderProjects();
                     alert("✨ 成功導入專案！");
@@ -802,9 +822,9 @@
             }
         }
 
-        window.removeProjectFromMyList = function(id) {
+        window.removeProjectFromMyList = async function(id) {
             if (confirm("確定要從你的畫面上移除這個專案嗎？")) {
-                removeMyProjectId(id);
+                await removeMyProjectId(id);
                 renderProjects();
             }
         }
@@ -830,6 +850,20 @@
             document.getElementById('login-modal').classList.add('hidden');
 
             try {
+                // 同步雲端個人資料與專案清單
+                const userDocRef = doc(db, "user_profiles", currentMyName);
+                const userSnap = await getDoc(userDocRef);
+                if (userSnap.exists()) {
+                    let cloudProjects = userSnap.data().projects || [];
+                    let localProjects = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
+                    let merged = Array.from(new Set([...localProjects, ...cloudProjects]));
+                    localStorage.setItem('my_subscribed_projects', JSON.stringify(merged));
+                    await setDoc(userDocRef, { projects: merged }, { merge: true });
+                } else {
+                    let localProjects = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
+                    await setDoc(userDocRef, { projects: localProjects });
+                }
+
                 await addDoc(collection(db, "projects", currentProjectId, "members"), { name: currentMyName });
             } catch (e) {}
 
@@ -849,6 +883,7 @@
             renderRemindersByRules(projectName);
             initLanguageModule(projectName);
             loadMembersAndExpenses(id);
+            loadCheckins(id);
             
             switchTab('schedule');
             loadSchedules(id);
@@ -877,6 +912,21 @@
             });
         }
 
+        function loadCheckins(projId) {
+            const checkinsRef = collection(db, "projects", projId, "checkins");
+            if (unsubscribeCheckins) unsubscribeCheckins();
+            unsubscribeCheckins = onSnapshot(checkinsRef, (snapshot) => {
+                allCheckinsData = {};
+                snapshot.forEach(docSnap => {
+                    let data = docSnap.data();
+                    if (data.uploader === currentMyName) {
+                        allCheckinsData[data.scheduleId] = data;
+                    }
+                });
+                renderQuestUI();
+            });
+        }
+
         function classifyScheduleItem(title) {
             let t = title.toLowerCase();
             if (t.includes('交通') || t.includes('機場') || t.includes('租車') || t.includes('還車') || t.includes('出發') || t.includes('前往') || t.includes('搭車') || t.includes('班機') || t.includes('住宿') || t.includes('飯店') || t.includes('民宿') || t.includes('check-in') || t.includes('check in')) {
@@ -901,7 +951,14 @@
             allSchedulesData.forEach(s => {
                 let category = classifyScheduleItem(s.title);
                 if (category !== null) {
-                    questItems.push({ ...s, category });
+                    let myCheckin = allCheckinsData[s.id];
+                    questItems.push({ 
+                        ...s, 
+                        category, 
+                        completed: !!myCheckin, 
+                        photoUrl: myCheckin ? myCheckin.photoUrl : '',
+                        uploader: myCheckin ? myCheckin.uploader : ''
+                    });
                 }
             });
 
@@ -967,7 +1024,6 @@
                             <div class="space-y-1 min-w-0 flex-1 pr-2">
                                 <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
                                 <h5 class="font-black text-gray-900 text-xs mt-1 truncate">${cleanTitle}</h5>
-                                ${s.uploader ? `<p class="text-[9px] text-gray-400 font-bold">👤 拍攝者: ${s.uploader}</p>` : ''}
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
                                 ${photoThumbnail}
@@ -1018,7 +1074,7 @@
 
         window.openQuestPhotoModal = function(scheduleId, title) {
             currentQuestTargetId = scheduleId;
-            compressedPhotoBase64 = ""; // 重設
+            compressedPhotoBase64 = "";
             document.getElementById('quest-modal-title').innerText = `📸 打卡：${title}`;
             document.getElementById('quest-file-input').value = '';
             document.getElementById('quest-photo-preview-container').classList.add('hidden');
@@ -1049,17 +1105,23 @@
 
         window.cancelQuestCheckin = async function() {
             if (!currentProjectId || !currentQuestTargetId) return;
-            if (confirm("確定要取消打卡嗎？照片將被移除，您可以晚點再上傳！")) {
+            if (confirm("確定要取消打卡嗎？照片將從你的任務中移除！")) {
                 try {
-                    const docRef = doc(db, "projects", currentProjectId, "schedules", currentQuestTargetId);
-                    await updateDoc(docRef, { completed: false, photoUrl: "", uploader: "" });
+                    const q = query(
+                        collection(db, "projects", currentProjectId, "checkins"), 
+                        where("scheduleId", "==", currentQuestTargetId),
+                        where("uploader", "==", currentMyName)
+                    );
+                    const snapshot = await getDocs(q);
+                    snapshot.forEach(async (docSnap) => {
+                        await deleteDoc(doc(db, "projects", currentProjectId, "checkins", docSnap.id));
+                    });
                     closeQuestEditModal();
                     alert("✨ 已成功取消打卡！");
                 } catch (e) { alert("操作失敗"); }
             }
         }
 
-        // 🌟 自動壓縮照片，確保上傳絕對不失敗
         window.previewQuestPhoto = function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1072,7 +1134,6 @@
                     let width = img.width;
                     let height = img.height;
                     
-                    // 限制最大寬高 800px 以內
                     const maxDim = 800;
                     if (width > height && width > maxDim) {
                         height = Math.round((height * maxDim) / width);
@@ -1087,7 +1148,6 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // 壓縮成品質 0.7 的 JPEG 格式
                     compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
 
                     document.getElementById('quest-photo-preview').src = compressedPhotoBase64;
@@ -1106,8 +1166,28 @@
             }
 
             try {
-                const docRef = doc(db, "projects", currentProjectId, "schedules", currentQuestTargetId);
-                await updateDoc(docRef, { completed: true, photoUrl: compressedPhotoBase64, uploader: currentMyName });
+                const q = query(
+                    collection(db, "projects", currentProjectId, "checkins"), 
+                    where("scheduleId", "==", currentQuestTargetId),
+                    where("uploader", "==", currentMyName)
+                );
+                const snapshot = await getDocs(q);
+                
+                if (!snapshot.empty) {
+                    let docId = snapshot.docs[0].id;
+                    await updateDoc(doc(db, "projects", currentProjectId, "checkins", docId), {
+                        photoUrl: compressedPhotoBase64,
+                        createdAt: Date.now()
+                    });
+                } else {
+                    await addDoc(collection(db, "projects", currentProjectId, "checkins"), {
+                        scheduleId: currentQuestTargetId,
+                        photoUrl: compressedPhotoBase64,
+                        uploader: currentMyName,
+                        createdAt: Date.now()
+                    });
+                }
+
                 closeQuestPhotoModal();
                 alert("✨ 打卡成功！");
             } catch (e) {
@@ -1116,30 +1196,44 @@
             }
         }
 
-        window.openPhotoGalleryModal = function() {
+        window.openPhotoGalleryModal = async function() {
             const grid = document.getElementById('photo-gallery-grid');
-            grid.innerHTML = '';
-
-            let photos = allSchedulesData.filter(s => s.photoUrl);
-            if (photos.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center text-xs text-gray-400 py-8">目前還沒有旅伴上傳打卡照片喔！✨</div>`;
-            } else {
-                photos.forEach(p => {
-                    let div = document.createElement('div');
-                    div.className = "cute-card overflow-hidden bg-white border border-[#eae1d7] p-2 space-y-1.5 flex flex-col justify-between";
-                    div.innerHTML = `
-                        <div>
-                            <img src="${p.photoUrl}" class="w-full h-28 object-cover rounded-xl">
-                            <p class="text-[11px] font-black text-gray-800 truncate mt-1">${cleanDisplayTitle(p.title)}</p>
-                            <p class="text-[9px] text-gray-400 font-bold">👤 ${p.uploader || '夥伴'} | ${p.day || 'Day 1'}</p>
-                        </div>
-                        <a href="${p.photoUrl}" download="travel_photo_${p.id}.jpg" class="w-full text-center bg-[#f0dcd0] text-[#735848] text-[10px] py-1.5 rounded-lg font-black hover:bg-[#e2c8b8] transition">📥 下載到手機相冊</a>
-                    `;
-                    grid.appendChild(div);
-                });
-            }
-            document.getElementById('photo-gallery-modal').classList.add('hidden');
+            grid.innerHTML = '<p class="col-span-2 text-center text-xs text-gray-400 py-4">載入寫真中... 📸</p>';
             document.getElementById('photo-gallery-modal').classList.remove('hidden');
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "projects", currentProjectId, "checkins"));
+                grid.innerHTML = '';
+                let photos = [];
+                querySnapshot.forEach(docSnap => {
+                    photos.push(docSnap.data());
+                });
+
+                if (photos.length === 0) {
+                    grid.innerHTML = `<div class="col-span-2 text-center text-xs text-gray-400 py-8">目前還沒有旅伴上傳打卡照片喔！✨</div>`;
+                } else {
+                    photos.forEach(p => {
+                        let scheduleItem = allSchedulesData.find(s => s.id === p.scheduleId);
+                        let title = scheduleItem ? cleanDisplayTitle(scheduleItem.title) : '打卡景點';
+                        let day = scheduleItem ? (scheduleItem.day || 'Day 1') : 'Day 1';
+
+                        let div = document.createElement('div');
+                        div.className = "cute-card overflow-hidden bg-white border border-[#eae1d7] p-2 space-y-1.5 flex flex-col justify-between";
+                        div.innerHTML = `
+                            <div>
+                                <img src="${p.photoUrl}" class="w-full h-28 object-cover rounded-xl">
+                                <p class="text-[11px] font-black text-gray-800 truncate mt-1">${title}</p>
+                                <p class="text-[9px] text-gray-400 font-bold">👤 ${p.uploader || '夥伴'} | ${day}</p>
+                            </div>
+                            <a href="${p.photoUrl}" download="travel_photo_${p.scheduleId}.jpg" class="w-full text-center bg-[#f0dcd0] text-[#735848] text-[10px] py-1.5 rounded-lg font-black hover:bg-[#e2c8b8] transition">📥 下載到手機相冊</a>
+                        `;
+                        grid.appendChild(div);
+                    });
+                }
+            } catch (e) {
+                console.error("載入寫真冊失敗", e);
+                grid.innerHTML = `<div class="col-span-2 text-center text-xs text-red-400 py-8">載入寫真冊失敗</div>`;
+            }
         }
         window.closePhotoGalleryModal = function() {
             document.getElementById('photo-gallery-modal').classList.add('hidden');
@@ -1641,7 +1735,6 @@
                     currentActivePhrase = p;
                     document.getElementById('display-cn').innerText = p.cn;
                     document.getElementById('display-foreign').innerText = p.foreign;
-                    speakCurrentPhrase();
                 };
                 phraseContainer.appendChild(card);
             });
@@ -1661,6 +1754,7 @@
             if (unsubscribeSchedules) unsubscribeSchedules();
             if (unsubscribeExpenses) unsubscribeExpenses();
             if (unsubscribeMembers) unsubscribeMembers();
+            if (unsubscribeCheckins) unsubscribeCheckins();
             document.getElementById('view-workspace').classList.add('hidden');
             document.getElementById('bottom-nav').classList.add('hidden');
             document.getElementById('back-btn').classList.add('hidden');
@@ -1922,7 +2016,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const sharedProjId = urlParams.get('project');
             if (sharedProjId) {
-                saveMyProjectId(sharedProjId);
+                await saveMyProjectId(sharedProjId);
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
             renderProjects();
