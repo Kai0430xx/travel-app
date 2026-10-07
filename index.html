@@ -46,6 +46,27 @@
             background: #f0dcd0;
             box-shadow: 0 4px 12px rgba(217, 130, 98, 0.2);
         }
+        /* 可愛手繪地圖風格容器 */
+        .map-canvas {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            border-radius: 24px;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid #eae1d7;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .map-pin {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .map-pin:hover {
+            transform: translate(-50%, -50%) scale(1.15);
+        }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #e2d3c3; border-radius: 4px; }
     </style>
@@ -157,7 +178,7 @@
                 </div>
             </div>
 
-            <!-- 分頁 5：闖關 (支援 標準打卡 / 足跡佔領) -->
+            <!-- 分頁 5：闖關 (支援 標準打卡 / 足跡插旗地圖) -->
             <div id="tab-quest" class="tab-content hidden space-y-4">
                 <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-4 shadow-md border-[#e2d3c3]">
                     <div class="flex justify-between items-center">
@@ -174,7 +195,7 @@
                         </div>
                     </div>
 
-                    <!-- 圓形布章區 (僅標準模式顯示) -->
+                    <!-- 圓形布章區 (標準模式顯示) -->
                     <div id="badge-container-box" class="grid grid-cols-3 gap-3 pt-2 border-t border-[#eae1d7] text-center">
                         <div class="flex flex-col items-center">
                             <div id="badge-food" class="badge-circle">
@@ -200,7 +221,15 @@
                     </div>
                 </div>
 
-                <!-- 任務或足跡領地清單 -->
+                <!-- 🗺️ 足跡插旗互動地圖專用區 -->
+                <div id="territory-map-container" class="hidden space-y-3">
+                    <div id="custom-map-board" class="map-canvas">
+                        <!-- 動態插旗點會由 JS 渲染在此 -->
+                    </div>
+                    <p class="text-center text-[11px] text-[#8c7868] font-bold">💡 點擊地圖上的可愛旗幟即可進行打卡或查看照片！</p>
+                </div>
+
+                <!-- 標準任務清單容器 -->
                 <div id="quest-list-container" class="space-y-3">
                     <p class="text-center text-xs text-gray-400 py-6">正在載入闖關任務... ⏳</p>
                 </div>
@@ -479,7 +508,7 @@
         let currentProjectId = null;
         let currentProjectName = "";
         let currentProjectPin = "";
-        let currentProjectMode = "standard"; // 'standard' 或 'territory'
+        let currentProjectMode = "standard"; 
         let currentMyName = localStorage.getItem('my_travel_nickname') || "";
         let currentDestinationLang = 'ko-KR';
         let currentActivePhrase = { cn: "請選擇想說的話", foreign: "請選擇想說的話" };
@@ -587,7 +616,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -697,6 +726,36 @@
             }
         };
 
+        // 🗺️ 根據專案名稱決定可愛插畫風格地圖的背景圖與主題
+        function getMapTheme(projectName) {
+            let n = projectName.toLowerCase();
+            if (n.includes('濟州') || n.includes('韓國') || n.includes('釜山') || n.includes('首爾')) {
+                return {
+                    bg: "linear-gradient(135deg, #e8f4f8 0%, #d4e8f0 100%), radial-gradient(circle at 30% 40%, rgba(255,182,193,0.3) 0%, transparent 50%)",
+                    border: "#7ba4b5",
+                    label: "🇰🇷 韓國冒險手繪地圖"
+                };
+            } else if (n.includes('東京') || n.includes('日本') || n.includes('大阪') || n.includes('京都') || n.includes('沖繩')) {
+                return {
+                    bg: "linear-gradient(135deg, #fef4f4 0%, #fbe4e4 100%), radial-gradient(circle at 70% 30%, rgba(255,192,203,0.4) 0%, transparent 60%)",
+                    border: "#d99b9b",
+                    label: "🇯🇵 日本漫遊手繪地圖"
+                };
+            } else if (n.includes('泰國') || n.includes('曼谷') || n.includes('清邁')) {
+                return {
+                    bg: "linear-gradient(135deg, #fefae0 0%, #fef1bc 100%), radial-gradient(circle at 50% 50%, rgba(144,238,144,0.3) 0%, transparent 60%)",
+                    border: "#c2b078",
+                    label: "🇹🇭 泰國熱帶手繪地圖"
+                };
+            } else {
+                return {
+                    bg: "linear-gradient(135deg, #f4efe6 0%, #e8dec9 100%), radial-gradient(circle at 40% 60%, rgba(217,130,98,0.2) 0%, transparent 60%)",
+                    border: "#c4b59d",
+                    label: "🌍 世界探索手繪地圖"
+                };
+            }
+        }
+
         async function getMyProjectIds() {
             if (!currentMyName) return JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
             try {
@@ -767,12 +826,11 @@
             }
         }
 
-        // 🌟 創建專案時可選擇模式
         window.openNewProjectModal = async function() {
             const name = prompt("請輸入新旅遊專案名稱（例如：濟州島自駕、曼谷自由行）：");
             if (!name) return;
             const dates = prompt("請輸入旅遊日期區間（例如：11/23 - 11/27）：", "11/23 - 11/27");
-            const modeInput = prompt("請選擇闖關模式：\n請輸入數字 1 或 2\n1. 標準行程任務打卡\n2. 足跡領地佔領戰", "1");
+            const modeInput = prompt("請選擇闖關模式：\n請輸入數字 1 或 2\n1. 標準行程任務打卡\n2. 足跡插旗地圖佔領", "1");
             const mode = (modeInput === "2") ? "territory" : "standard";
 
             try {
@@ -832,7 +890,6 @@
             }
         }
 
-        // 🌟 進入專案時自動從雲端撈取最新 pin 碼，確保分享絕對不會失效
         window.enterProject = async function(id) {
             currentProjectId = id;
             try {
@@ -951,9 +1008,10 @@
             return 'spot';
         }
 
-        // 🌟 核心：支援標準任務模式與足跡佔領模式的渲染
+        // 🌟 核心：支援標準任務模式與足跡插旗地圖模式
         function renderQuestUI() {
             const container = document.getElementById('quest-list-container');
+            const mapContainer = document.getElementById('territory-map-container');
             const countEl = document.getElementById('quest-total-count');
             const percentEl = document.getElementById('quest-percent');
             const progressBar = document.getElementById('quest-progress-bar');
@@ -961,58 +1019,92 @@
             const badgeBox = document.getElementById('badge-container-box');
 
             if (currentProjectMode === 'territory') {
-                // 🗺️ 模式 B：足跡領地佔領戰 (以天數/區域為單位)
+                // 🗺️ 模式 B：足跡插旗地圖佔領
                 badgeBox.classList.add('hidden');
-                modeLabel.innerText = "領地佔領進度";
+                container.classList.add('hidden');
+                mapContainer.classList.remove('hidden');
+                modeLabel.innerText = "地圖插旗佔領進度";
 
-                let groupedDays = {};
+                let questItems = [];
                 allSchedulesData.forEach(s => {
-                    let dayKey = s.day || 'Day 1';
-                    if (!groupedDays[dayKey]) groupedDays[dayKey] = [];
-                    groupedDays[dayKey].push(s);
+                    let category = classifyScheduleItem(s.title);
+                    if (category !== null) {
+                        let myCheckin = allCheckinsData[s.id];
+                        questItems.push({ 
+                            ...s, 
+                            completed: !!myCheckin, 
+                            photoUrl: myCheckin ? myCheckin.photoUrl : ''
+                        });
+                    }
                 });
 
-                let dayKeys = Object.keys(groupedDays);
-                if (dayKeys.length === 0) {
-                    container.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前尚無行程可以佔領！✨</p>`;
-                    countEl.innerText = `已佔領 0 / 0`;
+                let totalCount = questItems.length;
+                if (totalCount === 0) {
+                    countEl.innerText = `已插旗 0 / 0`;
                     percentEl.innerText = `0%`;
                     progressBar.style.width = `0%`;
+                    document.getElementById('custom-map-board').innerHTML = `<p class="text-center text-xs text-gray-400 py-24">尚無可插旗的景點或餐廳！✨</p>`;
                     return;
                 }
 
-                let totalZones = dayKeys.length;
-                let conqueredZones = 0;
-
-                container.innerHTML = '';
-                dayKeys.forEach(dayKey => {
-                    let items = groupedDays[dayKey];
-                    // 只要該天內有任何一個行程打卡了，就算佔領該區域
-                    let isConquered = items.some(item => allCheckinsData[item.id]);
-                    if (isConquered) conqueredZones++;
-
-                    let card = document.createElement('div');
-                    card.className = `cute-card p-4 border transition flex justify-between items-center ${isConquered ? 'bg-[#fffaf5] border-[#d98262]' : 'bg-gray-50 border-[#eae1d7]'}`;
-                    card.innerHTML = `
-                        <div class="space-y-1">
-                            <span class="text-[10px] px-2 py-0.5 rounded-md font-black ${isConquered ? 'bg-[#d98262] text-white' : 'bg-gray-200 text-gray-600'}">
-                                ${isConquered ? '🚩 已插旗佔領' : '🔒 尚未佔領'}
-                            </span>
-                            <h4 class="font-black text-gray-900 text-sm mt-1">${dayKey} 探索領地</h4>
-                            <p class="text-[10px] text-gray-400 font-bold">包含 ${items.length} 個探索點，於其中完成打卡即可點亮領地！</p>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-
-                let percent = Math.round((conqueredZones / totalZones) * 100);
-                countEl.innerText = `已佔領 ${conqueredZones} / ${totalZones} 領地`;
+                let completedCount = questItems.filter(i => i.completed).length;
+                let percent = Math.round((completedCount / totalCount) * 100);
+                countEl.innerText = `已插旗 ${completedCount} / ${totalCount}`;
                 percentEl.innerText = `${percent}%`;
                 progressBar.style.width = `${percent}%`;
+
+                // 渲染手繪地圖主題與插旗點
+                const mapBoard = document.getElementById('custom-map-board');
+                const theme = getMapTheme(currentProjectName);
+                mapBoard.style.background = theme.bg;
+                mapBoard.style.borderColor = theme.border;
+
+                // 根據項目數量自動排列散布在地圖上的座標百分比
+                mapBoard.innerHTML = `<div class="absolute top-2 left-3 text-[10px] font-black text-[#735848] bg-white/80 px-2 py-0.5 rounded-full border border-[#eae1d7]">${theme.label}</div>`;
+
+                questItems.forEach((item, index) => {
+                    let cleanTitle = cleanDisplayTitle(item.title);
+                    // 計算漂亮的環形或網格散布座標
+                    let angle = (index / totalCount) * 2 * Math.PI;
+                    let radiusX = 32; // 橫向半徑百分比
+                    let radiusY = 30; // 縱向半徑百分比
+                    let posX = 50 + radiusX * Math.cos(angle + (index * 0.5));
+                    let posY = 50 + radiusY * Math.sin(angle + (index * 0.5));
+                    // 確保座標不出界
+                    posX = Math.max(15, Math.min(85, posX));
+                    posY = Math.max(20, Math.min(80, posY));
+
+                    let pinBtn = document.createElement('div');
+                    pinBtn.className = "map-pin flex flex-col items-center";
+                    pinBtn.style.left = `${posX}%`;
+                    pinBtn.style.top = `${posY}%`;
+
+                    if (item.completed) {
+                        pinBtn.innerHTML = `
+                            <div class="relative group">
+                                <img src="${item.photoUrl}" class="w-10 h-10 rounded-full object-cover border-2 border-[#d98262] shadow-lg">
+                                <span class="absolute -bottom-1 -right-1 text-xs">🚩</span>
+                            </div>
+                            <span class="text-[9px] font-black text-[#5c4a3d] bg-white/90 px-2 py-0.5 rounded-full mt-1 border border-[#eae1d7] shadow-sm max-w-[80px] truncate">${cleanTitle}</span>
+                        `;
+                        pinBtn.onclick = () => openQuestEditModal(item.id, cleanTitle);
+                    } else {
+                        pinBtn.innerHTML = `
+                            <div class="w-9 h-9 rounded-full bg-[#fffaf5] border-2 border-dashed border-[#d98262] flex items-center justify-center shadow-md">
+                                <span class="text-sm">📍</span>
+                            </div>
+                            <span class="text-[9px] font-bold text-gray-500 bg-white/80 px-1.5 py-0.5 rounded-full mt-1 border border-[#eae1d7] max-w-[80px] truncate">${cleanTitle}</span>
+                        `;
+                        pinBtn.onclick = () => openQuestPhotoModal(item.id, cleanTitle);
+                    }
+                    mapBoard.appendChild(pinBtn);
+                });
 
             } else {
                 // 🎯 模式 A：標準行程任務打卡
                 badgeBox.classList.remove('hidden');
+                mapContainer.classList.add('hidden');
+                container.classList.remove('hidden');
                 modeLabel.innerText = "整體解鎖進度";
 
                 let questItems = [];
@@ -1133,7 +1225,7 @@
             if (shTotal > 0 && shDone === shTotal) {
                 shBadge.className = "badge-circle unlocked"; shTitle.innerText = "精品大收割";
             } else {
-                shBadge.className = "badge-circle"; shTitle.innerText = `購物 (${shDone}/${shTotal})`;
+                shBadge.className = "badge-circle"; sTitle.innerText = `購物 (${shDone}/${shTotal})`;
             }
         }
 
@@ -1170,7 +1262,7 @@
 
         window.cancelQuestCheckin = async function() {
             if (!currentProjectId || !currentQuestTargetId) return;
-            if (confirm("確定要取消打卡嗎？照片將從你的任務中移除！")) {
+            if (confirm("確定要取消打卡嗎？照片將從你的任務與地圖中移除！")) {
                 try {
                     const q = query(
                         collection(db, "projects", currentProjectId, "checkins"), 
@@ -2039,56 +2131,3 @@
                 await addDoc(collection(db, "projects", currentProjectId, "schedules"), parsedItems[i]);
             }
             closeSmartPasteModal();
-            alert(`✨ 成功導入 ${parsedItems.length} 筆行程！`);
-        }
-
-        window.shareCurrentProject = function() {
-            if (!currentProjectId) return;
-            document.getElementById('share-modal-pin').innerText = currentProjectPin || '未設定';
-            document.getElementById('share-choice-modal').classList.remove('hidden');
-        }
-        window.closeShareModal = function() {
-            document.getElementById('share-choice-modal').classList.add('hidden');
-        }
-        window.copySharePin = function() {
-            if (!currentProjectPin) return;
-            navigator.clipboard.writeText(currentProjectPin);
-            alert(`📋 專案 6 位數代碼【${currentProjectPin}】已複製！`);
-            closeShareModal();
-        }
-        window.copyShareUrl = function() {
-            const shareUrl = `${window.location.href.split('?')[0]}?project=${currentProjectId}`;
-            navigator.clipboard.writeText(shareUrl);
-            alert("🌸 專屬分享網址已複製！");
-            closeShareModal();
-        }
-
-        window.switchTab = function(tabName) {
-            ['schedule', 'ai', 'lang', 'split', 'quest'].forEach(t => {
-                document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).className = "flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5";
-            });
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            document.getElementById(`nav-${tabName}`).className = "flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5";
-        }
-
-        window.speakText = function(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ko-KR';
-            window.speechSynthesis.speak(utterance);
-        }
-
-        async function initApp() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const sharedProjId = urlParams.get('project');
-            if (sharedProjId) {
-                await saveMyProjectId(sharedProjId);
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-            renderProjects();
-        }
-
-        initApp();
-    </script>
-</body>
-</html>
