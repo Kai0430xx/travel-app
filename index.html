@@ -606,13 +606,13 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
                         { cn: "救命！我的護照（或錢包）被偷了！", foreign: "助けてください！パスポート（または財布）が盗まれました！" },
                         { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "体調が悪いのですが、近くに薬局や病院はありますか？" },
-                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "すみません、道に迷いました。警察を呼んでいただけますか？" }
+                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "すみません、道に迷いました。警察를 呼んでいただけますか？" }
                     ]
                 }
             },
@@ -716,6 +716,143 @@
             }
         };
 
+        // 🌟 把所有重要函式直接在全域宣告，保證 onclick 絕對找得到
+        window.backToProjects = function() {
+            currentProjectId = null;
+            currentProjectName = "";
+            currentProjectPin = "";
+            if (unsubscribeSchedules) unsubscribeSchedules();
+            if (unsubscribeExpenses) unsubscribeExpenses();
+            if (unsubscribeMembers) unsubscribeMembers();
+            if (unsubscribeCheckins) unsubscribeCheckins();
+            document.getElementById('view-workspace').classList.add('hidden');
+            document.getElementById('bottom-nav').classList.add('hidden');
+            document.getElementById('back-btn').classList.add('hidden');
+            document.getElementById('share-btn').classList.add('hidden');
+            document.getElementById('view-projects').classList.remove('hidden');
+            document.getElementById('header-title').innerText = "🧳 我的旅遊專案清單";
+            document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
+            renderProjects();
+        };
+
+        window.enterProject = async function(id) {
+            currentProjectId = id;
+            try {
+                const docSnap = await getDoc(doc(db, "projects", id));
+                if (docSnap.exists()) {
+                    const p = docSnap.data();
+                    currentProjectName = p.name;
+                    currentProjectPin = p.pin || "";
+                }
+            } catch (e) {}
+
+            if (!currentMyName) {
+                document.getElementById('login-modal').classList.remove('hidden');
+                return;
+            }
+
+            proceedEnterProject();
+        };
+
+        window.renderRemindersByRules = function(projectName) {
+            const container = document.getElementById('dynamic-reminders-container');
+            let nameLower = projectName.toLowerCase();
+            let html = '';
+
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">當地早晚溫差較大且風大，建議穿著長袖、針織衫或帽T，並準備防風外套 🧥。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>導航 App：強烈建議使用 Naver Map 或 Kakao Map，以電話號碼查詢景點最準確！</li>
+                            <li>測速照相：道路速限嚴格，沿途有大量測速照相，務必依速限行駛。</li>
+                            <li>加油還車：多為自助/半人工，記得確認租車規定（通常為滿油出借還車）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>證件：務必備妥台灣駕照正本與國際駕照。</li>
+                            <li>支付：信用卡普及，建議身上備妥 5~10 萬韓元現金備用。</li>
+                            <li>插頭：電壓 220V，圓形雙孔（歐規/韓規）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>警察局：112 | 救護車/消防：119 | 中文旅遊熱線：1330</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都') || nameLower.includes('沖繩') || nameLower.includes('北海道') || nameLower.includes('名古屋')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇯🇵 日本旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">行程多以步行與大眾運輸為主，建議穿著舒適好走的布鞋，並隨身攜帶輕便外套與雨具 🌂。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚆 交通與導航提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>導航：推薦使用 Google Maps 或 乗換案內 查詢地鐵。</li>
+                            <li>IC 卡：建議事先將 Suica 或 Pasmo 加入手機錢包（Apple Pay）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>護照效期需大於 6 個月。部分小店或拉麵機仍需現金，建議備妥適量日幣。</li>
+                            <li>插頭：電壓 100V，雙孔扁平插頭（與台灣相同）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>警察局：110 | 救護車/消防：119</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁') || nameLower.includes('普吉') || nameLower.includes('芭達雅')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇹🇭 泰國旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">終年炎熱，建議穿著輕薄透氣衣物，備好防曬與雨具。進出寺廟衣著需端莊（不可露肩短褲）。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🛵 交通與叫車提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>叫車：推薦使用 Grab 或 Bolt。市區可多利用 BTS/MRT 避開塞車。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與小費</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>夜市小吃多收現金，可至當地 SuperRich 換匯。按摩或服務良好建議給 20-100 銖小費。</li>
+                            <li>插頭：電壓 220V，圓形或扁平兩用。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>觀光警察：1155 | 警察局：191 | 醫療：1669</li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥當地網卡、萬用轉接頭與海外旅遊平安險。</p>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        };
+
         async function getMyProjectIds() {
             let localList = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
             if (!currentMyName) return localList;
@@ -798,17 +935,17 @@
             }
         }
 
-        function openNewProjectModal() {
+        window.openNewProjectModal = function() {
             document.getElementById('new-proj-name').value = '';
             document.getElementById('new-proj-dates').value = '01/01 - 01/05';
             document.getElementById('new-proj-startdate').value = '';
             document.getElementById('new-project-modal').classList.remove('hidden');
-        }
-        function closeNewProjectModal() {
+        };
+        window.closeNewProjectModal = function() {
             document.getElementById('new-project-modal').classList.add('hidden');
-        }
+        };
 
-        async function submitNewProject() {
+        window.submitNewProject = async function() {
             const name = document.getElementById('new-proj-name').value.trim();
             const year = document.getElementById('new-proj-year').value;
             const dates = document.getElementById('new-proj-dates').value.trim();
@@ -832,152 +969,17 @@
                 renderProjects();
                 alert(`✨ 新專案建立成功！專案 6 位數代碼為：【${randomPin}】`);
             } catch (e) { alert("新增失敗"); }
-        }
+        };
 
-        function getDefaultPackingList() {
-            return [
-                { id: 1, text: "護照 (效期大於6個月)", checked: false },
-                { id: 2, text: "網卡 / eSIM / 漫遊", checked: false },
-                { id: 3, text: "台幣 / 當地外幣現金", checked: false },
-                { id: 4, text: "信用卡 / 跨國提款卡", checked: false },
-                { id: 5, text: "萬用轉接頭 / 充電器", checked: false },
-                { id: 6, text: "行動電源", checked: false },
-                { id: 7, text: "個人常備藥品", checked: false },
-                { id: 8, text: "換洗衣物 / 外套", checked: false }
-            ];
-        }
-
-        function openPackingModal(projId) {
-            currentProjectId = projId;
-            renderPackingListUI();
-            document.getElementById('packing-modal').classList.remove('hidden');
-        }
-        function closePackingModal() {
-            document.getElementById('packing-modal').classList.add('hidden');
-            renderProjects();
-        }
-
-        function renderPackingListUI() {
-            const container = document.getElementById('packing-list-container');
-            let items = JSON.parse(localStorage.getItem(`packing_${currentProjectId}_${currentMyName}`)) || getDefaultPackingList();
-            container.innerHTML = '';
-
-            items.forEach((item, index) => {
-                let div = document.createElement('div');
-                div.className = "flex justify-between items-center bg-[#fffaf5] p-3 rounded-xl border border-[#eae1d7] font-bold";
-                div.innerHTML = `
-                    <label class="flex items-center gap-2.5 flex-1 cursor-pointer min-w-0 pr-2">
-                        <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="window.togglePackingItem(${index})" class="rounded accent-[#d98262] w-4 h-4 shrink-0">
-                        <span class="text-xs ${item.checked ? 'line-through text-gray-400' : 'text-gray-800'} break-words">${item.text}</span>
-                    </label>
-                    <button onclick="window.deletePackingItem(${index})" class="text-gray-300 hover:text-red-500 text-xs p-1 shrink-0">🗑️</button>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function togglePackingItem(index) {
-            let items = JSON.parse(localStorage.getItem(`packing_${currentProjectId}_${currentMyName}`)) || getDefaultPackingList();
-            items[index].checked = !items[index].checked;
-            localStorage.setItem(`packing_${currentProjectId}_${currentMyName}`, JSON.stringify(items));
-            renderPackingListUI();
-        }
-
-        function addPackingItem() {
-            const input = document.getElementById('new-packing-item');
-            const text = input.value.trim();
-            if (!text) return;
-            let items = JSON.parse(localStorage.getItem(`packing_${currentProjectId}_${currentMyName}`)) || getDefaultPackingList();
-            items.push({ id: Date.now(), text, checked: false });
-            localStorage.setItem(`packing_${currentProjectId}_${currentMyName}`, JSON.stringify(items));
-            input.value = '';
-            renderPackingListUI();
-        }
-
-        function deletePackingItem(index) {
-            let items = JSON.parse(localStorage.getItem(`packing_${currentProjectId}_${currentMyName}`)) || getDefaultPackingList();
-            items.splice(index, 1);
-            localStorage.setItem(`packing_${currentProjectId}_${currentMyName}`, JSON.stringify(items));
-            renderPackingListUI();
-        }
-
-        async function openFlightModal(projId) {
-            currentProjectId = projId;
-            try {
-                const docSnap = await getDoc(doc(db, "projects", projId));
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    document.getElementById('flight-outbound').value = data.flightOutbound || '';
-                    document.getElementById('flight-outbound-seat').value = data.flightOutboundSeat || '';
-                    document.getElementById('flight-inbound').value = data.flightInbound || '';
-                    document.getElementById('flight-inbound-seat').value = data.flightInboundSeat || '';
-                }
-            } catch (e) {}
-            document.getElementById('flight-modal').classList.remove('hidden');
-        }
-        function closeFlightModal() {
-            document.getElementById('flight-modal').classList.add('hidden');
-        }
-
-        async function saveFlightInfo() {
-            if (!currentProjectId) return;
-            const flightOutbound = document.getElementById('flight-outbound').value.trim();
-            const flightOutboundSeat = document.getElementById('flight-outbound-seat').value.trim();
-            const flightInbound = document.getElementById('flight-inbound').value.trim();
-            const flightInboundSeat = document.getElementById('flight-inbound-seat').value.trim();
-
-            try {
-                await updateDoc(doc(db, "projects", currentProjectId), {
-                    flightOutbound, flightOutboundSeat, flightInbound, flightInboundSeat
-                });
-                closeFlightModal();
-                renderProjects();
-                alert("✨ 航班資訊已同步更新！");
-            } catch (e) { alert("儲存失敗"); }
-        }
-
-        async function openHotelModal(projId) {
-            currentProjectId = projId;
-            try {
-                const docSnap = await getDoc(doc(db, "projects", projId));
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    document.getElementById('hotel-name').value = data.hotelName || '';
-                    document.getElementById('hotel-address').value = data.hotelAddress || '';
-                    document.getElementById('hotel-dates').value = data.hotelDates || '';
-                }
-            } catch (e) {}
-            document.getElementById('hotel-modal').classList.remove('hidden');
-        }
-        function closeHotelModal() {
-            document.getElementById('hotel-modal').classList.add('hidden');
-        }
-
-        async function saveHotelInfo() {
-            if (!currentProjectId) return;
-            const hotelName = document.getElementById('hotel-name').value.trim();
-            const hotelAddress = document.getElementById('hotel-address').value.trim();
-            const hotelDates = document.getElementById('hotel-dates').value.trim();
-
-            try {
-                await updateDoc(doc(db, "projects", currentProjectId), {
-                    hotelName, hotelAddress, hotelDates
-                });
-                closeHotelModal();
-                renderProjects();
-                alert("✨ 住宿資訊已同步更新！");
-            } catch (e) { alert("儲存失敗"); }
-        }
-
-        function openImportProjectModal() {
+        window.openImportProjectModal = function() {
             document.getElementById('import-code-input').value = '';
             document.getElementById('import-project-modal').classList.remove('hidden');
-        }
-        function closeImportProjectModal() {
+        };
+        window.closeImportProjectModal = function() {
             document.getElementById('import-project-modal').classList.add('hidden');
-        }
+        };
 
-        async function submitImportProject() {
+        window.submitImportProject = async function() {
             const pinCode = document.getElementById('import-code-input').value.trim();
             if (pinCode.length !== 6) {
                 alert("請輸入正確的 6 位數專案代碼！");
@@ -1002,35 +1004,16 @@
                     alert("✨ 成功導入專案！");
                 }
             } catch (e) { alert("導入失敗"); }
-        }
+        };
 
-        async function removeProjectFromMyList(id) {
+        window.removeProjectFromMyList = async function(id) {
             if (confirm("確定要從你的畫面上移除這個專案嗎？")) {
                 await removeMyProjectId(id);
                 renderProjects();
             }
-        }
+        };
 
-        async function enterProject(id) {
-            currentProjectId = id;
-            try {
-                const docSnap = await getDoc(doc(db, "projects", id));
-                if (docSnap.exists()) {
-                    const p = docSnap.data();
-                    currentProjectName = p.name;
-                    currentProjectPin = p.pin || "";
-                }
-            } catch (e) {}
-
-            if (!currentMyName) {
-                document.getElementById('login-modal').classList.remove('hidden');
-                return;
-            }
-
-            proceedEnterProject();
-        }
-
-        async function submitLoginName() {
+        window.submitLoginName = async function() {
             const name = document.getElementById('login-name-input').value.trim();
             if (!name) { alert("請輸入名字！"); return; }
             currentMyName = name;
@@ -1054,7 +1037,7 @@
             } catch (e) {}
 
             proceedEnterProject();
-        }
+        };
 
         function proceedEnterProject() {
             document.getElementById('view-projects').classList.add('hidden');
@@ -1066,7 +1049,7 @@
             document.getElementById('header-title').innerText = `🌸 ${currentProjectName}`;
             document.getElementById('header-sub').innerText = `旅伴：${currentMyName} ✨`;
             
-            renderRemindersByRules(currentProjectName);
+            window.renderRemindersByRules(currentProjectName);
             initLanguageModule(currentProjectName);
             loadMembersAndExpenses(currentProjectId);
             loadCheckins(currentProjectId);
@@ -1224,12 +1207,12 @@
             });
         }
 
-        function toggleQuestCollapse(sectionId) {
+        window.toggleQuestCollapse = function(sectionId) {
             const el = document.getElementById(sectionId);
             const icon = document.getElementById(`icon_${sectionId}`);
             if (el.classList.contains('hidden')) { el.classList.remove('hidden'); icon.innerText = "▲ 收合"; }
             else { el.classList.add('hidden'); icon.innerText = "▼ 展開"; }
-        }
+        };
 
         function updateBadges(fDone, fTotal, sDone, sTotal, shDone, shTotal) {
             const fBadge = document.getElementById('badge-food');
@@ -1258,7 +1241,7 @@
             }
         }
 
-        function openQuestPhotoModal(scheduleId, title) {
+        window.openQuestPhotoModal = function(scheduleId, title) {
             currentQuestTargetId = scheduleId;
             compressedPhotoBase64 = "";
             document.getElementById('quest-modal-title').innerText = `📸 打卡：${title}`;
@@ -1266,30 +1249,30 @@
             document.getElementById('quest-photo-preview-container').classList.add('hidden');
             document.getElementById('quest-photo-preview').src = '';
             document.getElementById('quest-photo-modal').classList.remove('hidden');
-        }
-        function closeQuestPhotoModal() {
+        };
+        window.closeQuestPhotoModal = function() {
             document.getElementById('quest-photo-modal').classList.add('hidden');
             currentQuestTargetId = null;
-        }
+        };
 
-        function openQuestEditModal(scheduleId, title) {
+        window.openQuestEditModal = function(scheduleId, title) {
             currentQuestTargetId = scheduleId;
             document.getElementById('edit-quest-modal-title').innerText = `✨ 已打卡：${title}`;
             document.getElementById('quest-edit-modal').classList.remove('hidden');
-        }
-        function closeQuestEditModal() {
+        };
+        window.closeQuestEditModal = function() {
             document.getElementById('quest-edit-modal').classList.add('hidden');
             currentQuestTargetId = null;
-        }
+        };
 
-        function openChangePhotoFromEdit() {
+        window.openChangePhotoFromEdit = function() {
             let sId = currentQuestTargetId;
             let item = allSchedulesData.find(s => s.id === sId);
             closeQuestEditModal();
             if (item) openQuestPhotoModal(sId, cleanDisplayTitle(item.title));
-        }
+        };
 
-        async function cancelQuestCheckin() {
+        window.cancelQuestCheckin = async function() {
             if (!currentProjectId || !currentQuestTargetId) return;
             if (confirm("確定要取消打卡嗎？")) {
                 try {
@@ -1306,9 +1289,9 @@
                     alert("✨ 已成功取消打卡！");
                 } catch (e) { alert("操作失敗"); }
             }
-        }
+        };
 
-        function previewQuestPhoto(event) {
+        window.previewQuestPhoto = function(event) {
             const file = event.target.files[0];
             if (!file) return;
 
@@ -1342,9 +1325,9 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
-        }
+        };
 
-        async function submitQuestPhoto() {
+        window.submitQuestPhoto = async function() {
             if (!currentProjectId || !currentQuestTargetId) return;
             if (!compressedPhotoBase64) {
                 alert("請先選擇要上傳的照片！");
@@ -1377,9 +1360,9 @@
                 closeQuestPhotoModal();
                 alert("✨ 打卡成功！");
             } catch (e) { alert("打卡失敗"); }
-        }
+        };
 
-        async function openPhotoGalleryModal() {
+        window.openPhotoGalleryModal = async function() {
             const grid = document.getElementById('photo-gallery-grid');
             grid.innerHTML = '<p class="col-span-2 text-center text-xs text-gray-400 py-4">載入寫真中... 📸</p>';
             document.getElementById('photo-gallery-modal').classList.remove('hidden');
@@ -1416,12 +1399,12 @@
             } catch (e) {
                 grid.innerHTML = `<div class="col-span-2 text-center text-xs text-red-400 py-8">載入寫真冊失敗</div>`;
             }
-        }
-        function closePhotoGalleryModal() {
+        };
+        window.closePhotoGalleryModal = function() {
             document.getElementById('photo-gallery-modal').classList.add('hidden');
-        }
+        };
 
-        function openDetailModal(id) {
+        window.openDetailModal = function(id) {
             const item = allSchedulesData.find(s => s.id === id);
             if (!item) return;
             currentDetailItem = item;
@@ -1458,9 +1441,9 @@
             document.getElementById('modal-view-mode').classList.remove('hidden');
             document.getElementById('modal-edit-mode').classList.add('hidden');
             document.getElementById('detail-modal').classList.remove('hidden');
-        }
+        };
 
-        function launchDirectMap(mapType) {
+        window.launchDirectMap = function(mapType) {
             if (!currentDetailItem) return;
             let queryStr = customMapQueries[currentDetailItem.id];
             if (!queryStr) {
@@ -1486,9 +1469,9 @@
                 `https://m.map.naver.com/search2/search.naver?query=${queryText}` : 
                 `https://www.google.com/maps/search/?api=1&query=${queryText}`;
             window.open(url, '_blank');
-        }
+        };
 
-        function openMapSearchModal() {
+        window.openMapSearchModal = function() {
             if (!currentDetailItem) return;
             let currentQuery = customMapQueries[currentDetailItem.id];
             if (!currentQuery) {
@@ -1521,13 +1504,13 @@
             
             btnContainer.innerHTML = buttonsHtml;
             document.getElementById('map-search-modal').classList.remove('hidden');
-        }
+        };
 
-        function closeMapSearchModal() {
+        window.closeMapSearchModal = function() {
             document.getElementById('map-search-modal').classList.add('hidden');
-        }
+        };
 
-        function saveAndLaunchMap(mapType) {
+        window.saveAndLaunchMap = function(mapType) {
             const inputVal = document.getElementById('map-search-input').value.trim();
             if (!inputVal) { alert("請輸入搜尋關鍵字！"); return; }
             
@@ -1542,13 +1525,13 @@
 
             window.open(url, '_blank');
             closeMapSearchModal();
-        }
+        };
 
-        function closeDetailModal() { document.getElementById('detail-modal').classList.add('hidden'); }
-        function switchToEditMode() { document.getElementById('modal-view-mode').classList.add('hidden'); document.getElementById('modal-edit-mode').classList.remove('hidden'); }
-        function switchToViewMode() { document.getElementById('modal-edit-mode').classList.add('hidden'); document.getElementById('modal-view-mode').classList.remove('hidden'); }
+        window.closeDetailModal = function() { document.getElementById('detail-modal').classList.add('hidden'); };
+        window.switchToEditMode = function() { document.getElementById('modal-view-mode').classList.add('hidden'); document.getElementById('modal-edit-mode').classList.remove('hidden'); };
+        window.switchToViewMode = function() { document.getElementById('modal-edit-mode').classList.add('hidden'); document.getElementById('modal-view-mode').classList.remove('hidden'); };
 
-        async function saveScheduleEdit() {
+        window.saveScheduleEdit = async function() {
             if (!currentProjectId) return;
             const scheduleId = document.getElementById('edit-schedule-id').value;
             const day = document.getElementById('edit-day').value.trim();
@@ -1561,14 +1544,14 @@
                 closeDetailModal();
                 alert("✨ 行程修改成功！");
             } catch (e) { alert("修改失敗"); }
-        }
+        };
 
-        function openSmartPasteModal() { if (currentProjectId) document.getElementById('smart-paste-modal').classList.remove('hidden'); }
-        function closeSmartPasteModal() { document.getElementById('smart-paste-modal').classList.add('hidden'); }
-        function openAddScheduleModal() { if (currentProjectId) document.getElementById('schedule-modal').classList.remove('hidden'); }
-        function closeAddScheduleModal() { document.getElementById('schedule-modal').classList.add('hidden'); }
+        window.openSmartPasteModal = function() { if (currentProjectId) document.getElementById('smart-paste-modal').classList.remove('hidden'); };
+        window.closeSmartPasteModal = function() { document.getElementById('smart-paste-modal').classList.add('hidden'); };
+        window.openAddScheduleModal = function() { if (currentProjectId) document.getElementById('schedule-modal').classList.remove('hidden'); };
+        window.closeAddScheduleModal = function() { document.getElementById('schedule-modal').classList.add('hidden'); };
 
-        async function submitScheduleForm() {
+        window.submitScheduleForm = async function() {
             if (!currentProjectId) return;
             const day = document.getElementById('input-day').value.trim() || "Day 1";
             const time = document.getElementById('input-time').value.trim() || "10:00";
@@ -1580,231 +1563,11 @@
                 closeAddScheduleModal();
                 alert("✨ 行程新增成功！");
             } catch (e) { alert("新增失敗"); }
-        }
+        };
 
-        async function parseSmartPaste() {
+        window.parseSmartPaste = async function() {
             const rawText = document.getElementById('smart-paste-input').value.trim();
             if(!rawText) { alert("請先輸入行程！"); return; }
             alert("✨ AI 正在拆解行程...");
             const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentDay = "Day 1";
-            let parsedItems = [];
-            let currentItem = null;
-            for (let i = 0; i < lines.length; i++) {
-                let line = lines[i];
-                let dayMatch = line.match(/(Day\s*\d+|第[一二三四五六七八九十]+天)/i);
-                if (dayMatch) {
-                    if (currentItem) { parsedItems.push(currentItem); currentItem = null; }
-                    currentDay = dayMatch[0];
-                    continue;
-                }
-                let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
-                let hasNoteKeyword = line.includes("備註") || line.includes("營業時間");
-                let isNewItem = timeMatch && !hasNoteKeyword;
-                if (isNewItem) {
-                    if (currentItem) parsedItems.push(currentItem);
-                    currentItem = { day: currentDay, time: timeMatch[1], title: line.replace(/^\s*•?\s*\d{1,2}[:：]\d{2}\s*/, '').trim(), location: "", createdAt: Date.now() + parsedItems.length };
-                } else if (currentItem) {
-                    currentItem.location = currentItem.location ? (currentItem.location + "\n" + line) : line;
-                }
-            }
-            if (currentItem) parsedItems.push(currentItem);
-            for (let i = 0; i < parsedItems.length; i++) {
-                await addDoc(collection(db, "projects", currentProjectId, "schedules"), parsedItems[i]);
-            }
-            closeSmartPasteModal();
-            alert(`✨ 成功導入 ${parsedItems.length} 筆行程！`);
-        }
-
-        function shareCurrentProject() {
-            if (!currentProjectId) return;
-            document.getElementById('share-modal-pin').innerText = currentProjectPin || '未設定';
-            document.getElementById('share-choice-modal').classList.remove('hidden');
-        }
-        function closeShareModal() {
-            document.getElementById('share-choice-modal').classList.add('hidden');
-        }
-        function copySharePin() {
-            if (!currentProjectPin) return;
-            navigator.clipboard.writeText(currentProjectPin);
-            alert(`📋 專案 6 位數代碼【${currentProjectPin}】已複製！`);
-            closeShareModal();
-        }
-        function copyShareUrl() {
-            const shareUrl = `${window.location.href.split('?')[0]}?project=${currentProjectId}`;
-            navigator.clipboard.writeText(shareUrl);
-            alert("🌸 專屬分享網址已複製！");
-            closeShareModal();
-        }
-
-        function switchTab(tabName) {
-            ['schedule', 'ai', 'lang', 'split', 'quest'].forEach(t => {
-                document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).className = "flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5";
-            });
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            document.getElementById(`nav-${tabName}`).className = "flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5";
-        }
-
-        function speakText(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ko-KR';
-            window.speechSynthesis.speak(utterance);
-        }
-
-        // 🌟 提醒規則函式
-        function renderRemindersByRules(projectName) {
-            const container = document.getElementById('dynamic-reminders-container');
-            let nameLower = projectName.toLowerCase();
-            let html = '';
-
-            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">當地早晚溫差較大且風大，建議穿著長袖、針織衫或帽T，並準備防風外套 🧥。</p>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>導航 App：強烈建議使用 Naver Map 或 Kakao Map，以電話號碼查詢景點最準確！</li>
-                            <li>測速照相：道路速限嚴格，沿途有大量測速照相，務必依速限行駛。</li>
-                            <li>加油還車：多為自助/半人工，記得確認租車規定（通常為滿油出借還車）。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>證件：務必備妥台灣駕照正本與國際駕照。</li>
-                            <li>支付：信用卡普及，建議身上備妥 5~10 萬韓元現金備用。</li>
-                            <li>插頭：電壓 220V，圓形雙孔（歐規/韓規）。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
-                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>警察局：112 | 救護車/消防：119 | 中文旅遊熱線：1330</li>
-                        </ul>
-                    </div>
-                `;
-            } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都') || nameLower.includes('沖繩') || nameLower.includes('北海道') || nameLower.includes('名古屋')) {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇯🇵 日本旅遊與天氣指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">行程多以步行與大眾運輸為主，建議穿著舒適好走的布鞋，並隨身攜帶輕便外套與雨具 🌂。</p>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚆 交通與導航提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>導航：推薦使用 Google Maps 或 乗換案內 查詢地鐵。</li>
-                            <li>IC 卡：建議事先將 Suica 或 Pasmo 加入手機錢包（Apple Pay）。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>護照效期需大於 6 個月。部分小店或拉麵機仍需現金，建議備妥適量日幣。</li>
-                            <li>插頭：電壓 100V，雙孔扁平插頭（與台灣相同）。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
-                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>警察局：110 | 救護車/消防：119</li>
-                        </ul>
-                    </div>
-                `;
-            } else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁') || nameLower.includes('普吉') || nameLower.includes('芭達雅')) {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇹🇭 泰國旅遊與天氣指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">終年炎熱，建議穿著輕薄透氣衣物，備好防曬與雨具。進出寺廟衣著需端莊（不可露肩短褲）。</p>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🛵 交通與叫車提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>叫車：推薦使用 Grab 或 Bolt。市區可多利用 BTS/MRT 避開塞車。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與小費</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>夜市小吃多收現金，可至當地 SuperRich 換匯。按摩或服務良好建議給 20-100 銖小費。</li>
-                            <li>插頭：電壓 220V，圓形或扁平兩用。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
-                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>觀光警察：1155 | 警察局：191 | 醫療：1669</li>
-                        </ul>
-                    </div>
-                `;
-            } else {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥當地網卡、萬用轉接頭與海外旅遊平安險。</p>
-                    </div>
-                `;
-            }
-
-            container.innerHTML = html;
-        }
-
-        // 🌟 完整掛載所有函式至全域 window 物件（防止找不到函式）
-        window.renderRemindersByRules = renderRemindersByRules;
-        window.backToProjects = backToProjects;
-        window.enterProject = enterProject;
-        window.openNewProjectModal = openNewProjectModal;
-        window.closeNewProjectModal = closeNewProjectModal;
-        window.submitNewProject = submitNewProject;
-        window.openImportProjectModal = openImportProjectModal;
-        window.closeImportProjectModal = closeImportProjectModal;
-        window.submitImportProject = submitImportProject;
-        window.removeProjectFromMyList = removeProjectFromMyList;
-        window.openPackingModal = openPackingModal;
-        window.closePackingModal = closePackingModal;
-        window.addPackingItem = addPackingItem;
-        window.deletePackingItem = deletePackingItem;
-        window.openFlightModal = openFlightModal;
-        window.closeFlightModal = closeFlightModal;
-        window.saveFlightInfo = saveFlightInfo;
-        window.openHotelModal = openHotelModal;
-        window.closeHotelModal = closeHotelModal;
-        window.saveHotelInfo = saveHotelInfo;
-        window.openMapSearchModal = openMapSearchModal;
-        window.closeMapSearchModal = closeMapSearchModal;
-        window.saveAndLaunchMap = saveAndLaunchMap;
-        window.closeDetailModal = closeDetailModal;
-        window.switchToEditMode = switchToEditMode;
-        window.switchToViewMode = switchToViewMode;
-        window.saveScheduleEdit = saveScheduleEdit;
-        window.openSmartPasteModal = openSmartPasteModal;
-        window.closeSmartPasteModal = closeSmartPasteModal;
-        window.openAddScheduleModal = openAddScheduleModal;
-        window.closeAddScheduleModal = closeAddScheduleModal;
-        window.submitScheduleForm = submitScheduleForm;
-        window.parseSmartPaste = parseSmartPaste;
-        window.shareCurrentProject = shareCurrentProject;
-        window.closeShareModal = closeShareModal;
-        window.copySharePin = copySharePin;
-        window.copyShareUrl = copyShareUrl;
-        window.switchTab = switchTab;
-        window.speakText = speakText;
-        window.launchDirectMap = launchDirectMap;
-
-        async function initApp() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const sharedProjId = urlParams.get('project');
-            if (sharedProjId) {
-                await saveMyProjectId(sharedProjId);
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-            renderProjects();
-        }
-
-        initApp();
-    </script>
-</body>
-</html>
