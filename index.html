@@ -603,7 +603,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -707,13 +707,74 @@
                     emergency: [
                         { cn: "救命！我的護照（或錢包）被偷了！", foreign: "Help! My passport (wallet) has been stolen!" },
                         { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "I feel sick. Is there a pharmacy or hospital nearby?" },
-                        { cn: "不好意思， I'm lost. Can you help me call the police?", foreign: "Excuse me, I'm lost. Can you help me call the police?" }
+                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "Excuse me, I'm lost. Can you help me call the police?" }
                     ]
                 }
             }
         };
 
-        // 🌟 確保所有函式在頂層定義並完整掛載到 window 物件
+        // 🌟 補齊所有漏掉的內部與全域函式
+        function loadMembersAndExpenses(projId) {
+            const membersRef = collection(db, "projects", projId, "members");
+            if (unsubscribeMembers) unsubscribeMembers();
+            unsubscribeMembers = onSnapshot(membersRef, (snapshot) => {
+                allMembersData = [];
+                snapshot.forEach(docSnap => {
+                    allMembersData.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderMemberListUI();
+                updateExpenseModalDropdowns();
+            });
+
+            const expensesRef = collection(db, "projects", projId, "expenses");
+            if (unsubscribeExpenses) unsubscribeExpenses();
+            unsubscribeExpenses = onSnapshot(query(expensesRef, orderBy("createdAt", "desc")), (snapshot) => {
+                allExpensesData = [];
+                snapshot.forEach(docSnap => {
+                    allExpensesData.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderExpenseUI();
+            });
+        }
+        window.loadMembersAndExpenses = loadMembersAndExpenses;
+
+        function loadCheckins(projId) {
+            const checkinsRef = collection(db, "projects", projId, "checkins");
+            if (unsubscribeCheckins) unsubscribeCheckins();
+            unsubscribeCheckins = onSnapshot(checkinsRef, (snapshot) => {
+                allCheckinsData = {};
+                snapshot.forEach(docSnap => {
+                    let data = docSnap.data();
+                    if (data.uploader === currentMyName) {
+                        allCheckinsData[data.scheduleId] = data;
+                    }
+                });
+                renderQuestUI();
+            });
+        }
+        window.loadCheckins = loadCheckins;
+
+        function loadSchedules(projId) {
+            const schedulesRef = collection(db, "projects", projId, "schedules");
+            const q = query(schedulesRef, orderBy("createdAt", "asc"));
+            if (unsubscribeSchedules) unsubscribeSchedules();
+            unsubscribeSchedules = onSnapshot(q, (snapshot) => {
+                allSchedulesData = [];
+                snapshot.forEach((docSnap) => { allSchedulesData.push({ id: docSnap.id, ...docSnap.data() }); });
+                renderDayPills();
+                renderScheduleUI();
+                renderQuestUI();
+            });
+        }
+        window.loadSchedules = loadSchedules;
+
+        function cleanDisplayTitle(title) {
+            if (!title) return '';
+            return title.replace(/^\d{1,2}[:：]\d{2}\s*/, '').trim();
+        }
+        window.cleanDisplayTitle = cleanDisplayTitle;
+
+        // 🌟 完整掛載所有函式至全域 window 物件
         window.backToProjects = function() {
             currentProjectId = null;
             currentProjectName = "";
@@ -769,11 +830,11 @@
             
             window.renderRemindersByRules(currentProjectName);
             window.initLanguageModule(currentProjectName);
-            loadMembersAndExpenses(currentProjectId);
-            loadCheckins(currentProjectId);
+            window.loadMembersAndExpenses(currentProjectId);
+            window.loadCheckins(currentProjectId);
             
             switchTab('schedule');
-            loadSchedules(currentProjectId);
+            window.loadSchedules(currentProjectId);
         };
 
         window.renderRemindersByRules = function(projectName) {
@@ -905,22 +966,6 @@
             });
             renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
         };
-
-        function renderPhrases(phrases) {
-            const phraseContainer = document.getElementById('lang-phrases');
-            phraseContainer.innerHTML = '';
-            phrases.forEach(p => {
-                let card = document.createElement('div');
-                card.className = "cute-card p-3.5 bg-white hover:bg-[#fffaf5] border border-[#eae1d7] cursor-pointer transition flex justify-between items-center";
-                card.innerHTML = `<div><p class="text-xs text-gray-800 font-bold">${p.cn}</p></div>`;
-                card.onclick = () => {
-                    currentActivePhrase = p;
-                    document.getElementById('display-cn').innerText = p.cn;
-                    document.getElementById('display-foreign').innerText = p.foreign;
-                };
-                phraseContainer.appendChild(card);
-            });
-        }
 
         async function getMyProjectIds() {
             let localList = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
