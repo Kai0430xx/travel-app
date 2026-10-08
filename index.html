@@ -713,7 +713,7 @@
             }
         };
 
-        // 🌟 完整掛載所有函式至全域 window 物件（徹底解決所有 not defined）
+        // 🌟 絕對完整的全域 window 掛載，確保所有函式百分之百無死角
         window.backToProjects = function() {
             currentProjectId = null;
             currentProjectName = "";
@@ -755,6 +755,25 @@
             }
 
             proceedEnterProject();
+        };
+
+        window.proceedEnterProject = function() {
+            document.getElementById('view-projects').classList.add('hidden');
+            document.getElementById('view-workspace').classList.remove('hidden');
+            document.getElementById('bottom-nav').classList.remove('hidden');
+            document.getElementById('back-btn').classList.remove('hidden');
+            document.getElementById('share-btn').classList.remove('hidden');
+            
+            document.getElementById('header-title').innerText = `🌸 ${currentProjectName}`;
+            document.getElementById('header-sub').innerText = `旅伴：${currentMyName} ✨`;
+            
+            renderRemindersByRules(currentProjectName);
+            initLanguageModule(currentProjectName);
+            loadMembersAndExpenses(currentProjectId);
+            loadCheckins(currentProjectId);
+            
+            switchTab('schedule');
+            loadSchedules(currentProjectId);
         };
 
         window.renderRemindersByRules = function(projectName) {
@@ -1433,9 +1452,48 @@
             } catch (e) { alert("記帳失敗"); }
         };
 
-        // 導覽列與按鈕事件綁定
-        document.getElementById('back-btn').onclick = window.backToProjects;
-        document.getElementById('share-btn').onclick = window.shareCurrentProject;
+        // 確保所有函式完整掛載至 window
+        window.renderRemindersByRules = renderRemindersByRules;
+        window.backToProjects = backToProjects;
+        window.enterProject = enterProject;
+        window.proceedEnterProject = proceedEnterProject;
+        window.openNewProjectModal = openNewProjectModal;
+        window.closeNewProjectModal = closeNewProjectModal;
+        window.submitNewProject = submitNewProject;
+        window.openImportProjectModal = openImportProjectModal;
+        window.closeImportProjectModal = closeImportProjectModal;
+        window.submitImportProject = submitImportProject;
+        window.removeProjectFromMyList = removeProjectFromMyList;
+        window.openPackingModal = openPackingModal;
+        window.closePackingModal = closePackingModal;
+        window.addPackingItem = addPackingItem;
+        window.deletePackingItem = deletePackingItem;
+        window.openFlightModal = openFlightModal;
+        window.closeFlightModal = closeFlightModal;
+        window.saveFlightInfo = saveFlightInfo;
+        window.openHotelModal = openHotelModal;
+        window.closeHotelModal = closeHotelModal;
+        window.saveHotelInfo = saveHotelInfo;
+        window.openMapSearchModal = openMapSearchModal;
+        window.closeMapSearchModal = closeMapSearchModal;
+        window.saveAndLaunchMap = saveAndLaunchMap;
+        window.closeDetailModal = closeDetailModal;
+        window.switchToEditMode = switchToEditMode;
+        window.switchToViewMode = switchToViewMode;
+        window.saveScheduleEdit = saveScheduleEdit;
+        window.openSmartPasteModal = openSmartPasteModal;
+        window.closeSmartPasteModal = closeSmartPasteModal;
+        window.openAddScheduleModal = openAddScheduleModal;
+        window.closeAddScheduleModal = closeAddScheduleModal;
+        window.submitScheduleForm = submitScheduleForm;
+        window.parseSmartPaste = parseSmartPaste;
+        window.shareCurrentProject = shareCurrentProject;
+        window.closeShareModal = closeShareModal;
+        window.copySharePin = copySharePin;
+        window.copyShareUrl = copyShareUrl;
+        window.switchTab = switchTab;
+        window.speakCurrentPhrase = speakCurrentPhrase;
+        window.launchDirectMap = launchDirectMap;
 
         async function initApp() {
             const urlParams = new URLSearchParams(window.location.search);
