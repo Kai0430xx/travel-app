@@ -226,6 +226,46 @@
         </div>
     </main>
 
+    <!-- 🌸 新增專案 Modal (支援精準日期選擇與年份設定) -->
+    <div id="new-project-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-[#5c4a3d] text-base">✈️ 建立新旅遊專案</h3>
+                <button onclick="closeNewProjectModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">專案名稱</label>
+                    <input type="text" id="new-proj-name" placeholder="例如：濟州島自駕、曼谷自由行" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-gray-600 mb-1">出發年份</label>
+                        <select id="new-proj-year" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
+                            <option value="2026">2026年</option>
+                            <option value="2027" selected>2027年</option>
+                            <option value="2028">2028年</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-gray-600 mb-1">日期區間</label>
+                        <input type="text" id="new-proj-dates" placeholder="例如：11/23 - 11/27" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" value="01/01 - 01/05">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">精準排序起始日 (用於計算倒數天數)</label>
+                    <input type="date" id="new-proj-startdate" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
+                </div>
+            </div>
+
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="closeNewProjectModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
+                <button onclick="submitNewProject()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認建立</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 📦 打包清單 Modal (個人獨立) -->
     <div id="packing-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] flex flex-col">
@@ -710,7 +750,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -861,7 +901,7 @@
             }
         }
 
-        // 🌟 參考設計改造：第一個專案變身為吸睛的「下一趟旅程」大卡片（內含打包、航班、住宿小區塊）
+        // 🌟 智慧排序與首頁渲染：根據精準開始日期 (startDate) 計算倒數天數並自動排序
         async function renderProjects() {
             const list = document.getElementById('project-list');
             try {
@@ -888,11 +928,17 @@
                     return;
                 }
 
+                // 根據 startDate 進行精準時間排序
+                projectsData.sort((a, b) => {
+                    let dateA = a.startDate ? new Date(a.startDate).getTime() : a.createdAt;
+                    let dateB = b.startDate ? new Date(b.startDate).getTime() : b.createdAt;
+                    return dateA - dateB;
+                });
+
                 let hero = projectsData[0];
                 let heroCard = document.createElement('div');
                 heroCard.className = "hero-travel-card p-6 space-y-4 relative overflow-hidden";
                 
-                // 獲取打包進度與航班住宿預覽
                 let packingItems = JSON.parse(localStorage.getItem(`packing_${hero.id}_${currentMyName}`)) || getDefaultPackingList();
                 let packedCount = packingItems.filter(i => i.checked).length;
                 let packingText = `${packedCount}/${packingItems.length}`;
@@ -900,14 +946,35 @@
                 let flightStatus = (hero.flightOutbound || hero.flightInbound) ? "已填寫" : "尚未填寫";
                 let hotelStatus = hero.hotelName ? "已訂" : "尚未訂";
 
+                // 計算倒數天數
+                let countdownHtml = "";
+                if (hero.startDate) {
+                    let today = new Date();
+                    today.setHours(0,0,0,0);
+                    let start = new Date(hero.startDate);
+                    start.setHours(0,0,0,0);
+                    let diffDays = Math.ceil((start - today) / (1000 * 60 * 60 * 24));
+                    if (diffDays > 0) {
+                        countdownHtml = `<div class="flex items-baseline gap-1.5"><span class="text-3xl font-black">${diffDays}</span><span class="text-xs font-bold text-gray-300">天後出發 ✈️</span></div>`;
+                    } else if (diffDays === 0) {
+                        countdownHtml = `<div class="flex items-baseline gap-1.5"><span class="text-2xl font-black text-orange-300">今天出發！</span></div>`;
+                    } else {
+                        countdownHtml = `<div class="flex items-baseline gap-1.5"><span class="text-xl font-black text-gray-400">旅程進行中 / 已結束</span></div>`;
+                    }
+                }
+
                 heroCard.innerHTML = `
                     <div class="flex justify-between items-start">
-                        <div onclick="enterProject('${hero.id}')" class="cursor-pointer flex-1 pr-2">
+                        <div class="space-y-1">
                             <span class="text-[11px] bg-white/20 text-white px-3 py-1 rounded-full font-black">✈️ 下一趟旅程</span>
-                            <h3 class="text-xl font-black text-white mt-2 break-words">${hero.name}</h3>
-                            <p class="text-xs text-gray-300 font-bold mt-0.5">${hero.dates || '未定日期'}</p>
+                            ${countdownHtml}
                         </div>
                         <button onclick="event.stopPropagation(); removeProjectFromMyList('${hero.id}')" class="text-white/60 hover:text-red-300 text-sm p-1.5 transition" title="移除專案">🗑️</button>
+                    </div>
+
+                    <div onclick="enterProject('${hero.id}')" class="cursor-pointer space-y-0.5">
+                        <h3 class="text-lg font-black text-white break-words">${hero.name}</h3>
+                        <p class="text-xs text-gray-300 font-bold">${hero.dates || '未定日期'}</p>
                     </div>
 
                     <!-- 三個小區塊：打包、航班、住宿 -->
@@ -962,6 +1029,43 @@
             }
         }
 
+        window.openNewProjectModal = function() {
+            document.getElementById('new-proj-name').value = '';
+            document.getElementById('new-proj-dates').value = '01/01 - 01/05';
+            document.getElementById('new-proj-startdate').value = '';
+            document.getElementById('new-project-modal').classList.remove('hidden');
+        }
+        window.closeNewProjectModal = function() {
+            document.getElementById('new-project-modal').classList.add('hidden');
+        }
+
+        window.submitNewProject = async function() {
+            const name = document.getElementById('new-proj-name').value.trim();
+            const year = document.getElementById('new-proj-year').value;
+            const dates = document.getElementById('new-proj-dates').value.trim();
+            const startDate = document.getElementById('new-proj-startdate').value;
+
+            if (!name) { alert("請輸入專案名稱！"); return; }
+            if (!startDate) { alert("請選擇精準的起始日期，以方便系統計算倒數！"); return; }
+
+            try {
+                const newId = 'proj_' + Date.now();
+                const randomPin = Math.floor(100000 + Math.random() * 900000).toString();
+                let fullDatesText = `${year}年 ${dates}`;
+                await setDoc(doc(db, "projects", newId), { 
+                    name, 
+                    dates: fullDatesText, 
+                    startDate, 
+                    pin: randomPin, 
+                    createdAt: Date.now() 
+                });
+                await saveMyProjectId(newId);
+                closeNewProjectModal();
+                renderProjects();
+                alert(`✨ 新專案建立成功！專案 6 位數代碼為：【${randomPin}】`);
+            } catch (e) { alert("新增失敗"); }
+        }
+
         // 📦 打包清單邏輯 (個人獨立)
         function getDefaultPackingList() {
             return [
@@ -983,7 +1087,7 @@
         }
         window.closePackingModal = function() {
             document.getElementById('packing-modal').classList.add('hidden');
-            renderProjects(); // 更新首頁打包進度
+            renderProjects();
         }
 
         function renderPackingListUI() {
@@ -1098,20 +1202,6 @@
                 renderProjects();
                 alert("✨ 住宿資訊已同步更新給所有旅伴！");
             } catch (e) { alert("儲存失敗"); }
-        }
-
-        window.openNewProjectModal = async function() {
-            const name = prompt("請輸入新旅遊專案名稱（例如：濟州島自駕、曼谷自由行）：");
-            if (!name) return;
-            const dates = prompt("請輸入旅遊日期區間（例如：11/23 - 11/27）：", "11/23 - 11/27");
-            try {
-                const newId = 'proj_' + Date.now();
-                const randomPin = Math.floor(100000 + Math.random() * 900000).toString();
-                await setDoc(doc(db, "projects", newId), { name, dates, pin: randomPin, createdAt: Date.now() });
-                await saveMyProjectId(newId);
-                renderProjects();
-                alert(`✨ 新專案建立成功！專案 6 位數代碼為：【${randomPin}】`);
-            } catch (e) { alert("新增失敗"); }
         }
 
         window.openImportProjectModal = function() {
