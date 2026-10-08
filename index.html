@@ -313,26 +313,25 @@
         </div>
     </div>
 
-    <!-- 🗺️ 彈出式地圖搜尋微調 Modal (可自由修改搜尋文字) -->
-    <div id="map-search-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <!-- 🗺️ 彈出式地圖搜尋微調 Modal (層級設為 z-[70]，確保浮在詳細行程視窗上方) -->
+    <div id="map-search-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base" id="map-modal-title">🗺️ 確認地圖搜尋關鍵字</h3>
                 <button onclick="closeMapSearchModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
-            <p class="text-gray-500 font-bold">如果自動抓取的店名不夠精準，您可以直接在這裡修改成詳細的店名、韓文/日文或地址：</p>
+            <p class="text-gray-500 font-bold">您可以直接修改下方的關鍵字（例如補上完整店名或區域），再點擊按鈕開啟地圖：</p>
             
             <input type="text" id="map-search-input" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-sm" placeholder="輸入搜尋關鍵字...">
 
-            <div class="pt-2 space-y-2">
-                <button onclick="launchMapSearch('naver')" class="w-full text-center bg-[#2db400] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💚 打開 Naver Map 搜尋</button>
-                <button onclick="launchMapSearch('google')" class="w-full text-center bg-[#4285f4] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💙 打開 Google Maps 搜尋</button>
-                <button onclick="closeMapSearchModal()" class="w-full text-center bg-gray-100 text-gray-600 py-2.5 rounded-full font-black">取消</button>
+            <div id="map-buttons-container" class="pt-2 space-y-2">
+                <!-- 動態按鈕會由 JS 根據國家自動渲染 -->
             </div>
+            <button onclick="closeMapSearchModal()" class="w-full text-center bg-gray-100 text-gray-600 py-2.5 rounded-full font-black">取消</button>
         </div>
     </div>
 
-    <!-- 行程詳細與修改 Modal -->
+    <!-- 行程詳細與修改 Modal (層級 z-50) -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             <div id="modal-view-mode" class="space-y-4">
@@ -351,7 +350,7 @@
                     </div>
                 </div>
                 <div class="pt-2 flex gap-2.5">
-                    <button onclick="openMapSearchModal('naver')" class="flex-1 text-center text-xs bg-[#2db400] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💚 Naver Map</button>
+                    <button onclick="openMapSearchModal('naver')" id="btn-naver-map" class="flex-1 text-center text-xs bg-[#2db400] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💚 Naver Map</button>
                     <button onclick="openMapSearchModal('google')" class="flex-1 text-center text-xs bg-[#4285f4] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💙 Google Maps</button>
                 </div>
                 <div class="pt-2 flex gap-2.5">
@@ -606,7 +605,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -973,7 +972,6 @@
             return 'spot';
         }
 
-        // 純標準任務打卡模式 (含圓形布章與按天數收合任務清單)
         function renderQuestUI() {
             const container = document.getElementById('quest-list-container');
             const countEl = document.getElementById('quest-total-count');
@@ -1095,13 +1093,13 @@
             if (sTotal > 0 && sDone === sTotal) {
                 sBadge.className = "badge-circle unlocked"; sTitle.innerText = "深度冒險家";
             } else {
-                sBadge.className = "badge-circle"; sTitle.innerText = `景點 (${sDone}/${sTotal})`;
+                sBadge.className = "badge-circle"; fTitle.innerText = `景點 (${sDone}/${sTotal})`;
             }
 
             if (shTotal > 0 && shDone === shTotal) {
-                shBadge.className = "badge-circle unlocked"; sTitle.innerText = "精品大收割";
+                shBadge.className = "badge-circle unlocked"; shTitle.innerText = "精品大收割";
             } else {
-                shBadge.className = "badge-circle"; sTitle.innerText = `購物 (${shDone}/${shTotal})`;
+                shBadge.className = "badge-circle"; shTitle.innerText = `購物 (${shDone}/${shTotal})`;
             }
         }
 
@@ -1633,7 +1631,17 @@
             let nameLower = projectName.toLowerCase();
             let html = '';
 
-            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
+            // 🌟 智慧判斷是否為韓國行程（決定是否顯示 Naver Map）
+            const isKoreaTrip = nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾');
+            
+            // 同步調整詳細頁面中的地圖按鈕（若非韓國，則隱藏 Naver 按鈕，放大 Google 按鈕）
+            const naverBtn = document.getElementById('btn-naver-map');
+            if (naverBtn) {
+                if (isKoreaTrip) naverBtn.classList.remove('hidden');
+                else naverBtn.classList.add('hidden');
+            }
+
+            if (isKoreaTrip) {
                 html = `
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
@@ -1737,7 +1745,7 @@
 
             const currentLangPack = languageData[destKey];
             currentDestinationLang = currentLangPack.langCode;
-            currentActivePhrase = { cn: "請點選左側分類與右側句子", foreign: "Ready to Speak ✨" };
+            currentActivePhrase = { cn: "請選取左側分類與右側句子", foreign: "Ready to Speak ✨" };
             document.getElementById('display-cn').innerText = currentActivePhrase.cn;
             document.getElementById('display-foreign').innerText = currentActivePhrase.foreign;
 
@@ -1947,7 +1955,7 @@
             document.getElementById('detail-modal').classList.remove('hidden');
         }
 
-        // 🗺️ 彈出地圖搜尋小視窗
+        // 🗺️ 彈出地圖搜尋小視窗 (根據國家動態顯示按鈕)
         window.openMapSearchModal = function(mapType) {
             if (!currentDetailItem) return;
             let cleanTitle = cleanDisplayTitle(currentDetailItem.title);
@@ -1968,8 +1976,20 @@
             }
 
             document.getElementById('map-search-input').value = smartQuery;
-            document.getElementById('map-modal-title').innerText = mapType === 'naver' ? '💚 Naver Map 搜尋確認' : '💙 Google Maps 搜尋確認';
-            window.activeMapType = mapType;
+            document.getElementById('map-modal-title').innerText = '🗺️ 確認地圖搜尋關鍵字';
+
+            // 判斷是否為韓國行程
+            let isKoreaTrip = currentProjectName && (currentProjectName.includes("濟州") || currentProjectName.includes("韓國") || currentProjectName.includes("釜山") || currentProjectName.includes("首爾"));
+
+            const btnContainer = document.getElementById('map-buttons-container');
+            let buttonsHtml = '';
+            if (isKoreaTrip) {
+                buttonsHtml += `<button onclick="launchMapSearch('naver')" class="w-full text-center bg-[#2db400] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💚 打開 Naver Map 搜尋</button>`;
+            }
+            buttonsHtml += `<button onclick="launchMapSearch('google')" class="w-full text-center bg-[#4285f4] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💙 打開 Google Maps 搜尋</button>`;
+            
+            btnContainer.innerHTML = buttonsHtml;
+
             document.getElementById('map-search-modal').classList.remove('hidden');
         }
 
