@@ -55,7 +55,7 @@
     <!-- 頂部標題區 -->
     <header class="bg-[#f3e9de] text-[#5c4a3d] px-4 py-4 shadow-sm sticky top-0 z-50 flex justify-between items-center rounded-b-[24px] border-b border-[#eae1d7]">
         <div class="flex items-center gap-2 min-w-0 pr-2">
-            <button id="back-btn" onclick="backToProjects()" class="hidden bg-white/90 hover:bg-white text-[#5c4a3d] px-3 py-1.5 rounded-full text-xs font-bold shadow-sm transition active:scale-95 shrink-0 border border-[#eae1d7]">
+            <button id="back-btn" onclick="window.backToProjects()" class="hidden bg-white/90 hover:bg-white text-[#5c4a3d] px-3 py-1.5 rounded-full text-xs font-bold shadow-sm transition active:scale-95 shrink-0 border border-[#eae1d7]">
                 專案
             </button>
             <div class="min-w-0">
@@ -63,7 +63,7 @@
                 <p id="header-sub" class="text-[11px] text-[#8c7868] opacity-90 truncate mt-0.5">選擇你的冒險旅程 ✨</p>
             </div>
         </div>
-        <button id="share-btn" onclick="shareCurrentProject()" class="hidden bg-white/90 hover:bg-white text-[#5c4a3d] text-xs px-3.5 py-1.5 rounded-full font-bold shadow-sm transition active:scale-95 shrink-0 border border-[#eae1d7]">
+        <button id="share-btn" onclick="window.shareCurrentProject()" class="hidden bg-white/90 hover:bg-white text-[#5c4a3d] text-xs px-3.5 py-1.5 rounded-full font-bold shadow-sm transition active:scale-95 shrink-0 border border-[#eae1d7]">
             ✨ 分享
         </button>
     </header>
@@ -76,10 +76,10 @@
             <div class="flex justify-between items-center px-1">
                 <h2 class="font-black text-[#5c4a3d] text-sm tracking-wide">我的旅遊小專案 ✈</h2>
                 <div class="flex gap-2">
-                    <button onclick="openImportProjectModal()" class="bg-white text-[#d98262] border border-[#d98262]/40 text-xs px-3 py-2.5 rounded-full font-black shadow-sm transition active:scale-95">
+                    <button onclick="window.openImportProjectModal()" class="bg-white text-[#d98262] border border-[#d98262]/40 text-xs px-3 py-2.5 rounded-full font-black shadow-sm transition active:scale-95">
                         📥 導入專案
                     </button>
-                    <button onclick="openNewProjectModal()" class="bg-gradient-to-r from-[#d98262] to-[#e69c7c] text-white text-xs px-4 py-2.5 rounded-full font-black shadow-md shadow-orange-900/10 transition active:scale-95">
+                    <button onclick="window.openNewProjectModal()" class="bg-gradient-to-r from-[#d98262] to-[#e69c7c] text-white text-xs px-4 py-2.5 rounded-full font-black shadow-md shadow-orange-900/10 transition active:scale-95">
                         ＋ 新增專案
                     </button>
                 </div>
@@ -99,8 +99,8 @@
                 <div class="flex justify-between items-center px-1 pt-1">
                     <h3 class="font-black text-[#736052] text-xs tracking-wider">📅 完整行程時間軸</h3>
                     <div class="flex gap-2">
-                        <button onclick="openSmartPasteModal()" class="bg-white hover:bg-orange-50 text-[#d98262] border border-[#d98262]/30 text-xs px-3 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">✨ 智慧導入</button>
-                        <button onclick="openAddScheduleModal()" class="bg-[#d98262] text-white text-xs px-3.5 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">＋ 新增</button>
+                        <button onclick="window.openSmartPasteModal()" class="bg-white hover:bg-orange-50 text-[#d98262] border border-[#d98262]/30 text-xs px-3 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">✨ 智慧導入</button>
+                        <button onclick="window.openAddScheduleModal()" class="bg-[#d98262] text-white text-xs px-3.5 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">＋ 新增</button>
                     </div>
                 </div>
                 <div id="schedule-container" class="space-y-3">
@@ -124,7 +124,7 @@
                         <h2 id="display-foreign" class="text-xl font-black text-[#5c4a3d] mt-1 break-words">請選擇想說的話 ✨</h2>
                     </div>
                     <div class="pt-1">
-                        <button onclick="speakCurrentPhrase()" class="bg-[#d98262] text-white px-5 py-2.5 rounded-full text-xs font-black shadow-md shadow-orange-900/10 transition active:scale-95 inline-flex items-center gap-1.5">🔊 點擊朗讀</button>
+                        <button onclick="window.speakCurrentPhrase()" class="bg-[#d98262] text-white px-5 py-2.5 rounded-full text-xs font-black shadow-md shadow-orange-900/10 transition active:scale-95 inline-flex items-center gap-1.5">🔊 點擊朗讀</button>
                     </div>
                 </div>
                 <div class="grid grid-cols-12 gap-3">
@@ -140,7 +140,7 @@
                 <div class="bg-gradient-to-r from-[#d98262] to-[#e08e6d] text-white p-5 rounded-[24px] shadow-lg shadow-orange-900/10 space-y-2">
                     <div class="flex justify-between items-center">
                         <p class="text-xs opacity-90 font-medium">✨ 旅程總花費 (折合台幣)</p>
-                        <button onclick="openAddMemberModal()" class="bg-white/20 hover:bg-white/30 text-white text-[11px] px-3 py-1.5 rounded-full font-bold transition">＋ 管理成員</button>
+                        <button onclick="window.openAddMemberModal()" class="bg-white/20 hover:bg-white/30 text-white text-[11px] px-3 py-1.5 rounded-full font-bold transition">＋ 管理成員</button>
                     </div>
                     <h3 id="total-expense-twd" class="text-2xl font-black tracking-tight">NT$ 0</h3>
                     <div id="currency-breakdown" class="text-[11px] opacity-90 flex gap-3 pt-1 border-t border-white/20 flex-wrap"></div>
@@ -148,8 +148,8 @@
                 <div class="flex justify-between items-center px-1">
                     <h3 class="font-black text-[#736052] text-xs tracking-wider">💰 帳目與結算</h3>
                     <div class="flex gap-2">
-                        <button onclick="openSettlementModal()" class="bg-[#f0dcd0] text-[#735848] text-xs px-3.5 py-2 rounded-full font-black shadow-sm transition active:scale-95">📊 查看結算</button>
-                        <button onclick="openAddExpenseModal()" class="bg-gradient-to-r from-[#d98262] to-[#e69c7c] text-white text-xs px-3.5 py-2 rounded-full font-black shadow-sm transition active:scale-95">＋ 記一筆</button>
+                        <button onclick="window.openSettlementModal()" class="bg-[#f0dcd0] text-[#735848] text-xs px-3.5 py-2 rounded-full font-black shadow-sm transition active:scale-95">📊 查看結算</button>
+                        <button onclick="window.openAddExpenseModal()" class="bg-gradient-to-r from-[#d98262] to-[#e69c7c] text-white text-xs px-3.5 py-2 rounded-full font-black shadow-sm transition active:scale-95">＋ 記一筆</button>
                     </div>
                 </div>
                 <div id="expense-list-container" class="space-y-2.5">
@@ -163,7 +163,7 @@
                 <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-4 shadow-md border-[#e2d3c3]">
                     <div class="flex justify-between items-center">
                         <span id="quest-total-count" class="text-xs font-black text-[#d98262]">已打卡 0 / 0</span>
-                        <button onclick="openPhotoGalleryModal()" class="bg-[#d98262] text-white text-[11px] px-3.5 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">📸 旅程回憶寫真冊</button>
+                        <button onclick="window.openPhotoGalleryModal()" class="bg-[#d98262] text-white text-[11px] px-3.5 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">📸 旅程回憶寫真冊</button>
                     </div>
                     <div>
                         <div class="flex justify-between text-xs font-black text-[#736052] mb-1">
@@ -215,13 +215,13 @@
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base">📥 輸入 6 位數專案號碼</h3>
-                <button onclick="closeImportProjectModal()" class="text-gray-400 font-black text-base">✕</button>
+                <button onclick="window.closeImportProjectModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
             <p class="text-gray-500 font-bold">請輸入朋友給你的 6 位數專案代碼，即可將行程加入你的 App 中！✨</p>
             <input type="text" id="import-code-input" maxlength="6" placeholder="例如：883921" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-center text-lg tracking-widest">
             <div class="flex gap-2.5 pt-2">
-                <button onclick="closeImportProjectModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="submitImportProject()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認導入</button>
+                <button onclick="window.closeImportProjectModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
+                <button onclick="window.submitImportProject()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認導入</button>
             </div>
         </div>
     </div>
@@ -231,18 +231,18 @@
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs text-center">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base">✨ 分享此專案</h3>
-                <button onclick="closeShareModal()" class="text-gray-400 font-black text-base">✕</button>
+                <button onclick="window.closeShareModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
             <p class="text-gray-500 font-bold">請選擇你要分享給朋友的方式：</p>
             
             <div class="p-4 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl space-y-1">
                 <p class="text-[11px] text-gray-400 font-bold">專案 6 位數代碼 (適合桌面 App)</p>
                 <p id="share-modal-pin" class="text-2xl font-black text-[#d98262] tracking-widest">------</p>
-                <button onclick="copySharePin()" class="mt-2 w-full bg-[#f0dcd0] text-[#735848] py-2 rounded-xl font-black">📋 複製 6 位數代碼</button>
+                <button onclick="window.copySharePin()" class="mt-2 w-full bg-[#f0dcd0] text-[#735848] py-2 rounded-xl font-black">📋 複製 6 位數代碼</button>
             </div>
 
             <div class="pt-1">
-                <button onclick="copyShareUrl()" class="w-full bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">🔗 複製專屬網址</button>
+                <button onclick="window.copyShareUrl()" class="w-full bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">🔗 複製專屬網址</button>
             </div>
         </div>
     </div>
@@ -252,7 +252,7 @@
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base" id="quest-modal-title">📸 打卡上傳</h3>
-                <button onclick="closeQuestPhotoModal()" class="text-gray-400 font-black text-base">✕</button>
+                <button onclick="window.closeQuestPhotoModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
             
             <div id="quest-photo-preview-container" class="hidden w-full h-40 bg-gray-50 rounded-2xl border border-[#eae1d7] overflow-hidden flex items-center justify-center">
@@ -261,12 +261,12 @@
 
             <div>
                 <label class="block font-bold text-gray-600 mb-1">選擇照片 (會自動優化壓縮)</label>
-                <input type="file" id="quest-file-input" accept="image/*" onchange="previewQuestPhoto(event)" class="w-full text-xs p-2.5 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
+                <input type="file" id="quest-file-input" accept="image/*" onchange="window.previewQuestPhoto(event)" class="w-full text-xs p-2.5 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
             </div>
 
             <div class="flex gap-2.5 pt-2">
-                <button onclick="closeQuestPhotoModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="submitQuestPhoto()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認打卡</button>
+                <button onclick="window.closeQuestPhotoModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
+                <button onclick="window.submitQuestPhoto()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認打卡</button>
             </div>
         </div>
     </div>
@@ -276,12 +276,12 @@
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base" id="edit-quest-modal-title">✨ 已打卡項目管理</h3>
-                <button onclick="closeQuestEditModal()" class="text-gray-400 font-black text-base">✕</button>
+                <button onclick="window.closeQuestEditModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
             <p class="text-gray-500 font-bold">您可以選擇更換照片，或是取消打卡晚點再上傳！</p>
             <div class="flex gap-2.5 pt-2">
-                <button onclick="openChangePhotoFromEdit()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">📷 更換照片</button>
-                <button onclick="cancelQuestCheckin()" class="flex-1 bg-red-100 text-red-600 py-3 rounded-full font-black">❌ 取消打卡</button>
+                <button onclick="window.openChangePhotoFromEdit()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">📷 更換照片</button>
+                <button onclick="window.cancelQuestCheckin()" class="flex-1 bg-red-100 text-red-600 py-3 rounded-full font-black">❌ 取消打卡</button>
             </div>
         </div>
     </div>
@@ -291,14 +291,14 @@
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center shrink-0">
                 <h3 class="font-black text-[#5c4a3d] text-base">📸 旅伴共同寫真冊</h3>
-                <button onclick="closePhotoGalleryModal()" class="text-gray-400 font-black text-base">✕</button>
+                <button onclick="window.closePhotoGalleryModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
             <p class="text-gray-500 font-bold shrink-0">這裡統整了所有旅伴上傳的打卡照片，點擊即可下載至手機相冊！✨</p>
 
             <div id="photo-gallery-grid" class="grid grid-cols-2 gap-3 overflow-y-auto pr-1 flex-1"></div>
 
             <div class="pt-2 shrink-0">
-                <button onclick="closePhotoGalleryModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button>
+                <button onclick="window.closePhotoGalleryModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button>
             </div>
         </div>
     </div>
@@ -309,7 +309,7 @@
             <h3 class="font-black text-[#5c4a3d] text-base text-center">🌸 歡迎加入放風之旅</h3>
             <p class="text-gray-500 font-bold text-center">請輸入您的名字，讓大家在分帳與寫真冊中認識你！✨</p>
             <input type="text" id="login-name-input" placeholder="例如：小明" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-center text-sm">
-            <button onclick="submitLoginName()" class="w-full bg-[#d98262] text-white py-3.5 rounded-full font-black shadow-md">進入旅程 🚀</button>
+            <button onclick="window.submitLoginName()" class="w-full bg-[#d98262] text-white py-3.5 rounded-full font-black shadow-md">進入旅程 🚀</button>
         </div>
     </div>
 
@@ -318,14 +318,14 @@
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base">🗺️ 確認地圖搜尋關鍵字</h3>
-                <button onclick="closeMapSearchModal()" class="text-gray-400 font-black text-base">✕</button>
+                <button onclick="window.closeMapSearchModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
             <p class="text-gray-500 font-bold">修改下方關鍵字即可直接跳轉地圖：</p>
             
             <input type="text" id="map-search-input" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-sm" placeholder="輸入搜尋關鍵字...">
 
             <div id="map-buttons-container" class="pt-2 space-y-2"></div>
-            <button onclick="closeMapSearchModal()" class="w-full text-center bg-gray-100 text-gray-600 py-2.5 rounded-full font-black">取消</button>
+            <button onclick="window.closeMapSearchModal()" class="w-full text-center bg-gray-100 text-gray-600 py-2.5 rounded-full font-black">取消</button>
         </div>
     </div>
 
@@ -338,7 +338,7 @@
                         <span id="modal-day" class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black">Day 1</span>
                         <span id="modal-time" class="text-xs text-gray-400 font-bold ml-2">12:00</span>
                     </div>
-                    <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
+                    <button onclick="window.closeDetailModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
                 </div>
                 <div>
                     <h3 id="modal-title" class="font-black text-gray-900 text-base mt-2">行程名稱</h3>
@@ -352,15 +352,15 @@
                 <div id="modal-map-btn-container" class="pt-2 flex gap-2.5"></div>
                 <!-- 第三行：修改地圖、修改行程、關閉 -->
                 <div class="pt-2 flex gap-2.5">
-                    <button onclick="openMapSearchModal()" class="flex-1 bg-[#f0dcd0] text-[#735848] text-xs py-2.5 rounded-full font-black transition">🗺️ 修改地圖</button>
-                    <button onclick="switchToEditMode()" class="flex-1 bg-[#f0dcd0] text-[#735848] text-xs py-2.5 rounded-full font-black transition">✏️ 修改行程</button>
-                    <button onclick="closeDetailModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-2.5 rounded-full font-bold">關閉</button>
+                    <button onclick="window.openMapSearchModal()" class="flex-1 bg-[#f0dcd0] text-[#735848] text-xs py-2.5 rounded-full font-black transition">🗺️ 修改地圖</button>
+                    <button onclick="window.switchToEditMode()" class="flex-1 bg-[#f0dcd0] text-[#735848] text-xs py-2.5 rounded-full font-black transition">✏️ 修改行程</button>
+                    <button onclick="window.closeDetailModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-2.5 rounded-full font-bold">關閉</button>
                 </div>
             </div>
             <div id="modal-edit-mode" class="hidden space-y-3 text-xs">
                 <div class="flex justify-between items-center">
                     <h3 class="font-black text-[#5c4a3d] text-base">✏️ 編輯行程內容</h3>
-                    <button onclick="closeDetailModal()" class="text-gray-400 font-black text-base">✕</button>
+                    <button onclick="window.closeDetailModal()" class="text-gray-400 font-black text-base">✕</button>
                 </div>
                 <input type="hidden" id="edit-schedule-id">
                 <div><label class="block font-bold text-gray-600 mb-1">天數</label><input type="text" id="edit-day" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
@@ -368,8 +368,8 @@
                 <div><label class="block font-bold text-gray-600 mb-1">行程名稱</label><input type="text" id="edit-title" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
                 <div><label class="block font-bold text-gray-600 mb-1">備註</label><textarea id="edit-location" rows="3" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none font-bold" placeholder="輸入備註..."></textarea></div>
                 <div class="flex gap-2.5 pt-2">
-                    <button onclick="switchToViewMode()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">返回</button>
-                    <button onclick="saveScheduleEdit()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">儲存修改</button>
+                    <button onclick="window.switchToViewMode()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">返回</button>
+                    <button onclick="window.saveScheduleEdit()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">儲存修改</button>
                 </div>
             </div>
         </div>
@@ -380,12 +380,12 @@
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base">✨ AI 智慧導入行程</h3>
-                <button onclick="closeSmartPasteModal()" class="text-gray-400 font-black text-base">✕</button>
+                <button onclick="window.closeSmartPasteModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
             <textarea id="smart-paste-input" rows="8" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none"></textarea>
             <div class="flex gap-2.5 pt-1">
-                <button onclick="closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
-                <button onclick="parseSmartPaste()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">開始智慧拆解</button>
+                <button onclick="window.closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
+                <button onclick="window.parseSmartPaste()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">開始智慧拆解</button>
             </div>
         </div>
     </div>
@@ -394,7 +394,7 @@
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base">✏️ 手動新增行程</h3>
-                <button onclick="closeAddScheduleModal()" class="text-gray-400 font-black text-base">✕</button>
+                <button onclick="window.closeAddScheduleModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
             <div class="space-y-3 text-xs">
                 <div><label class="block font-bold text-gray-600 mb-1">天數</label><input type="text" id="input-day" value="Day 1" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
@@ -403,8 +403,8 @@
                 <div><label class="block font-bold text-gray-600 mb-1">備註</label><textarea id="input-location" rows="3" placeholder="備註..." class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none font-bold"></textarea></div>
             </div>
             <div class="flex gap-2.5 pt-2">
-                <button onclick="closeAddScheduleModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
-                <button onclick="submitScheduleForm()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">確認新增</button>
+                <button onclick="window.closeAddScheduleModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
+                <button onclick="window.submitScheduleForm()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">確認新增</button>
             </div>
         </div>
     </div>
@@ -414,14 +414,14 @@
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-3.5 shadow-2xl text-xs max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
                 <h3 class="font-black text-[#5c4a3d] text-base">✍️ 新增記帳</h3>
-                <button onclick="closeAddExpenseModal()" class="text-gray-400 font-black text-base">✕</button>
+                <button onclick="window.closeAddExpenseModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
             <div><label class="block font-bold text-gray-600 mb-1">項目名稱</label><input type="text" id="exp-title" placeholder="例如：晚餐" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
             <div class="grid grid-cols-2 gap-2">
                 <div><label class="block font-bold text-gray-600 mb-1">金額</label><input type="number" id="exp-amount" placeholder="金額" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
                 <div>
                     <label class="block font-bold text-gray-600 mb-1">幣別</label>
-                    <select id="exp-currency" onchange="toggleExchangeRate()" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold">
+                    <select id="exp-currency" onchange="window.toggleExchangeRate()" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold">
                         <option value="TWD">TWD</option><option value="KRW" selected>KRW</option><option value="JPY">JPY</option><option value="THB">THB</option><option value="USD">USD</option>
                     </select>
                 </div>
@@ -438,15 +438,15 @@
                 <div class="flex justify-between items-center mb-1">
                     <label class="font-bold text-gray-600">分攤模式</label>
                     <div class="flex gap-2">
-                        <button type="button" onclick="setSplitMode('equal')" id="btn-mode-equal" class="text-[10px] px-2.5 py-1 rounded-full font-black bg-[#d98262] text-white">均攤</button>
-                        <button type="button" onclick="setSplitMode('custom')" id="btn-mode-custom" class="text-[10px] px-2.5 py-1 rounded-full font-black bg-gray-100 text-gray-600">自訂</button>
+                        <button type="button" onclick="window.setSplitMode('equal')" id="btn-mode-equal" class="text-[10px] px-2.5 py-1 rounded-full font-black bg-[#d98262] text-white">均攤</button>
+                        <button type="button" onclick="window.setSplitMode('custom')" id="btn-mode-custom" class="text-[10px] px-2.5 py-1 rounded-full font-black bg-gray-100 text-gray-600">自訂</button>
                     </div>
                 </div>
                 <div id="exp-participants-container" class="space-y-2 p-2.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl max-h-40 overflow-y-auto"></div>
             </div>
             <div class="flex gap-2.5 pt-2">
-                <button onclick="closeAddExpenseModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="submitExpense()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確定</button>
+                <button onclick="window.closeAddExpenseModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
+                <button onclick="window.submitExpense()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確定</button>
             </div>
         </div>
     </div>
@@ -454,27 +454,27 @@
     <!-- 成員管理 Modal -->
     <div id="member-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
-            <div class="flex justify-between items-center"><h3 class="font-black text-[#5c4a3d] text-base">👥 成員管理</h3><button onclick="closeAddMemberModal()" class="text-gray-400 font-black">✕</button></div>
-            <div class="flex gap-2"><input type="text" id="new-member-name" placeholder="名字" class="flex-1 p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"><button onclick="addMember()" class="bg-[#d98262] text-white px-4 py-3 rounded-2xl font-black">新增</button></div>
+            <div class="flex justify-between items-center"><h3 class="font-black text-[#5c4a3d] text-base">👥 成員管理</h3><button onclick="window.closeAddMemberModal()" class="text-gray-400 font-black">✕</button></div>
+            <div class="flex gap-2"><input type="text" id="new-member-name" placeholder="名字" class="flex-1 p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"><button onclick="window.addMember()" class="bg-[#d98262] text-white px-4 py-3 rounded-2xl font-black">新增</button></div>
             <div id="member-list-display" class="space-y-2 max-h-48 overflow-y-auto"></div>
-            <button onclick="closeAddMemberModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">完成</button>
+            <button onclick="window.closeAddMemberModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">完成</button>
         </div>
     </div>
 
     <div id="settlement-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs">
             <div id="settlement-content" class="space-y-3 max-h-72 overflow-y-auto pr-1"></div>
-            <button onclick="closeSettlementModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button>
+            <button onclick="window.closeSettlementModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button>
         </div>
     </div>
 
     <!-- 底部導覽列 -->
     <nav id="bottom-nav" class="hidden fixed bottom-3 left-4 right-4 max-w-[448px] mx-auto bg-white/95 backdrop-blur-md border border-[#eae1d7] flex justify-around py-3 rounded-2xl shadow-xl z-50">
-        <button onclick="switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5"><span class="text-xl">📅</span>行程</button>
-        <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💡</span>提醒</button>
-        <button onclick="switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🗣</span>語言</button>
-        <button onclick="switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💰</span>分帳</button>
-        <button onclick="switchTab('quest')" id="nav-quest" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🎯</span>闖關</button>
+        <button onclick="window.switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5"><span class="text-xl">📅</span>行程</button>
+        <button onclick="window.switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💡</span>提醒</button>
+        <button onclick="window.switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🗣</span>語言</button>
+        <button onclick="window.switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💰</span>分帳</button>
+        <button onclick="window.switchTab('quest')" id="nav-quest" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🎯</span>闖關</button>
     </nav>
 
     <!-- Firebase 與邏輯控制 -->
@@ -716,7 +716,7 @@
             }
         };
 
-        // 🌟 把所有重要函式直接在全域宣告，保證 onclick 絕對找得到
+        // 🌟 絕對不出錯的全域函式宣告
         window.backToProjects = function() {
             currentProjectId = null;
             currentProjectName = "";
@@ -1049,7 +1049,7 @@
             document.getElementById('header-title').innerText = `🌸 ${currentProjectName}`;
             document.getElementById('header-sub').innerText = `旅伴：${currentMyName} ✨`;
             
-            window.renderRemindersByRules(currentProjectName);
+            renderRemindersByRules(currentProjectName);
             initLanguageModule(currentProjectName);
             loadMembersAndExpenses(currentProjectId);
             loadCheckins(currentProjectId);
@@ -1571,3 +1571,123 @@
             alert("✨ AI 正在拆解行程...");
             const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentDay = "Day 1";
+            let parsedItems = [];
+            let currentItem = null;
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                let dayMatch = line.match(/(Day\s*\d+|第[一二三四五六七八九十]+天)/i);
+                if (dayMatch) {
+                    if (currentItem) { parsedItems.push(currentItem); currentItem = null; }
+                    currentDay = dayMatch[0];
+                    continue;
+                }
+                let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
+                let hasNoteKeyword = line.includes("備註") || line.includes("營業時間");
+                let isNewItem = timeMatch && !hasNoteKeyword;
+                if (isNewItem) {
+                    if (currentItem) parsedItems.push(currentItem);
+                    currentItem = { day: currentDay, time: timeMatch[1], title: line.replace(/^\s*•?\s*\d{1,2}[:：]\d{2}\s*/, '').trim(), location: "", createdAt: Date.now() + parsedItems.length };
+                } else if (currentItem) {
+                    currentItem.location = currentItem.location ? (currentItem.location + "\n" + line) : line;
+                }
+            }
+            if (currentItem) parsedItems.push(currentItem);
+            for (let i = 0; i < parsedItems.length; i++) {
+                await addDoc(collection(db, "projects", currentProjectId, "schedules"), parsedItems[i]);
+            }
+            closeSmartPasteModal();
+            alert(`✨ 成功導入 ${parsedItems.length} 筆行程！`);
+        };
+
+        window.shareCurrentProject = function() {
+            if (!currentProjectId) return;
+            document.getElementById('share-modal-pin').innerText = currentProjectPin || '未設定';
+            document.getElementById('share-choice-modal').classList.remove('hidden');
+        };
+        window.closeShareModal = function() {
+            document.getElementById('share-choice-modal').classList.add('hidden');
+        };
+        window.copySharePin = function() {
+            if (!currentProjectPin) return;
+            navigator.clipboard.writeText(currentProjectPin);
+            alert(`📋 專案 6 位數代碼【${currentProjectPin}】已複製！`);
+            closeShareModal();
+        };
+        window.copyShareUrl = function() {
+            const shareUrl = `${window.location.href.split('?')[0]}?project=${currentProjectId}`;
+            navigator.clipboard.writeText(shareUrl);
+            alert("🌸 專屬分享網址已複製！");
+            closeShareModal();
+        };
+
+        window.switchTab = function(tabName) {
+            ['schedule', 'ai', 'lang', 'split', 'quest'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).className = "flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5";
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabName}`).className = "flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5";
+        };
+
+        window.speakText = function(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ko-KR';
+            window.speechSynthesis.speak(utterance);
+        };
+
+        // 🌟 確保所有對外函式完全掛載到全域 window 物件
+        window.renderRemindersByRules = renderRemindersByRules;
+        window.backToProjects = backToProjects;
+        window.enterProject = enterProject;
+        window.openNewProjectModal = openNewProjectModal;
+        window.closeNewProjectModal = closeNewProjectModal;
+        window.submitNewProject = submitNewProject;
+        window.openImportProjectModal = openImportProjectModal;
+        window.closeImportProjectModal = closeImportProjectModal;
+        window.submitImportProject = submitImportProject;
+        window.removeProjectFromMyList = removeProjectFromMyList;
+        window.openPackingModal = openPackingModal;
+        window.closePackingModal = closePackingModal;
+        window.addPackingItem = addPackingItem;
+        window.deletePackingItem = deletePackingItem;
+        window.openFlightModal = openFlightModal;
+        window.closeFlightModal = closeFlightModal;
+        window.saveFlightInfo = saveFlightInfo;
+        window.openHotelModal = openHotelModal;
+        window.closeHotelModal = closeHotelModal;
+        window.saveHotelInfo = saveHotelInfo;
+        window.openMapSearchModal = openMapSearchModal;
+        window.closeMapSearchModal = closeMapSearchModal;
+        window.saveAndLaunchMap = saveAndLaunchMap;
+        window.closeDetailModal = closeDetailModal;
+        window.switchToEditMode = switchToEditMode;
+        window.switchToViewMode = switchToViewMode;
+        window.saveScheduleEdit = saveScheduleEdit;
+        window.openSmartPasteModal = openSmartPasteModal;
+        window.closeSmartPasteModal = closeSmartPasteModal;
+        window.openAddScheduleModal = openAddScheduleModal;
+        window.closeAddScheduleModal = closeAddScheduleModal;
+        window.submitScheduleForm = submitScheduleForm;
+        window.parseSmartPaste = parseSmartPaste;
+        window.shareCurrentProject = shareCurrentProject;
+        window.closeShareModal = closeShareModal;
+        window.copySharePin = copySharePin;
+        window.copyShareUrl = copyShareUrl;
+        window.switchTab = switchTab;
+        window.speakText = speakText;
+        window.launchDirectMap = launchDirectMap;
+
+        async function initApp() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedProjId = urlParams.get('project');
+            if (sharedProjId) {
+                await saveMyProjectId(sharedProjId);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            renderProjects();
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
