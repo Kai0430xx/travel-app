@@ -606,7 +606,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -757,7 +757,7 @@
             }
         }
 
-        // 🌟 穩定版專案渲染：絕對不會卡死的標準清單架構
+        // 🌟 絕對穩定版專案渲染（完美修復 ReferenceError）
         async function renderProjects() {
             const list = document.getElementById('project-list');
             try {
@@ -1653,7 +1653,107 @@
             window.speechSynthesis.speak(utterance);
         }
 
-        // 🌟 確保所有函式安全掛載至全域 window
+        // 🌟 核心提醒規則函式宣告與全域掛載
+        function renderRemindersByRules(projectName) {
+            const container = document.getElementById('dynamic-reminders-container');
+            let nameLower = projectName.toLowerCase();
+            let html = '';
+
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">當地早晚溫差較大且風大，建議穿著長袖、針織衫或帽T，並準備防風外套 🧥。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>導航 App：強烈建議使用 Naver Map 或 Kakao Map，以電話號碼查詢景點最準確！</li>
+                            <li>測速照相：道路速限嚴格，沿途有大量測速照相，務必依速限行駛。</li>
+                            <li>加油還車：多為自助/半人工，記得確認租車規定（通常為滿油出借還車）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>證件：務必備妥台灣駕照正本與國際駕照。</li>
+                            <li>支付：信用卡普及，建議身上備妥 5~10 萬韓元現金備用。</li>
+                            <li>插頭：電壓 220V，圓形雙孔（歐規/韓規）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>警察局：112 | 救護車/消防：119 | 中文旅遊熱線：1330</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都') || nameLower.includes('沖繩') || nameLower.includes('北海道') || nameLower.includes('名古屋')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇯🇵 日本旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">行程多以步行與大眾運輸為主，建議穿著舒適好走的布鞋，並隨身攜帶輕便外套與雨具 🌂。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚆 交通與導航提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>導航：推薦使用 Google Maps 或 乗換案內 查詢地鐵。</li>
+                            <li>IC 卡：建議事先將 Suica 或 Pasmo 加入手機錢包（Apple Pay）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>護照效期需大於 6 個月。部分小店或拉麵機仍需現金，建議備妥適量日幣。</li>
+                            <li>插頭：電壓 100V，雙孔扁平插頭（與台灣相同）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>警察局：110 | 救護車/消防：119</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁') || nameLower.includes('普吉') || nameLower.includes('芭達雅')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇹🇭 泰國旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">終年炎熱，建議穿著輕薄透氣衣物，備好防曬與雨具。進出寺廟衣著需端莊（不可露肩短褲）。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🛵 交通與叫車提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>叫車：推薦使用 Grab 或 Bolt。市區可多利用 BTS/MRT 避開塞車。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與小費</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>夜市小吃多收現金，可至當地 SuperRich 換匯。按摩或服務良好建議給 20-100 銖小費。</li>
+                            <li>插頭：電壓 220V，圓形或扁平兩用。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>觀光警察：1155 | 警察局：191 | 醫療：1669</li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥當地網卡、萬用轉接頭與海外旅遊平安險。</p>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // 🌟 完整掛載所有函式至全域 window 物件
         window.renderRemindersByRules = renderRemindersByRules;
         window.backToProjects = backToProjects;
         window.enterProject = enterProject;
