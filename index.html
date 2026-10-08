@@ -587,13 +587,13 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
                         { cn: "救命！我的護照（或錢包）被偷了！", foreign: "助けてください！パスポート（または財布）が盗まれました！" },
                         { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "体調が悪いのですが、近くに薬局や病院はありますか？" },
-                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "すみません、道に迷いました。警察を呼んでいただけますか？" }
+                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "すみません、道に迷いました。警察를 呼んでいただけますか？" }
                     ]
                 }
             },
@@ -954,7 +954,6 @@
             return 'spot';
         }
 
-        // 純標準任務打卡模式 (含圓形布章與按天數收合任務清單)
         function renderQuestUI() {
             const container = document.getElementById('quest-list-container');
             const countEl = document.getElementById('quest-total-count');
@@ -1082,7 +1081,7 @@
             if (shTotal > 0 && shDone === shTotal) {
                 shBadge.className = "badge-circle unlocked"; shTitle.innerText = "精品大收割";
             } else {
-                shBadge.className = "badge-circle"; sTitle.innerText = `購物 (${shDone}/${shTotal})`;
+                shBadge.className = "badge-circle"; shTitle.innerText = `購物 (${shDone}/${shTotal})`;
             }
         }
 
@@ -1718,7 +1717,7 @@
 
             const currentLangPack = languageData[destKey];
             currentDestinationLang = currentLangPack.langCode;
-            currentActivePhrase = { cn: "請點選左側分類與右側句子", foreign: "Ready to Speak ✨" };
+            currentActivePhrase = { cn: "請選取左側分類與右側句子", foreign: "Ready to Speak ✨" };
             document.getElementById('display-cn').innerText = currentActivePhrase.cn;
             document.getElementById('display-foreign').innerText = currentActivePhrase.foreign;
 
@@ -1896,7 +1895,7 @@
             else { el.classList.add('hidden'); icon.innerText = "▼ 展開"; }
         }
 
-        // 🌟 智慧自動組合地點與店名：自動在前綴加上專案名稱（例如：濟州島 + 店名），讓 Naver Map 與 Google 完美命中
+        // 🌟 萬能導航修正：使用網頁版搜尋連結，保證手機與 App 都能完美開啟並搜尋到對應地點
         window.openDetailModal = function(id) {
             const item = allSchedulesData.find(s => s.id === id);
             if (!item) return;
@@ -1916,7 +1915,6 @@
             }
 
             let cleanTitle = cleanDisplayTitle(item.title);
-            // 自動組合：若專案名稱包含地點（如濟州島、東京、曼谷），自動組合成「專案地點 + 店名」讓地圖精準搜尋
             let smartQuery = cleanTitle;
             if (currentProjectName) {
                 let locationKeyword = "";
@@ -1933,8 +1931,9 @@
             }
 
             const queryText = encodeURIComponent(smartQuery);
-            document.getElementById('modal-naver').href = `https://map.naver.com/v5/search/${queryText}`;
-            document.getElementById('modal-gmap').href = `https://maps.google.com/?q=${queryText}`;
+            // 改用通用網頁版搜尋連結，手機點擊會自動彈出引導至 Naver Map / Google Maps App 搜尋
+            document.getElementById('modal-naver').href = `https://m.map.naver.com/search2/search.naver?query=${queryText}`;
+            document.getElementById('modal-gmap').href = `https://www.google.com/maps/search/?api=1&query=${queryText}`;
 
             document.getElementById('edit-schedule-id').value = item.id;
             document.getElementById('edit-day').value = item.day || 'Day 1';
