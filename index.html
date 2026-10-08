@@ -29,22 +29,6 @@
             box-shadow: 0 4px 20px rgba(180, 150, 130, 0.08);
             border: 1.5px solid #eae1d7;
         }
-        .hero-travel-card {
-            background: linear-gradient(135deg, #2b3a4a 0%, #1f2933 100%);
-            border-radius: 24px;
-            box-shadow: 0 8px 25px rgba(43, 58, 74, 0.2);
-            color: #ffffff;
-        }
-        .hero-sub-btn {
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.2s ease;
-        }
-        .hero-sub-btn:active {
-            transform: scale(0.96);
-            background: rgba(255, 255, 255, 0.25);
-        }
         .badge-circle {
             width: 72px;
             height: 72px;
@@ -100,7 +84,7 @@
                     </button>
                 </div>
             </div>
-            <div id="project-list" class="space-y-4">
+            <div id="project-list" class="space-y-3.5">
                 <p class="text-center text-xs text-gray-400 py-8">載入中... ☁️</p>
             </div>
         </div>
@@ -226,134 +210,6 @@
         </div>
     </main>
 
-    <!-- 🌸 新增專案 Modal -->
-    <div id="new-project-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">✈️ 建立新旅遊專案</h3>
-                <button onclick="window.closeNewProjectModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            
-            <div class="space-y-3">
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">專案名稱</label>
-                    <input type="text" id="new-proj-name" placeholder="例如：濟州島自駕、曼谷自由行" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block font-bold text-gray-600 mb-1">出發年份</label>
-                        <select id="new-proj-year" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
-                            <option value="2026">2026年</option>
-                            <option value="2027" selected>2027年</option>
-                            <option value="2028">2028年</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-gray-600 mb-1">日期區間</label>
-                        <input type="text" id="new-proj-dates" placeholder="例如：11/23 - 11/27" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" value="01/01 - 01/05">
-                    </div>
-                </div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">精準排序起始日 (用於計算倒數天數)</label>
-                    <input type="date" id="new-proj-startdate" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
-                </div>
-            </div>
-
-            <div class="flex gap-2.5 pt-2">
-                <button onclick="window.closeNewProjectModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.submitNewProject()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認建立</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 📦 打包清單 Modal -->
-    <div id="packing-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] flex flex-col">
-            <div class="flex justify-between items-center shrink-0">
-                <h3 class="font-black text-[#5c4a3d] text-base">🎒 行李打包清單</h3>
-                <button onclick="window.closePackingModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <p class="text-gray-500 font-bold shrink-0">勾選你的行李準備進度，個人專屬狀態！✨</p>
-
-            <div class="flex gap-2 shrink-0">
-                <input type="text" id="new-packing-item" placeholder="新增行李項目..." class="flex-1 p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
-                <button onclick="window.addPackingItem()" class="bg-[#d98262] text-white px-4 py-3 rounded-xl font-black">新增</button>
-            </div>
-
-            <div id="packing-list-container" class="space-y-2 overflow-y-auto pr-1 flex-1"></div>
-
-            <div class="pt-2 shrink-0">
-                <button onclick="window.closePackingModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ✈️ 航班資訊 Modal -->
-    <div id="flight-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] overflow-y-auto">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">✈️ 航班與劃位資訊</h3>
-                <button onclick="window.closeFlightModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <p class="text-gray-500 font-bold">此資訊全團共用，任何成員修改大家都會同步更新！✨</p>
-            
-            <div class="space-y-3">
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">🛫 去程航班</label>
-                    <input type="text" id="flight-outbound" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" placeholder="例如：JX802 08:30">
-                </div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">💺 去程劃位</label>
-                    <input type="text" id="flight-outbound-seat" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" placeholder="例如：12A, 12B">
-                </div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">🛬 回程航班</label>
-                    <input type="text" id="flight-inbound" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" placeholder="例如：JX803 16:20">
-                </div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">💺 回程劃位</label>
-                    <input type="text" id="flight-inbound-seat" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" placeholder="例如：15H, 15K">
-                </div>
-            </div>
-
-            <div class="flex gap-2.5 pt-2">
-                <button onclick="window.closeFlightModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.saveFlightInfo()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">儲存航班</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 🏨 住宿資訊 Modal -->
-    <div id="hotel-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] overflow-y-auto">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">🏨 住宿飯店資訊</h3>
-                <button onclick="window.closeHotelModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <p class="text-gray-500 font-bold">此資訊全團共用，任何成員修改大家都會同步更新！✨</p>
-            
-            <div class="space-y-3">
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">🏨 飯店名稱</label>
-                    <input type="text" id="hotel-name" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" placeholder="例如：格蘭德飯店">
-                </div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">📍 飯店地址 / 電話</label>
-                    <textarea id="hotel-address" rows="3" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none resize-none font-bold" placeholder="輸入地址..."></textarea>
-                </div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">📅 入住與退房日期</label>
-                    <input type="text" id="hotel-dates" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" placeholder="例如：11/23 - 11/27">
-                </div>
-            </div>
-
-            <div class="flex gap-2.5 pt-2">
-                <button onclick="window.closeHotelModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.saveHotelInfo()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">儲存住宿</button>
-            </div>
-        </div>
-    </div>
-
     <!-- 🌸 6位數專案導入 Modal -->
     <div id="import-project-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
@@ -361,7 +217,7 @@
                 <h3 class="font-black text-[#5c4a3d] text-base">📥 輸入 6 位數專案號碼</h3>
                 <button onclick="window.closeImportProjectModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
-            <p class="text-gray-500 font-bold">請輸入朋友給你的 6 位數專案代碼！✨</p>
+            <p class="text-gray-500 font-bold">請輸入朋友給你的 6 位數專案代碼，即可將行程加入你的 App 中！✨</p>
             <input type="text" id="import-code-input" maxlength="6" placeholder="例如：883921" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-center text-lg tracking-widest">
             <div class="flex gap-2.5 pt-2">
                 <button onclick="window.closeImportProjectModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
@@ -380,7 +236,7 @@
             <p class="text-gray-500 font-bold">請選擇你要分享給朋友的方式：</p>
             
             <div class="p-4 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl space-y-1">
-                <p class="text-[11px] text-gray-400 font-bold">專案 6 位數代碼</p>
+                <p class="text-[11px] text-gray-400 font-bold">專案 6 位數代碼 (適合桌面 App)</p>
                 <p id="share-modal-pin" class="text-2xl font-black text-[#d98262] tracking-widest">------</p>
                 <button onclick="window.copySharePin()" class="mt-2 w-full bg-[#f0dcd0] text-[#735848] py-2 rounded-xl font-black">📋 複製 6 位數代碼</button>
             </div>
@@ -404,7 +260,7 @@
             </div>
 
             <div>
-                <label class="block font-bold text-gray-600 mb-1">選擇照片 (自動壓縮)</label>
+                <label class="block font-bold text-gray-600 mb-1">選擇照片 (會自動優化壓縮)</label>
                 <input type="file" id="quest-file-input" accept="image/*" onchange="window.previewQuestPhoto(event)" class="w-full text-xs p-2.5 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
             </div>
 
@@ -422,7 +278,7 @@
                 <h3 class="font-black text-[#5c4a3d] text-base" id="edit-quest-modal-title">✨ 已打卡項目管理</h3>
                 <button onclick="window.closeQuestEditModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
-            <p class="text-gray-500 font-bold">您可以選擇更換照片，或是取消打卡！</p>
+            <p class="text-gray-500 font-bold">您可以選擇更換照片，或是取消打卡晚點再上傳！</p>
             <div class="flex gap-2.5 pt-2">
                 <button onclick="window.openChangePhotoFromEdit()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">📷 更換照片</button>
                 <button onclick="window.cancelQuestCheckin()" class="flex-1 bg-red-100 text-red-600 py-3 rounded-full font-black">❌ 取消打卡</button>
@@ -437,7 +293,7 @@
                 <h3 class="font-black text-[#5c4a3d] text-base">📸 旅伴共同寫真冊</h3>
                 <button onclick="window.closePhotoGalleryModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
-            <p class="text-gray-500 font-bold shrink-0">統整所有旅伴上傳的打卡照片，點擊即可下載至手機！✨</p>
+            <p class="text-gray-500 font-bold shrink-0">這裡統整了所有旅伴上傳的打卡照片，點擊即可下載至手機相冊！✨</p>
 
             <div id="photo-gallery-grid" class="grid grid-cols-2 gap-3 overflow-y-auto pr-1 flex-1"></div>
 
@@ -750,7 +606,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -901,6 +757,7 @@
             }
         }
 
+        // 🌟 穩定版專案渲染：絕對不會卡死的標準清單架構
         async function renderProjects() {
             const list = document.getElementById('project-list');
             try {
@@ -911,113 +768,31 @@
                 }
                 list.innerHTML = '';
                 
-                let projectsData = [];
                 for (let id of myIds) {
                     try {
                         const docRef = doc(db, "projects", id);
                         const docSnap = await getDoc(docRef);
                         if (docSnap.exists()) {
-                            projectsData.push({ id, ...docSnap.data() });
+                            const p = docSnap.data();
+                            const card = document.createElement('div');
+                            card.className = "cute-card p-5 space-y-3 relative transition hover:border-[#d98262] cursor-pointer";
+                            card.onclick = () => window.enterProject(id);
+                            card.innerHTML = `
+                                <div class="flex justify-between items-center gap-2 w-full">
+                                    <span class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black shrink-0">進行中 🚗</span>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span class="text-xs text-gray-500 font-bold">${p.dates || '未定日期'}</span>
+                                        <button onclick="event.stopPropagation(); window.removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1 shrink-0" title="從我的清單移除">🗑️</button>
+                                    </div>
+                                </div>
+                                <div class="space-y-1">
+                                    <h3 class="font-black text-gray-900 text-base break-words">🌸 ${p.name}</h3>
+                                </div>
+                            `;
+                            list.appendChild(card);
                         }
-                    } catch (e) {}
+                    } catch (e) { console.error("單一專案載入錯誤", e); }
                 }
-
-                if (projectsData.length === 0) {
-                    list.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前沒有專案。點上方按鈕新增，或輸入 6 位數專案號碼導入！✨</p>`;
-                    return;
-                }
-
-                projectsData.sort((a, b) => {
-                    let dateA = a.startDate ? new Date(a.startDate).getTime() : (a.createdAt || 0);
-                    let dateB = b.startDate ? new Date(b.startDate).getTime() : (b.createdAt || 0);
-                    return dateA - dateB;
-                });
-
-                let hero = projectsData[0];
-                let heroCard = document.createElement('div');
-                heroCard.className = "hero-travel-card p-6 space-y-4 relative overflow-hidden";
-                
-                let packingItems = JSON.parse(localStorage.getItem(`packing_${hero.id}_${currentMyName}`)) || getDefaultPackingList();
-                let packedCount = packingItems.filter(i => i.checked).length;
-                let packingText = `${packedCount}/${packingItems.length}`;
-                
-                let flightStatus = (hero.flightOutbound || hero.flightInbound) ? "已填寫" : "尚未填寫";
-                let hotelStatus = hero.hotelName ? "已訂" : "尚未訂";
-
-                let countdownHtml = "";
-                if (hero.startDate) {
-                    let today = new Date();
-                    today.setHours(0,0,0,0);
-                    let start = new Date(hero.startDate);
-                    start.setHours(0,0,0,0);
-                    let diffDays = Math.ceil((start - today) / (1000 * 60 * 60 * 24));
-                    if (diffDays > 0) {
-                        countdownHtml = `<div class="flex items-baseline gap-1.5"><span class="text-3xl font-black">${diffDays}</span><span class="text-xs font-bold text-gray-300">天後出發 ✈️</span></div>`;
-                    } else if (diffDays === 0) {
-                        countdownHtml = `<div class="flex items-baseline gap-1.5"><span class="text-2xl font-black text-orange-300">今天出發！</span></div>`;
-                    } else {
-                        countdownHtml = `<div class="flex items-baseline gap-1.5"><span class="text-xl font-black text-gray-400">旅程進行中 / 已結束</span></div>`;
-                    }
-                }
-
-                heroCard.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div class="space-y-1">
-                            <span class="text-[11px] bg-white/20 text-white px-3 py-1 rounded-full font-black">✈️ 下一趟旅程</span>
-                            ${countdownHtml}
-                        </div>
-                        <button onclick="window.removeProjectFromMyList('${hero.id}')" class="text-white/60 hover:text-red-300 text-sm p-1.5 transition" title="移除專案">🗑️</button>
-                    </div>
-
-                    <div onclick="window.enterProject('${hero.id}')" class="cursor-pointer space-y-0.5">
-                        <h3 class="text-lg font-black text-white break-words">${hero.name}</h3>
-                        <p class="text-xs text-gray-300 font-bold">${hero.dates || '未定日期'}</p>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-2 pt-1">
-                        <div onclick="window.openPackingModal('${hero.id}')" class="hero-sub-btn p-2.5 rounded-xl cursor-pointer text-center">
-                            <p class="text-[10px] text-gray-300 font-bold">📦 打包</p>
-                            <p class="text-xs font-black text-white mt-0.5">${packingText}</p>
-                        </div>
-                        <div onclick="window.openFlightModal('${hero.id}')" class="hero-sub-btn p-2.5 rounded-xl cursor-pointer text-center">
-                            <p class="text-[10px] text-gray-300 font-bold">✈️ 航班</p>
-                            <p class="text-xs font-black text-white mt-0.5">${flightStatus}</p>
-                        </div>
-                        <div onclick="window.openHotelModal('${hero.id}')" class="hero-sub-btn p-2.5 rounded-xl cursor-pointer text-center">
-                            <p class="text-[10px] text-gray-300 font-bold">🏨 住宿</p>
-                            <p class="text-xs font-black text-white mt-0.5">${hotelStatus}</p>
-                        </div>
-                    </div>
-
-                    <div onclick="window.enterProject('${hero.id}')" class="pt-2 border-t border-white/10 flex justify-between items-center text-xs font-bold text-gray-200 cursor-pointer">
-                        <span>✨ 點擊進入專案中心</span>
-                        <span class="underline">查看行程 →</span>
-                    </div>
-                `;
-                list.appendChild(heroCard);
-
-                if (projectsData.length > 1) {
-                    let subHeader = document.createElement('p');
-                    subHeader.className = "text-xs font-black text-[#736052] px-1 pt-2";
-                    subHeader.innerText = "之後還有";
-                    list.appendChild(subHeader);
-
-                    for (let i = 1; i < projectsData.length; i++) {
-                        let p = projectsData[i];
-                        let card = document.createElement('div');
-                        card.className = "cute-card p-4 bg-white border border-[#eae1d7] flex justify-between items-center cursor-pointer transition hover:border-[#d98262]";
-                        card.onclick = () => window.enterProject(p.id);
-                        card.innerHTML = `
-                            <div class="space-y-1 min-w-0 flex-1 pr-2">
-                                <h4 class="font-black text-gray-900 text-xs truncate">🌸 ${p.name}</h4>
-                                <p class="text-[10px] text-gray-400 font-bold">${p.dates || '未定日期'}</p>
-                            </div>
-                            <button onclick="event.stopPropagation(); window.removeProjectFromMyList('${p.id}')" class="text-gray-300 hover:text-red-500 text-sm p-1.5 shrink-0" title="移除專案">🗑️</button>
-                        `;
-                        list.appendChild(card);
-                    }
-                }
-
             } catch (e) {
                 console.error("專案列表載入失敗", e);
                 list.innerHTML = `<p class="text-center text-xs text-red-400 py-8">載入專案發生錯誤，請重新整理頁面！</p>`;
@@ -1041,7 +816,6 @@
             const startDate = document.getElementById('new-proj-startdate').value;
 
             if (!name) { alert("請輸入專案名稱！"); return; }
-            if (!startDate) { alert("請選擇精準的起始日期！"); return; }
 
             try {
                 const newId = 'proj_' + Date.now();
@@ -1050,7 +824,7 @@
                 await setDoc(doc(db, "projects", newId), { 
                     name, 
                     dates: fullDatesText, 
-                    startDate, 
+                    startDate: startDate || '', 
                     pin: randomPin, 
                     createdAt: Date.now() 
                 });
@@ -1481,7 +1255,7 @@
             if (shTotal > 0 && shDone === shTotal) {
                 shBadge.className = "badge-circle unlocked"; shTitle.innerText = "精品大收割";
             } else {
-                shBadge.className = "badge-circle"; shTitle.innerText = `購物 (${shDone}/${shTotal})`;
+                shBadge.className = "badge-circle"; sTitle.innerText = `購物 (${shDone}/${shTotal})`;
             }
         }
 
@@ -1879,7 +1653,7 @@
             window.speechSynthesis.speak(utterance);
         }
 
-        // 🌟 將所有常用函式全部安全掛載至全域 window
+        // 🌟 確保所有函式安全掛載至全域 window
         window.renderRemindersByRules = renderRemindersByRules;
         window.backToProjects = backToProjects;
         window.enterProject = enterProject;
