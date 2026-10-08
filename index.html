@@ -603,7 +603,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -707,13 +707,13 @@
                     emergency: [
                         { cn: "救命！我的護照（或錢包）被偷了！", foreign: "Help! My passport (wallet) has been stolen!" },
                         { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "I feel sick. Is there a pharmacy or hospital nearby?" },
-                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "Excuse me, I'm lost. Can you help me call the police?" }
+                        { cn: "不好意思， I'm lost. Can you help me call the police?", foreign: "Excuse me, I'm lost. Can you help me call the police?" }
                     ]
                 }
             }
         };
 
-        // 🌟 絕對完整的全域掛載 (確保所有函式在檔案最上方先定義並綁定)
+        // 🌟 確保所有函式在頂層定義並完整掛載到 window 物件
         window.backToProjects = function() {
             currentProjectId = null;
             currentProjectName = "";
@@ -768,7 +768,7 @@
             document.getElementById('header-sub').innerText = `旅伴：${currentMyName} ✨`;
             
             window.renderRemindersByRules(currentProjectName);
-            initLanguageModule(currentProjectName);
+            window.initLanguageModule(currentProjectName);
             loadMembersAndExpenses(currentProjectId);
             loadCheckins(currentProjectId);
             
@@ -874,6 +874,53 @@
 
             container.innerHTML = html;
         };
+
+        window.initLanguageModule = function(projectName) {
+            let nameLower = projectName.toLowerCase();
+            let destKey = 'general';
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) destKey = 'korea';
+            else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都')) destKey = 'japan';
+            else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁')) destKey = 'thailand';
+
+            const currentLangPack = languageData[destKey];
+            currentDestinationLang = currentLangPack.langCode;
+            currentActivePhrase = { cn: "請選取左側分類與右側句子", foreign: "Ready to Speak ✨" };
+            document.getElementById('display-cn').innerText = currentActivePhrase.cn;
+            document.getElementById('display-foreign').innerText = currentActivePhrase.foreign;
+
+            const catContainer = document.getElementById('lang-categories');
+            catContainer.innerHTML = '';
+            currentLangPack.categories.forEach((cat, idx) => {
+                let btn = document.createElement('button');
+                btn.className = `w-full text-left text-xs font-black p-3 rounded-2xl transition border ${idx === 0 ? 'bg-[#d98262] text-white border-[#d98262] shadow-sm' : 'bg-white text-gray-700 border-[#eae1d7] hover:bg-[#fffaf5]'}`;
+                btn.innerText = cat.name;
+                btn.onclick = () => {
+                    document.querySelectorAll('#lang-categories button').forEach(b => {
+                        b.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-white text-gray-700 border-[#eae1d7] hover:bg-[#fffaf5]";
+                    });
+                    btn.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-[#d98262] text-white border-[#d98262] shadow-sm";
+                    renderPhrases(currentLangPack.phrases[cat.id]);
+                };
+                catContainer.appendChild(btn);
+            });
+            renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
+        };
+
+        function renderPhrases(phrases) {
+            const phraseContainer = document.getElementById('lang-phrases');
+            phraseContainer.innerHTML = '';
+            phrases.forEach(p => {
+                let card = document.createElement('div');
+                card.className = "cute-card p-3.5 bg-white hover:bg-[#fffaf5] border border-[#eae1d7] cursor-pointer transition flex justify-between items-center";
+                card.innerHTML = `<div><p class="text-xs text-gray-800 font-bold">${p.cn}</p></div>`;
+                card.onclick = () => {
+                    currentActivePhrase = p;
+                    document.getElementById('display-cn').innerText = p.cn;
+                    document.getElementById('display-foreign').innerText = p.foreign;
+                };
+                phraseContainer.appendChild(card);
+            });
+        }
 
         async function getMyProjectIds() {
             let localList = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
@@ -988,7 +1035,7 @@
                     createdAt: Date.now() 
                 });
                 await saveMyProjectId(newId);
-                window.closeNewProjectModal();
+                closeNewProjectModal();
                 renderProjects();
                 alert(`✨ 新專案建立成功！專案 6 位數代碼為：【${randomPin}】`);
             } catch (e) { alert("新增失敗"); }
@@ -1023,7 +1070,7 @@
 
                 if (foundId) {
                     await saveMyProjectId(foundId);
-                    window.closeImportProjectModal();
+                    closeImportProjectModal();
                     renderProjects();
                     alert("✨ 成功導入專案！");
                 }
@@ -1157,7 +1204,7 @@
                 await updateDoc(doc(db, "projects", currentProjectId), {
                     flightOutbound, flightOutboundSeat, flightInbound, flightInboundSeat
                 });
-                window.closeFlightModal();
+                closeFlightModal();
                 renderProjects();
                 alert("✨ 航班資訊已同步更新！");
             } catch (e) { alert("儲存失敗"); }
@@ -1191,7 +1238,7 @@
                 await updateDoc(doc(db, "projects", currentProjectId), {
                     hotelName, hotelAddress, hotelDates
                 });
-                window.closeHotelModal();
+                closeHotelModal();
                 renderProjects();
                 alert("✨ 住宿資訊已同步更新！");
             } catch (e) { alert("儲存失敗"); }
@@ -1320,12 +1367,12 @@
         window.openAddExpenseModal = function() {
             if (allMembersData.length === 0) {
                 alert("請先至成員管理新增至少一位成員！");
-                window.openAddMemberModal();
+                openAddMemberModal();
                 return;
             }
             document.getElementById('exp-title').value = '';
             document.getElementById('exp-amount').value = '';
-            window.setSplitMode('equal');
+            setSplitMode('equal');
             document.getElementById('expense-modal').classList.remove('hidden');
         };
         window.closeAddExpenseModal = function() { document.getElementById('expense-modal').classList.add('hidden'); };
@@ -1452,7 +1499,7 @@
                 await addDoc(collection(db, "projects", currentProjectId, "expenses"), {
                     title, amount, currency, rate, payer, settleCurrency, shares, participants, createdAt: Date.now()
                 });
-                window.closeAddExpenseModal();
+                closeAddExpenseModal();
                 alert("✨ 記帳成功！");
             } catch (e) { alert("記帳失敗"); }
         };
@@ -1510,7 +1557,7 @@
                 `https://www.google.com/maps/search/?api=1&query=${queryText}`;
 
             window.open(url, '_blank');
-            window.closeMapSearchModal();
+            closeMapSearchModal();
         };
 
         window.closeDetailModal = function() { document.getElementById('detail-modal').classList.add('hidden'); };
@@ -1527,7 +1574,7 @@
             if (!title) { alert("請填寫行程名稱！"); return; }
             try {
                 await updateDoc(doc(db, "projects", currentProjectId, "schedules", scheduleId), { day, time, title, location });
-                window.closeDetailModal();
+                closeDetailModal();
                 alert("✨ 行程修改成功！");
             } catch (e) { alert("修改失敗"); }
         };
@@ -1546,7 +1593,7 @@
             if (!title) { alert("請填寫行程名稱！"); return; }
             try {
                 await addDoc(collection(db, "projects", currentProjectId, "schedules"), { day, time, title, location, createdAt: Date.now() });
-                window.closeAddScheduleModal();
+                closeAddScheduleModal();
                 alert("✨ 行程新增成功！");
             } catch (e) { alert("新增失敗"); }
         };
@@ -1581,7 +1628,7 @@
             for (let i = 0; i < parsedItems.length; i++) {
                 await addDoc(collection(db, "projects", currentProjectId, "schedules"), parsedItems[i]);
             }
-            window.closeSmartPasteModal();
+            closeSmartPasteModal();
             alert(`✨ 成功導入 ${parsedItems.length} 筆行程！`);
         };
 
@@ -1593,14 +1640,14 @@
             if (!currentProjectPin) return;
             navigator.clipboard.writeText(currentProjectPin);
             alert(`📋 專案 6 位數代碼【${currentProjectPin}】已複製！`);
-            window.closeShareModal();
+            closeShareModal();
         };
 
         window.copyShareUrl = function() {
             const shareUrl = `${window.location.href.split('?')[0]}?project=${currentProjectId}`;
             navigator.clipboard.writeText(shareUrl);
             alert("🌸 專屬分享網址已複製！");
-            window.closeShareModal();
+            closeShareModal();
         };
 
         window.switchTab = function(tabName) {
