@@ -261,7 +261,7 @@
 
             <div class="flex gap-2.5 pt-2">
                 <button onclick="closeNewProjectModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.submitNewProject()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認建立</button>
+                <button onclick="submitNewProject()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認建立</button>
             </div>
         </div>
     </div>
@@ -277,7 +277,7 @@
 
             <div class="flex gap-2 shrink-0">
                 <input type="text" id="new-packing-item" placeholder="新增行李項目..." class="flex-1 p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
-                <button onclick="window.addPackingItem()" class="bg-[#d98262] text-white px-4 py-3 rounded-xl font-black">新增</button>
+                <button onclick="addPackingItem()" class="bg-[#d98262] text-white px-4 py-3 rounded-xl font-black">新增</button>
             </div>
 
             <div id="packing-list-container" class="space-y-2 overflow-y-auto pr-1 flex-1"></div>
@@ -318,7 +318,7 @@
 
             <div class="flex gap-2.5 pt-2">
                 <button onclick="closeFlightModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.saveFlightInfo()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">儲存航班</button>
+                <button onclick="saveFlightInfo()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">儲存航班</button>
             </div>
         </div>
     </div>
@@ -349,7 +349,7 @@
 
             <div class="flex gap-2.5 pt-2">
                 <button onclick="closeHotelModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.saveHotelInfo()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">儲存住宿</button>
+                <button onclick="saveHotelInfo()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">儲存住宿</button>
             </div>
         </div>
     </div>
@@ -365,7 +365,7 @@
             <input type="text" id="import-code-input" maxlength="6" placeholder="例如：883921" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-center text-lg tracking-widest">
             <div class="flex gap-2.5 pt-2">
                 <button onclick="closeImportProjectModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.submitImportProject()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認導入</button>
+                <button onclick="submitImportProject()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認導入</button>
             </div>
         </div>
     </div>
@@ -410,7 +410,7 @@
 
             <div class="flex gap-2.5 pt-2">
                 <button onclick="closeQuestPhotoModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.submitQuestPhoto()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認打卡</button>
+                <button onclick="submitQuestPhoto()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認打卡</button>
             </div>
         </div>
     </div>
@@ -425,7 +425,7 @@
             <p class="text-gray-500 font-bold">您可以選擇更換照片，或是取消打卡！</p>
             <div class="flex gap-2.5 pt-2">
                 <button onclick="openChangePhotoFromEdit()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">📷 更換照片</button>
-                <button onclick="window.cancelQuestCheckin()" class="flex-1 bg-red-100 text-red-600 py-3 rounded-full font-black">❌ 取消打卡</button>
+                <button onclick="cancelQuestCheckin()" class="flex-1 bg-red-100 text-red-600 py-3 rounded-full font-black">❌ 取消打卡</button>
             </div>
         </div>
     </div>
@@ -453,7 +453,7 @@
             <h3 class="font-black text-[#5c4a3d] text-base text-center">🌸 歡迎加入放風之旅</h3>
             <p class="text-gray-500 font-bold text-center">請輸入您的名字，讓大家在分帳與寫真冊中認識你！✨</p>
             <input type="text" id="login-name-input" placeholder="例如：小明" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-center text-sm">
-            <button onclick="window.submitLoginName()" class="w-full bg-[#d98262] text-white py-3.5 rounded-full font-black shadow-md">進入旅程 🚀</button>
+            <button onclick="submitLoginName()" class="w-full bg-[#d98262] text-white py-3.5 rounded-full font-black shadow-md">進入旅程 🚀</button>
         </div>
     </div>
 
@@ -513,7 +513,7 @@
                 <div><label class="block font-bold text-gray-600 mb-1">備註</label><textarea id="edit-location" rows="3" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none font-bold" placeholder="輸入備註..."></textarea></div>
                 <div class="flex gap-2.5 pt-2">
                     <button onclick="switchToViewMode()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">返回</button>
-                    <button onclick="window.saveScheduleEdit()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">儲存修改</button>
+                    <button onclick="saveScheduleEdit()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">儲存修改</button>
                 </div>
             </div>
         </div>
@@ -529,7 +529,7 @@
             <textarea id="smart-paste-input" rows="8" placeholder="貼上你的詳細行程..." class="w-full text-xs p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none"></textarea>
             <div class="flex gap-2.5 pt-1">
                 <button onclick="closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
-                <button onclick="window.parseSmartPaste()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">開始智慧拆解</button>
+                <button onclick="parseSmartPaste()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">開始智慧拆解</button>
             </div>
         </div>
     </div>
@@ -548,7 +548,7 @@
             </div>
             <div class="flex gap-2.5 pt-2">
                 <button onclick="closeAddScheduleModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
-                <button onclick="window.submitScheduleForm()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">確認新增</button>
+                <button onclick="submitScheduleForm()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">確認新增</button>
             </div>
         </div>
     </div>
@@ -590,7 +590,7 @@
             </div>
             <div class="flex gap-2.5 pt-2">
                 <button onclick="closeAddExpenseModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.submitExpense()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確定</button>
+                <button onclick="submitExpense()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確定</button>
             </div>
         </div>
     </div>
@@ -599,7 +599,7 @@
     <div id="member-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <div class="flex justify-between items-center"><h3 class="font-black text-[#5c4a3d] text-base">👥 成員管理</h3><button onclick="closeAddMemberModal()" class="text-gray-400 font-black">✕</button></div>
-            <div class="flex gap-2"><input type="text" id="new-member-name" placeholder="名字" class="flex-1 p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"><button onclick="window.addMember()" class="bg-[#d98262] text-white px-4 py-3 rounded-2xl font-black">新增</button></div>
+            <div class="flex gap-2"><input type="text" id="new-member-name" placeholder="名字" class="flex-1 p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"><button onclick="addMember()" class="bg-[#d98262] text-white px-4 py-3 rounded-2xl font-black">新增</button></div>
             <div id="member-list-display" class="space-y-2 max-h-48 overflow-y-auto"></div>
             <button onclick="closeAddMemberModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">完成</button>
         </div>
@@ -750,7 +750,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -904,7 +904,7 @@
         async function renderProjects() {
             const list = document.getElementById('project-list');
             try {
-                const myIds = await getMyProjectIds();
+                let myIds = await getMyProjectIds();
                 if (myIds.length === 0) {
                     list.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前沒有專案。點上方按鈕新增，或輸入 6 位數專案號碼導入！✨</p>`;
                     return;
@@ -1296,7 +1296,7 @@
             document.getElementById('header-title').innerText = `🌸 ${currentProjectName}`;
             document.getElementById('header-sub').innerText = `旅伴：${currentMyName} ✨`;
             
-            window.renderRemindersByRules(currentProjectName);
+            renderRemindersByRules(currentProjectName);
             initLanguageModule(currentProjectName);
             loadMembersAndExpenses(currentProjectId);
             loadCheckins(currentProjectId);
@@ -1675,9 +1675,9 @@
             const mapBtnContainer = document.getElementById('modal-map-btn-container');
             let mapBtnsHtml = '';
             if (isKoreaTrip) {
-                mapBtnsHtml += `<button onclick="launchDirectMap('naver')" class="flex-1 text-center text-xs bg-[#2db400] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💚 Naver Map</button>`;
+                mapBtnsHtml += `<button onclick="window.launchDirectMap('naver')" class="flex-1 text-center text-xs bg-[#2db400] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💚 Naver Map</button>`;
             }
-            mapBtnsHtml += `<button onclick="launchDirectMap('google')" class="flex-1 text-center text-xs bg-[#4285f4] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💙 Google Maps</button>`;
+            mapBtnsHtml += `<button onclick="window.launchDirectMap('google')" class="flex-1 text-center text-xs bg-[#4285f4] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💙 Google Maps</button>`;
             mapBtnContainer.innerHTML = mapBtnsHtml;
 
             document.getElementById('edit-schedule-id').value = item.id;
@@ -1745,9 +1745,9 @@
             const btnContainer = document.getElementById('map-buttons-container');
             let buttonsHtml = '';
             if (isKoreaTrip) {
-                buttonsHtml += `<button onclick="saveAndLaunchMap('naver')" class="w-full text-center bg-[#2db400] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💚 儲存並打開 Naver Map</button>`;
+                buttonsHtml += `<button onclick="window.saveAndLaunchMap('naver')" class="w-full text-center bg-[#2db400] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💚 儲存並打開 Naver Map</button>`;
             }
-            buttonsHtml += `<button onclick="saveAndLaunchMap('google')" class="w-full text-center bg-[#4285f4] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💙 儲存並打開 Google Maps</button>`;
+            buttonsHtml += `<button onclick="window.saveAndLaunchMap('google')" class="w-full text-center bg-[#4285f4] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💙 儲存並打開 Google Maps</button>`;
             
             btnContainer.innerHTML = buttonsHtml;
             document.getElementById('map-search-modal').classList.remove('hidden');
@@ -1882,10 +1882,46 @@
             window.speechSynthesis.speak(utterance);
         }
 
-        // 🌟 確保所有對外函式完全掛載到全域 window 物件
+        // 🌟 確保所有函式完全掛載到全域 window 物件
         window.renderRemindersByRules = renderRemindersByRules;
         window.backToProjects = backToProjects;
         window.enterProject = enterProject;
+        window.openNewProjectModal = openNewProjectModal;
+        window.closeNewProjectModal = closeNewProjectModal;
+        window.submitNewProject = submitNewProject;
+        window.openImportProjectModal = openImportProjectModal;
+        window.closeImportProjectModal = closeImportProjectModal;
+        window.submitImportProject = submitImportProject;
+        window.removeProjectFromMyList = removeProjectFromMyList;
+        window.openPackingModal = openPackingModal;
+        window.closePackingModal = closePackingModal;
+        window.addPackingItem = addPackingItem;
+        window.deletePackingItem = deletePackingItem;
+        window.openFlightModal = openFlightModal;
+        window.closeFlightModal = closeFlightModal;
+        window.saveFlightInfo = saveFlightInfo;
+        window.openHotelModal = openHotelModal;
+        window.closeHotelModal = closeHotelModal;
+        window.saveHotelInfo = saveHotelInfo;
+        window.openMapSearchModal = openMapSearchModal;
+        window.closeMapSearchModal = closeMapSearchModal;
+        window.saveAndLaunchMap = saveAndLaunchMap;
+        window.closeDetailModal = closeDetailModal;
+        window.switchToEditMode = switchToEditMode;
+        window.switchToViewMode = switchToViewMode;
+        window.saveScheduleEdit = saveScheduleEdit;
+        window.openSmartPasteModal = openSmartPasteModal;
+        window.closeSmartPasteModal = closeSmartPasteModal;
+        window.openAddScheduleModal = openAddScheduleModal;
+        window.closeAddScheduleModal = closeAddScheduleModal;
+        window.submitScheduleForm = submitScheduleForm;
+        window.parseSmartPaste = parseSmartPaste;
+        window.shareCurrentProject = shareCurrentProject;
+        window.closeShareModal = closeShareModal;
+        window.copySharePin = copySharePin;
+        window.copyShareUrl = copyShareUrl;
+        window.switchTab = switchTab;
+        window.speakText = speakText;
 
         async function initApp() {
             const urlParams = new URLSearchParams(window.location.search);
