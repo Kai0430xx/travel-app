@@ -286,7 +286,7 @@
         </div>
     </div>
 
-    <!-- 🌸 照片回憶寫真冊 Modal (排版優化：照片完整呈現、文字不擠壓) -->
+    <!-- 🌸 照片回憶寫真冊 Modal -->
     <div id="photo-gallery-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center shrink-0">
@@ -587,7 +587,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -954,7 +954,7 @@
             return 'spot';
         }
 
-        // 🌟 純標準任務打卡模式 (含圓形布章與按天數收合任務清單)
+        // 純標準任務打卡模式 (含圓形布章與按天數收合任務清單)
         function renderQuestUI() {
             const container = document.getElementById('quest-list-container');
             const countEl = document.getElementById('quest-total-count');
@@ -1082,7 +1082,7 @@
             if (shTotal > 0 && shDone === shTotal) {
                 shBadge.className = "badge-circle unlocked"; shTitle.innerText = "精品大收割";
             } else {
-                shBadge.className = "badge-circle"; shTitle.innerText = `購物 (${shDone}/${shTotal})`;
+                shBadge.className = "badge-circle"; sTitle.innerText = `購物 (${shDone}/${shTotal})`;
             }
         }
 
@@ -1210,7 +1210,6 @@
             }
         }
 
-        // 🌟 寫真冊排版優化：照片保持原始比例不裁切、文字與下載按鈕完美呈現
         window.openPhotoGalleryModal = async function() {
             const grid = document.getElementById('photo-gallery-grid');
             grid.innerHTML = '<p class="col-span-2 text-center text-xs text-gray-400 py-4">載入寫真中... 📸</p>';
@@ -1897,18 +1896,43 @@
             else { el.classList.add('hidden'); icon.innerText = "▼ 展開"; }
         }
 
+        // 🌟 智慧自動組合地點與店名：自動在前綴加上專案名稱（例如：濟州島 + 店名），讓 Naver Map 與 Google 完美命中
         window.openDetailModal = function(id) {
             const item = allSchedulesData.find(s => s.id === id);
             if (!item) return;
             document.getElementById('modal-day').innerText = item.day || 'Day 1';
             document.getElementById('modal-time').innerText = item.time || '全天';
             document.getElementById('modal-title').innerText = cleanDisplayTitle(item.title);
+            
             const locContainer = document.getElementById('modal-location-container');
             const locSpan = document.getElementById('modal-location');
-            if (item.location && item.location.trim() !== '') { locSpan.innerText = item.location; locContainer.classList.remove('hidden'); }
-            else { locSpan.innerText = ''; locContainer.classList.add('hidden'); }
+            
+            if (item.location && item.location.trim() !== '') {
+                locSpan.innerText = item.location;
+                locContainer.classList.remove('hidden');
+            } else {
+                locSpan.innerText = '';
+                locContainer.classList.add('hidden');
+            }
 
-            const queryText = encodeURIComponent(cleanDisplayTitle(item.title));
+            let cleanTitle = cleanDisplayTitle(item.title);
+            // 自動組合：若專案名稱包含地點（如濟州島、東京、曼谷），自動組合成「專案地點 + 店名」讓地圖精準搜尋
+            let smartQuery = cleanTitle;
+            if (currentProjectName) {
+                let locationKeyword = "";
+                if (currentProjectName.includes("濟州")) locationKeyword = "濟州島";
+                else if (currentProjectName.includes("東京")) locationKeyword = "東京";
+                else if (currentProjectName.includes("釜山")) locationKeyword = "釜山";
+                else if (currentProjectName.includes("首爾")) locationKeyword = "首爾";
+                else if (currentProjectName.includes("曼谷")) locationKeyword = "曼谷";
+                else if (currentProjectName.includes("大阪")) locationKeyword = "大阪";
+
+                if (locationKeyword && !cleanTitle.includes(locationKeyword)) {
+                    smartQuery = `${locationKeyword} ${cleanTitle}`;
+                }
+            }
+
+            const queryText = encodeURIComponent(smartQuery);
             document.getElementById('modal-naver').href = `https://map.naver.com/v5/search/${queryText}`;
             document.getElementById('modal-gmap').href = `https://maps.google.com/?q=${queryText}`;
 
