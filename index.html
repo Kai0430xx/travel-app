@@ -29,6 +29,22 @@
             box-shadow: 0 4px 20px rgba(180, 150, 130, 0.08);
             border: 1.5px solid #eae1d7;
         }
+        .hero-travel-card {
+            background: linear-gradient(135deg, #2b3a4a 0%, #1f2933 100%);
+            border-radius: 24px;
+            box-shadow: 0 8px 25px rgba(43, 58, 74, 0.2);
+            color: #ffffff;
+        }
+        .hero-sub-btn {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+        .hero-sub-btn:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.25);
+        }
         .badge-circle {
             width: 72px;
             height: 72px;
@@ -84,7 +100,7 @@
                     </button>
                 </div>
             </div>
-            <div id="project-list" class="space-y-3.5">
+            <div id="project-list" class="space-y-4">
                 <p class="text-center text-xs text-gray-400 py-8">載入中... ☁️</p>
             </div>
         </div>
@@ -210,6 +226,94 @@
         </div>
     </main>
 
+    <!-- 📦 打包清單 Modal (個人獨立) -->
+    <div id="packing-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center shrink-0">
+                <h3 class="font-black text-[#5c4a3d] text-base">🎒 行李打包清單</h3>
+                <button onclick="closePackingModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <p class="text-gray-500 font-bold shrink-0">勾選你的行李準備進度，這裡為你個人專屬，其他人看不到你的勾選狀態！✨</p>
+
+            <div class="flex gap-2 shrink-0">
+                <input type="text" id="new-packing-item" placeholder="新增行李項目（例如：護照、網卡）" class="flex-1 p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
+                <button onclick="addPackingItem()" class="bg-[#d98262] text-white px-4 py-3 rounded-xl font-black">新增</button>
+            </div>
+
+            <div id="packing-list-container" class="space-y-2 overflow-y-auto pr-1 flex-1"></div>
+
+            <div class="pt-2 shrink-0">
+                <button onclick="closePackingModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✈️ 航班資訊 Modal (全團同步) -->
+    <div id="flight-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-[#5c4a3d] text-base">✈️ 航班與劃位資訊</h3>
+                <button onclick="closeFlightModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <p class="text-gray-500 font-bold">此資訊全團共用，任何成員修改後大家都會同步更新！✨</p>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">🛫 去程航班 (例如：星宇航空 JX802 08:30)</label>
+                    <input type="text" id="flight-outbound" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" placeholder="輸入去程航班...">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">💺 去程劃位資訊 (例如：12A, 12B)</label>
+                    <input type="text" id="flight-outbound-seat" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" placeholder="輸入去程劃位...">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">🛬 回程航班 (例如：星宇航空 JX803 16:20)</label>
+                    <input type="text" id="flight-inbound" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" placeholder="輸入回程航班...">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">💺 回程劃位資訊 (例如：15H, 15K)</label>
+                    <input type="text" id="flight-inbound-seat" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" placeholder="輸入回程劃位...">
+                </div>
+            </div>
+
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="closeFlightModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
+                <button onclick="saveFlightInfo()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">儲存航班資訊</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🏨 住宿資訊 Modal (全團同步) -->
+    <div id="hotel-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-[#5c4a3d] text-base">🏨 住宿飯店資訊</h3>
+                <button onclick="closeHotelModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <p class="text-gray-500 font-bold">此資訊全團共用，任何成員修改後大家都會同步更新！✨</p>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">🏨 飯店名稱</label>
+                    <input type="text" id="hotel-name" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" placeholder="例如：濟州格蘭德飯店">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">📍 飯店地址 / 電話</label>
+                    <textarea id="hotel-address" rows="3" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none resize-none font-bold" placeholder="輸入地址或電話..."></textarea>
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">📅 入住與退房日期</label>
+                    <input type="text" id="hotel-dates" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold" placeholder="例如：11/23 - 11/27 (4晚)">
+                </div>
+            </div>
+
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="closeHotelModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
+                <button onclick="saveHotelInfo()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">儲存住宿資訊</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 🌸 6位數專案導入 Modal -->
     <div id="import-project-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
@@ -313,25 +417,23 @@
         </div>
     </div>
 
-    <!-- 🗺️ 彈出式地圖搜尋微調 Modal (層級設為 z-[70]，確保浮在詳細行程視窗上方) -->
+    <!-- 🗺️ 彈出式地圖搜尋微調 Modal -->
     <div id="map-search-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base" id="map-modal-title">🗺️ 確認地圖搜尋關鍵字</h3>
+                <h3 class="font-black text-[#5c4a3d] text-base">🗺️ 確認地圖搜尋關鍵字</h3>
                 <button onclick="closeMapSearchModal()" class="text-gray-400 font-black text-base">✕</button>
             </div>
-            <p class="text-gray-500 font-bold">您可以直接修改下方的關鍵字（例如補上完整店名或區域），再點擊按鈕開啟地圖：</p>
+            <p class="text-gray-500 font-bold">您可以隨時修改下方的搜尋關鍵字（例如補上完整店名或區域），點擊按鈕即可直接跳轉地圖：</p>
             
             <input type="text" id="map-search-input" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-sm" placeholder="輸入搜尋關鍵字...">
 
-            <div id="map-buttons-container" class="pt-2 space-y-2">
-                <!-- 動態按鈕會由 JS 根據國家自動渲染 -->
-            </div>
+            <div id="map-buttons-container" class="pt-2 space-y-2"></div>
             <button onclick="closeMapSearchModal()" class="w-full text-center bg-gray-100 text-gray-600 py-2.5 rounded-full font-black">取消</button>
         </div>
     </div>
 
-    <!-- 行程詳細與修改 Modal (層級 z-50) -->
+    <!-- 行程詳細與修改 Modal -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
             <div id="modal-view-mode" class="space-y-4">
@@ -344,18 +446,19 @@
                 </div>
                 <div>
                     <h3 id="modal-title" class="font-black text-gray-900 text-base mt-2">行程名稱</h3>
+                    <!-- 第一行：備註 -->
                     <div id="modal-location-container" class="mt-2 hidden bg-[#fffaf5] p-3 rounded-2xl border border-[#eae1d7]">
                         <p class="text-xs text-gray-600 font-bold mb-0.5">📝 備註：</p>
                         <p id="modal-location" class="text-xs text-gray-800 whitespace-pre-line font-medium"></p>
                     </div>
                 </div>
+                <!-- 第二行：Map 按鈕 -->
+                <div id="modal-map-btn-container" class="pt-2 flex gap-2.5"></div>
+                <!-- 第三行：修改地圖關鍵字、修改行程、修改地圖(原關閉) -->
                 <div class="pt-2 flex gap-2.5">
-                    <button onclick="openMapSearchModal('naver')" id="btn-naver-map" class="flex-1 text-center text-xs bg-[#2db400] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💚 Naver Map</button>
-                    <button onclick="openMapSearchModal('google')" class="flex-1 text-center text-xs bg-[#4285f4] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💙 Google Maps</button>
-                </div>
-                <div class="pt-2 flex gap-2.5">
-                    <button onclick="switchToEditMode()" class="flex-1 bg-[#f0dcd0] text-[#735848] text-xs py-3 rounded-full font-black transition">✏️ 修改行程</button>
-                    <button onclick="closeDetailModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-bold">關閉</button>
+                    <button onclick="openMapSearchModal()" class="flex-1 bg-[#f0dcd0] text-[#735848] text-xs py-2.5 rounded-full font-black transition">🗺️ 修改地圖</button>
+                    <button onclick="switchToEditMode()" class="flex-1 bg-[#f0dcd0] text-[#735848] text-xs py-2.5 rounded-full font-black transition">✏️ 修改行程</button>
+                    <button onclick="closeDetailModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-2.5 rounded-full font-bold">關閉</button>
                 </div>
             </div>
             <div id="modal-edit-mode" class="hidden space-y-3 text-xs">
@@ -515,6 +618,8 @@
         let currentSplitMode = 'equal';
         let activeDayFilter = 'all';
         let currentQuestTargetId = null;
+        let currentDetailItem = null;
+        let customMapQueries = {};
 
         const languageData = {
             korea: {
@@ -605,7 +710,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -756,6 +861,7 @@
             }
         }
 
+        // 🌟 參考設計改造：第一個專案變身為吸睛的「下一趟旅程」大卡片（內含打包、航班、住宿小區塊）
         async function renderProjects() {
             const list = document.getElementById('project-list');
             try {
@@ -765,34 +871,233 @@
                     return;
                 }
                 list.innerHTML = '';
+                
+                let projectsData = [];
                 for (let id of myIds) {
                     try {
                         const docRef = doc(db, "projects", id);
                         const docSnap = await getDoc(docRef);
                         if (docSnap.exists()) {
-                            const p = docSnap.data();
-                            const card = document.createElement('div');
-                            card.className = "cute-card p-5 space-y-3 relative transition hover:border-[#d98262] overflow-hidden";
-                            card.innerHTML = `
-                                <div class="flex justify-between items-center gap-2 w-full">
-                                    <span class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black shrink-0">進行中 🚗</span>
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <span class="text-xs text-gray-500 font-bold">${p.dates || '未定日期'}</span>
-                                        <button onclick="event.stopPropagation(); removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1 shrink-0" title="從我的清單移除">🗑️</button>
-                                    </div>
-                                </div>
-                                <div onclick="enterProject('${id}')" class="cursor-pointer space-y-1">
-                                    <h3 class="font-black text-gray-900 text-base break-words">🌸 ${p.name}</h3>
-                                </div>
-                            `;
-                            list.appendChild(card);
+                            projectsData.push({ id, ...docSnap.data() });
                         }
-                    } catch (e) { console.error("單一專案載入錯誤", e); }
+                    } catch (e) {}
                 }
+
+                if (projectsData.length === 0) {
+                    list.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前沒有專案。點上方按鈕新增，或輸入 6 位數專案號碼導入！✨</p>`;
+                    return;
+                }
+
+                let hero = projectsData[0];
+                let heroCard = document.createElement('div');
+                heroCard.className = "hero-travel-card p-6 space-y-4 relative overflow-hidden";
+                
+                // 獲取打包進度與航班住宿預覽
+                let packingItems = JSON.parse(localStorage.getItem(`packing_${hero.id}_${currentMyName}`)) || getDefaultPackingList();
+                let packedCount = packingItems.filter(i => i.checked).length;
+                let packingText = `${packedCount}/${packingItems.length}`;
+                
+                let flightStatus = (hero.flightOutbound || hero.flightInbound) ? "已填寫" : "尚未填寫";
+                let hotelStatus = hero.hotelName ? "已訂" : "尚未訂";
+
+                heroCard.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div onclick="enterProject('${hero.id}')" class="cursor-pointer flex-1 pr-2">
+                            <span class="text-[11px] bg-white/20 text-white px-3 py-1 rounded-full font-black">✈️ 下一趟旅程</span>
+                            <h3 class="text-xl font-black text-white mt-2 break-words">${hero.name}</h3>
+                            <p class="text-xs text-gray-300 font-bold mt-0.5">${hero.dates || '未定日期'}</p>
+                        </div>
+                        <button onclick="event.stopPropagation(); removeProjectFromMyList('${hero.id}')" class="text-white/60 hover:text-red-300 text-sm p-1.5 transition" title="移除專案">🗑️</button>
+                    </div>
+
+                    <!-- 三個小區塊：打包、航班、住宿 -->
+                    <div class="grid grid-cols-3 gap-2 pt-1">
+                        <div onclick="openPackingModal('${hero.id}')" class="hero-sub-btn p-2.5 rounded-xl cursor-pointer text-center">
+                            <p class="text-[10px] text-gray-300 font-bold">📦 打包</p>
+                            <p class="text-xs font-black text-white mt-0.5">${packingText}</p>
+                        </div>
+                        <div onclick="openFlightModal('${hero.id}')" class="hero-sub-btn p-2.5 rounded-xl cursor-pointer text-center">
+                            <p class="text-[10px] text-gray-300 font-bold">✈️ 航班</p>
+                            <p class="text-xs font-black text-white mt-0.5">${flightStatus}</p>
+                        </div>
+                        <div onclick="openHotelModal('${hero.id}')" class="hero-sub-btn p-2.5 rounded-xl cursor-pointer text-center">
+                            <p class="text-[10px] text-gray-300 font-bold">🏨 住宿</p>
+                            <p class="text-xs font-black text-white mt-0.5">${hotelStatus}</p>
+                        </div>
+                    </div>
+
+                    <div onclick="enterProject('${hero.id}')" class="pt-2 border-t border-white/10 flex justify-between items-center text-xs font-bold text-gray-200 cursor-pointer">
+                        <span>✨ 點擊進入專案中心</span>
+                        <span class="underline">查看行程 →</span>
+                    </div>
+                `;
+                list.appendChild(heroCard);
+
+                // 之後還有... 小清單
+                if (projectsData.length > 1) {
+                    let subHeader = document.createElement('p');
+                    subHeader.className = "text-xs font-black text-[#736052] px-1 pt-2";
+                    subHeader.innerText = "之後還有";
+                    list.appendChild(subHeader);
+
+                    for (let i = 1; i < projectsData.length; i++) {
+                        let p = projectsData[i];
+                        let card = document.createElement('div');
+                        card.className = "cute-card p-4 bg-white border border-[#eae1d7] flex justify-between items-center cursor-pointer transition hover:border-[#d98262]";
+                        card.onclick = () => enterProject(p.id);
+                        card.innerHTML = `
+                            <div class="space-y-1 min-w-0 flex-1 pr-2">
+                                <h4 class="font-black text-gray-900 text-xs truncate">🌸 ${p.name}</h4>
+                                <p class="text-[10px] text-gray-400 font-bold">${p.dates || '未定日期'}</p>
+                            </div>
+                            <button onclick="event.stopPropagation(); removeProjectFromMyList('${p.id}')" class="text-gray-300 hover:text-red-500 text-sm p-1.5 shrink-0" title="移除專案">🗑️</button>
+                        `;
+                        list.appendChild(card);
+                    }
+                }
+
             } catch (e) {
                 console.error("專案列表載入失敗", e);
                 list.innerHTML = `<p class="text-center text-xs text-red-400 py-8">載入專案發生錯誤，請重新整理頁面！</p>`;
             }
+        }
+
+        // 📦 打包清單邏輯 (個人獨立)
+        function getDefaultPackingList() {
+            return [
+                { id: 1, text: "護照 (效期大於6個月)", checked: false },
+                { id: 2, text: "網卡 / eSIM / 漫遊", checked: false },
+                { id: 3, text: "台幣 / 當地外幣現金", checked: false },
+                { id: 4, text: "信用卡 / 跨國提款卡", checked: false },
+                { id: 5, text: "萬用轉接頭 / 充電器", checked: false },
+                { id: 6, text: "行動電源 (需手提不可託運)", checked: false },
+                { id: 7, text: "個人常備藥品 / OK繃", checked: false },
+                { id: 8, text: "換洗衣物 / 外套", checked: false }
+            ];
+        }
+
+        window.openPackingModal = function(projId) {
+            currentProjectId = projId;
+            renderPackingListUI();
+            document.getElementById('packing-modal').classList.remove('hidden');
+        }
+        window.closePackingModal = function() {
+            document.getElementById('packing-modal').classList.add('hidden');
+            renderProjects(); // 更新首頁打包進度
+        }
+
+        function renderPackingListUI() {
+            const container = document.getElementById('packing-list-container');
+            let items = JSON.parse(localStorage.getItem(`packing_${currentProjectId}_${currentMyName}`)) || getDefaultPackingList();
+            container.innerHTML = '';
+
+            items.forEach((item, index) => {
+                let div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-[#fffaf5] p-3 rounded-xl border border-[#eae1d7] font-bold";
+                div.innerHTML = `
+                    <label class="flex items-center gap-2.5 flex-1 cursor-pointer min-w-0 pr-2">
+                        <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="togglePackingItem(${index})" class="rounded accent-[#d98262] w-4 h-4 shrink-0">
+                        <span class="text-xs ${item.checked ? 'line-through text-gray-400' : 'text-gray-800'} break-words">${item.text}</span>
+                    </label>
+                    <button onclick="deletePackingItem(${index})" class="text-gray-300 hover:text-red-500 text-xs p-1 shrink-0">🗑️</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        window.togglePackingItem = function(index) {
+            let items = JSON.parse(localStorage.getItem(`packing_${currentProjectId}_${currentMyName}`)) || getDefaultPackingList();
+            items[index].checked = !items[index].checked;
+            localStorage.setItem(`packing_${currentProjectId}_${currentMyName}`, JSON.stringify(items));
+            renderPackingListUI();
+        }
+
+        window.addPackingItem = function() {
+            const input = document.getElementById('new-packing-item');
+            const text = input.value.trim();
+            if (!text) return;
+            let items = JSON.parse(localStorage.getItem(`packing_${currentProjectId}_${currentMyName}`)) || getDefaultPackingList();
+            items.push({ id: Date.now(), text, checked: false });
+            localStorage.setItem(`packing_${currentProjectId}_${currentMyName}`, JSON.stringify(items));
+            input.value = '';
+            renderPackingListUI();
+        }
+
+        window.deletePackingItem = function(index) {
+            let items = JSON.parse(localStorage.getItem(`packing_${currentProjectId}_${currentMyName}`)) || getDefaultPackingList();
+            items.splice(index, 1);
+            localStorage.setItem(`packing_${currentProjectId}_${currentMyName}`, JSON.stringify(items));
+            renderPackingListUI();
+        }
+
+        // ✈️ 航班資訊邏輯 (全團同步)
+        window.openFlightModal = async function(projId) {
+            currentProjectId = projId;
+            try {
+                const docSnap = await getDoc(doc(db, "projects", projId));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('flight-outbound').value = data.flightOutbound || '';
+                    document.getElementById('flight-outbound-seat').value = data.flightOutboundSeat || '';
+                    document.getElementById('flight-inbound').value = data.flightInbound || '';
+                    document.getElementById('flight-inbound-seat').value = data.flightInboundSeat || '';
+                }
+            } catch (e) {}
+            document.getElementById('flight-modal').classList.remove('hidden');
+        }
+        window.closeFlightModal = function() {
+            document.getElementById('flight-modal').classList.add('hidden');
+        }
+
+        window.saveFlightInfo = async function() {
+            if (!currentProjectId) return;
+            const flightOutbound = document.getElementById('flight-outbound').value.trim();
+            const flightOutboundSeat = document.getElementById('flight-outbound-seat').value.trim();
+            const flightInbound = document.getElementById('flight-inbound').value.trim();
+            const flightInboundSeat = document.getElementById('flight-inbound-seat').value.trim();
+
+            try {
+                await updateDoc(doc(db, "projects", currentProjectId), {
+                    flightOutbound, flightOutboundSeat, flightInbound, flightInboundSeat
+                });
+                closeFlightModal();
+                renderProjects();
+                alert("✨ 航班資訊已同步更新給所有旅伴！");
+            } catch (e) { alert("儲存失敗"); }
+        }
+
+        // 🏨 住宿資訊邏輯 (全團同步)
+        window.openHotelModal = async function(projId) {
+            currentProjectId = projId;
+            try {
+                const docSnap = await getDoc(doc(db, "projects", projId));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('hotel-name').value = data.hotelName || '';
+                    document.getElementById('hotel-address').value = data.hotelAddress || '';
+                    document.getElementById('hotel-dates').value = data.hotelDates || '';
+                }
+            } catch (e) {}
+            document.getElementById('hotel-modal').classList.remove('hidden');
+        }
+        window.closeHotelModal = function() {
+            document.getElementById('hotel-modal').classList.add('hidden');
+        }
+
+        window.saveHotelInfo = async function() {
+            if (!currentProjectId) return;
+            const hotelName = document.getElementById('hotel-name').value.trim();
+            const hotelAddress = document.getElementById('hotel-address').value.trim();
+            const hotelDates = document.getElementById('hotel-dates').value.trim();
+
+            try {
+                await updateDoc(doc(db, "projects", currentProjectId), {
+                    hotelName, hotelAddress, hotelDates
+                });
+                closeHotelModal();
+                renderProjects();
+                alert("✨ 住宿資訊已同步更新給所有旅伴！");
+            } catch (e) { alert("儲存失敗"); }
         }
 
         window.openNewProjectModal = async function() {
@@ -1093,7 +1398,7 @@
             if (sTotal > 0 && sDone === sTotal) {
                 sBadge.className = "badge-circle unlocked"; sTitle.innerText = "深度冒險家";
             } else {
-                sBadge.className = "badge-circle"; fTitle.innerText = `景點 (${sDone}/${sTotal})`;
+                sBadge.className = "badge-circle"; sTitle.innerText = `景點 (${sDone}/${sTotal})`;
             }
 
             if (shTotal > 0 && shDone === shTotal) {
@@ -1272,659 +1577,6 @@
             document.getElementById('photo-gallery-modal').classList.add('hidden');
         }
 
-        function renderExpenseUI() {
-            const container = document.getElementById('expense-list-container');
-            const breakdownContainer = document.getElementById('currency-breakdown');
-            const totalTwdEl = document.getElementById('total-expense-twd');
-            
-            container.innerHTML = '';
-            if (allExpensesData.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前還沒有記帳，點上方按鈕開始記帳吧！✨</p>`;
-                totalTwdEl.innerText = "NT$ 0";
-                breakdownContainer.innerHTML = "尚無花費記錄";
-                return;
-            }
-
-            let totalTwdSum = 0;
-            let currencySums = {};
-
-            allExpensesData.forEach(exp => {
-                let twdVal = exp.currency === 'TWD' ? exp.amount : (exp.amount * (exp.rate || 1));
-                totalTwdSum += twdVal;
-                if (!currencySums[exp.currency]) currencySums[exp.currency] = 0;
-                currencySums[exp.currency] += exp.amount;
-            });
-
-            totalTwdSum = Math.round(totalTwdSum);
-            totalTwdEl.innerText = `NT$ ${totalTwdSum.toLocaleString()}`;
-
-            let breakdownHtml = '';
-            Object.keys(currencySums).forEach(cur => {
-                breakdownHtml += `<span>${cur}: ${currencySums[cur].toLocaleString()}</span>`;
-            });
-            breakdownContainer.innerHTML = breakdownHtml;
-
-            allExpensesData.forEach(exp => {
-                let twdVal = Math.round(exp.currency === 'TWD' ? exp.amount : (exp.amount * (exp.rate || 1)));
-                let card = document.createElement('div');
-                card.className = "cute-card p-4 bg-white border border-[#eae1d7] flex justify-between items-center gap-3";
-                
-                let count = 0;
-                if (exp.shares) {
-                    Object.keys(exp.shares).forEach(m => { if (exp.shares[m] > 0) count++; });
-                } else if (exp.participants) {
-                    count = exp.participants.length;
-                }
-
-                card.innerHTML = `
-                    <div class="space-y-1 min-w-0 flex-1">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-xs font-black text-gray-900 truncate">${exp.title}</span>
-                            <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-full font-bold shrink-0">${exp.payer} 付款</span>
-                        </div>
-                        <p class="text-[11px] text-gray-400 font-bold">
-                            ${count} 人分攤 (${exp.settleCurrency === 'TWD' ? '折合台幣結算' : '原幣別結算'})
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <div class="text-right">
-                            <p class="text-sm font-black text-[#d98262]">${exp.currency} ${exp.amount.toLocaleString()}</p>
-                            <p class="text-[10px] text-gray-400 font-bold">≈ NT$ ${twdVal.toLocaleString()}</p>
-                        </div>
-                        <button onclick="deleteExpense('${exp.id}')" class="text-gray-300 hover:text-red-500 text-sm p-1.5 transition" title="刪除此筆記帳">🗑️</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        window.deleteExpense = async function(expenseId) {
-            if (!currentProjectId) return;
-            if (confirm("確定要刪除這筆記帳嗎？")) {
-                try {
-                    await deleteDoc(doc(db, "projects", currentProjectId, "expenses", expenseId));
-                    alert("✨ 刪除成功！");
-                } catch (e) { alert("刪除失敗"); }
-            }
-        }
-
-        window.openAddExpenseModal = function() {
-            if (allMembersData.length === 0) {
-                alert("請先至成員管理新增至少一位成員！");
-                openAddMemberModal();
-                return;
-            }
-            document.getElementById('exp-title').value = '';
-            document.getElementById('exp-amount').value = '';
-            setSplitMode('equal');
-            document.getElementById('expense-modal').classList.remove('hidden');
-        }
-        window.closeAddExpenseModal = function() { document.getElementById('expense-modal').classList.add('hidden'); }
-
-        window.toggleExchangeRate = function() {
-            let cur = document.getElementById('exp-currency').value;
-            let rateBox = document.getElementById('rate-box');
-            let rateInput = document.getElementById('exp-rate');
-            if (cur === 'TWD') {
-                rateBox.classList.add('hidden');
-                rateInput.value = 1;
-            } else {
-                rateBox.classList.remove('hidden');
-                if (cur === 'KRW') rateInput.value = 0.024;
-                else if (cur === 'JPY') rateInput.value = 0.21;
-                else if (cur === 'THB') rateInput.value = 0.92;
-                else if (cur === 'USD') rateInput.value = 32.5;
-            }
-        }
-
-        window.setSplitMode = function(mode) {
-            currentSplitMode = mode;
-            const btnEq = document.getElementById('btn-mode-equal');
-            const btnCu = document.getElementById('btn-mode-custom');
-            if (mode === 'equal') {
-                btnEq.className = "text-[10px] px-2.5 py-1 rounded-full font-black bg-[#d98262] text-white transition";
-                btnCu.className = "text-[10px] px-2.5 py-1 rounded-full font-black bg-gray-100 text-gray-600 transition";
-            } else {
-                btnCu.className = "text-[10px] px-2.5 py-1 rounded-full font-black bg-[#d98262] text-white transition";
-                btnEq.className = "text-[10px] px-2.5 py-1 rounded-full font-black bg-gray-100 text-gray-600 transition";
-            }
-            updateExpenseModalDropdowns();
-        }
-
-        function updateExpenseModalDropdowns() {
-            const payerSelect = document.getElementById('exp-payer');
-            const container = document.getElementById('exp-participants-container');
-            payerSelect.innerHTML = '';
-            container.innerHTML = '';
-            allMembersData.forEach(m => {
-                let opt = document.createElement('option');
-                opt.value = m.name;
-                opt.innerText = m.name;
-                if (m.name === currentMyName) opt.selected = true;
-                payerSelect.appendChild(opt);
-
-                let div = document.createElement('div');
-                div.className = "flex justify-between items-center bg-white p-2 rounded-xl border border-[#eae1d7]";
-                if (currentSplitMode === 'equal') {
-                    div.innerHTML = `
-                        <label class="flex items-center gap-2 font-bold text-gray-700 cursor-pointer">
-                            <input type="checkbox" name="participant" value="${m.name}" checked class="rounded accent-[#d98262]"> ${m.name}
-                        </label>
-                        <span class="text-gray-400 font-bold text-[11px]">參與均攤</span>
-                    `;
-                } else {
-                    div.innerHTML = `
-                        <label class="flex items-center gap-2 font-bold text-gray-700">
-                            <input type="checkbox" name="participant" value="${m.name}" checked onchange="toggleCustomInput(this)" class="rounded accent-[#d98262]"> ${m.name}
-                        </label>
-                        <input type="number" name="custom-share-${m.name}" placeholder="分攤金額" value="" class="w-24 p-1.5 bg-[#fffaf5] border border-[#eae1d7] rounded-lg outline-none font-bold text-right">
-                    `;
-                }
-                container.appendChild(div);
-            });
-        }
-
-        window.toggleCustomInput = function(cb) {
-            let input = cb.parentElement.parentElement.querySelector('input[type="number"]');
-            if (input) {
-                input.disabled = !cb.checked;
-                if (!cb.checked) input.value = '';
-            }
-        }
-
-        window.submitExpense = async function() {
-            if (!currentProjectId) return;
-            const title = document.getElementById('exp-title').value.trim();
-            const amount = parseFloat(document.getElementById('exp-amount').value);
-            const currency = document.getElementById('exp-currency').value;
-            const rate = parseFloat(document.getElementById('exp-rate').value) || 1;
-            const payer = document.getElementById('exp-payer').value;
-            const settleCurrency = document.getElementById('exp-settle-currency').value;
-
-            if (!title || isNaN(amount) || amount <= 0) {
-                alert("請填寫有效的項目名稱與金額！");
-                return;
-            }
-
-            let shares = {};
-            let participants = [];
-
-            if (currentSplitMode === 'equal') {
-                let checkedBoxes = document.querySelectorAll('input[name="participant"]:checked');
-                checkedBoxes.forEach(cb => participants.push(cb.value));
-                if (participants.length === 0) {
-                    alert("請至少選擇一位參與分攤的成員！");
-                    return;
-                }
-                let shareAmount = Math.round((amount / participants.length) * 100) / 100;
-                participants.forEach(p => { shares[p] = shareAmount; });
-            } else {
-                let sumCustom = 0;
-                allMembersData.forEach(m => {
-                    let cb = document.querySelector(`input[name="participant"][value="${m.name}"]`);
-                    if (cb && cb.checked) {
-                        let input = document.querySelector(`input[name="custom-share-${m.name}"]`);
-                        let val = parseFloat(input.value) || 0;
-                        shares[m.name] = val;
-                        sumCustom += val;
-                        participants.push(m.name);
-                    } else {
-                        shares[m.name] = 0;
-                    }
-                });
-
-                if (Math.abs(sumCustom - amount) > 1) {
-                    alert(`自訂分攤總金額 (${sumCustom}) 與總支出金額 (${amount}) 不符，請重新確認！`);
-                    return;
-                }
-            }
-
-            try {
-                await addDoc(collection(db, "projects", currentProjectId, "expenses"), {
-                    title, amount, currency, rate, payer, settleCurrency, shares, participants, createdAt: Date.now()
-                });
-                closeAddExpenseModal();
-                alert("✨ 記帳成功！");
-            } catch (e) { alert("記帳失敗"); }
-        }
-
-        window.openAddMemberModal = function() { document.getElementById('member-modal').classList.remove('hidden'); }
-        window.closeAddMemberModal = function() { document.getElementById('member-modal').classList.add('hidden'); }
-
-        window.addMember = async function() {
-            if (!currentProjectId) return;
-            const nameInput = document.getElementById('new-member-name');
-            const name = nameInput.value.trim();
-            if (!name) return;
-            try {
-                await addDoc(collection(db, "projects", currentProjectId, "members"), { name });
-                nameInput.value = '';
-            } catch (e) { alert("新增成員失敗"); }
-        }
-
-        window.deleteMember = async function(memberId, memberName) {
-            if (!currentProjectId) return;
-            if (confirm(`確定要將成員【${memberName}】從此專案中移除嗎？`)) {
-                try {
-                    await deleteDoc(doc(db, "projects", currentProjectId, "members", memberId));
-                    alert("✨ 成員已移除！");
-                } catch (e) {
-                    console.error("刪除成員失敗", e);
-                    alert("刪除失敗");
-                }
-            }
-        }
-
-        function renderMemberListUI() {
-            const container = document.getElementById('member-list-display');
-            container.innerHTML = '';
-            allMembersData.forEach(m => {
-                let div = document.createElement('div');
-                div.className = "flex justify-between items-center p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl font-bold";
-                div.innerHTML = `
-                    <span>👤 ${m.name}</span>
-                    <button onclick="deleteMember('${m.id}', '${m.name}')" class="text-gray-400 hover:text-red-500 text-xs px-2 py-1 transition">🗑️ 刪除</button>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        window.openSettlementModal = function() {
-            const content = document.getElementById('settlement-content');
-            content.innerHTML = '';
-            if (allExpensesData.length === 0 || allMembersData.length === 0) {
-                content.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">尚無足夠的帳目資料進行結算！</p>`;
-                document.getElementById('settlement-modal').classList.remove('hidden');
-                return;
-            }
-
-            let balances = {};
-            allMembersData.forEach(m => { balances[m.name] = {}; });
-
-            allExpensesData.forEach(exp => {
-                let cur = exp.currency;
-                let settleCur = exp.settleCurrency || 'ORIGINAL';
-                let effectiveCur = (settleCur === 'TWD') ? 'TWD' : cur;
-                let totalAmt = exp.amount;
-                let rate = exp.rate || 1;
-
-                if (effectiveCur === 'TWD' && cur !== 'TWD') {
-                    totalAmt = totalAmt * rate;
-                }
-
-                allMembersData.forEach(m => {
-                    if (!balances[m.name][effectiveCur]) balances[m.name][effectiveCur] = 0;
-                });
-
-                balances[exp.payer][effectiveCur] += totalAmt;
-
-                let shares = exp.shares || {};
-                Object.keys(shares).forEach(mName => {
-                    let sh = shares[mName];
-                    if (effectiveCur === 'TWD' && cur !== 'TWD') {
-                        sh = sh * rate;
-                    }
-                    if (balances[mName] !== undefined) {
-                        if (!balances[mName][effectiveCur]) balances[mName][effectiveCur] = 0;
-                        balances[mName][effectiveCur] -= sh;
-                    }
-                });
-            });
-
-            let html = `<p class="text-xs text-gray-500 font-bold mb-2">以下為各幣別的最簡化還款建議：</p>`;
-            let hasTransaction = false;
-
-            let activeCurrencies = new Set();
-            Object.keys(balances).forEach(name => {
-                Object.keys(balances[name]).forEach(c => activeCurrencies.add(c));
-            });
-
-            activeCurrencies.forEach(cur => {
-                let debtors = [];
-                let creditors = [];
-
-                Object.keys(balances).forEach(name => {
-                    let val = Math.round((balances[name][cur] || 0) * 100) / 100;
-                    if (val < 0) debtors.push({ name, amount: -val });
-                    else if (val > 0) creditors.push({ name, amount: val });
-                });
-
-                let dIdx = 0, cIdx = 0;
-                while (dIdx < debtors.length && cIdx < creditors.length) {
-                    let debtor = debtors[dIdx];
-                    let creditor = creditors[cIdx];
-                    let amt = Math.min(debtor.amount, creditor.amount);
-                    amt = Math.round(amt * 100) / 100;
-
-                    if (amt > 0) {
-                        hasTransaction = true;
-                        let prefix = (cur === 'TWD') ? 'NT$' : cur;
-                        html += `
-                            <div class="p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl mb-2">
-                                👉 <strong>${debtor.name}</strong> 需支付給 <strong>${creditor.name}</strong>： 
-                                <span class="text-[#d98262] font-black">${prefix} ${amt.toLocaleString()}</span>
-                            </div>
-                        `;
-                    }
-
-                    debtor.amount -= amt;
-                    creditor.amount -= amt;
-
-                    if (debtor.amount <= 0) dIdx++;
-                    if (creditor.amount <= 0) cIdx++;
-                }
-            });
-
-            if (!hasTransaction) {
-                content.innerHTML = `<p class="text-center text-xs text-gray-600 py-6 font-bold">✨ 大家剛好互不欠帳，完美平分！</p>`;
-            } else {
-                content.innerHTML = html;
-            }
-
-            document.getElementById('settlement-modal').classList.remove('hidden');
-        }
-        window.closeSettlementModal = function() { document.getElementById('settlement-modal').classList.add('hidden'); }
-
-        // 提醒規則引擎
-        function renderRemindersByRules(projectName) {
-            const container = document.getElementById('dynamic-reminders-container');
-            let nameLower = projectName.toLowerCase();
-            let html = '';
-
-            // 🌟 智慧判斷是否為韓國行程（決定是否顯示 Naver Map）
-            const isKoreaTrip = nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾');
-            
-            // 同步調整詳細頁面中的地圖按鈕（若非韓國，則隱藏 Naver 按鈕，放大 Google 按鈕）
-            const naverBtn = document.getElementById('btn-naver-map');
-            if (naverBtn) {
-                if (isKoreaTrip) naverBtn.classList.remove('hidden');
-                else naverBtn.classList.add('hidden');
-            }
-
-            if (isKoreaTrip) {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">當地早晚溫差較大且風大，建議穿著長袖、針織衫或帽T，並準備防風外套 🧥。</p>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>導航 App：強烈建議使用 Naver Map 或 Kakao Map，以電話號碼查詢景點最準確！</li>
-                            <li>測速照相：道路速限嚴格，沿途有大量測速照相，務必依速限行駛。</li>
-                            <li>加油還車：多為自助/半人工，記得確認租車規定（通常為滿油出借還車）。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>證件：務必備妥台灣駕照正本與國際駕照。</li>
-                            <li>支付：信用卡普及，建議身上備妥 5~10 萬韓元現金備用。</li>
-                            <li>插頭：電壓 220V，圓形雙孔（歐規/韓規）。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
-                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>警察局：112 | 救護車/消防：119 | 中文旅遊熱線：1330</li>
-                        </ul>
-                    </div>
-                `;
-            } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都') || nameLower.includes('沖繩') || nameLower.includes('北海道') || nameLower.includes('名古屋')) {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇯🇵 日本旅遊與天氣指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">行程多以步行與大眾運輸為主，建議穿著舒適好走的布鞋，並隨身攜帶輕便外套與雨具 🌂。</p>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚆 交通與導航提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>導航：推薦使用 Google Maps 或 乗換案內 查詢地鐵。</li>
-                            <li>IC 卡：建議事先將 Suica 或 Pasmo 加入手機錢包（Apple Pay）。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>護照效期需大於 6 個月。部分小店或拉麵機仍需現金，建議備妥適量日幣。</li>
-                            <li>插頭：電壓 100V，雙孔扁平插頭（與台灣相同）。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
-                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>警察局：110 | 救護車/消防：119</li>
-                        </ul>
-                    </div>
-                `;
-            } else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁') || nameLower.includes('普吉') || nameLower.includes('芭達雅')) {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇹🇭 泰國旅遊與天氣指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">終年炎熱，建議穿著輕薄透氣衣物，備好防曬與雨具。進出寺廟衣著需端莊（不可露肩短褲）。</p>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🛵 交通與叫車提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>叫車：推薦使用 Grab 或 Bolt。市區可多利用 BTS/MRT 避開塞車。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與小費</h3>
-                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>夜市小吃多收現金，可至當地 SuperRich 換匯。按摩或服務良好建議給 20-100 銖小費。</li>
-                            <li>插頭：電壓 220V，圓形或扁平兩用。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
-                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>觀光警察：1155 | 警察局：191 | 醫療：1669</li>
-                        </ul>
-                    </div>
-                `;
-            } else {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥當地網卡、萬用轉接頭與海外旅遊平安險。</p>
-                    </div>
-                `;
-            }
-
-            container.innerHTML = html;
-        }
-
-        // 語言模組
-        function initLanguageModule(projectName) {
-            let nameLower = projectName.toLowerCase();
-            let destKey = 'general';
-            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) destKey = 'korea';
-            else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都')) destKey = 'japan';
-            else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁')) destKey = 'thailand';
-
-            const currentLangPack = languageData[destKey];
-            currentDestinationLang = currentLangPack.langCode;
-            currentActivePhrase = { cn: "請選取左側分類與右側句子", foreign: "Ready to Speak ✨" };
-            document.getElementById('display-cn').innerText = currentActivePhrase.cn;
-            document.getElementById('display-foreign').innerText = currentActivePhrase.foreign;
-
-            const catContainer = document.getElementById('lang-categories');
-            catContainer.innerHTML = '';
-            currentLangPack.categories.forEach((cat, idx) => {
-                let btn = document.createElement('button');
-                btn.className = `w-full text-left text-xs font-black p-3 rounded-2xl transition border ${idx === 0 ? 'bg-[#d98262] text-white border-[#d98262] shadow-sm' : 'bg-white text-gray-700 border-[#eae1d7] hover:bg-[#fffaf5]'}`;
-                btn.innerText = cat.name;
-                btn.onclick = () => {
-                    document.querySelectorAll('#lang-categories button').forEach(b => {
-                        b.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-white text-gray-700 border-[#eae1d7] hover:bg-[#fffaf5]";
-                    });
-                    btn.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-[#d98262] text-white border-[#d98262] shadow-sm";
-                    renderPhrases(currentLangPack.phrases[cat.id]);
-                };
-                catContainer.appendChild(btn);
-            });
-            renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
-        }
-
-        function renderPhrases(phrases) {
-            const phraseContainer = document.getElementById('lang-phrases');
-            phraseContainer.innerHTML = '';
-            phrases.forEach(p => {
-                let card = document.createElement('div');
-                card.className = "cute-card p-3.5 bg-white hover:bg-[#fffaf5] border border-[#eae1d7] cursor-pointer transition flex justify-between items-center";
-                card.innerHTML = `<div><p class="text-xs text-gray-800 font-bold">${p.cn}</p></div>`;
-                card.onclick = () => {
-                    currentActivePhrase = p;
-                    document.getElementById('display-cn').innerText = p.cn;
-                    document.getElementById('display-foreign').innerText = p.foreign;
-                };
-                phraseContainer.appendChild(card);
-            });
-        }
-
-        window.speakCurrentPhrase = function() {
-            if (!currentActivePhrase || !currentActivePhrase.foreign) return;
-            const utterance = new SpeechSynthesisUtterance(currentActivePhrase.foreign);
-            utterance.lang = currentDestinationLang;
-            window.speechSynthesis.speak(utterance);
-        }
-
-        window.backToProjects = function() {
-            currentProjectId = null;
-            currentProjectName = "";
-            currentProjectPin = "";
-            if (unsubscribeSchedules) unsubscribeSchedules();
-            if (unsubscribeExpenses) unsubscribeExpenses();
-            if (unsubscribeMembers) unsubscribeMembers();
-            if (unsubscribeCheckins) unsubscribeCheckins();
-            document.getElementById('view-workspace').classList.add('hidden');
-            document.getElementById('bottom-nav').classList.add('hidden');
-            document.getElementById('back-btn').classList.add('hidden');
-            document.getElementById('share-btn').classList.add('hidden');
-            document.getElementById('view-projects').classList.remove('hidden');
-            document.getElementById('header-title').innerText = "🧳 我的旅遊專案清單";
-            document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
-            renderProjects();
-        }
-
-        function loadSchedules(projId) {
-            const schedulesRef = collection(db, "projects", projId, "schedules");
-            const q = query(schedulesRef, orderBy("createdAt", "asc"));
-            if (unsubscribeSchedules) unsubscribeSchedules();
-            unsubscribeSchedules = onSnapshot(q, (snapshot) => {
-                allSchedulesData = [];
-                snapshot.forEach((docSnap) => { allSchedulesData.push({ id: docSnap.id, ...docSnap.data() }); });
-                renderDayPills();
-                renderScheduleUI();
-                renderQuestUI();
-            });
-        }
-
-        function cleanDisplayTitle(title) {
-            if (!title) return '';
-            return title.replace(/^\d{1,2}[:：]\d{2}\s*/, '').trim();
-        }
-
-        function renderDayPills() {
-            const pillsContainer = document.getElementById('day-pills-container');
-            pillsContainer.innerHTML = '';
-            let grouped = {};
-            allSchedulesData.forEach(item => {
-                let dayKey = item.day || 'Day 1';
-                if (!grouped[dayKey]) grouped[dayKey] = [];
-                grouped[dayKey].push(item);
-            });
-            let days = Object.keys(grouped);
-            if (days.length === 0) return;
-
-            let allBtn = document.createElement('button');
-            allBtn.className = `px-4 py-2 rounded-full text-xs font-black transition shrink-0 ${activeDayFilter === 'all' ? 'bg-[#d98262] text-white shadow-sm' : 'bg-white text-[#736052] border border-[#eae1d7]'}`;
-            allBtn.innerText = "全部行程";
-            allBtn.onclick = () => { activeDayFilter = 'all'; renderDayPills(); renderScheduleUI(); };
-            pillsContainer.appendChild(allBtn);
-
-            days.forEach(dayKey => {
-                let btn = document.createElement('button');
-                let isActive = activeDayFilter === dayKey;
-                btn.className = `px-4 py-2 rounded-full text-xs font-black transition shrink-0 ${isActive ? 'bg-[#d98262] text-white shadow-sm' : 'bg-white text-[#736052] border border-[#eae1d7]'}`;
-                btn.innerText = dayKey;
-                btn.onclick = () => { activeDayFilter = dayKey; renderDayPills(); renderScheduleUI(); };
-                pillsContainer.appendChild(btn);
-            });
-        }
-
-        function renderScheduleUI() {
-            const container = document.getElementById('schedule-container');
-            const upcomingContainer = document.getElementById('upcoming-card-container');
-            container.innerHTML = ''; upcomingContainer.innerHTML = '';
-
-            if (allSchedulesData.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前還沒有行程，快點擊上方按鈕新增或智慧導入吧！✨</p>`;
-                return;
-            }
-
-            const nextItem = allSchedulesData[0];
-            const cleanNextTitle = cleanDisplayTitle(nextItem.title);
-            upcomingContainer.innerHTML = `
-                <div onclick="openDetailModal('${nextItem.id}')" class="cute-card p-4 bg-gradient-to-r from-[#fffaf5] to-[#fbf2e9] border-2 border-[#d98262]/40 space-y-2 relative shadow-md cursor-pointer">
-                    <div class="flex justify-between items-center">
-                        <span class="text-[10px] bg-[#d98262] text-white px-2.5 py-0.5 rounded-full font-black">🚀 即將到來</span>
-                        <span class="text-xs font-black text-[#d98262]">${nextItem.day || 'Day 1'} • ${nextItem.time || '全天'}</span>
-                    </div>
-                    <h4 class="font-black text-gray-900 text-sm">${cleanNextTitle}</h4>
-                </div>
-            `;
-
-            let grouped = {};
-            allSchedulesData.forEach(item => {
-                let dayKey = item.day || 'Day 1';
-                if (!grouped[dayKey]) grouped[dayKey] = [];
-                grouped[dayKey].push(item);
-            });
-
-            Object.keys(grouped).forEach((dayKey, index) => {
-                if (activeDayFilter !== 'all' && activeDayFilter !== dayKey) return;
-                let items = grouped[dayKey];
-                let sectionId = `day_section_${index}`;
-                let dayBox = document.createElement('div');
-                dayBox.className = "cute-card overflow-hidden border border-[#eae1d7] mb-3";
-                
-                let headerHtml = `
-                    <div onclick="toggleDayCollapse('${sectionId}')" class="bg-[#f3e9de]/70 p-3.5 flex justify-between items-center cursor-pointer hover:bg-[#f3e9de] transition">
-                        <h4 class="font-black text-[#5c4a3d] text-xs">${dayKey} <span class="text-[11px] text-[#8c7868] font-bold">(${items.length} 個行程)</span></h4>
-                        <span id="icon_${sectionId}" class="text-xs text-[#8c7868] font-black">▼ 展開</span>
-                    </div>
-                `;
-                let isExpanded = activeDayFilter !== 'all';
-                let listHtml = `<div id="${sectionId}" class="${isExpanded ? '' : 'hidden'} p-3 space-y-2.5 bg-white">`;
-
-                items.forEach(s => {
-                    let cleanTitle = cleanDisplayTitle(s.title);
-                    listHtml += `
-                        <div onclick="openDetailModal('${s.id}')" class="p-3.5 bg-[#fffaf5] hover:bg-[#fbf2e9] rounded-2xl border border-[#eae1d7] flex justify-between items-center cursor-pointer transition">
-                            <div class="space-y-0.5">
-                                <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
-                                <h5 class="font-black text-gray-900 text-sm mt-1">${cleanTitle}</h5>
-                            </div>
-                        </div>
-                    `;
-                });
-                listHtml += `</div>`;
-                dayBox.innerHTML = headerHtml + listHtml;
-                container.appendChild(dayBox);
-            });
-        }
-
-        window.toggleDayCollapse = function(sectionId) {
-            const el = document.getElementById(sectionId);
-            const icon = document.getElementById(`icon_${sectionId}`);
-            if (el.classList.contains('hidden')) { el.classList.remove('hidden'); icon.innerText = "▲ 收合"; }
-            else { el.classList.add('hidden'); icon.innerText = "▼ 展開"; }
-        }
-
-        let currentDetailItem = null;
-
         window.openDetailModal = function(id) {
             const item = allSchedulesData.find(s => s.id === id);
             if (!item) return;
@@ -1945,6 +1597,15 @@
                 locContainer.classList.add('hidden');
             }
 
+            let isKoreaTrip = currentProjectName && (currentProjectName.includes("濟州") || currentProjectName.includes("韓國") || currentProjectName.includes("釜山") || currentProjectName.includes("首爾"));
+            const mapBtnContainer = document.getElementById('modal-map-btn-container');
+            let mapBtnsHtml = '';
+            if (isKoreaTrip) {
+                mapBtnsHtml += `<button onclick="launchDirectMap('naver')" class="flex-1 text-center text-xs bg-[#2db400] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💚 Naver Map</button>`;
+            }
+            mapBtnsHtml += `<button onclick="launchDirectMap('google')" class="flex-1 text-center text-xs bg-[#4285f4] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💙 Google Maps</button>`;
+            mapBtnContainer.innerHTML = mapBtnsHtml;
+
             document.getElementById('edit-schedule-id').value = item.id;
             document.getElementById('edit-day').value = item.day || 'Day 1';
             document.getElementById('edit-time').value = item.time || '10:00';
@@ -1955,41 +1616,66 @@
             document.getElementById('detail-modal').classList.remove('hidden');
         }
 
-        // 🗺️ 彈出地圖搜尋小視窗 (根據國家動態顯示按鈕)
-        window.openMapSearchModal = function(mapType) {
+        window.launchDirectMap = function(mapType) {
             if (!currentDetailItem) return;
-            let cleanTitle = cleanDisplayTitle(currentDetailItem.title);
-            let smartQuery = cleanTitle;
+            let queryStr = customMapQueries[currentDetailItem.id];
+            if (!queryStr) {
+                let cleanTitle = cleanDisplayTitle(currentDetailItem.title);
+                queryStr = cleanTitle;
+                if (currentProjectName) {
+                    let locationKeyword = "";
+                    if (currentProjectName.includes("濟州")) locationKeyword = "濟州島";
+                    else if (currentProjectName.includes("東京")) locationKeyword = "東京";
+                    else if (currentProjectName.includes("釜山")) locationKeyword = "釜山";
+                    else if (currentProjectName.includes("首爾")) locationKeyword = "首爾";
+                    else if (currentProjectName.includes("曼谷")) locationKeyword = "曼谷";
+                    else if (currentProjectName.includes("大阪")) locationKeyword = "大阪";
 
-            if (currentProjectName) {
-                let locationKeyword = "";
-                if (currentProjectName.includes("濟州")) locationKeyword = "濟州島";
-                else if (currentProjectName.includes("東京")) locationKeyword = "東京";
-                else if (currentProjectName.includes("釜山")) locationKeyword = "釜山";
-                else if (currentProjectName.includes("首爾")) locationKeyword = "首爾";
-                else if (currentProjectName.includes("曼谷")) locationKeyword = "曼谷";
-                else if (currentProjectName.includes("大阪")) locationKeyword = "大阪";
-
-                if (locationKeyword && !cleanTitle.includes(locationKeyword)) {
-                    smartQuery = `${locationKeyword} ${cleanTitle}`;
+                    if (locationKeyword && !cleanTitle.includes(locationKeyword)) {
+                        queryStr = `${locationKeyword} ${cleanTitle}`;
+                    }
                 }
             }
 
-            document.getElementById('map-search-input').value = smartQuery;
-            document.getElementById('map-modal-title').innerText = '🗺️ 確認地圖搜尋關鍵字';
+            const queryText = encodeURIComponent(queryStr);
+            let url = (mapType === 'naver') ? 
+                `https://m.map.naver.com/search2/search.naver?query=${queryText}` : 
+                `https://www.google.com/maps/search/?api=1&query=${queryText}`;
+            window.open(url, '_blank');
+        }
 
-            // 判斷是否為韓國行程
+        window.openMapSearchModal = function() {
+            if (!currentDetailItem) return;
+            let currentQuery = customMapQueries[currentDetailItem.id];
+            if (!currentQuery) {
+                let cleanTitle = cleanDisplayTitle(currentDetailItem.title);
+                currentQuery = cleanTitle;
+                if (currentProjectName) {
+                    let locationKeyword = "";
+                    if (currentProjectName.includes("濟州")) locationKeyword = "濟州島";
+                    else if (currentProjectName.includes("東京")) locationKeyword = "東京";
+                    else if (currentProjectName.includes("釜山")) locationKeyword = "釜山";
+                    else if (currentProjectName.includes("首爾")) locationKeyword = "首爾";
+                    else if (currentProjectName.includes("曼谷")) locationKeyword = "曼谷";
+                    else if (currentProjectName.includes("大阪")) locationKeyword = "大阪";
+
+                    if (locationKeyword && !cleanTitle.includes(locationKeyword)) {
+                        currentQuery = `${locationKeyword} ${cleanTitle}`;
+                    }
+                }
+            }
+
+            document.getElementById('map-search-input').value = currentQuery;
             let isKoreaTrip = currentProjectName && (currentProjectName.includes("濟州") || currentProjectName.includes("韓國") || currentProjectName.includes("釜山") || currentProjectName.includes("首爾"));
 
             const btnContainer = document.getElementById('map-buttons-container');
             let buttonsHtml = '';
             if (isKoreaTrip) {
-                buttonsHtml += `<button onclick="launchMapSearch('naver')" class="w-full text-center bg-[#2db400] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💚 打開 Naver Map 搜尋</button>`;
+                buttonsHtml += `<button onclick="saveAndLaunchMap('naver')" class="w-full text-center bg-[#2db400] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💚 儲存並打開 Naver Map</button>`;
             }
-            buttonsHtml += `<button onclick="launchMapSearch('google')" class="w-full text-center bg-[#4285f4] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💙 打開 Google Maps 搜尋</button>`;
+            buttonsHtml += `<button onclick="saveAndLaunchMap('google')" class="w-full text-center bg-[#4285f4] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💙 儲存並打開 Google Maps</button>`;
             
             btnContainer.innerHTML = buttonsHtml;
-
             document.getElementById('map-search-modal').classList.remove('hidden');
         }
 
@@ -1997,16 +1683,18 @@
             document.getElementById('map-search-modal').classList.add('hidden');
         }
 
-        window.launchMapSearch = function(mapType) {
-            const queryText = encodeURIComponent(document.getElementById('map-search-input').value.trim());
-            if (!queryText) { alert("請輸入搜尋關鍵字！"); return; }
-
-            let url = "";
-            if (mapType === 'naver') {
-                url = `https://m.map.naver.com/search2/search.naver?query=${queryText}`;
-            } else {
-                url = `https://www.google.com/maps/search/?api=1&query=${queryText}`;
+        window.saveAndLaunchMap = function(mapType) {
+            const inputVal = document.getElementById('map-search-input').value.trim();
+            if (!inputVal) { alert("請輸入搜尋關鍵字！"); return; }
+            
+            if (currentDetailItem) {
+                customMapQueries[currentDetailItem.id] = inputVal;
             }
+
+            const queryText = encodeURIComponent(inputVal);
+            let url = (mapType === 'naver') ? 
+                `https://m.map.naver.com/search2/search.naver?query=${queryText}` : 
+                `https://www.google.com/maps/search/?api=1&query=${queryText}`;
 
             window.open(url, '_blank');
             closeMapSearchModal();
