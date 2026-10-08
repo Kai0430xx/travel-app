@@ -313,6 +313,25 @@
         </div>
     </div>
 
+    <!-- 🗺️ 彈出式地圖搜尋微調 Modal (可自由修改搜尋文字) -->
+    <div id="map-search-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-[#5c4a3d] text-base" id="map-modal-title">🗺️ 確認地圖搜尋關鍵字</h3>
+                <button onclick="closeMapSearchModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <p class="text-gray-500 font-bold">如果自動抓取的店名不夠精準，您可以直接在這裡修改成詳細的店名、韓文/日文或地址：</p>
+            
+            <input type="text" id="map-search-input" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-sm" placeholder="輸入搜尋關鍵字...">
+
+            <div class="pt-2 space-y-2">
+                <button onclick="launchMapSearch('naver')" class="w-full text-center bg-[#2db400] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💚 打開 Naver Map 搜尋</button>
+                <button onclick="launchMapSearch('google')" class="w-full text-center bg-[#4285f4] text-white py-3 rounded-full font-black shadow-md transition flex items-center justify-center gap-1.5">💙 打開 Google Maps 搜尋</button>
+                <button onclick="closeMapSearchModal()" class="w-full text-center bg-gray-100 text-gray-600 py-2.5 rounded-full font-black">取消</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 行程詳細與修改 Modal -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
@@ -332,8 +351,8 @@
                     </div>
                 </div>
                 <div class="pt-2 flex gap-2.5">
-                    <a id="modal-naver" href="#" target="_blank" class="flex-1 text-center text-xs bg-[#2db400] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💚 Naver Map</a>
-                    <a id="modal-gmap" href="#" target="_blank" class="flex-1 text-center text-xs bg-[#4285f4] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💙 Google Maps</a>
+                    <button onclick="openMapSearchModal('naver')" class="flex-1 text-center text-xs bg-[#2db400] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💚 Naver Map</button>
+                    <button onclick="openMapSearchModal('google')" class="flex-1 text-center text-xs bg-[#4285f4] text-white py-2.5 rounded-full font-black hover:opacity-90 transition flex items-center justify-center gap-1 shadow-sm">💙 Google Maps</button>
                 </div>
                 <div class="pt-2 flex gap-2.5">
                     <button onclick="switchToEditMode()" class="flex-1 bg-[#f0dcd0] text-[#735848] text-xs py-3 rounded-full font-black transition">✏️ 修改行程</button>
@@ -587,13 +606,13 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
                         { cn: "救命！我的護照（或錢包）被偷了！", foreign: "助けてください！パスポート（または財布）が盗まれました！" },
                         { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "体調が悪いのですが、近くに薬局や病院はありますか？" },
-                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "すみません、道に迷いました。警察를 呼んでいただけますか？" }
+                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "すみません、道に迷いました。警察を呼んでいただけますか？" }
                     ]
                 }
             },
@@ -954,6 +973,7 @@
             return 'spot';
         }
 
+        // 純標準任務打卡模式 (含圓形布章與按天數收合任務清單)
         function renderQuestUI() {
             const container = document.getElementById('quest-list-container');
             const countEl = document.getElementById('quest-total-count');
@@ -1079,9 +1099,9 @@
             }
 
             if (shTotal > 0 && shDone === shTotal) {
-                shBadge.className = "badge-circle unlocked"; shTitle.innerText = "精品大收割";
+                shBadge.className = "badge-circle unlocked"; sTitle.innerText = "精品大收割";
             } else {
-                shBadge.className = "badge-circle"; shTitle.innerText = `購物 (${shDone}/${shTotal})`;
+                shBadge.className = "badge-circle"; sTitle.innerText = `購物 (${shDone}/${shTotal})`;
             }
         }
 
@@ -1717,7 +1737,7 @@
 
             const currentLangPack = languageData[destKey];
             currentDestinationLang = currentLangPack.langCode;
-            currentActivePhrase = { cn: "請選取左側分類與右側句子", foreign: "Ready to Speak ✨" };
+            currentActivePhrase = { cn: "請點選左側分類與右側句子", foreign: "Ready to Speak ✨" };
             document.getElementById('display-cn').innerText = currentActivePhrase.cn;
             document.getElementById('display-foreign').innerText = currentActivePhrase.foreign;
 
@@ -1895,10 +1915,13 @@
             else { el.classList.add('hidden'); icon.innerText = "▼ 展開"; }
         }
 
-        // 🌟 萬能導航修正：使用網頁版搜尋連結，保證手機與 App 都能完美開啟並搜尋到對應地點
+        let currentDetailItem = null;
+
         window.openDetailModal = function(id) {
             const item = allSchedulesData.find(s => s.id === id);
             if (!item) return;
+            currentDetailItem = item;
+
             document.getElementById('modal-day').innerText = item.day || 'Day 1';
             document.getElementById('modal-time').innerText = item.time || '全天';
             document.getElementById('modal-title').innerText = cleanDisplayTitle(item.title);
@@ -1914,8 +1937,22 @@
                 locContainer.classList.add('hidden');
             }
 
-            let cleanTitle = cleanDisplayTitle(item.title);
+            document.getElementById('edit-schedule-id').value = item.id;
+            document.getElementById('edit-day').value = item.day || 'Day 1';
+            document.getElementById('edit-time').value = item.time || '10:00';
+            document.getElementById('edit-title').value = cleanDisplayTitle(item.title);
+            document.getElementById('edit-location').value = item.location || '';
+            document.getElementById('modal-view-mode').classList.remove('hidden');
+            document.getElementById('modal-edit-mode').classList.add('hidden');
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        // 🗺️ 彈出地圖搜尋小視窗
+        window.openMapSearchModal = function(mapType) {
+            if (!currentDetailItem) return;
+            let cleanTitle = cleanDisplayTitle(currentDetailItem.title);
             let smartQuery = cleanTitle;
+
             if (currentProjectName) {
                 let locationKeyword = "";
                 if (currentProjectName.includes("濟州")) locationKeyword = "濟州島";
@@ -1930,20 +1967,31 @@
                 }
             }
 
-            const queryText = encodeURIComponent(smartQuery);
-            // 改用通用網頁版搜尋連結，手機點擊會自動彈出引導至 Naver Map / Google Maps App 搜尋
-            document.getElementById('modal-naver').href = `https://m.map.naver.com/search2/search.naver?query=${queryText}`;
-            document.getElementById('modal-gmap').href = `https://www.google.com/maps/search/?api=1&query=${queryText}`;
-
-            document.getElementById('edit-schedule-id').value = item.id;
-            document.getElementById('edit-day').value = item.day || 'Day 1';
-            document.getElementById('edit-time').value = item.time || '10:00';
-            document.getElementById('edit-title').value = cleanDisplayTitle(item.title);
-            document.getElementById('edit-location').value = item.location || '';
-            document.getElementById('modal-view-mode').classList.remove('hidden');
-            document.getElementById('modal-edit-mode').classList.add('hidden');
-            document.getElementById('detail-modal').classList.remove('hidden');
+            document.getElementById('map-search-input').value = smartQuery;
+            document.getElementById('map-modal-title').innerText = mapType === 'naver' ? '💚 Naver Map 搜尋確認' : '💙 Google Maps 搜尋確認';
+            window.activeMapType = mapType;
+            document.getElementById('map-search-modal').classList.remove('hidden');
         }
+
+        window.closeMapSearchModal = function() {
+            document.getElementById('map-search-modal').classList.add('hidden');
+        }
+
+        window.launchMapSearch = function(mapType) {
+            const queryText = encodeURIComponent(document.getElementById('map-search-input').value.trim());
+            if (!queryText) { alert("請輸入搜尋關鍵字！"); return; }
+
+            let url = "";
+            if (mapType === 'naver') {
+                url = `https://m.map.naver.com/search2/search.naver?query=${queryText}`;
+            } else {
+                url = `https://www.google.com/maps/search/?api=1&query=${queryText}`;
+            }
+
+            window.open(url, '_blank');
+            closeMapSearchModal();
+        }
+
         window.closeDetailModal = function() { document.getElementById('detail-modal').classList.add('hidden'); }
         window.switchToEditMode = function() { document.getElementById('modal-view-mode').classList.add('hidden'); document.getElementById('modal-edit-mode').classList.remove('hidden'); }
         window.switchToViewMode = function() { document.getElementById('modal-edit-mode').classList.add('hidden'); document.getElementById('modal-view-mode').classList.remove('hidden'); }
