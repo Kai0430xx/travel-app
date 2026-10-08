@@ -750,7 +750,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -1881,6 +1881,11 @@
             utterance.lang = 'ko-KR';
             window.speechSynthesis.speak(utterance);
         }
+
+        // 🌟 確保全域能夠呼叫的函式
+        window.renderRemindersByRules = renderRemindersByRules;
+        window.backToProjects = backToProjects;
+        window.enterProject = enterProject;
 
         async function initApp() {
             const urlParams = new URLSearchParams(window.location.search);
