@@ -66,7 +66,8 @@ const S={id:null,name:'',pin:'',me:localStorage.getItem('my_travel_nickname')||'
 const dest=n=>/濟州|韓國|釜山|首爾/.test(n||'')?'korea':/日本|東京|大阪|京都|沖繩/.test(n||'')?'japan':'general';
 const dn=s=>+String(s||'').replace(/\D/g,'')||1,clean=t=>(t||'').replace(/^\d{1,2}[:：]\d{2}\s*/,'').trim();
 const RATE={TWD:1,KRW:.024,JPY:.21,USD:32};
-/* ---------- SVG 插圖 ---------- */
+
+/* ---------- SVG 插圖 (首頁大圖) ---------- */
 const K='stroke="#3E3A39" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"';
 const cloud=(x,y)=>`<g transform="translate(${x} ${y})"><g class="dr"><path d="M0 18q-2-14 14-12q8-12 22 0q14-2 12 12z" fill="#FFFCF6" ${K}/></g></g>`;
 const hill=(c,y)=>`<path d="M-4 140V${y}Q80 ${y-24} 160 ${y}T324 ${y-6}V140z" fill="${c}" ${K}/>`;
@@ -76,13 +77,13 @@ japan:`<rect width="320" height="140" fill="#F6D27A"/><g class="fl"><circle cx="
 general:`<rect width="320" height="140" fill="#A8D3E6"/>${cloud(18,30)}${cloud(220,64)}<g class="dr"><path d="M80 60l92-12q24-2 24 8t-24 8l-92-4z" fill="#F6D27A" ${K}/><path d="M124 58l-18-26h14l30 26z" fill="#F2A497" ${K}/></g>${hill('#B9DAA5',112)}<g class="fl"><rect x="232" y="92" width="44" height="34" rx="8" fill="#F2A497" ${K}/><path d="M244 92v-9h20v9" fill="none" ${K}/></g>`};
 const scene=n=>`<svg viewBox="0 0 320 140" role="img" aria-label="旅行插圖">${SC[dest(n)]}</svg>`;
 
-// 各分頁專屬插圖 SVG
+/* ---------- 各分頁專屬精緻插圖 ---------- */
 const TAB_SC = {
-    schedule: `<rect width="320" height="140" fill="#F6D27A"/>${cloud(40,20)}<g class="fl"><rect x="110" y="40" width="100" height="70" rx="14" fill="#FFFCF6" ${K}/><rect x="130" y="60" width="60" height="30" rx="6" fill="#A8D3E6" ${K}/></g>`,
-    ai: `<rect width="320" height="140" fill="#B9DAA5"/>${cloud(30,30)}<g class="fl"><circle cx="160" cy="70" r="32" fill="#F6D27A" ${K}/><path d="M160 50v24l16 10" fill="none" ${K}/></g>`,
-    lang: `<rect width="320" height="140" fill="#A8D3E6"/>${cloud(220,20)}<g class="dr"><rect x="100" y="45" width="120" height="60" rx="16" fill="#FFFCF6" ${K}/><path d="M120 75h80M120 90h50" fill="none" ${K}/></g>`,
-    split: `<rect width="320" height="140" fill="#F2A497"/>${cloud(50,20)}<g class="fl"><circle cx="160" cy="70" r="30" fill="#F6D27A" ${K}/><text x="148" y="80" font-size="28" font-weight="bold" fill="#3E3A39">NT$</text></g>`,
-    quest: `<rect width="320" height="140" fill="#B9DAA5"/>${cloud(180,20)}<g class="fl"><path d="M140 40l20 20l40-40" fill="none" stroke="#3E3A39" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></g>`
+    schedule: `<rect width="320" height="140" fill="#F6D27A"/>${cloud(30,20)}<g class="fl"><rect x="110" y="35" width="100" height="76" rx="14" fill="#FFFCF6" ${K}/><rect x="125" y="55" width="70" height="12" rx="4" fill="#F2A497" ${K}/><rect x="125" y="75" width="50" height="10" rx="3" fill="#A8D3E6" ${K}/><circle cx="100" cy="80" r="14" fill="#B9DAA5" ${K}/></g>`,
+    ai: `<rect width="320" height="140" fill="#B9DAA5"/>${cloud(40,25)}<g class="fl"><circle cx="160" cy="70" r="34" fill="#FFFCF6" ${K}/><path d="M148 70l10 10l18-20" fill="none" stroke="#3E3A39" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>`,
+    lang: `<rect width="320" height="140" fill="#A8D3E6"/>${cloud(220,20)}<g class="dr"><path d="M90 50q20-15 50 0t50 0t50 0" fill="none" ${K}/><rect x="110" y="55" width="100" height="50" rx="14" fill="#FFFCF6" ${K}/><circle cx="140" cy="80" r="6" fill="#3E3A39"/><circle cx="160" cy="80" r="6" fill="#3E3A39"/><circle cx="180" cy="80" r="6" fill="#3E3A39"/></g>`,
+    split: `<rect width="320" height="140" fill="#F2A497"/>${cloud(50,20)}<g class="fl"><circle cx="130" cy="75" r="24" fill="#F6D27A" ${K}/><text x="121" y="84" font-size="22" font-weight="bold" fill="#3E3A39">$</text><circle cx="190" cy="65" r="30" fill="#FFFCF6" ${K}/><text x="179" y="74" font-size="26" font-weight="bold" fill="#3E3A39">$</text></g>`,
+    quest: `<rect width="320" height="140" fill="#A8D3E6"/>${cloud(30,20)}<g class="fl"><polygon points="160,30 180,75 225,80 190,110 200,155 160,130 120,155 130,110 95,80 140,75" fill="#F6D27A" ${K}/></g>`
 };
 const tabScene=t=>`<svg viewBox="0 0 320 140" role="img" aria-label="分頁插圖">${TAB_SC[t]||TAB_SC.schedule}</svg>`;
 
@@ -93,6 +94,7 @@ const c=()=>m.remove();q(m,'.x').onclick=q(m,'.cl').onclick=c;m.onclick=e=>{if(e
 if(ok)q(m,'.ok').onclick=async()=>{if(await onOk(m)!==false)c()};document.body.appendChild(m);return m}
 const val=(m,s)=>q(m,s).value.trim();
 const copy=async t=>{try{await navigator.clipboard.writeText(t);alert('已複製 ✨')}catch{prompt('請手動複製',t)}};
+
 /* ---------- 計算出發倒數 ---------- */
 const getCountdown=datesStr=>{
 if(!datesStr)return'';
@@ -101,33 +103,50 @@ if(!match)return'';
 const[,y,m,d]=match,start=new Date(`${y}-${m}-${d}T00:00:00`),now=new Date();
 now.setHours(0,0,0,0);const diff=Math.ceil((start-now)/(1000*60*60*24));
 if(diff>0)return`🔥 倒數 ${diff} 天`;if(diff===0)return`🎉 今天出發！`;return`✈️ 進行中/已結束`};
-/* ---------- 專案 ---------- */
+
+/* ---------- 專案列表與刪除 ---------- */
 const ids=()=>JSON.parse(localStorage.getItem('my_subscribed_projects')||'[]');
 const saveIds=a=>localStorage.setItem('my_subscribed_projects',JSON.stringify([...new Set(a)]));
+
 async function renderProjects(){const l=$('pl'),a=ids();if(!a.length){l.innerHTML='<p class="mute">還沒有專案，新增一個或輸入 6 位數號碼導入吧 ✨</p>';return}
 const snaps=await Promise.all(a.map(i=>getDoc(doc(db,'projects',i)).catch(()=>null)));l.innerHTML='';
 snaps.forEach(s=>{if(!s||!s.exists())return;const p=s.data(),d=document.createElement('div');d.className='box item';
-d.innerHTML=`<div class="row" style="margin:0"><span class="tag">${esc(p.dates||'未定日期')}</span><small style="color:var(--co);font-weight:bold">${getCountdown(p.dates)}</small></div><b style="font-size:16px;margin-top:4px">🌸 ${esc(p.name)}</b>`;d.onclick=()=>enter(s.id);l.appendChild(d)})}
+d.style.display='flex';d.style.justifyContent='space-between';d.style.alignItems='center';
+d.innerHTML=`<div style="flex:1;min-width:0" onclick="window.enterProj('${s.id}')"><div class="row" style="margin:0"><span class="tag">${esc(p.dates||'未定日期')}</span><small style="color:var(--co);font-weight:bold">${getCountdown(p.dates)}</small></div><b style="font-size:16px;margin-top:4px">🌸 ${esc(p.name)}</b></div><button class="btn" style="background:#ffdddd;padding:6px 10px;margin-left:8px" onclick="event.stopPropagation();window.delProj('${s.id}')">🗑️</button>`;
+l.appendChild(d)})}
+
+window.enterProj = id => enter(id);
+window.delProj = async id => {
+    if(confirm('確定要從清單中移除這個專案嗎？')){
+        saveIds(ids().filter(i=>i!==id));
+        renderProjects();
+    }
+};
+
 $('new').onclick=()=>modal('🌸 新增旅程','<label>旅程名稱</label><input id="n1" placeholder="例如：濟州島四日遊"><label>日期（請包含年份，例如：2026年 11/23-11/27）</label><input id="n2" placeholder="2026年 11/23 - 11/27">','建立',async m=>{const name=val(m,'#n1');if(!name){alert('請輸入名稱');return false}
 const pin=String(Math.floor(100000+Math.random()*900000)),r=await addDoc(collection(db,'projects'),{name,dates:val(m,'#n2'),pin,createdAt:Date.now()});saveIds([r.id,...ids()]);renderProjects()});
 $('imp').onclick=()=>modal('📥 輸入 6 位數專案號碼','<input id="c1" maxlength="6" inputmode="numeric" placeholder="例如：883921" style="text-align:center;font-size:20px;letter-spacing:4px">','導入',async m=>{const c=val(m,'#c1'),r=await getDocs(query(collection(db,'projects'),where('pin','==',c)));
 if(r.empty){alert('找不到這個專案號碼');return false}saveIds([r.docs[0].id,...ids()]);renderProjects()});
 $('sh').onclick=()=>{const url=location.origin+location.pathname+'?project='+S.id;const m=modal('✨ 分享此專案',`<h1 style="text-align:center;letter-spacing:6px;margin:6px 0">${esc(S.pin||'------')}</h1><button class="btn gr" id="cp" style="width:100%;margin-bottom:8px">📋 複製 6 位數代碼</button><button class="btn aq" id="cu" style="width:100%">🔗 複製專屬網址</button>`);q(m,'#cp').onclick=()=>copy(S.pin);q(m,'#cu').onclick=()=>copy(url)};
+
 async function enter(id){const s=await getDoc(doc(db,'projects',id));if(!s.exists())return;Object.assign(S,{id,name:s.data().name,pin:s.data().pin||''});
 if(S.me)return open_();modal('🌸 歡迎加入旅程','<input id="nm" placeholder="你的名字，例如：小明">','進入旅程',m=>{const v=val(m,'#nm');if(!v){alert('請輸入名字');return false}S.me=v;localStorage.setItem('my_travel_nickname',v);open_()})}
+
 function open_(){$('v0').hidden=true;$('v1').hidden=false;$('nav').hidden=false;$('bk').hidden=false;$('sh').hidden=false;$('ht').textContent='🌸 '+S.name;$('hs').textContent='旅伴：'+S.me;
-// 各分頁填入對應專屬插圖
 ['schedule','ai','lang','split','quest'].forEach(t=>{const el=$('hero-'+t);if(el)el.innerHTML=tabScene(t)});
 S.day='all';S.lang=LG[dest(S.name)].c;rRemind();rLang();
 setDoc(doc(db,'projects',S.id,'members',S.me),{name:S.me},{merge:true});
 const sub=(c,o,fn)=>{const r=collection(db,'projects',S.id,c);S.un.push(onSnapshot(o?query(r,orderBy(o)):r,sn=>fn(sn.docs.map(d=>({id:d.id,...d.data()})))))};
 sub('schedules','createdAt',a=>{S.sch=a;rSch();rQuest()});sub('members',0,a=>{S.mem=a.map(m=>m.name||m.id);rSplit()});sub('expenses','createdAt',a=>{S.exp=a;rSplit()});
 sub('checkins',0,a=>{S.all=a;S.chk={};a.filter(c=>c.uploader===S.me).forEach(c=>S.chk[c.scheduleId]=c);rQuest()});tab('schedule')}
+
 $('bk').onclick=()=>{S.un.forEach(f=>f());S.un=[];S.id=null;$('v0').hidden=false;$('v1').hidden=true;$('nav').hidden=true;$('bk').hidden=true;$('sh').hidden=true;$('ht').textContent='🧳 放風之旅';$('hs').textContent='選擇你的冒險旅程 ✨';renderProjects()};
+
 const TABS=[['schedule','📅','行程'],['ai','💡','提醒'],['lang','🗣','語言'],['split','💰','分帳'],['quest','🎯','闖關']];
 $('nav').innerHTML=TABS.map(t=>`<button data-t="${t[0]}"><span>${t[1]}</span>${t[2]}</button>`).join('');
 $('nav').querySelectorAll('button').forEach(b=>b.onclick=()=>{tab(b.dataset.t);b.classList.add('bn')});
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.hidden=e.id!=='t-'+t);$('nav').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.t===t);if(b.dataset.t!==t)b.classList.remove('bn')})}
+
 /* ---------- 行程 ---------- */
 const tp=t=>String(t||'99:99').padStart(5,'0');
 function rSch(pop){const days=[...new Set(S.sch.map(s=>s.day||'Day 1'))].sort((a,b)=>dn(a)-dn(b));if(S.day!=='all'&&!days.includes(S.day))S.day='all';
@@ -136,27 +155,34 @@ $('pills').querySelectorAll('button').forEach(b=>b.onclick=()=>{S.day=b.dataset.
 const l=S.sch.filter(s=>S.day==='all'||(s.day||'Day 1')===S.day).sort((a,b)=>dn(a.day)-dn(b.day)||tp(a.time).localeCompare(tp(b.time)));
 $('sl').innerHTML=l.length?l.map(s=>`<div class="box item${pop?' bn':''}" data-i="${s.id}"><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><b>${esc(clean(s.title))}</b></div>`).join(''):'<p class="mute">還沒有行程，按「新增」或「智慧導入」吧 ✨</p>';
 $('sl').querySelectorAll('.item').forEach(e=>e.onclick=()=>detail(e.dataset.i))}
+
 function detail(id){const s=S.sch.find(x=>x.id===id);if(!s)return;const t=clean(s.title),k=encodeURIComponent((/濟州/.test(S.name)&&!t.includes('濟州')?'濟州島 ':'')+t);
 const m=modal(esc(t),`<span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span>${s.location?`<div class="box" style="margin:8px 0;white-space:pre-line">📝 ${esc(s.location)}</div>`:''}
 <div class="row gap" style="justify-content:flex-start">${dest(S.name)==='korea'?`<a class="btn gr" target="_blank" rel="noopener" href="https://m.map.naver.com/search2/search.naver?query=${k}">💚 Naver</a>`:''}<a class="btn aq" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${k}">💙 Google</a><button class="btn" id="dl">🗑 刪除</button></div>`);
 q(m,'#dl').onclick=async()=>{if(confirm('確定刪除這個行程？')){await deleteDoc(doc(db,'projects',S.id,'schedules',id));m.remove()}}}
+
 $('ad').onclick=()=>modal('✏️ 新增行程','<label>天數</label><input id="a1" value="Day 1"><label>時間</label><input id="a2" value="10:00"><label>行程名稱</label><input id="a3"><label>備註</label><textarea id="a4" rows="3"></textarea>','新增',async m=>{const title=val(m,'#a3');if(!title){alert('請輸入名稱');return false}
 await addDoc(collection(db,'projects',S.id,'schedules'),{day:val(m,'#a1')||'Day 1',time:val(m,'#a2'),title,location:val(m,'#a4'),createdAt:Date.now()})});
+
 $('sp').onclick=()=>modal('✨ 智慧導入行程','<textarea id="p1" rows="9" placeholder="貼上行程，例如：&#10;Day 1&#10;10:00 抵達機場&#10;備註：…"></textarea>','開始拆解',async m=>{const lines=val(m,'#p1').split('\n').map(l=>l.trim()).filter(Boolean);if(!lines.length){alert('請先貼上行程');return false}
 const CN='一二三四五六七八九十';let day='Day 1',cur=null;const out=[];
 for(const raw of lines){const dm=raw.match(/Day\s*(\d+)|第([一二三四五六七八九十])天/i);if(dm){if(cur)out.push(cur);cur=null;day='Day '+(dm[1]||CN.indexOf(dm[2])+1);continue}
 const line=raw.replace(/：/g,':'),tm=line.match(/(\d{1,2}):(\d{2})/);
 if(tm&&!/備註|營業時間/.test(line)){if(cur)out.push(cur);cur={day,time:tm[0],title:line.replace(/^[•\-\s]*\d{1,2}:\d{2}\s*/,'').trim(),location:'',createdAt:Date.now()+out.length}}else if(cur)cur.location+=(cur.location?'\n':'')+raw}
 if(cur)out.push(cur);await Promise.all(out.map(i=>addDoc(collection(db,'projects',S.id,'schedules'),i)));alert(`✨ 成功導入 ${out.length} 筆行程！`)});
+
 /* ---------- 提醒 / 語言 ---------- */
 function rRemind(){const c=t=>`<div class="box"><h3>${t[0]}</h3><div style="font-size:14px">${t[1]}</div></div>`;
 $('t-ai').innerHTML=tabScene('ai')+(dest(S.name)==='korea'?[['🇰🇷 天氣小提醒','早晚溫差大、風也大，記得帶防風外套 🧥'],['🚗 自駕導航','推薦 Naver Map 或 Kakao Map，用電話號碼搜尋最準。沿途測速相機很多，請依速限行駛。'],['🚨 緊急電話','警察 112 ｜ 救護・消防 119 ｜ 中文旅遊熱線 1330']].map(c).join(''):c(['🌍 出發前確認','護照效期需大於 6 個月，備好網卡與萬用轉接頭 🔌']))}
+
 const CATS=[['restaurant','🍽️ 餐廳'],['shopping','🛍️ 購物'],['transport','🚗 交通'],['hotel','🏨 住宿'],['emergency','🚨 突發']];
 const LG={korea:{c:'ko-KR',p:{restaurant:[['我們有 4 個人。','4명입니다.'],['請問有中文菜單嗎？','중국어 메뉴판 있어요?'],['請推薦招牌菜。','대표 메뉴 추천해주세요.']],shopping:[['請問這個多少錢？','이거 얼마예요?'],['現在有折扣嗎？','할인 중인가요?']],transport:[['最近的地鐵站在哪裡？','가장 가까운 지하철역이 어디예요?']],hotel:[['我要辦理入住。','체크인 하겠습니다.']],emergency:[['救命！護照被偷了！','살려주세요! 여권을 도둑맞았어요!']]}},
 japan:{c:'ja-JP',p:{restaurant:[['我們有 4 個人。','4人です。'],['請問有中文菜單嗎？','中国語のメニューはありますか？'],['請推薦招牌菜。','おすすめの料理を教えてください。']],shopping:[['請問這個多少錢？','これはいくらですか？']],transport:[['最近的車站在哪裡？','一番近い駅はどこですか？']],hotel:[['我要辦理入住。','チェックインお願いします。']],emergency:[['救命！護照被偷了！','助けてください！パスポートが盗まれました！']]}},
 general:{c:'en-US',p:{restaurant:[['我們有 4 個人。','Table for four, please.']],shopping:[['請問這個多少錢？','How much is this?']],transport:[['最近的地鐵站在哪裡？','Where is the nearest subway station?']],hotel:[['我要辦理入住。',"I'd like to check in, please."]],emergency:[['救命！護照被偷了！','Help! My passport has been stolen!']]}}};
+
 function rLang(){const P=LG[dest(S.name)].p;const show=id=>{$('lc').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===id));$('lp').innerHTML=(P[id]||[]).map((p,i)=>`<button class="box item" style="width:100%;font:inherit;color:inherit;text-align:left;margin:0 0 10px" data-i="${i}">${esc(p[0])}</button>`).join('');
 $('lp').querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=P[id][b.dataset.i];S.phrase=p;$('dc').textContent=p[0];$('df').textContent=p[1]})};$('lc').innerHTML=CATS.map(c=>`<button class="btn" data-c="${c[0]}">${c[1]}</button>`).join('');$('lc').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.c));show('restaurant')}$('say').onclick=()=>{if(!S.phrase)return;const u=new SpeechSynthesisUtterance(S.phrase[1]);u.lang=S.lang;speechSynthesis.speak(u)};
+
 /* ---------- 分帳 ---------- */
 const money=n=>'NT$ '+Math.round(n).toLocaleString();
 function bal(){const b={};S.mem.forEach(n=>b[n]=0);S.exp.forEach(e=>{const t=e.amount*(RATE[e.cur]||1),sp=e.split&&e.split.length?e.split:S.mem;b[e.payer]=(b[e.payer]||0)+t;sp.forEach(n=>b[n]=(b[n]||0)-t/sp.length)});return b}
@@ -164,17 +190,21 @@ function rSplit(){const by={};let tot=0;S.exp.forEach(e=>{by[e.cur]=(by[e.cur]||
 $('tot').textContent=money(tot);$('brk').textContent=Object.entries(by).map(([c,v])=>`${c} ${Math.round(v).toLocaleString()}`).join(' ');
 $('el').innerHTML=S.exp.length?S.exp.slice().reverse().map(e=>`<div class="box item" style="display:flex;justify-content:space-between;gap:8px"><div><b>${esc(e.title)}</b><small>${esc(e.payer)} 先付 · ${(e.split&&e.split.length)||S.mem.length} 人分</small></div><div style="text-align:right"><b>${esc(e.cur)} ${Math.round(e.amount).toLocaleString()}</b><br><button class="btn" data-d="${e.id}" style="padding:0 8px">刪</button></div></div>`).join(''):'<p class="mute">還沒有記帳，點「記一筆」開始吧 ✨</p>';
 $('el').querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>confirm('刪除這筆帳？')&&deleteDoc(doc(db,'projects',S.id,'expenses',b.dataset.d)))}
+
 $('mb').onclick=()=>{const m=modal('👥 旅伴成員',`<div id="ml"></div><input id="m1" placeholder="新增成員名字"><button class="btn gr" id="m2">＋ 加入</button>`);
 const draw=()=>{q(m,'#ml').innerHTML=S.mem.map(n=>`<span class="tag" style="margin-right:6px">${esc(n)} <a data-n="${esc(n)}" style="cursor:pointer">✕</a></span>`).join('');q(m,'#ml').querySelectorAll('a').forEach(a=>a.onclick=async()=>{await deleteDoc(doc(db,'projects',S.id,'members',a.dataset.n));setTimeout(draw,400)})};draw();
 q(m,'#m2').onclick=async()=>{const n=val(m,'#m1');if(!n)return;await setDoc(doc(db,'projects',S.id,'members',n),{name:n});q(m,'#m1').value='';setTimeout(draw,400)}};
+
 $('ae').onclick=()=>{if(!S.mem.length){alert('請先在專案中加入旅伴');return}const dc={korea:'KRW',japan:'JPY'}[dest(S.name)]||'TWD';
 modal('💸 記一筆',`<label>項目</label><input id="e1"><label>金額</label><input id="e2" type="number" inputmode="decimal"><label>幣別</label><select id="e3">${Object.keys(RATE).map(c=>`<option ${c===dc?'selected':''}>${c}</option>`).join('')}</select><label>誰先付</label><select id="e4">${S.mem.map(n=>`<option ${n===S.me?'selected':''}>${esc(n)}</option>`).join('')}</select><label>分給誰</label><div id="e5">${S.mem.map(n=>`<label class="chk"><input type="checkbox" checked value="${esc(n)}">${esc(n)}</label>`).join('')}</div>`,'儲存',async m=>{
 const title=val(m,'#e1'),amount=parseFloat(val(m,'#e2')),split=[...m.querySelectorAll('#e5 input:checked')].map(i=>i.value);
 if(!title||!(amount>0)||!split.length){alert('請填寫項目、金額，並至少選一位分攤者');return false}
 await addDoc(collection(db,'projects',S.id,'expenses'),{title,amount,cur:val(m,'#e3'),payer:val(m,'#e4'),split,createdAt:Date.now()})})};
+
 $('st').onclick=()=>{const b=bal(),cr=[],de=[];Object.entries(b).forEach(([n,v])=>{if(v>1)cr.push([n,v]);else if(v<-1)de.push([n,-v])});const tr=[];
 while(cr.length&&de.length){cr.sort((a,b)=>b[1]-a[1]);de.sort((a,b)=>b[1]-a[1]);const x=Math.min(cr[0][1],de[0][1]);tr.push(`${esc(de[0][0])} ➜ ${esc(cr[0][0])} ${money(x)}`);cr[0][1]-=x;de[0][1]-=x;if(cr[0][1]<1)cr.shift();if(de[0][1]<1)de.shift()}
 modal('📊 結算（折合台幣）',tr.length?tr.map(t=>`<div class="box" style="margin:6px 0;background:var(--aq)">${t}</div>`).join(''):'<p class="mute">目前不需要轉帳 🎉</p>')};
+
 /* ---------- 闖關與打卡 ---------- */
 const cls=t=>{t=t||'';if(/交通|機場|租車|還車|出發|前往|搭車|班機|住宿|飯店|民宿/.test(t))return null;if(/餐廳|美食|咖啡|晚餐|午餐|早餐|烤肉|料理|吃/.test(t))return'food';if(/購物|免稅|超市|商場|買/.test(t))return'shop';return'spot'};
 const BD={food:['美食家','var(--co)'],spot:['探險家','var(--aq)'],shop:['購物達人','var(--ye)']};
@@ -183,7 +213,9 @@ $('qc').textContent=`已打卡 ${n} / ${it.length}`;$('qp').textContent=p+'\%';$
 for(const k in BD){const on=it.some(s=>s.k===k&&S.chk[s.id]),b=$('b-'+k),was=b.classList.contains('on');b.classList.toggle('on',on);b.style.background=on?BD[k][1]:'';$('bt-'+k).textContent=on?BD[k][0]:'未解鎖';if(on&&!was){b.classList.add('bn')}}
 $('ql').innerHTML=it.length?it.map(s=>`<div class="box item" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><b>${esc(clean(s.title))}</b></div><button class="btn ${S.chk[s.id]?'gr':''}" data-i="${s.id}">${S.chk[s.id]?'✔ 已解鎖':'📍 打卡'}</button></div>`).join(''):'<p class="mute">行程中還沒有可打卡的景點、美食或購物 ✨</p>';
 $('ql').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>checkin(b.dataset.i))}
+
 const shrink=f=>new Promise((ok,no)=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const k=Math.min(1,700/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>b?ok(b):no(),'image/jpeg',.7)};im.onerror=no;im.src=u});
+
 function checkin(id){const s=S.sch.find(x=>x.id===id);if(!s)return;const cur=S.chk[id],r=doc(db,'projects',S.id,'checkins',id+'_'+S.me);
 const m=modal(esc(clean(s.title)),`${cur&&cur.photoUrl?`<img src="${esc(cur.photoUrl)}" alt="" style="width:100%;border:3px solid var(--ink);border-radius:20px;margin-bottom:8px">`:''}<input id="ph" type="file" accept="image/*" hidden><button class="btn co" id="up" style="width:100%;margin-bottom:8px">📷 ${cur?'換一張照片':'選照片打卡'}</button>${cur?'<button class="btn" id="un" style="width:100%">↩ 取消打卡</button>':'<button class="btn" id="np" style="width:100%">✔ 不放照片，直接打卡</button>'}`);
 q(m,'#up').onclick=()=>q(m,'#ph').click();
@@ -191,8 +223,10 @@ q(m,'#ph').onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=q(m
 try{const blob=await shrink(f),p=ref(st,`checkins/${S.id}/${id}_${S.me}_${Date.now()}.jpg`);await uploadBytes(p,blob,{contentType:'image/jpeg'});await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:await getDownloadURL(p),at:Date.now()});m.remove()}catch(x){console.error(x);alert('照片上傳失敗');b.textContent='再試一次';b.disabled=false}};
 const np=q(m,'#np');if(np)np.onclick=async()=>{await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:'',at:Date.now()});m.remove()};
 const un=q(m,'#un');if(un)un.onclick=async()=>{await deleteDoc(r);m.remove()}}
+
 $('gal').onclick=()=>{const l=(S.all||[]).filter(c=>c.photoUrl).sort((a,b)=>b.at-a.at);
 modal('📸 旅程回憶寫真冊',l.length?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${l.map((c,i)=>{const s=S.sch.find(x=>x.id===c.scheduleId);return`<div style="border:3px solid var(--ink);border-radius:18px;overflow:hidden;background:#fff;transform:rotate(${i%2?1.5:-1.5}deg)"><img src="${esc(c.photoUrl)}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;display:block"><small style="display:block;padding:2px 8px">${esc(s?clean(s.title):'')} · ${esc(c.uploader)}</small></div>`}).join('')}</div>`:'<p class="mute">還沒有照片，去闖關打卡拍一張吧 📷</p>')};
+
 /* ---------- 啟動 ---------- */
 $('hero0').innerHTML=scene('');
 (async()=>{const p=new URLSearchParams(location.search).get('project');if(p){saveIds([p,...ids()]);history.replaceState({},'',location.pathname)}renderProjects()})();
