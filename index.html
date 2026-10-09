@@ -24,13 +24,13 @@ header div{flex:1;min-width:0}header b,header small{display:block;white-space:no
 .tag{display:inline-block;background:var(--ye);border:2px solid var(--ink);border-radius:999px;padding:0 10px;font-size:12px;margin-bottom:4px}
 .item{cursor:pointer;display:block}.item b{display:block}
 
-/* 🌸 絕對不透明導覽列，完美解決內容穿透 */
-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:calc(100% - 28px);max-width:452px;background:var(--paper);border:3px solid var(--ink);border-radius:26px;box-shadow:0 8px 24px rgba(62,58,57,0.15), 3px 3px 0 var(--ink);display:flex;justify-content:space-around;padding:6px;z-index:100}
-nav button{font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:var(--paper);color:var(--ink);padding:4px 8px;cursor:pointer}
+/* 🌸 完美修復導覽列穿透：強制最高圖層與絕對不透明背景 */
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));width:calc(100% - 28px);max-width:452px;background:#FFFCF6;border:3px solid var(--ink);border-radius:26px;box-shadow:0 -8px 20px rgba(62,58,57,0.12), 3px 3px 0 var(--ink);display:flex;justify-content:space-around;padding:6px;z-index:9999}
+nav button{font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:#FFFCF6;color:var(--ink);padding:4px 8px;cursor:pointer}
 nav button span{display:block;font-size:20px}
 nav button.on{background:var(--ye);border-color:var(--ink)}
 
-.mask{position:fixed;inset:0;background:rgba(62,58,57,.45);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px}
+.mask{position:fixed;inset:0;background:rgba(62,58,57,.45);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px}
 .sheet{width:100%;max-width:400px;max-height:88vh;overflow:auto;margin:0}
 input,textarea,select{font:inherit;width:100%;border:3px solid var(--ink);border-radius:16px;background:#fff;padding:8px 12px;margin:4px 0 8px;color:var(--ink)}
 label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:0 10px 6px 0}.chk input{width:auto;margin:0}
@@ -503,7 +503,7 @@ q(m,'#up').onclick=()=>{
         alert('讀取檔案失敗');
         b.textContent='再試一次'; b.disabled=false;
     };
-    reader.readAsDataURL(f);
+    reader.readAsDataURL(fileInput.files[0]);
 };
 const np=q(m,'#np');if(np)np.onclick=async()=>{await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:'',at:Date.now()});m.remove()};
 const un=q(m,'#un');if(un)un.onclick=async()=>{await deleteDoc(r);m.remove()}}
