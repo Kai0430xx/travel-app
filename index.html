@@ -160,7 +160,7 @@ const line=raw.replace(/：/g,':'),tm=line.match(/(\d{1,2}):(\d{2})/);
 if(tm&&!/備註|營業時間/.test(line)){if(cur)out.push(cur);cur={day,time:tm[0],title:line.replace(/^[•\-\s]*\d{1,2}:\d{2}\s*/,'').trim(),location:'',createdAt:Date.now()+out.length}}else if(cur)cur.location+=(cur.location?'\n':'')+raw}
 if(cur)out.push(cur);await Promise.all(out.map(i=>addDoc(collection(db,'projects',S.id,'schedules'),i)));alert(`✨ 成功導入 ${out.length} 筆行程！`)});
 
-/* ---------- 提醒 (豐富詳細版) ---------- */
+/* ---------- 提醒 ---------- */
 function rRemind(){
 const box=(t,b)=>`<div class="box"><h3>${t}</h3><div style="font-size:14px;margin-top:6px">${b}</div></div>`;
 let h='';
@@ -177,7 +177,7 @@ if(dest(S.name)==='korea'){
     h+=box('🔌 電壓與插頭規格','日本電壓為 100V，雙孔扁平插頭（與台灣相同），一般電器不需轉接頭。');
     h+=box('🚨 緊急求助電話','警察局：110 ｜ 救護車/消防：119');
 }else{
-    h+=box('🌍 國際自由行通用須知','請確認護照效期大於 6 個月，備好當地網卡、萬用轉接頭與海外旅遊平安險 ✈️。');
+    h+=box('🌍 國際自由行通用須知','請確認護照效期大於 6 個月，備好網卡與萬用轉接頭與海外旅遊平安險 ✈️。');
 }
 $('t-ai').innerHTML=h;
 }
@@ -263,12 +263,12 @@ japan:{c:'ja-JP',p:{
         ['這是我的護照。','パスポートです。'],
         ['我有行李要托運。','荷物を預けたいです。'],
         ['請給我靠走道的座位。','通路側の席をお願いします。'],
-        ['我的行李找不到。','荷物が見つかりません。']
+        ['我的行李找不到。','荷물が見つかりません。']
     ],
     hotel:[
         ['我有預約，名字是…','予約している…です。'],
         ['請問有附早餐嗎？','朝食はついていますか？'],
-        ['可以寄放行李嗎？','荷物を預かっていただけますか？'],
+        ['可以寄放行李嗎？','荷물을預かっていただけますか？'],
         ['房間有 Wi-Fi 嗎？密碼是什麼？','部屋にWi-Fiはありますか？パスワードは何ですか？'],
         ['幾點退房？','チェックアウトは何時ですか？']
     ],
@@ -368,9 +368,24 @@ general:{c:'en-US',p:{
 function rLang(){const P=LG[dest(S.name)].p;const show=id=>{$('lc').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===id));$('lp').innerHTML=(P[id]||[]).map((p,i)=>`<button class="box item" style="width:100%;font:inherit;color:inherit;text-align:left;margin:0 0 10px" data-i="${i}"><b>${esc(p[0])}</b><small style="color:var(--co)">${esc(p[1])}</small></button>`).join('');
 $('lp').querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=P[id][b.dataset.i];S.phrase=p;$('dc').textContent=p[0];$('df').textContent=p[1]})};$('lc').innerHTML=CATS.map(c=>`<button class="btn" data-c="${c[0]}">${c[1]}</button>`).join('');$('lc').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.c));show('airport')}$('say').onclick=()=>{if(!S.phrase)return;const u=new SpeechSynthesisUtterance(S.phrase[S.lang==='en-US'?0:1]);u.lang=S.lang;speechSynthesis.speak(u)};
 
-/* ---------- 分帳 (新增自訂金額與收款幣別選擇) ---------- */
+/* ---------- 分帳 (完美修復結算幣別與原幣別顯示) ---------- */
 const money=n=>'NT$ '+Math.round(n).toLocaleString();
-function bal(){const b={};S.mem.forEach(n=>b[n]=0);S.exp.forEach(e=>{const t=e.amount*(RATE[e.cur]||1),sp=e.split&&e.split.length?e.split:S.mem;b[e.payer]=(b[e.payer]||0)+t;sp.forEach(n=>b[n]=(b[n]||0)-t/sp.length)});return b}
+function bal(){
+const b={};S.mem.forEach(n=>b[n]={});
+S.exp.forEach(e=>{
+    const cur=e.cur||'TWD';
+    if(!b[e.payer][cur]) b[e.payer][cur]=0;
+    const sp=e.split&&Object.keys(e.split).length?e.split:{[e.payer]:e.amount};
+    const totalSplitAmt=Object.values(sp).reduce((a,v)=>a+v,0)||e.amount;
+    b[e.payer][cur]+=e.amount;
+    Object.entries(sp).forEach(([n,shareAmt])=>{
+        if(!b[n]) b[n]={};
+        if(!b[n][cur]) b[n][cur]=0;
+        b[n][cur]-=shareAmt;
+    });
+});
+return b;
+}
 
 function rSplit(){const by={};let tot=0;S.exp.forEach(e=>{by[e.cur]=(by[e.cur]||0)+e.amount;tot+=e.amount*(RATE[e.cur]||1)});
 $('tot').textContent=money(tot);$('brk').textContent=Object.entries(by).map(([c,v])=>`${c} ${Math.round(v).toLocaleString()}`).join(' ');
@@ -406,11 +421,38 @@ q(m,'#m-eq').onclick=()=>{S.splitMode='equal';q(m,'#m-eq').style.background='var
 q(m,'#m-cust').onclick=()=>{S.splitMode='custom';q(m,'#m-cust').style.background='var(--aq)';q(m,'#m-eq').style.background='var(--ye)';renderSplitInputs()};
 };
 
-$('st').onclick=()=>{const b=bal(),cr=[],de=[];Object.entries(b).forEach(([n,v])=>{if(v>1)cr.push([n,v]);else if(v<-1)de.push([n,-v])});const tr=[];
-while(cr.length&&de.length){cr.sort((a,b)=>b[1]-a[1]);de.sort((a,b)=>b[1]-a[1]);const x=Math.min(cr[0][1],de[0][1]);tr.push(`${esc(de[0][0])} ➜ ${esc(cr[0][0])} ${money(x)}`);cr[0][1]-=x;de[0][1]-=x;if(cr[0][1]<1)cr.shift();if(de[0][1]<1)de.shift()}
-modal('📊 結算（折合台幣）',tr.length?tr.map(t=>`<div class="box" style="margin:6px 0;background:var(--aq)">${t}</div>`).join(''):'<p class="mute">目前不需要轉帳 🎉</p>')};
+$('st').onclick=()=>{
+const b=bal(), curSet=new Set();
+S.exp.forEach(e=>curSet.add(e.cur||'TWD'));
+const curArr=[...curSet];
+let resHtml='';
 
-/* ---------- 闖關與修復照片上傳 ---------- */
+curArr.forEach(cur=>{
+    const settleType = S.exp.find(e=>(e.cur||'TWD')===cur)?.settle || 'twd';
+    const subB={}; S.mem.forEach(n=>subB[n]=0);
+    S.exp.filter(e=>(e.cur||'TWD')===cur).forEach(e=>{
+        subB[e.payer]=(subB[e.payer]||0)+e.amount;
+        const sp=e.split&&Object.keys(e.split).length?e.split:{[e.payer]:e.amount};
+        Object.entries(sp).forEach(([n,v])=>{subB[n]=(subB[n]||0)-v});
+    });
+    const cr=[],de=[];
+    Object.entries(subB).forEach(([n,v])=>{if(v>0.1)cr.push([n,v]);else if(v<-1)de.push([n,-v])});
+    const tr=[];
+    while(cr.length&&de.length){
+        cr.sort((a,b)=>b[1]-a[1]);de.sort((a,b)=>b[1]-a[1]);
+        const x=Math.min(cr[0][1],de[0][1]);
+        tr.push(`${esc(de[0][0])} ➜ ${esc(cr[0][0])} ${cur} ${Math.round(x).toLocaleString()}`);
+        cr[0][1]-=x;de[0][1]-=x;if(cr[0][1]<0.1)cr.shift();if(de[0][1]<0.1)de.shift();
+    }
+    if(tr.length){
+        resHtml+=`<div style="margin-bottom:10px"><b style="color:var(--co)">📍 幣別：${cur} (${settleType==='orig'?'原幣別結算':'折合台幣'})</b>${tr.map(t=>`<div class="box" style="margin:4px 0;background:var(--aq)">${t}</div>`).join('')}</div>`;
+    }
+});
+
+modal('📊 結算明細',resHtml||'<p class="mute">目前不需要轉帳 🎉</p>');
+};
+
+/* ---------- 闖關與打卡 ---------- */
 const cls=t=>{t=t||'';if(/交通|機場|租車|還車|출발|空港/.test(t))return null;if(/餐廳|美食|咖啡|晚餐|午餐|早餐|烤肉|料理|吃|맛집|식당/.test(t))return'food';if(/購物|免稅|超市|商場|買|마트|쇼핑/.test(t))return'shop';return'spot'};
 const BD={food:['美食家','var(--co)'],spot:['探險家','var(--aq)'],shop:['購物達人','var(--ye)']};
 function rQuest(){const it=S.sch.map(s=>({...s,k:cls(s.title)})).filter(s=>s.k),n=it.filter(s=>S.chk[s.id]).length,p=it.length?Math.round(n/it.length*100):0;
