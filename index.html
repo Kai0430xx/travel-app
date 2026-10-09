@@ -44,7 +44,7 @@ label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:
 <main>
 <section id="v0"><div class="art" id="hero0"></div>
 <div class="row"><h2>我的旅程 ✈</h2><span><button id="imp" class="btn">📥 導入</button> <button id="new" class="btn co">＋ 新增</button></span></div><div id="pl"><p class="mute">載入中…☁️</p></div></section>
-<section id="v1" hidden><div class="art" id="hero"></div>
+<section id="v1" hidden>
 <div id="t-schedule" class="tab"><div class="row"><h3>📅 行程時間軸</h3><span><button id="sp" class="btn">✨ 智慧導入</button> <button id="ad" class="btn co">＋ 新增</button></span></div><div class="pills" id="pills"></div><div id="sl"></div></div>
 <div id="t-ai" class="tab" hidden></div>
 <div id="t-lang" class="tab" hidden><div class="box" style="text-align:center;background:var(--ye)"><small id="dc">請點選下方句子</small><h2 id="df" style="margin:4px 0 10px">想說什麼呢？</h2><button id="say" class="btn co">🔊 朗讀</button></div><div class="lang"><div id="lc"></div><div id="lp"></div></div></div>
@@ -96,7 +96,7 @@ $('sh').onclick=()=>{const url=location.origin+location.pathname+'?project='+S.i
 async function enter(id){const s=await getDoc(doc(db,'projects',id));if(!s.exists())return;Object.assign(S,{id,name:s.data().name,pin:s.data().pin||''});
 if(S.me)return open_();modal('🌸 歡迎加入旅程','<input id="nm" placeholder="你的名字，例如：小明">','進入旅程',m=>{const v=val(m,'#nm');if(!v){alert('請輸入名字');return false}S.me=v;localStorage.setItem('my_travel_nickname',v);open_()})}
 function open_(){$('v0').hidden=true;$('v1').hidden=false;$('nav').hidden=false;$('bk').hidden=false;$('sh').hidden=false;$('ht').textContent='🌸 '+S.name;$('hs').textContent='旅伴：'+S.me;
-$('hero').innerHTML=scene(S.name);S.day='all';S.lang=LG[dest(S.name)].c;rRemind();rLang();
+S.day='all';S.lang=LG[dest(S.name)].c;rRemind();rLang();
 setDoc(doc(db,'projects',S.id,'members',S.me),{name:S.me},{merge:true});
 const sub=(c,o,fn)=>{const r=collection(db,'projects',S.id,c);S.un.push(onSnapshot(o?query(r,orderBy(o)):r,sn=>fn(sn.docs.map(d=>({id:d.id,...d.data()})))))};
 sub('schedules','createdAt',a=>{S.sch=a;rSch();rQuest()});sub('members',0,a=>{S.mem=a.map(m=>m.name||m.id);rSplit()});sub('expenses','createdAt',a=>{S.exp=a;rSplit()});
@@ -161,11 +161,11 @@ $('qc').textContent=`已打卡 ${n} / ${it.length}`;$('qp').textContent=p+'\%';$
 for(const k in BD){const on=it.some(s=>s.k===k&&S.chk[s.id]),b=$('b-'+k),was=b.classList.contains('on');b.classList.toggle('on',on);b.style.background=on?BD[k][1]:'';$('bt-'+k).textContent=on?BD[k][0]:'未解鎖';if(on&&!was){b.classList.add('bn')}}
 $('ql').innerHTML=it.length?it.map(s=>`<div class="box item" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><b>${esc(clean(s.title))}</b></div><button class="btn ${S.chk[s.id]?'gr':''}" data-i="${s.id}">${S.chk[s.id]?'✔ 已解鎖':'📍 打卡'}</button></div>`).join(''):'<p class="mute">行程中還沒有可打卡的景點、美食或購物 ✨</p>';
 $('ql').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>checkin(b.dataset.i))}
-const shrink=f=>new Promise((ok,no)=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const k=Math.min(1,1000/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>b?ok(b):no(),'image/jpeg',.82)};im.onerror=no;im.src=u});
+const shrink=f=>new Promise((ok,no)=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const k=Math.min(1,700/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>b?ok(b):no(),'image/jpeg',.7)};im.onerror=no;im.src=u});
 function checkin(id){const s=S.sch.find(x=>x.id===id);if(!s)return;const cur=S.chk[id],r=doc(db,'projects',S.id,'checkins',id+'_'+S.me);
 const m=modal(esc(clean(s.title)),`${cur&&cur.photoUrl?`<img src="${esc(cur.photoUrl)}" alt="" style="width:100%;border:3px solid var(--ink);border-radius:20px;margin-bottom:8px">`:''}<input id="ph" type="file" accept="image/*" hidden><button class="btn co" id="up" style="width:100%;margin-bottom:8px">📷 ${cur?'換一張照片':'選照片打卡'}</button>${cur?'<button class="btn" id="un" style="width:100%">↩ 取消打卡</button>':'<button class="btn" id="np" style="width:100%">✔ 不放照片，直接打卡</button>'}`);
 q(m,'#up').onclick=()=>q(m,'#ph').click();
-q(m,'#ph').onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=q(m,'#up');b.textContent='上傳中… ⏳';b.disabled=true;
+q(m,'#ph').onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=q(m,'#up');b.textContent='壓縮上傳中… ⏳';b.disabled=true;
 try{const blob=await shrink(f),p=ref(st,`checkins/${S.id}/${id}_${S.me}_${Date.now()}.jpg`);await uploadBytes(p,blob,{contentType:'image/jpeg'});await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:await getDownloadURL(p),at:Date.now()});m.remove()}catch(x){console.error(x);alert('照片上傳失敗');b.textContent='再試一次';b.disabled=false}};
 const np=q(m,'#np');if(np)np.onclick=async()=>{await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:'',at:Date.now()});m.remove()};
 const un=q(m,'#un');if(un)un.onclick=async()=>{await deleteDoc(r);m.remove()}}
