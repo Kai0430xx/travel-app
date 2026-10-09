@@ -43,14 +43,15 @@ label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:
 <header><button id="bk" class="btn aq" hidden>← 專案</button><div><b id="ht">🧳 放風之旅</b><small id="hs">選擇你的冒險旅程 ✨</small></div><button id="sh" class="btn gr" hidden>✨ 分享</button></header>
 <main>
 <section id="v0">
+<div class="art" id="hero0"></div>
 <div class="row"><h2>我的旅程 ✈</h2><span><button id="imp" class="btn">📥 導入</button> <button id="new" class="btn co">＋ 新增</button></span></div><div id="pl"><p class="mute">載入中…☁️</p></div></section>
-<section id="v1" hidden><div class="art" id="hero"></div>
-<div id="t-schedule" class="tab"><div class="row"><h3>📅 行程時間軸</h3><span><button id="sp" class="btn">✨ 智慧導入</button> <button id="ad" class="btn co">＋ 新增</button></span></div><div class="pills" id="pills"></div><div id="sl"></div></div>
-<div id="t-ai" class="tab" hidden></div>
-<div id="t-lang" class="tab" hidden><div class="box" style="text-align:center;background:var(--ye)"><small id="dc">請點選下方句子</small><h2 id="df" style="margin:4px 0 10px">想說什麼呢？</h2><button id="say" class="btn co">🔊 朗讀</button></div><div class="lang"><div id="lc"></div><div id="lp"></div></div></div>
-<div id="t-split" class="tab" hidden><div class="box" style="background:var(--co)"><div class="row" style="margin:0"><small>旅程總花費（折合台幣）</small><button id="mb" class="btn">👥 成員</button></div><h2 id="tot">NT$ 0</h2><small id="brk"></small></div>
+<section id="v1" hidden>
+<div id="t-schedule" class="tab"><div class="art" id="hero-schedule"></div><div class="row"><h3>📅 行程時間軸</h3><span><button id="sp" class="btn">✨ 智慧導入</button> <button id="ad" class="btn co">＋ 新增</button></span></div><div class="pills" id="pills"></div><div id="sl"></div></div>
+<div id="t-ai" class="tab" hidden><div class="art" id="hero-ai"></div></div>
+<div id="t-lang" class="tab" hidden><div class="art" id="hero-lang"></div><div class="box" style="text-align:center;background:var(--ye)"><small id="dc">請點選下方句子</small><h2 id="df" style="margin:4px 0 10px">想說什麼呢？</h2><button id="say" class="btn co">🔊 朗讀</button></div><div class="lang"><div id="lc"></div><div id="lp"></div></div></div>
+<div id="t-split" class="tab" hidden><div class="art" id="hero-split"></div><div class="box" style="background:var(--co)"><div class="row" style="margin:0"><small>旅程總花費（折合台幣）</small><button id="mb" class="btn">👥 成員</button></div><h2 id="tot">NT$ 0</h2><small id="brk"></small></div>
 <div class="row"><h3>💰 帳目</h3><span><button id="st" class="btn aq">📊 結算</button> <button id="ae" class="btn co">＋ 記一筆</button></span></div><div id="el"></div></div>
-<div id="t-quest" class="tab" hidden><div class="box" style="background:var(--gr)"><div class="row" style="margin:0 0 6px"><b id="qc">已打卡 0 / 0</b><b id="qp">0%</b></div><div class="bar" style="background:var(--paper)"><i id="qb" style="width:0"></i></div>
+<div id="t-quest" class="tab" hidden><div class="art" id="hero-quest"></div><div class="box" style="background:var(--gr)"><div class="row" style="margin:0 0 6px"><b id="qc">已打卡 0 / 0</b><b id="qp">0%</b></div><div class="bar" style="background:var(--paper)"><i id="qb" style="width:0"></i></div>
 <button id="gal" class="btn aq" style="margin-top:12px">📸 回憶寫真冊</button><div class="badges" style="margin-top:12px"><div><div class="bd" id="b-food">🍽️</div><small id="bt-food"></small></div><div><div class="bd" id="b-spot">🗺️</div><small id="bt-spot"></small></div><div><div class="bd" id="b-shop">🛍️</div><small id="bt-shop"></small></div></div></div><div id="ql"></div></div>
 </section></main>
 <nav id="nav" hidden></nav>
@@ -74,6 +75,17 @@ korea:`<rect width="320" height="140" fill="#A8D3E6"/>${cloud(24,22)}<g class="f
 japan:`<rect width="320" height="140" fill="#F6D27A"/><g class="fl"><circle cx="58" cy="38" r="19" fill="#F2A497" ${K}/></g>${cloud(196,16)}<path d="M70 124L138 34h24l68 90z" fill="#A8D3E6" ${K}/><path d="M126 52l12-18h24l12 18l-12 7l-12-7l-12 7z" fill="#FFFCF6" ${K}/>${hill('#B9DAA5',116)}<g class="fl"><rect x="250" y="72" width="8" height="46" fill="#F2A497" ${K}/><rect x="284" y="72" width="8" height="46" fill="#F2A497" ${K}/><path d="M240 64h60l-6 11h-48z" fill="#F2A497" ${K}/></g>`,
 general:`<rect width="320" height="140" fill="#A8D3E6"/>${cloud(18,30)}${cloud(220,64)}<g class="dr"><path d="M80 60l92-12q24-2 24 8t-24 8l-92-4z" fill="#F6D27A" ${K}/><path d="M124 58l-18-26h14l30 26z" fill="#F2A497" ${K}/></g>${hill('#B9DAA5',112)}<g class="fl"><rect x="232" y="92" width="44" height="34" rx="8" fill="#F2A497" ${K}/><path d="M244 92v-9h20v9" fill="none" ${K}/></g>`};
 const scene=n=>`<svg viewBox="0 0 320 140" role="img" aria-label="旅行插圖">${SC[dest(n)]}</svg>`;
+
+// 各分頁專屬插圖 SVG
+const TAB_SC = {
+    schedule: `<rect width="320" height="140" fill="#F6D27A"/>${cloud(40,20)}<g class="fl"><rect x="110" y="40" width="100" height="70" rx="14" fill="#FFFCF6" ${K}/><rect x="130" y="60" width="60" height="30" rx="6" fill="#A8D3E6" ${K}/></g>`,
+    ai: `<rect width="320" height="140" fill="#B9DAA5"/>${cloud(30,30)}<g class="fl"><circle cx="160" cy="70" r="32" fill="#F6D27A" ${K}/><path d="M160 50v24l16 10" fill="none" ${K}/></g>`,
+    lang: `<rect width="320" height="140" fill="#A8D3E6"/>${cloud(220,20)}<g class="dr"><rect x="100" y="45" width="120" height="60" rx="16" fill="#FFFCF6" ${K}/><path d="M120 75h80M120 90h50" fill="none" ${K}/></g>`,
+    split: `<rect width="320" height="140" fill="#F2A497"/>${cloud(50,20)}<g class="fl"><circle cx="160" cy="70" r="30" fill="#F6D27A" ${K}/><text x="148" y="80" font-size="28" font-weight="bold" fill="#3E3A39">NT$</text></g>`,
+    quest: `<rect width="320" height="140" fill="#B9DAA5"/>${cloud(180,20)}<g class="fl"><path d="M140 40l20 20l40-40" fill="none" stroke="#3E3A39" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></g>`
+};
+const tabScene=t=>`<svg viewBox="0 0 320 140" role="img" aria-label="分頁插圖">${TAB_SC[t]||TAB_SC.schedule}</svg>`;
+
 /* ---------- 共用 UI ---------- */
 function modal(title,body,ok,onOk){const m=document.createElement('div');m.className='mask';
 m.innerHTML=`<div class="box sheet bn"><div class="row" style="margin-top:0"><h3>${title}</h3><button class="btn x">✕</button></div>${body}<div class="row gap">${ok?`<button class="btn co ok">${ok}</button>`:''}<button class="btn cl">關閉</button></div></div>`;
@@ -88,7 +100,7 @@ const match=datesStr.match(/(\d{4})[年/.-]?\s*(\d{1,2})[月/.-]\s*(\d{1,2})/);
 if(!match)return'';
 const[,y,m,d]=match,start=new Date(`${y}-${m}-${d}T00:00:00`),now=new Date();
 now.setHours(0,0,0,0);const diff=Math.ceil((start-now)/(1000*60*60*24));
-if(diff>0)return`🔥 倒數 ${diff} 天`;if(diff===0)return`🎉 今天出發！`;return`✈️ 旅程進行中/已結束`};
+if(diff>0)return`🔥 倒數 ${diff} 天`;if(diff===0)return`🎉 今天出發！`;return`✈️ 進行中/已結束`};
 /* ---------- 專案 ---------- */
 const ids=()=>JSON.parse(localStorage.getItem('my_subscribed_projects')||'[]');
 const saveIds=a=>localStorage.setItem('my_subscribed_projects',JSON.stringify([...new Set(a)]));
@@ -96,7 +108,7 @@ async function renderProjects(){const l=$('pl'),a=ids();if(!a.length){l.innerHTM
 const snaps=await Promise.all(a.map(i=>getDoc(doc(db,'projects',i)).catch(()=>null)));l.innerHTML='';
 snaps.forEach(s=>{if(!s||!s.exists())return;const p=s.data(),d=document.createElement('div');d.className='box item';
 d.innerHTML=`<div class="row" style="margin:0"><span class="tag">${esc(p.dates||'未定日期')}</span><small style="color:var(--co);font-weight:bold">${getCountdown(p.dates)}</small></div><b style="font-size:16px;margin-top:4px">🌸 ${esc(p.name)}</b>`;d.onclick=()=>enter(s.id);l.appendChild(d)})}
-$('new').onclick=()=>modal('🌸 新增旅程','<label>旅程名稱（含「濟州」「日本」等會有專屬插圖）</label><input id="n1" placeholder="例如：濟州島四日遊"><label>日期（請包含年份，例如：2026年 11/23-11/27）</label><input id="n2" placeholder="2026年 11/23 - 11/27">','建立',async m=>{const name=val(m,'#n1');if(!name){alert('請輸入名稱');return false}
+$('new').onclick=()=>modal('🌸 新增旅程','<label>旅程名稱</label><input id="n1" placeholder="例如：濟州島四日遊"><label>日期（請包含年份，例如：2026年 11/23-11/27）</label><input id="n2" placeholder="2026年 11/23 - 11/27">','建立',async m=>{const name=val(m,'#n1');if(!name){alert('請輸入名稱');return false}
 const pin=String(Math.floor(100000+Math.random()*900000)),r=await addDoc(collection(db,'projects'),{name,dates:val(m,'#n2'),pin,createdAt:Date.now()});saveIds([r.id,...ids()]);renderProjects()});
 $('imp').onclick=()=>modal('📥 輸入 6 位數專案號碼','<input id="c1" maxlength="6" inputmode="numeric" placeholder="例如：883921" style="text-align:center;font-size:20px;letter-spacing:4px">','導入',async m=>{const c=val(m,'#c1'),r=await getDocs(query(collection(db,'projects'),where('pin','==',c)));
 if(r.empty){alert('找不到這個專案號碼');return false}saveIds([r.docs[0].id,...ids()]);renderProjects()});
@@ -104,7 +116,9 @@ $('sh').onclick=()=>{const url=location.origin+location.pathname+'?project='+S.i
 async function enter(id){const s=await getDoc(doc(db,'projects',id));if(!s.exists())return;Object.assign(S,{id,name:s.data().name,pin:s.data().pin||''});
 if(S.me)return open_();modal('🌸 歡迎加入旅程','<input id="nm" placeholder="你的名字，例如：小明">','進入旅程',m=>{const v=val(m,'#nm');if(!v){alert('請輸入名字');return false}S.me=v;localStorage.setItem('my_travel_nickname',v);open_()})}
 function open_(){$('v0').hidden=true;$('v1').hidden=false;$('nav').hidden=false;$('bk').hidden=false;$('sh').hidden=false;$('ht').textContent='🌸 '+S.name;$('hs').textContent='旅伴：'+S.me;
-$('hero').innerHTML=scene(S.name);S.day='all';S.lang=LG[dest(S.name)].c;rRemind();rLang();
+// 各分頁填入對應專屬插圖
+['schedule','ai','lang','split','quest'].forEach(t=>{const el=$('hero-'+t);if(el)el.innerHTML=tabScene(t)});
+S.day='all';S.lang=LG[dest(S.name)].c;rRemind();rLang();
 setDoc(doc(db,'projects',S.id,'members',S.me),{name:S.me},{merge:true});
 const sub=(c,o,fn)=>{const r=collection(db,'projects',S.id,c);S.un.push(onSnapshot(o?query(r,orderBy(o)):r,sn=>fn(sn.docs.map(d=>({id:d.id,...d.data()})))))};
 sub('schedules','createdAt',a=>{S.sch=a;rSch();rQuest()});sub('members',0,a=>{S.mem=a.map(m=>m.name||m.id);rSplit()});sub('expenses','createdAt',a=>{S.exp=a;rSplit()});
@@ -136,7 +150,7 @@ if(tm&&!/備註|營業時間/.test(line)){if(cur)out.push(cur);cur={day,time:tm[
 if(cur)out.push(cur);await Promise.all(out.map(i=>addDoc(collection(db,'projects',S.id,'schedules'),i)));alert(`✨ 成功導入 ${out.length} 筆行程！`)});
 /* ---------- 提醒 / 語言 ---------- */
 function rRemind(){const c=t=>`<div class="box"><h3>${t[0]}</h3><div style="font-size:14px">${t[1]}</div></div>`;
-$('t-ai').innerHTML=dest(S.name)==='korea'?[['🇰🇷 天氣小提醒','早晚溫差大、風也大，記得帶防風外套 🧥'],['🚗 自駕導航','推薦 Naver Map 或 Kakao Map，用電話號碼搜尋最準。沿途測速相機很多，請依速限行駛。'],['🚨 緊急電話','警察 112 ｜ 救護・消防 119 ｜ 中文旅遊熱線 1330']].map(c).join(''):c(['🌍 出發前確認','護照效期需大於 6 個月，備好網卡與萬用轉接頭 🔌'])}
+$('t-ai').innerHTML=tabScene('ai')+(dest(S.name)==='korea'?[['🇰🇷 天氣小提醒','早晚溫差大、風也大，記得帶防風外套 🧥'],['🚗 自駕導航','推薦 Naver Map 或 Kakao Map，用電話號碼搜尋最準。沿途測速相機很多，請依速限行駛。'],['🚨 緊急電話','警察 112 ｜ 救護・消防 119 ｜ 中文旅遊熱線 1330']].map(c).join(''):c(['🌍 出發前確認','護照效期需大於 6 個月，備好網卡與萬用轉接頭 🔌']))}
 const CATS=[['restaurant','🍽️ 餐廳'],['shopping','🛍️ 購物'],['transport','🚗 交通'],['hotel','🏨 住宿'],['emergency','🚨 突發']];
 const LG={korea:{c:'ko-KR',p:{restaurant:[['我們有 4 個人。','4명입니다.'],['請問有中文菜單嗎？','중국어 메뉴판 있어요?'],['請推薦招牌菜。','대표 메뉴 추천해주세요.']],shopping:[['請問這個多少錢？','이거 얼마예요?'],['現在有折扣嗎？','할인 중인가요?']],transport:[['最近的地鐵站在哪裡？','가장 가까운 지하철역이 어디예요?']],hotel:[['我要辦理入住。','체크인 하겠습니다.']],emergency:[['救命！護照被偷了！','살려주세요! 여권을 도둑맞았어요!']]}},
 japan:{c:'ja-JP',p:{restaurant:[['我們有 4 個人。','4人です。'],['請問有中文菜單嗎？','中国語のメニューはありますか？'],['請推薦招牌菜。','おすすめの料理を教えてください。']],shopping:[['請問這個多少錢？','これはいくらですか？']],transport:[['最近的車站在哪裡？','一番近い駅はどこですか？']],hotel:[['我要辦理入住。','チェックインお願いします。']],emergency:[['救命！護照被偷了！','助けてください！パスポートが盗まれました！']]}},
@@ -180,5 +194,6 @@ const un=q(m,'#un');if(un)un.onclick=async()=>{await deleteDoc(r);m.remove()}}
 $('gal').onclick=()=>{const l=(S.all||[]).filter(c=>c.photoUrl).sort((a,b)=>b.at-a.at);
 modal('📸 旅程回憶寫真冊',l.length?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${l.map((c,i)=>{const s=S.sch.find(x=>x.id===c.scheduleId);return`<div style="border:3px solid var(--ink);border-radius:18px;overflow:hidden;background:#fff;transform:rotate(${i%2?1.5:-1.5}deg)"><img src="${esc(c.photoUrl)}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;display:block"><small style="display:block;padding:2px 8px">${esc(s?clean(s.title):'')} · ${esc(c.uploader)}</small></div>`}).join('')}</div>`:'<p class="mute">還沒有照片，去闖關打卡拍一張吧 📷</p>')};
 /* ---------- 啟動 ---------- */
+$('hero0').innerHTML=scene('');
 (async()=>{const p=new URLSearchParams(location.search).get('project');if(p){saveIds([p,...ids()]);history.replaceState({},'',location.pathname)}renderProjects()})();
 </script></body></html>
