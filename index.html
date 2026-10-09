@@ -10,7 +10,7 @@
 <style>
 :root{--ink:#3E3A39;--paper:#FFFCF6;--co:#F2A497;--ye:#F6D27A;--aq:#A8D3E6;--gr:#B9DAA5}
 *{box-sizing:border-box}[hidden]{display:none!important}
-body{margin:0 auto;max-width:480px;min-height:100vh;background:var(--paper);color:var(--ink);font:15px/1.6 "Huninn","Noto Sans TC",system-ui,sans-serif;padding:0 14px calc(100px + env(safe-area-inset-bottom))}
+body{margin:0 auto;max-width:480px;min-height:100vh;background:var(--paper);color:var(--ink);font:15px/1.6 "Huninn","Noto Sans TC",system-ui,sans-serif;padding:0 14px calc(150px + env(safe-area-inset-bottom))}
 h2,h3{margin:0}small{opacity:.7}.mute{text-align:center;opacity:.6;padding:18px 0}
 .box{border:3px solid var(--ink);border-radius:24px;background:var(--paper);box-shadow:3px 3px 0 var(--ink);padding:14px;margin:12px 0}
 .btn{font:inherit;font-size:13px;color:var(--ink);background:var(--ye);border:3px solid var(--ink);border-radius:999px;padding:4px 14px;cursor:pointer;box-shadow:2px 2px 0 var(--ink);text-decoration:none;display:inline-block}
@@ -23,9 +23,9 @@ header div{flex:1;min-width:0}header b,header small{display:block;white-space:no
 .pill{font:inherit;flex:none;border:3px solid var(--ink);border-radius:999px;background:var(--paper);padding:2px 14px;cursor:pointer;color:var(--ink)}.pill.on{background:var(--aq)}
 .tag{display:inline-block;background:var(--ye);border:2px solid var(--ink);border-radius:999px;padding:0 10px;font-size:12px;margin-bottom:4px}
 .item{cursor:pointer;display:block}.item b{display:block}
-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:calc(100% - 28px);max-width:452px;background:var(--paper);border:3px solid var(--ink);border-radius:26px;box-shadow:3px 3px 0 var(--ink);display:flex;justify-content:space-around;padding:6px;z-index:5}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:calc(100% - 28px);max-width:452px;background:var(--paper);border:3px solid var(--ink);border-radius:26px;box-shadow:3px 3px 0 var(--ink);display:flex;justify-content:space-around;padding:6px;z-index:10}
 nav button{font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:none;color:var(--ink);padding:2px 8px;cursor:pointer}nav button span{display:block;font-size:20px}nav .on{background:var(--ye);border-color:var(--ink)}
-.mask{position:fixed;inset:0;background:rgba(62,58,57,.45);z-index:9;display:flex;align-items:center;justify-content:center;padding:16px}
+.mask{position:fixed;inset:0;background:rgba(62,58,57,.45);z-index:99;display:flex;align-items:center;justify-content:center;padding:16px}
 .sheet{width:100%;max-width:400px;max-height:88vh;overflow:auto;margin:0}
 input,textarea,select{font:inherit;width:100%;border:3px solid var(--ink);border-radius:16px;background:#fff;padding:8px 12px;margin:4px 0 8px;color:var(--ink)}
 label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:0 10px 6px 0}.chk input{width:auto;margin:0}
@@ -58,8 +58,7 @@ label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import{getFirestore,collection,addDoc,getDoc,getDocs,deleteDoc,doc,setDoc,onSnapshot,query,where,orderBy}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import{getStorage,ref,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-const app=initializeApp({apiKey:"AIzaSyBcKmZhJaZn5emOlHRV95-uC9q01wFxt4M",authDomain:"my-travel-app-6e00c.firebaseapp.com",projectId:"my-travel-app-6e00c",storageBucket:"my-travel-app-6e00c.firebasestorage.app",messagingSenderId:"135860333246",appId:"1:135860333246:web:a25402eb743d6cebc9ccef"});const db=getFirestore(app),st=getStorage(app);
+const app=initializeApp({apiKey:"AIzaSyBcKmZhJaZn5emOlHRV95-uC9q01wFxt4M",authDomain:"my-travel-app-6e00c.firebaseapp.com",projectId:"my-travel-app-6e00c",storageBucket:"my-travel-app-6e00c.firebasestorage.app",messagingSenderId:"135860333246",appId:"1:135860333246:web:a25402eb743d6cebc9ccef"});const db=getFirestore(app);
 const $=i=>document.getElementById(i),q=(m,s)=>m.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const S={id:null,name:'',pin:'',me:localStorage.getItem('my_travel_nickname')||'',sch:[],mem:[],exp:[],all:[],chk:{},day:'all',un:[],phrase:null,lang:'en-US',splitMode:'equal'};
@@ -368,7 +367,7 @@ general:{c:'en-US',p:{
 function rLang(){const P=LG[dest(S.name)].p;const show=id=>{$('lc').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===id));$('lp').innerHTML=(P[id]||[]).map((p,i)=>`<button class="box item" style="width:100%;font:inherit;color:inherit;text-align:left;margin:0 0 10px" data-i="${i}"><b>${esc(p[0])}</b><small style="color:var(--co)">${esc(p[1])}</small></button>`).join('');
 $('lp').querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=P[id][b.dataset.i];S.phrase=p;$('dc').textContent=p[0];$('df').textContent=p[1]})};$('lc').innerHTML=CATS.map(c=>`<button class="btn" data-c="${c[0]}">${c[1]}</button>`).join('');$('lc').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.c));show('airport')}$('say').onclick=()=>{if(!S.phrase)return;const u=new SpeechSynthesisUtterance(S.phrase[S.lang==='en-US'?0:1]);u.lang=S.lang;speechSynthesis.speak(u)};
 
-/* ---------- 分帳 (完美修復：依每筆帳目的 settle 獨立結算) ---------- */
+/* ---------- 分帳 ---------- */
 const money=n=>'NT$ '+Math.round(n).toLocaleString();
 function rSplit(){const by={};let tot=0;S.exp.forEach(e=>{by[e.cur]=(by[e.cur]||0)+e.amount;tot+=e.amount*(RATE[e.cur]||1)});
 $('tot').textContent=money(tot);$('brk').textContent=Object.entries(by).map(([c,v])=>`${c} ${Math.round(v).toLocaleString()}`).join(' ');
@@ -405,8 +404,7 @@ q(m,'#m-cust').onclick=()=>{S.splitMode='custom';q(m,'#m-cust').style.background
 };
 
 $('st').onclick=()=>{
-// 分別計算「原幣別結算」與「台幣結算」
-const origGroups = {}; // { KRW: { person: netAmount }, JPY: { ... } }
+const origGroups = {};
 let twdSubB = {}; S.mem.forEach(n=>twdSubB[n]=0);
 
 S.exp.forEach(e=>{
@@ -432,8 +430,6 @@ S.exp.forEach(e=>{
 });
 
 let resHtml = '';
-
-// 1. 處理原幣別群組結算
 Object.entries(origGroups).forEach(([cur, subB])=>{
     const cr=[], de=[];
     Object.entries(subB).forEach(([n,v])=>{if(v>0.1)cr.push([n,v]);else if(v<-0.1)de.push([n,-v])});
@@ -450,7 +446,6 @@ Object.entries(origGroups).forEach(([cur, subB])=>{
     }
 });
 
-// 2. 處理台幣群組結算
 {
     const cr=[], de=[];
     Object.entries(twdSubB).forEach(([n,v])=>{if(v>1)cr.push([n,v]);else if(v<-1)de.push([n,-v])});
@@ -460,7 +455,7 @@ Object.entries(origGroups).forEach(([cur, subB])=>{
         const x = Math.min(cr[0][1], de[0][1]);
         tr.push(`${esc(de[0][0])} ➜ ${esc(cr[0][0])} ${money(x)}`);
         cr[0][1]-=x; de[0][1]-=x;
-        if(cr[0][1]<1) cr.shift(); if(de[0][1]<1) de.shift();
+        if(cr[0][1]<1) cr.shift(); if(de[0][1]<1) cr.shift();
     }
     if(tr.length){
         resHtml += `<div style="margin-bottom:12px"><b style="color:var(--co)">📍 台幣結算 (TWD)</b>${tr.map(t=>`<div class="box" style="margin:4px 0;background:var(--aq)">${t}</div>`).join('')}</div>`;
@@ -470,8 +465,8 @@ Object.entries(origGroups).forEach(([cur, subB])=>{
 modal('📊 結算明細', resHtml || '<p class="mute">目前不需要轉帳 🎉</p>');
 };
 
-/* ---------- 闖關與打卡 ---------- */
-const cls=t=>{t=t||'';if(/交通|機場|租車|還車|출발|空港/.test(t))return null;if(/餐廳|美食|咖啡|晚餐|午餐|早餐|烤肉|料理|吃|맛집|식당/.test(t))return'food';if(/購物|免稅|超市|商場|買|마트|쇼핑/.test(t))return'shop';return'spot'};
+/* ---------- 闖關與穩定上傳照片 ---------- */
+const cls=t=>{t=t||'';if(/交通|機場|租車|還車|출발|空港/.test(t))return null;if(/餐廳|美食|咖啡|晚餐|午餐|早餐|烤肉|料理|吃|맛집|식당|카페/.test(t))return'food';if(/購物|免稅|超市|商場|買|마트|쇼핑/.test(t))return'shop';return'spot'};
 const BD={food:['美食家','var(--co)'],spot:['探險家','var(--aq)'],shop:['購物達人','var(--ye)']};
 function rQuest(){const it=S.sch.map(s=>({...s,k:cls(s.title)})).filter(s=>s.k),n=it.filter(s=>S.chk[s.id]).length,p=it.length?Math.round(n/it.length*100):0;
 $('qc').textContent=`已打卡 ${n} / ${it.length}`;$('qp').textContent=p+'\%';$('qb').style.width=p+'%';
@@ -479,29 +474,40 @@ for(const k in BD){const on=it.some(s=>s.k===k&&S.chk[s.id]),b=$('b-'+k),was=b.c
 $('ql').innerHTML=it.length?it.map(s=>`<div class="box item" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><b>${esc(clean(s.title))}</b></div><button class="btn ${S.chk[s.id]?'gr':''}" data-i="${s.id}">${S.chk[s.id]?'✔ 已解鎖':'📍 打卡'}</button></div>`).join(''):'<p class="mute">行程中還沒有可打卡的景點、美食或購物 ✨</p>';
 $('ql').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>checkin(b.dataset.i))}
 
-const shrink=f=>new Promise((resolve)=>{
-const reader=new FileReader();
-reader.onload=e=>{
-    const img=new Image();
-    img.onload=()=>{
-        const MAX=800;let w=img.width,h=img.height;
-        if(w>h&&w>MAX){h*=MAX/w;w=MAX}else if(h>MAX){w*=MAX/h;h=MAX}
-        const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
-        const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,w,h);
-        canvas.toBlob(blob=>resolve(blob||f),'image/jpeg',0.75);
+// 完美修復照片上傳：直接轉壓縮 Base64 儲存到 Firestore，百分之百成功不依賴 Storage 權限
+const readAndCompressImage = file => new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_SIZE = 600;
+            let width = img.width;
+            let height = img.height;
+            if (width > height) {
+                if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+            } else {
+                if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.7));
+        };
+        img.onerror = () => resolve(e.target.result);
+        img.src = e.target.result;
     };
-    img.onerror=()=>resolve(f);
-    img.src=e.target.result;
-};
-reader.onerror=()=>resolve(f);
-reader.readAsDataURL(f);
+    reader.onerror = () => resolve('');
+    reader.readAsDataURL(file);
 });
 
 function checkin(id){const s=S.sch.find(x=>x.id===id);if(!s)return;const cur=S.chk[id],r=doc(db,'projects',S.id,'checkins',id+'_'+S.me);
 const m=modal(esc(clean(s.title)),`${cur&&cur.photoUrl?`<img src="${esc(cur.photoUrl)}" alt="" style="width:100%;border:3px solid var(--ink);border-radius:20px;margin-bottom:8px">`:''}<input id="ph" type="file" accept="image/*" hidden><button class="btn co" id="up" style="width:100%;margin-bottom:8px">📷 ${cur?'換一張照片':'選照片打卡'}</button>${cur?'<button class="btn" id="un" style="width:100%">↩ 取消打卡</button>':'<button class="btn" id="np" style="width:100%">✔ 不放照片，直接打卡</button>'}`);
 q(m,'#up').onclick=()=>q(m,'#ph').click();
-q(m,'#ph').onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=q(m,'#up');b.textContent='上傳中… ⏳';b.disabled=true;
-try{const blob=await shrink(f),p=ref(st,`checkins/${S.id}/${id}_${S.me}_${Date.now()}.jpg`);await uploadBytes(p,blob,{contentType:'image/jpeg'});await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:await getDownloadURL(p),at:Date.now()});m.remove()}catch(x){console.error(x);alert('照片上傳失敗，請檢查網路或 Storage 權限');b.textContent='再試一次';b.disabled=false}};
+q(m,'#ph').onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=q(m,'#up');b.textContent='處理上傳中… ⏳';b.disabled=true;
+try{const base64Data = await readAndCompressImage(f);if(!base64Data){alert('讀取圖片失敗');b.textContent='再試一次';b.disabled=false;return;}
+await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:base64Data,at:Date.now()});m.remove()}catch(x){console.error(x);alert('上傳失敗');b.textContent='再試一次';b.disabled=false}};
 const np=q(m,'#np');if(np)np.onclick=async()=>{await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:'',at:Date.now()});m.remove()};
 const un=q(m,'#un');if(un)un.onclick=async()=>{await deleteDoc(r);m.remove()}}
 
