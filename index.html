@@ -108,9 +108,7 @@ if(diff>0)return`🔥 倒數 ${diff} 天`;if(diff===0)return`🎉 今天出發�
 const ids=()=>JSON.parse(localStorage.getItem('my_subscribed_projects')||'[]');
 const saveIds=a=>localStorage.setItem('my_subscribed_projects',JSON.stringify([...new Set(a)]));
 
-async function renderProjects(){
-const l=$('pl'),a=ids();
-if(!a.length){l.innerHTML='<p class="mute">還沒有專案，新增一個或輸入 6 位數號碼導入吧 ✨</p>';return}
+async function renderProjects(){const l=$('pl'),a=ids();if(!a.length){l.innerHTML='<p class="mute">還沒有專案，新增一個或輸入 6 位數號碼導入吧 ✨</p>';return}
 const snaps=await Promise.all(a.map(i=>getDoc(doc(db,'projects',i)).catch(()=>null)));l.innerHTML='';
 snaps.forEach(s=>{if(!s||!s.exists())return;const p=s.data(),d=document.createElement('div');d.className='box item';
 d.style.display='flex';d.style.justifyContent='space-between';d.style.alignItems='center';
