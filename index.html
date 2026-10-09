@@ -234,196 +234,11 @@
         </div>
     </div>
 
-    <div id="quest-photo-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base" id="quest-modal-title">📸 打卡上傳</h3>
-                <button onclick="window.closeQuestPhotoModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <div id="quest-photo-preview-container" class="hidden w-full h-40 bg-gray-50 rounded-2xl border border-[#eae1d7] overflow-hidden flex items-center justify-center">
-                <img id="quest-photo-preview" src="" alt="預覽" class="w-full h-full object-cover">
-            </div>
-            <input type="file" id="quest-file-input" accept="image/*" onchange="previewQuestPhoto(event)" class="w-full text-xs p-2.5 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
-            <div class="flex gap-2.5 pt-2">
-                <button onclick="window.closeQuestPhotoModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.submitQuestPhoto()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認打卡</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="quest-edit-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base" id="edit-quest-modal-title">✨ 已打卡項目管理</h3>
-                <button onclick="window.closeQuestEditModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <div class="flex gap-2.5 pt-2">
-                <button onclick="window.openChangePhotoFromEdit()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">📷 更換照片</button>
-                <button onclick="window.cancelQuestCheckin()" class="flex-1 bg-red-100 text-red-600 py-3 rounded-full font-black">❌ 取消打卡</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="photo-gallery-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] flex flex-col">
-            <div class="flex justify-between items-center shrink-0">
-                <h3 class="font-black text-[#5c4a3d] text-base">📸 旅伴共同寫真冊</h3>
-                <button onclick="window.closePhotoGalleryModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <div id="photo-gallery-grid" class="grid grid-cols-2 gap-3 overflow-y-auto pr-1 flex-1"></div>
-            <div class="pt-2 shrink-0"><button onclick="window.closePhotoGalleryModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button></div>
-        </div>
-    </div>
-
     <div id="login-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <h3 class="font-black text-[#5c4a3d] text-base text-center">🌸 歡迎加入放風之旅</h3>
             <input type="text" id="login-name-input" placeholder="例如：小明" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-center text-sm">
             <button onclick="window.submitLoginName()" class="w-full bg-[#d98262] text-white py-3.5 rounded-full font-black shadow-md">進入旅程 🚀</button>
-        </div>
-    </div>
-
-    <div id="map-search-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">🗺️ 確認地圖搜尋關鍵字</h3>
-                <button onclick="window.closeMapSearchModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <input type="text" id="map-search-input" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-sm" placeholder="輸入關鍵字...">
-            <div id="map-buttons-container" class="pt-2 space-y-2"></div>
-            <button onclick="window.closeMapSearchModal()" class="w-full text-center bg-gray-100 text-gray-600 py-2.5 rounded-full font-black">取消</button>
-        </div>
-    </div>
-
-    <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
-            <div id="modal-view-mode" class="space-y-4">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <span id="modal-day" class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black">Day 1</span>
-                        <span id="modal-time" class="text-xs text-gray-400 font-bold ml-2">12:00</span>
-                    </div>
-                    <button onclick="window.closeDetailModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
-                </div>
-                <div>
-                    <h3 id="modal-title" class="font-black text-gray-900 text-base mt-2">行程名稱</h3>
-                    <div id="modal-location-container" class="mt-2 hidden bg-[#fffaf5] p-3 rounded-2xl border border-[#eae1d7]">
-                        <p class="text-xs text-gray-600 font-bold mb-0.5">📝 備註：</p>
-                        <p id="modal-location" class="text-xs text-gray-800 whitespace-pre-line font-medium"></p>
-                    </div>
-                </div>
-                <div id="modal-map-btn-container" class="pt-2 flex gap-2.5"></div>
-                <div class="pt-2 flex gap-2.5">
-                    <button onclick="window.openMapSearchModal()" class="flex-1 bg-[#f0dcd0] text-[#735848] text-xs py-2.5 rounded-full font-black transition">🗺️ 修改地圖</button>
-                    <button onclick="window.switchToEditMode()" class="flex-1 bg-[#f0dcd0] text-[#735848] text-xs py-2.5 rounded-full font-black transition">✏️ 修改行程</button>
-                    <button onclick="window.closeDetailModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-2.5 rounded-full font-bold">關閉</button>
-                </div>
-            </div>
-            <div id="modal-edit-mode" class="hidden space-y-3 text-xs">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-black text-[#5c4a3d] text-base">✏️ 編輯行程內容</h3>
-                    <button onclick="window.closeDetailModal()" class="text-gray-400 font-black text-base">✕</button>
-                </div>
-                <input type="hidden" id="edit-schedule-id">
-                <div><label class="block font-bold text-gray-600 mb-1">天數</label><input type="text" id="edit-day" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-                <div><label class="block font-bold text-gray-600 mb-1">時間</label><input type="text" id="edit-time" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-                <div><label class="block font-bold text-gray-600 mb-1">行程名稱</label><input type="text" id="edit-title" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-                <div><label class="block font-bold text-gray-600 mb-1">備註</label><textarea id="edit-location" rows="3" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none font-bold" placeholder="備註..."></textarea></div>
-                <div class="flex gap-2.5 pt-2">
-                    <button onclick="window.switchToViewMode()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">返回</button>
-                    <button onclick="window.saveScheduleEdit()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">儲存修改</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="smart-paste-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">✨ AI 智慧導入行程</h3>
-                <button onclick="window.closeSmartPasteModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <textarea id="smart-paste-input" rows="8" placeholder="貼上行程..." class="w-full text-xs p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none"></textarea>
-            <div class="flex gap-2.5 pt-1">
-                <button onclick="window.closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
-                <button onclick="window.parseSmartPaste()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">開始智慧拆解</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="schedule-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">✏️ 手動新增行程</h3>
-                <button onclick="window.closeAddScheduleModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <div class="space-y-3 text-xs">
-                <div><label class="block font-bold text-gray-600 mb-1">天數</label><input type="text" id="input-day" value="Day 1" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-                <div><label class="block font-bold text-gray-600 mb-1">時間</label><input type="text" id="input-time" value="10:00" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-                <div><label class="block font-bold text-gray-600 mb-1">行程名稱</label><input type="text" id="input-title" placeholder="名稱" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-                <div><label class="block font-bold text-gray-600 mb-1">備註</label><textarea id="input-location" rows="3" placeholder="備註..." class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none font-bold"></textarea></div>
-            </div>
-            <div class="flex gap-2.5 pt-2">
-                <button onclick="window.closeAddScheduleModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
-                <button onclick="window.submitScheduleForm()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">確認新增</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="expense-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-md p-6 space-y-3.5 shadow-2xl text-xs max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">✍️ 新增記帳</h3>
-                <button onclick="window.closeAddExpenseModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <div><label class="block font-bold text-gray-600 mb-1">項目名稱</label><input type="text" id="exp-title" placeholder="晚餐" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-            <div class="grid grid-cols-2 gap-2">
-                <div><label class="block font-bold text-gray-600 mb-1">金額</label><input type="number" id="exp-amount" placeholder="金額" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">幣別</label>
-                    <select id="exp-currency" onchange="window.toggleExchangeRate()" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold">
-                        <option value="TWD">TWD</option><option value="KRW" selected>KRW</option><option value="JPY">JPY</option><option value="THB">THB</option><option value="USD">USD</option>
-                    </select>
-                </div>
-            </div>
-            <div id="rate-box"><label class="block font-bold text-gray-600 mb-1">對台幣匯率</label><input type="number" id="exp-rate" value="0.024" step="0.0001" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-            <div><label class="block font-bold text-gray-600 mb-1">誰付錢？</label><select id="exp-payer" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></select></div>
-            <div>
-                <label class="block font-bold text-gray-600 mb-1">收款幣別</label>
-                <select id="exp-settle-currency" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold">
-                    <option value="ORIGINAL">依原幣別</option><option value="TWD">折合台幣</option>
-                </select>
-            </div>
-            <div>
-                <div class="flex justify-between items-center mb-1">
-                    <label class="font-bold text-gray-600">分攤模式</label>
-                    <div class="flex gap-2">
-                        <button type="button" onclick="window.setSplitMode('equal')" id="btn-mode-equal" class="text-[10px] px-2.5 py-1 rounded-full font-black bg-[#d98262] text-white">均攤</button>
-                        <button type="button" onclick="window.setSplitMode('custom')" id="btn-mode-custom" class="text-[10px] px-2.5 py-1 rounded-full font-black bg-gray-100 text-gray-600">自訂</button>
-                    </div>
-                </div>
-                <div id="exp-participants-container" class="space-y-2 p-2.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl max-h-40 overflow-y-auto"></div>
-            </div>
-            <div class="flex gap-2.5 pt-2">
-                <button onclick="window.closeAddExpenseModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.submitExpense()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確定</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="member-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
-            <div class="flex justify-between items-center"><h3 class="font-black text-[#5c4a3d] text-base">👥 成員管理</h3><button onclick="window.closeAddMemberModal()" class="text-gray-400 font-black">✕</button></div>
-            <div class="flex gap-2"><input type="text" id="new-member-name" placeholder="名字" class="flex-1 p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"><button onclick="window.addMember()" class="bg-[#d98262] text-white px-4 py-3 rounded-2xl font-black">新增</button></div>
-            <div id="member-list-display" class="space-y-2 max-h-48 overflow-y-auto"></div>
-            <button onclick="window.closeAddMemberModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">完成</button>
-        </div>
-    </div>
-
-    <div id="settlement-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs">
-            <div id="settlement-content" class="space-y-3 max-h-72 overflow-y-auto pr-1"></div>
-            <button onclick="window.closeSettlementModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button>
         </div>
     </div>
 
@@ -675,218 +490,606 @@
             }
         };
 
-        // 🌟 完整宣告所有 Modal 與按鈕互動函式並掛載到 window
-        window.openSmartPasteModal = function() {
-            if (currentProjectId) {
-                document.getElementById('smart-paste-modal').classList.remove('hidden');
+        // 🌟 完整宣告所有函式並直接掛載到 window 物件
+        function renderRemindersByRules(projectName) {
+            const container = document.getElementById('dynamic-reminders-container');
+            if (!container) return;
+            let nameLower = (projectName || '').toLowerCase();
+            let html = '';
+
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">當地早晚溫差較大且風大，建議穿著長袖、針織衫或帽T，並準備防風外套 🧥。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>導航 App：強烈建議使用 Naver Map 或 Kakao Map，以電話號碼查詢景點最準確！</li>
+                            <li>測速照相：道路速限嚴格，沿途有大量測速照相，務必依速限行駛。</li>
+                            <li>加油還車：多為自助/半人工，記得確認租車規定（通常為滿油出借還車）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>證件：務必備妥台灣駕照正本與國際駕照。</li>
+                            <li>支付：信用卡普及，建議身上備妥 5~10 萬韓元現金備用。</li>
+                            <li>插頭：電壓 220V，圓形雙孔（歐規/韓規）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>警察局：112 | 救護車/消防：119 | 中文旅遊熱線：1330</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都') || nameLower.includes('沖繩') || nameLower.includes('北海道') || nameLower.includes('名古屋')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇯🇵 日本旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">行程多以步行與大眾運輸為主，建議穿著舒適好走的布鞋，並隨身攜帶輕便外套與雨具 🌂。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚆 交通與導航提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>導航：推薦使用 Google Maps 或 乗換案內 查詢地鐵。</li>
+                            <li>IC 卡：建議事先將 Suica 或 Pasmo 加入手機錢包（Apple Pay）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>護照效期需大於 6 個月。部分小店或拉麵機仍需現金，建議備妥適量日幣。</li>
+                            <li>插頭：電壓 100V，雙孔扁平插頭（與台灣相同）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>警察局：110 | 救護車/消防：119</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁') || nameLower.includes('普吉') || nameLower.includes('芭達雅')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇹🇭 泰國旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">終年炎熱，建議穿著輕薄透氣衣物，備好防曬與雨具。進出寺廟衣著需端莊（不可露肩短褲）。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🛵 交通與叫車提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>叫車：推薦使用 Grab 或 Bolt。市區可多利用 BTS/MRT 避開塞車。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與小費</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>夜市小吃多收現金，可至當地 SuperRich 換匯。按摩或服務良好建議給 20-100 銖小費。</li>
+                            <li>插頭：電壓 220V，圓形或扁平兩用。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>觀光警察：1155 | 警察局：191 | 醫療：1669</li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥當地網卡、萬用轉接頭與海外旅遊平安險。</p>
+                    </div>
+                `;
             }
+
+            container.innerHTML = html;
         };
-        window.closeSmartPasteModal = function() {
-            document.getElementById('smart-paste-modal').classList.add('hidden');
+        window.renderRemindersByRules = renderRemindersByRules;
+
+        window.initLanguageModule = function(projectName) {
+            let nameLower = (projectName || '').toLowerCase();
+            let destKey = 'general';
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) destKey = 'korea';
+            else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都')) destKey = 'japan';
+            else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁')) destKey = 'thailand';
+
+            const currentLangPack = languageData[destKey];
+            currentDestinationLang = currentLangPack.langCode;
+            currentActivePhrase = { cn: "請選取左側分類與右側句子", foreign: "Ready to Speak ✨" };
+            document.getElementById('display-cn').innerText = currentActivePhrase.cn;
+            document.getElementById('display-foreign').innerText = currentActivePhrase.foreign;
+
+            const catContainer = document.getElementById('lang-categories');
+            catContainer.innerHTML = '';
+            currentLangPack.categories.forEach((cat, idx) => {
+                let btn = document.createElement('button');
+                btn.className = `w-full text-left text-xs font-black p-3 rounded-2xl transition border ${idx === 0 ? 'bg-[#d98262] text-white border-[#d98262] shadow-sm' : 'bg-white text-gray-700 border-[#eae1d7] hover:bg-[#fffaf5]'}`;
+                btn.innerText = cat.name;
+                btn.onclick = () => {
+                    document.querySelectorAll('#lang-categories button').forEach(b => {
+                        b.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-white text-gray-700 border-[#eae1d7] hover:bg-[#fffaf5]";
+                    });
+                    btn.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-[#d98262] text-white border-[#d98262] shadow-sm";
+                    window.renderPhrases(currentLangPack.phrases[cat.id]);
+                };
+                catContainer.appendChild(btn);
+            });
+            window.renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
         };
 
-        window.openAddScheduleModal = function() {
-            if (currentProjectId) {
-                document.getElementById('schedule-modal').classList.remove('hidden');
+        window.renderPhrases = function(phrases) {
+            const phraseContainer = document.getElementById('lang-phrases');
+            if (!phraseContainer) return;
+            phraseContainer.innerHTML = '';
+            phrases.forEach(p => {
+                let card = document.createElement('div');
+                card.className = "cute-card p-3.5 bg-white hover:bg-[#fffaf5] border border-[#eae1d7] cursor-pointer transition flex justify-between items-center";
+                card.innerHTML = `<div><p class="text-xs text-gray-800 font-bold">${p.cn}</p></div>`;
+                card.onclick = () => {
+                    currentActivePhrase = p;
+                    document.getElementById('display-cn').innerText = p.cn;
+                    document.getElementById('display-foreign').innerText = p.foreign;
+                };
+                phraseContainer.appendChild(card);
+            });
+        };
+
+        window.loadMembersAndExpenses = function(projId) {
+            const membersRef = collection(db, "projects", projId, "members");
+            if (unsubscribeMembers) unsubscribeMembers();
+            unsubscribeMembers = onSnapshot(membersRef, (snapshot) => {
+                allMembersData = [];
+                snapshot.forEach(docSnap => {
+                    allMembersData.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderMemberListUI();
+                updateExpenseModalDropdowns();
+            });
+
+            const expensesRef = collection(db, "projects", projId, "expenses");
+            if (unsubscribeExpenses) unsubscribeExpenses();
+            unsubscribeExpenses = onSnapshot(query(expensesRef, orderBy("createdAt", "desc")), (snapshot) => {
+                allExpensesData = [];
+                snapshot.forEach(docSnap => {
+                    allExpensesData.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderExpenseUI();
+            });
+        };
+
+        window.loadCheckins = function(projId) {
+            const checkinsRef = collection(db, "projects", projId, "checkins");
+            if (unsubscribeCheckins) unsubscribeCheckins();
+            unsubscribeCheckins = onSnapshot(checkinsRef, (snapshot) => {
+                allCheckinsData = {};
+                snapshot.forEach(docSnap => {
+                    let data = docSnap.data();
+                    if (data.uploader === currentMyName) {
+                        allCheckinsData[data.scheduleId] = data;
+                    }
+                });
+                renderQuestUI();
+            });
+        };
+
+        window.loadSchedules = function(projId) {
+            const schedulesRef = collection(db, "projects", projId, "schedules");
+            const q = query(schedulesRef, orderBy("createdAt", "asc"));
+            if (unsubscribeSchedules) unsubscribeSchedules();
+            unsubscribeSchedules = onSnapshot(q, (snapshot) => {
+                allSchedulesData = [];
+                snapshot.forEach((docSnap) => { allSchedulesData.push({ id: docSnap.id, ...docSnap.data() }); });
+                renderDayPills();
+                renderScheduleUI();
+                renderQuestUI();
+            });
+        };
+
+        window.cleanDisplayTitle = function(title) {
+            if (!title) return '';
+            return title.replace(/^\d{1,2}[:：]\d{2}\s*/, '').trim();
+        };
+
+        window.renderMemberListUI = function() {
+            const container = document.getElementById('member-list-display');
+            if (!container) return;
+            container.innerHTML = '';
+            allMembersData.forEach(m => {
+                let div = document.createElement('div');
+                div.className = "flex justify-between items-center p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl font-bold";
+                div.innerHTML = `
+                    <span>👤 ${m.name}</span>
+                    <button onclick="window.deleteMember('${m.id}', '${m.name}')" class="text-gray-400 hover:text-red-500 text-xs px-2 py-1 transition">🗑️ 刪除</button>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        window.renderExpenseUI = function() {
+            const container = document.getElementById('expense-list-container');
+            const totalEl = document.getElementById('total-expense-twd');
+            const breakdownEl = document.getElementById('currency-breakdown');
+            if (!container) return;
+
+            if (allExpensesData.length === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前還沒有記帳，點上方按鈕開始記帳吧！✨</p>`;
+                if (totalEl) totalEl.innerText = "NT$ 0";
+                if (breakdownEl) breakdownEl.innerHTML = "";
+                return;
+            }
+
+            container.innerHTML = '';
+            let totalTwdSum = 0;
+            let currencyTotals = {};
+
+            allExpensesData.forEach(exp => {
+                let cur = exp.currency || 'KRW';
+                let amt = exp.amount || 0;
+                let rate = exp.rate || 1;
+                let twdVal = (cur === 'TWD') ? amt : (amt * rate);
+                totalTwdSum += twdVal;
+
+                if (!currencyTotals[cur]) currencyTotals[cur] = 0;
+                currencyTotals[cur] += amt;
+
+                let div = document.createElement('div');
+                div.className = "cute-card p-3.5 bg-white border border-[#eae1d7] flex justify-between items-center";
+                div.innerHTML = `
+                    <div class="space-y-0.5">
+                        <h4 class="font-black text-gray-900 text-xs">💸 ${exp.title}</h4>
+                        <p class="text-[10px] text-gray-400 font-bold">付款人：${exp.payer} • 參與者：${(exp.participants || []).join(', ')}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-black text-[#d98262] text-xs">${cur} ${amt.toLocaleString()}</p>
+                        <p class="text-[10px] text-gray-400 font-bold">約 NT$ ${Math.round(twdVal).toLocaleString()}</p>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            if (totalEl) totalEl.innerText = `NT$ ${Math.round(totalTwdSum).toLocaleString()}`;
+            if (breakdownEl) {
+                let bdHtml = "";
+                Object.keys(currencyTotals).forEach(c => {
+                    bdHtml += `<span>${c} ${currencyTotals[c].toLocaleString()}</span>`;
+                });
+                breakdownEl.innerHTML = bdHtml;
             }
         };
-        window.closeAddScheduleModal = function() {
-            document.getElementById('schedule-modal').classList.add('hidden');
+
+        window.renderQuestUI = function() {
+            const container = document.getElementById('quest-list-container');
+            const countEl = document.getElementById('quest-total-count');
+            const percentEl = document.getElementById('quest-percent');
+            const progressBar = document.getElementById('quest-progress-bar');
+            if (!container) return;
+
+            let questItems = [];
+            allSchedulesData.forEach(s => {
+                let category = classifyScheduleItem(s.title);
+                if (category !== null) {
+                    let myCheckin = allCheckinsData[s.id];
+                    questItems.push({ 
+                        ...s, 
+                        category, 
+                        completed: !!myCheckin, 
+                        photoUrl: myCheckin ? myCheckin.photoUrl : '',
+                        uploader: myCheckin ? myCheckin.uploader : ''
+                    });
+                }
+            });
+
+            if (questItems.length === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前行程中尚無符合的打卡任務！✨</p>`;
+                if (countEl) countEl.innerText = `已打卡 0 / 0`;
+                if (percentEl) percentEl.innerText = `0%`;
+                if (progressBar) progressBar.style.width = `0%`;
+                return;
+            }
+
+            let totalCount = questItems.length;
+            let completedCount = questItems.filter(item => item.completed).length;
+            let percent = Math.round((completedCount / totalCount) * 100);
+
+            if (countEl) countEl.innerText = `已打卡 ${completedCount} / ${totalCount}`;
+            if (percentEl) percentEl.innerText = `${percent}%`;
+            if (progressBar) progressBar.style.width = `${percent}%`;
+
+            let foodItems = questItems.filter(i => i.category === 'food');
+            let spotItems = questItems.filter(i => i.category === 'spot');
+            let shopItems = questItems.filter(i => i.category === 'shop');
+
+            updateBadges(
+                foodItems.filter(i => i.completed).length, foodItems.length,
+                spotItems.filter(i => i.completed).length, spotItems.length,
+                shopItems.filter(i => i.completed).length, shopItems.length
+            );
+
+            let grouped = {};
+            questItems.forEach(item => {
+                let dayKey = item.day || 'Day 1';
+                if (!grouped[dayKey]) grouped[dayKey] = [];
+                grouped[dayKey].push(item);
+            });
+
+            container.innerHTML = '';
+            Object.keys(grouped).forEach((dayKey, index) => {
+                let items = grouped[dayKey];
+                let sectionId = `quest_section_${index}`;
+                let dayBox = document.createElement('div');
+                dayBox.className = "cute-card overflow-hidden border border-[#eae1d7]";
+                
+                let headerHtml = `
+                    <div onclick="window.toggleQuestCollapse('${sectionId}')" class="bg-[#f3e9de]/70 p-3.5 flex justify-between items-center cursor-pointer hover:bg-[#f3e9de] transition">
+                        <h4 class="font-black text-[#5c4a3d] text-xs">${dayKey} 任務清單 <span class="text-[11px] text-[#8c7868] font-bold">(${items.filter(i => i.completed).length}/${items.length})</span></h4>
+                        <span id="icon_${sectionId}" class="text-xs text-[#8c7868] font-black">▼ 展開</span>
+                    </div>
+                `;
+
+                let listHtml = `<div id="${sectionId}" class="hidden p-3 space-y-2.5 bg-white">`;
+                items.forEach(s => {
+                    let cleanTitle = cleanDisplayTitle(s.title);
+                    let statusBadge = s.completed ? 
+                        `<span onclick="event.stopPropagation(); window.openQuestEditModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-black cursor-pointer hover:bg-green-200">✔️ 已打卡</span>` : 
+                        `<span onclick="window.openQuestPhotoModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-1 rounded-full font-black cursor-pointer hover:bg-[#e2c8b8]">打卡</span>`;
+                    
+                    let photoThumbnail = s.photoUrl ? `<img src="${s.photoUrl}" class="w-10 h-10 rounded-xl object-cover border border-[#eae1d7] shrink-0">` : '';
+
+                    listHtml += `
+                        <div class="p-3.5 bg-[#fffaf5] rounded-2xl border border-[#eae1d7] flex justify-between items-center transition">
+                            <div class="space-y-1 min-w-0 flex-1 pr-2">
+                                <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
+                                <h5 class="font-black text-gray-900 text-xs mt-1 truncate">${cleanTitle}</h5>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                ${photoThumbnail}
+                                ${statusBadge}
+                            </div>
+                        </div>
+                    `;
+                });
+                listHtml += `</div>`;
+                dayBox.innerHTML = headerHtml + listHtml;
+                container.appendChild(dayBox);
+            });
+        };
+
+        window.renderDayPills = function() {
+            const pillsContainer = document.getElementById('day-pills-container');
+            if (!pillsContainer) return;
+            pillsContainer.innerHTML = '';
+            let grouped = {};
+            allSchedulesData.forEach(item => {
+                let dayKey = item.day || 'Day 1';
+                if (!grouped[dayKey]) grouped[dayKey] = [];
+                grouped[dayKey].push(item);
+            });
+            let days = Object.keys(grouped);
+            if (days.length === 0) return;
+
+            let allBtn = document.createElement('button');
+            allBtn.className = `px-4 py-2 rounded-full text-xs font-black transition shrink-0 ${activeDayFilter === 'all' ? 'bg-[#d98262] text-white shadow-sm' : 'bg-white text-[#736052] border border-[#eae1d7]'}`;
+            allBtn.innerText = "全部行程";
+            allBtn.onclick = () => { activeDayFilter = 'all'; renderDayPills(); renderScheduleUI(); };
+            pillsContainer.appendChild(allBtn);
+
+            days.forEach(dayKey => {
+                let btn = document.createElement('button');
+                let isActive = activeDayFilter === dayKey;
+                btn.className = `px-4 py-2 rounded-full text-xs font-black transition shrink-0 ${isActive ? 'bg-[#d98262] text-white shadow-sm' : 'bg-white text-[#736052] border border-[#eae1d7]'}`;
+                btn.innerText = dayKey;
+                btn.onclick = () => { activeDayFilter = dayKey; renderDayPills(); renderScheduleUI(); };
+                pillsContainer.appendChild(btn);
+            });
+        };
+
+        window.renderScheduleUI = function() {
+            const container = document.getElementById('schedule-container');
+            const upcomingContainer = document.getElementById('upcoming-card-container');
+            if (!container) return;
+            container.innerHTML = ''; if (upcomingContainer) upcomingContainer.innerHTML = '';
+
+            if (allSchedulesData.length === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前還沒有行程，快點擊上方按鈕新增或智慧導入吧！✨</p>`;
+                return;
+            }
+
+            const nextItem = allSchedulesData[0];
+            const cleanNextTitle = cleanDisplayTitle(nextItem.title);
+            if (upcomingContainer) {
+                upcomingContainer.innerHTML = `
+                    <div id="upcoming-card" class="cute-card p-4 bg-gradient-to-r from-[#fffaf5] to-[#fbf2e9] border-2 border-[#d98262]/40 space-y-2 relative shadow-md cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] bg-[#d98262] text-white px-2.5 py-0.5 rounded-full font-black">🚀 即將到來</span>
+                            <span class="text-xs font-black text-[#d98262]">${nextItem.day || 'Day 1'} • ${nextItem.time || '全天'}</span>
+                        </div>
+                        <h4 class="font-black text-gray-900 text-sm">${cleanNextTitle}</h4>
+                    </div>
+                `;
+                document.getElementById('upcoming-card').onclick = () => openDetailModal(nextItem.id);
+            }
+
+            let grouped = {};
+            allSchedulesData.forEach(item => {
+                let dayKey = item.day || 'Day 1';
+                if (!grouped[dayKey]) grouped[dayKey] = [];
+                grouped[dayKey].push(item);
+            });
+
+            Object.keys(grouped).forEach((dayKey, index) => {
+                if (activeDayFilter !== 'all' && activeDayFilter !== dayKey) return;
+                let items = grouped[dayKey];
+                let sectionId = `day_section_${index}`;
+                let dayBox = document.createElement('div');
+                dayBox.className = "cute-card overflow-hidden border border-[#eae1d7] mb-3";
+                
+                let headerHtml = `
+                    <div id="toggle_${sectionId}" class="bg-[#f3e9de]/70 p-3.5 flex justify-between items-center cursor-pointer hover:bg-[#f3e9de] transition">
+                        <h4 class="font-black text-[#5c4a3d] text-xs">${dayKey} <span class="text-[11px] text-[#8c7868] font-bold">(${items.length} 個行程)</span></h4>
+                        <span id="icon_${sectionId}" class="text-xs text-[#8c7868] font-black">▼ 展開</span>
+                    </div>
+                `;
+                let isExpanded = activeDayFilter !== 'all';
+                let listHtml = `<div id="${sectionId}" class="${isExpanded ? '' : 'hidden'} p-3 space-y-2.5 bg-white">`;
+
+                items.forEach(s => {
+                    let cleanTitle = cleanDisplayTitle(s.title);
+                    listHtml += `
+                        <div id="sched_item_${s.id}" class="p-3.5 bg-[#fffaf5] hover:bg-[#fbf2e9] rounded-2xl border border-[#eae1d7] flex justify-between items-center cursor-pointer transition">
+                            <div class="space-y-0.5">
+                                <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
+                                <h5 class="font-black text-gray-900 text-sm mt-1">${cleanTitle}</h5>
+                            </div>
+                        </div>
+                    `;
+                });
+                listHtml += `</div>`;
+                dayBox.innerHTML = headerHtml + listHtml;
+                container.appendChild(dayBox);
+
+                setTimeout(() => {
+                    let toggleEl = document.getElementById(`toggle_${sectionId}`);
+                    if (toggleEl) {
+                        toggleEl.onclick = () => {
+                            const el = document.getElementById(sectionId);
+                            const icon = document.getElementById(`icon_${sectionId}`);
+                            if (el.classList.contains('hidden')) { el.classList.remove('hidden'); icon.innerText = "▲ 收合"; }
+                            else { el.classList.add('hidden'); icon.innerText = "▼ 展開"; }
+                        };
+                    }
+                    items.forEach(s => {
+                        let itemEl = document.getElementById(`sched_item_${s.id}`);
+                        if (itemEl) itemEl.onclick = () => openDetailModal(s.id);
+                    });
+                }, 50);
+            });
+        };
+
+        window.classifyScheduleItem = function(title) {
+            let t = (title || '').toLowerCase();
+            if (t.includes('交通') || t.includes('機場') || t.includes('租車') || t.includes('還車') || t.includes('出發') || t.includes('前往') || t.includes('搭車') || t.includes('班機') || t.includes('住宿') || t.includes('飯店') || t.includes('民宿') || t.includes('check-in') || t.includes('check in')) {
+                return null;
+            }
+            if (t.includes('餐廳') || t.includes('美食') || t.includes('咖啡') || t.includes('晚餐') || t.includes('午餐') || t.includes('早餐') || t.includes('烤肉') || t.includes('料理') || t.includes('吃') || t.includes('酒') || t.includes('茶')) {
+                return 'food';
+            }
+            if (t.includes('購物') || t.includes('免稅') || t.includes('超市') || t.includes('商場') || t.includes('買') || t.includes('市場') || t.includes('outlet')) {
+                return 'shop';
+            }
+            return 'spot';
+        };
+
+        window.openNewProjectModal = function() {
+            document.getElementById('new-proj-name').value = '';
+            document.getElementById('new-proj-dates').value = '01/01 - 01/05';
+            document.getElementById('new-proj-startdate').value = '';
+            document.getElementById('new-project-modal').classList.remove('hidden');
+        };
+
+        window.closeNewProjectModal = function() {
+            document.getElementById('new-project-modal').classList.add('hidden');
+        };
+
+        window.submitNewProject = async function() {
+            const name = document.getElementById('new-proj-name').value.trim();
+            const year = document.getElementById('new-proj-year').value;
+            const dates = document.getElementById('new-proj-dates').value.trim();
+            const startDate = document.getElementById('new-proj-startdate').value;
+
+            if (!name) { alert("請輸入專案名稱！"); return; }
+
+            try {
+                const newId = 'proj_' + Date.now();
+                const randomPin = Math.floor(100000 + Math.random() * 900000).toString();
+                let fullDatesText = `${year}年 ${dates}`;
+                await setDoc(doc(db, "projects", newId), { 
+                    name, 
+                    dates: fullDatesText, 
+                    startDate: startDate || '', 
+                    pin: randomPin, 
+                    createdAt: Date.now() 
+                });
+                await saveMyProjectId(newId);
+                closeNewProjectModal();
+                renderProjects();
+                alert(`✨ 新專案建立成功！專案 6 位數代碼為：【${randomPin}】`);
+            } catch (e) { alert("新增失敗"); }
         };
 
         window.openImportProjectModal = function() {
             document.getElementById('import-code-input').value = '';
             document.getElementById('import-project-modal').classList.remove('hidden');
         };
+
         window.closeImportProjectModal = function() {
             document.getElementById('import-project-modal').classList.add('hidden');
         };
 
-        window.openNewProjectModal = function() {
-            document.getElementById('new-proj-name').value = '';
-            document.getElementById('new-proj-dates').value = '01/01 - 01/05';
-            document.getElementById('new-project-modal').classList.add('hidden'); // 如果有這個modal的html，可以視需要展開，此處我們主要確保函式存在
-        };
-
-        window.closeShareModal = function() {
-            document.getElementById('share-choice-modal').classList.add('hidden');
-        };
-
-        window.closeQuestPhotoModal = function() {
-            document.getElementById('quest-photo-modal').classList.add('hidden');
-            currentQuestTargetId = null;
-        };
-
-        window.closeQuestEditModal = function() {
-            document.getElementById('quest-edit-modal').classList.add('hidden');
-            currentQuestTargetId = null;
-        };
-
-        window.closePhotoGalleryModal = function() {
-            document.getElementById('photo-gallery-modal').classList.add('hidden');
-        };
-
-        window.closeMapSearchModal = function() {
-            document.getElementById('map-search-modal').classList.add('hidden');
-        };
-
-        window.closeDetailModal = function() {
-            document.getElementById('detail-modal').classList.add('hidden');
-        };
-
-        window.closeAddExpenseModal = function() {
-            document.getElementById('expense-modal').classList.add('hidden');
-        };
-
-        window.closeAddMemberModal = function() {
-            document.getElementById('member-modal').classList.add('hidden');
-        };
-
-        window.closeSettlementModal = function() {
-            document.getElementById('settlement-modal').classList.add('hidden');
-        };
-
-        window.backToProjects = function() {
-            currentProjectId = null;
-            currentProjectName = "";
-            currentProjectPin = "";
-            if (unsubscribeSchedules) unsubscribeSchedules();
-            if (unsubscribeExpenses) unsubscribeExpenses();
-            if (unsubscribeMembers) unsubscribeMembers();
-            if (unsubscribeCheckins) unsubscribeCheckins();
-            document.getElementById('view-workspace').classList.add('hidden');
-            document.getElementById('bottom-nav').classList.add('hidden');
-            document.getElementById('back-btn').classList.add('hidden');
-            document.getElementById('share-btn').classList.add('hidden');
-            document.getElementById('view-projects').classList.remove('hidden');
-            document.getElementById('header-title').innerText = "🧳 我的旅遊專案清單";
-            document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
-            renderProjects();
-        };
-
-        window.shareCurrentProject = function() {
-            if (!currentProjectId) return;
-            document.getElementById('share-modal-pin').innerText = currentProjectPin || '未設定';
-            document.getElementById('share-choice-modal').classList.remove('hidden');
-        };
-
-        window.enterProject = async function(id) {
-            currentProjectId = id;
-            try {
-                const docSnap = await getDoc(doc(db, "projects", id));
-                if (docSnap.exists()) {
-                    const p = docSnap.data();
-                    currentProjectName = p.name;
-                    currentProjectPin = p.pin || "";
-                }
-            } catch (e) {}
-
-            if (!currentMyName) {
-                document.getElementById('login-modal').classList.remove('hidden');
+        window.submitImportProject = async function() {
+            const pinCode = document.getElementById('import-code-input').value.trim();
+            if (pinCode.length !== 6) {
+                alert("請輸入正確的 6 位數專案代碼！");
                 return;
             }
 
-            window.proceedEnterProject();
-        };
-
-        window.proceedEnterProject = function() {
-            document.getElementById('view-projects').classList.add('hidden');
-            document.getElementById('view-workspace').classList.remove('hidden');
-            document.getElementById('bottom-nav').classList.remove('hidden');
-            document.getElementById('back-btn').classList.remove('hidden');
-            document.getElementById('share-btn').classList.remove('hidden');
-            
-            document.getElementById('header-title').innerText = `🌸 ${currentProjectName}`;
-            document.getElementById('header-sub').innerText = `旅伴：${currentMyName} ✨`;
-            
-            window.renderRemindersByRules(currentProjectName);
-            window.initLanguageModule(currentProjectName);
-            window.loadMembersAndExpenses(currentProjectId);
-            window.loadCheckins(currentProjectId);
-            
-            switchTab('schedule');
-            window.loadSchedules(currentProjectId);
-        };
-
-        window.switchTab = function(tabName) {
-            ['schedule', 'ai', 'lang', 'split', 'quest'].forEach(t => {
-                document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).className = "flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5";
-            });
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            document.getElementById(`nav-${tabName}`).className = "flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5";
-        };
-
-        async function getMyProjectIds() {
-            let localList = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
-            if (!currentMyName) return localList;
             try {
-                const docRef = doc(db, "user_profiles", currentMyName);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists() && docSnap.data().projects) {
-                    let cloudList = docSnap.data().projects;
-                    let merged = Array.from(new Set([...localList, ...cloudList]));
-                    return merged;
-                }
-            } catch (e) {
-                console.warn("雲端讀取失敗，使用本機快取", e);
-            }
-            return localList;
-        }
-
-        async function saveMyProjectId(id) {
-            let list = await getMyProjectIds();
-            if (!list.includes(id)) {
-                list.unshift(id);
-                localStorage.setItem('my_subscribed_projects', JSON.stringify(list));
-                if (currentMyName) {
-                    try {
-                        await setDoc(doc(db, "user_profiles", currentMyName), { projects: list }, { merge: true });
-                    } catch (e) {}
-                }
-            }
-        }
-
-        async function renderProjects() {
-            const list = document.getElementById('project-list');
-            try {
-                let myIds = await getMyProjectIds();
-                if (myIds.length === 0) {
-                    list.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前沒有專案。點上方按鈕新增，或輸入 6 位數專案號碼導入！✨</p>`;
+                const q = query(collection(db, "projects"), where("pin", "==", pinCode));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    alert("找不到此專案代碼！");
                     return;
                 }
-                list.innerHTML = '';
-                
-                for (let id of myIds) {
-                    try {
-                        const docRef = doc(db, "projects", id);
-                        const docSnap = await getDoc(docRef);
-                        if (docSnap.exists()) {
-                            const p = docSnap.data();
-                            const card = document.createElement('div');
-                            card.className = "cute-card p-5 space-y-3 relative transition hover:border-[#d98262] cursor-pointer";
-                            card.onclick = () => window.enterProject(id);
-                            card.innerHTML = `
-                                <div class="flex justify-between items-center gap-2 w-full">
-                                    <span class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black shrink-0">進行中 🚗</span>
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <span class="text-xs text-gray-500 font-bold">${p.dates || '未定日期'}</span>
-                                        <button onclick="event.stopPropagation(); window.removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1 shrink-0" title="從我的清單移除">🗑️</button>
-                                    </div>
-                                </div>
-                                <div class="space-y-1">
-                                    <h3 class="font-black text-gray-900 text-base break-words">🌸 ${p.name}</h3>
-                                </div>
-                            `;
-                            list.appendChild(card);
-                        }
-                    } catch (e) {}
+
+                let foundId = null;
+                querySnapshot.forEach((docSnap) => { foundId = docSnap.id; });
+
+                if (foundId) {
+                    await saveMyProjectId(foundId);
+                    closeImportProjectModal();
+                    renderProjects();
+                    alert("✨ 成功導入專案！");
                 }
-            } catch (e) {
-                list.innerHTML = `<p class="text-center text-xs text-red-400 py-8">載入專案發生錯誤，請重新整理頁面！</p>`;
+            } catch (e) { alert("導入失敗"); }
+        };
+
+        window.removeProjectFromMyList = async function(id) {
+            if (confirm("確定要從你的畫面上移除這個專案嗎？")) {
+                await removeMyProjectId(id);
+                renderProjects();
             }
-        }
-        window.renderProjects = renderProjects;
+        };
+
+        window.submitLoginName = async function() {
+            const name = document.getElementById('login-name-input').value.trim();
+            if (!name) { alert("請輸入名字！"); return; }
+            currentMyName = name;
+            localStorage.setItem('my_travel_nickname', name);
+            document.getElementById('login-modal').classList.add('hidden');
+
+            try {
+                let localProjects = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
+                const userDocRef = doc(db, "user_profiles", currentMyName);
+                const userSnap = await getDoc(userDocRef);
+                if (userSnap.exists()) {
+                    let cloudProjects = userSnap.data().projects || [];
+                    let merged = Array.from(new Set([...localProjects, ...cloudProjects]));
+                    localStorage.setItem('my_subscribed_projects', JSON.stringify(merged));
+                    await setDoc(userDocRef, { projects: merged }, { merge: true });
+                } else {
+                    await setDoc(userDocRef, { projects: localProjects });
+                }
+
+                await addDoc(collection(db, "projects", currentProjectId, "members"), { name: currentMyName });
+            } catch (e) {}
+
+            window.proceedEnterProject();
+        };
 
         // 初始化應用程式
         async function initApp() {
