@@ -675,7 +675,7 @@
             }
         };
 
-        // 🌟 優先宣告所有全域核心函式
+        // 🌟 優先宣告所有資料與專案管理函式，並掛載至 window
         async function getMyProjectIds() {
             let localList = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
             if (!currentMyName) return localList;
@@ -808,7 +808,7 @@
         window.proceedEnterProject = function() {
             document.getElementById('view-projects').classList.add('hidden');
             document.getElementById('view-workspace').classList.remove('hidden');
-            document.getElementById('bottom-nav').classList.remove('hidden');
+            document.getElementById('bottom-nav').classList.add('hidden');
             document.getElementById('back-btn').classList.remove('hidden');
             document.getElementById('share-btn').classList.remove('hidden');
             
@@ -979,7 +979,7 @@
                 snapshot.forEach(docSnap => {
                     allMembersData.push({ id: docSnap.id, ...docSnap.data() });
                 });
-                window.renderMemberListUI();
+                renderMemberListUI();
                 updateExpenseModalDropdowns();
             });
 
@@ -990,7 +990,7 @@
                 snapshot.forEach(docSnap => {
                     allExpensesData.push({ id: docSnap.id, ...docSnap.data() });
                 });
-                window.renderExpenseUI();
+                renderExpenseUI();
             });
         };
 
@@ -1005,7 +1005,7 @@
                         allCheckinsData[data.scheduleId] = data;
                     }
                 });
-                window.renderQuestUI();
+                renderQuestUI();
             });
         };
 
@@ -1016,9 +1016,9 @@
             unsubscribeSchedules = onSnapshot(q, (snapshot) => {
                 allSchedulesData = [];
                 snapshot.forEach((docSnap) => { allSchedulesData.push({ id: docSnap.id, ...docSnap.data() }); });
-                window.renderDayPills();
-                window.renderScheduleUI();
-                window.renderQuestUI();
+                renderDayPills();
+                renderScheduleUI();
+                renderQuestUI();
             });
         };
 
@@ -1165,7 +1165,7 @@
 
                 let listHtml = `<div id="${sectionId}" class="hidden p-3 space-y-2.5 bg-white">`;
                 items.forEach(s => {
-                    let cleanTitle = window.cleanDisplayTitle(s.title);
+                    let cleanTitle = cleanDisplayTitle(s.title);
                     let statusBadge = s.completed ? 
                         `<span onclick="event.stopPropagation(); window.openQuestEditModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-black cursor-pointer hover:bg-green-200">✔️ 已打卡</span>` : 
                         `<span onclick="window.openQuestPhotoModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-1 rounded-full font-black cursor-pointer hover:bg-[#e2c8b8]">打卡</span>`;
@@ -1207,7 +1207,7 @@
             let allBtn = document.createElement('button');
             allBtn.className = `px-4 py-2 rounded-full text-xs font-black transition shrink-0 ${activeDayFilter === 'all' ? 'bg-[#d98262] text-white shadow-sm' : 'bg-white text-[#736052] border border-[#eae1d7]'}`;
             allBtn.innerText = "全部行程";
-            allBtn.onclick = () => { activeDayFilter = 'all'; window.renderDayPills(); window.renderScheduleUI(); };
+            allBtn.onclick = () => { activeDayFilter = 'all'; renderDayPills(); renderScheduleUI(); };
             pillsContainer.appendChild(allBtn);
 
             days.forEach(dayKey => {
@@ -1215,7 +1215,7 @@
                 let isActive = activeDayFilter === dayKey;
                 btn.className = `px-4 py-2 rounded-full text-xs font-black transition shrink-0 ${isActive ? 'bg-[#d98262] text-white shadow-sm' : 'bg-white text-[#736052] border border-[#eae1d7]'}`;
                 btn.innerText = dayKey;
-                btn.onclick = () => { activeDayFilter = dayKey; window.renderDayPills(); window.renderScheduleUI(); };
+                btn.onclick = () => { activeDayFilter = dayKey; renderDayPills(); renderScheduleUI(); };
                 pillsContainer.appendChild(btn);
             });
         };
@@ -1232,7 +1232,7 @@
             }
 
             const nextItem = allSchedulesData[0];
-            const cleanNextTitle = window.cleanDisplayTitle(nextItem.title);
+            const cleanNextTitle = cleanDisplayTitle(nextItem.title);
             if (upcomingContainer) {
                 upcomingContainer.innerHTML = `
                     <div id="upcoming-card" class="cute-card p-4 bg-gradient-to-r from-[#fffaf5] to-[#fbf2e9] border-2 border-[#d98262]/40 space-y-2 relative shadow-md cursor-pointer">
@@ -1270,7 +1270,7 @@
                 let listHtml = `<div id="${sectionId}" class="${isExpanded ? '' : 'hidden'} p-3 space-y-2.5 bg-white">`;
 
                 items.forEach(s => {
-                    let cleanTitle = window.cleanDisplayTitle(s.title);
+                    let cleanTitle = cleanDisplayTitle(s.title);
                     listHtml += `
                         <div id="sched_item_${s.id}" class="p-3.5 bg-[#fffaf5] hover:bg-[#fbf2e9] rounded-2xl border border-[#eae1d7] flex justify-between items-center cursor-pointer transition">
                             <div class="space-y-0.5">
@@ -1347,7 +1347,7 @@
                     createdAt: Date.now() 
                 });
                 await saveMyProjectId(newId);
-                window.closeNewProjectModal();
+                closeNewProjectModal();
                 renderProjects();
                 alert(`✨ 新專案建立成功！專案 6 位數代碼為：【${randomPin}】`);
             } catch (e) { alert("新增失敗"); }
@@ -1380,4 +1380,103 @@
                 let foundId = null;
                 querySnapshot.forEach((docSnap) => { foundId = docSnap.id; });
 
-                if
+                if (foundId) {
+                    await saveMyProjectId(foundId);
+                    closeImportProjectModal();
+                    renderProjects();
+                    alert("✨ 成功導入專案！");
+                }
+            } catch (e) { alert("導入失敗"); }
+        };
+
+        window.removeProjectFromMyList = async function(id) {
+            if (confirm("確定要從你的畫面上移除這個專案嗎？")) {
+                await removeMyProjectId(id);
+                renderProjects();
+            }
+        };
+
+        window.submitLoginName = async function() {
+            const name = document.getElementById('login-name-input').value.trim();
+            if (!name) { alert("請輸入名字！"); return; }
+            currentMyName = name;
+            localStorage.setItem('my_travel_nickname', name);
+            document.getElementById('login-modal').classList.add('hidden');
+
+            try {
+                let localProjects = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
+                const userDocRef = doc(db, "user_profiles", currentMyName);
+                const userSnap = await getDoc(userDocRef);
+                if (userSnap.exists()) {
+                    let cloudProjects = userSnap.data().projects || [];
+                    let merged = Array.from(new Set([...localProjects, ...cloudProjects]));
+                    localStorage.setItem('my_subscribed_projects', JSON.stringify(merged));
+                    await setDoc(userDocRef, { projects: merged }, { merge: true });
+                } else {
+                    await setDoc(userDocRef, { projects: localProjects });
+                }
+
+                await addDoc(collection(db, "projects", currentProjectId, "members"), { name: currentMyName });
+            } catch (e) {}
+
+            window.proceedEnterProject();
+        };
+
+        window.switchTab = function(tabName) {
+            ['schedule', 'ai', 'lang', 'split', 'quest'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).className = "flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5";
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabName}`).className = "flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5";
+        };
+
+        window.updateExpenseModalDropdowns = function() {
+            const payerSelect = document.getElementById('exp-payer');
+            const container = document.getElementById('exp-participants-container');
+            if (!payerSelect || !container) return;
+            payerSelect.innerHTML = '';
+            container.innerHTML = '';
+            allMembersData.forEach(m => {
+                let opt = document.createElement('option');
+                opt.value = m.name;
+                opt.innerText = m.name;
+                if (m.name === currentMyName) opt.selected = true;
+                payerSelect.appendChild(opt);
+
+                let div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-white p-2 rounded-xl border border-[#eae1d7]";
+                if (currentSplitMode === 'equal') {
+                    div.innerHTML = `
+                        <label class="flex items-center gap-2 font-bold text-gray-700 cursor-pointer">
+                            <input type="checkbox" name="participant" value="${m.name}" checked class="rounded accent-[#d98262]"> ${m.name}
+                        </label>
+                        <span class="text-gray-400 font-bold text-[11px]">參與均攤</span>
+                    `;
+                } else {
+                    div.innerHTML = `
+                        <label class="flex items-center gap-2 font-bold text-gray-700">
+                            <input type="checkbox" name="participant" value="${m.name}" checked onchange="window.toggleCustomInput(this)" class="rounded accent-[#d98262]"> ${m.name}
+                        </label>
+                        <input type="number" name="custom-share-${m.name}" placeholder="分攤金額" value="" class="w-24 p-1.5 bg-[#fffaf5] border border-[#eae1d7] rounded-lg outline-none font-bold text-right">
+                    `;
+                }
+                container.appendChild(div);
+            });
+        };
+
+        // 初始化應用程式
+        async function initApp() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedProjId = urlParams.get('project');
+            if (sharedProjId) {
+                await saveMyProjectId(sharedProjId);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            renderProjects();
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
