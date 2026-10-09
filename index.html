@@ -565,7 +565,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -675,8 +675,284 @@
             }
         };
 
-        // 🌟 完整宣告與掛載所有介面渲染與控制函式
-        window.renderMemberListUI = function() {
+        // 🌟 在頂層完整宣告所有函式與 window 掛載
+        function backToProjects() {
+            currentProjectId = null;
+            currentProjectName = "";
+            currentProjectPin = "";
+            if (unsubscribeSchedules) unsubscribeSchedules();
+            if (unsubscribeExpenses) unsubscribeExpenses();
+            if (unsubscribeMembers) unsubscribeMembers();
+            if (unsubscribeCheckins) unsubscribeCheckins();
+            document.getElementById('view-workspace').classList.add('hidden');
+            document.getElementById('bottom-nav').classList.add('hidden');
+            document.getElementById('back-btn').classList.add('hidden');
+            document.getElementById('share-btn').classList.add('hidden');
+            document.getElementById('view-projects').classList.remove('hidden');
+            document.getElementById('header-title').innerText = "🧳 我的旅遊專案清單";
+            document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
+            renderProjects();
+        }
+        window.backToProjects = backToProjects;
+
+        function shareCurrentProject() {
+            if (!currentProjectId) return;
+            document.getElementById('share-modal-pin').innerText = currentProjectPin || '未設定';
+            document.getElementById('share-choice-modal').classList.remove('hidden');
+        }
+        window.shareCurrentProject = shareCurrentProject;
+
+        async function enterProject(id) {
+            currentProjectId = id;
+            try {
+                const docSnap = await getDoc(doc(db, "projects", id));
+                if (docSnap.exists()) {
+                    const p = docSnap.data();
+                    currentProjectName = p.name;
+                    currentProjectPin = p.pin || "";
+                }
+            } catch (e) {}
+
+            if (!currentMyName) {
+                document.getElementById('login-modal').classList.remove('hidden');
+                return;
+            }
+
+            proceedEnterProject();
+        }
+        window.enterProject = enterProject;
+
+        function proceedEnterProject() {
+            document.getElementById('view-projects').classList.add('hidden');
+            document.getElementById('view-workspace').classList.remove('hidden');
+            document.getElementById('bottom-nav').classList.remove('hidden');
+            document.getElementById('back-btn').classList.remove('hidden');
+            document.getElementById('share-btn').classList.remove('hidden');
+            
+            document.getElementById('header-title').innerText = `🌸 ${currentProjectName}`;
+            document.getElementById('header-sub').innerText = `旅伴：${currentMyName} ✨`;
+            
+            renderRemindersByRules(currentProjectName);
+            initLanguageModule(currentProjectName);
+            loadMembersAndExpenses(currentProjectId);
+            loadCheckins(currentProjectId);
+            
+            switchTab('schedule');
+            loadSchedules(currentProjectId);
+        }
+        window.proceedEnterProject = proceedEnterProject;
+
+        function renderRemindersByRules(projectName) {
+            const container = document.getElementById('dynamic-reminders-container');
+            let nameLower = projectName.toLowerCase();
+            let html = '';
+
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">當地早晚溫差較大且風大，建議穿著長袖、針織衫或帽T，並準備防風外套 🧥。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>導航 App：強烈建議使用 Naver Map 或 Kakao Map，以電話號碼查詢景點最準確！</li>
+                            <li>測速照相：道路速限嚴格，沿途有大量測速照相，務必依速限行駛。</li>
+                            <li>加油還車：多為自助/半人工，記得確認租車規定（通常為滿油出借還車）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>證件：務必備妥台灣駕照正本與國際駕照。</li>
+                            <li>支付：信用卡普及，建議身上備妥 5~10 萬韓元現金備用。</li>
+                            <li>插頭：電壓 220V，圓形雙孔（歐規/韓規）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>警察局：112 | 救護車/消防：119 | 中文旅遊熱線：1330</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都') || nameLower.includes('沖繩') || nameLower.includes('北海道') || nameLower.includes('名古屋')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇯🇵 日本旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">行程多以步行與大眾運輸為主，建議穿著舒適好走的布鞋，並隨身攜帶輕便外套與雨具 🌂。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚆 交通與導航提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>導航：推薦使用 Google Maps 或 乗換案內 查詢地鐵。</li>
+                            <li>IC 卡：建議事先將 Suica 或 Pasmo 加入手機錢包（Apple Pay）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與行前提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>護照效期需大於 6 個月。部分小店或拉麵機仍需現金，建議備妥適量日幣。</li>
+                            <li>插頭：電壓 100V，雙孔扁平插頭（與台灣相同）。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>警察局：110 | 救護車/消防：119</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁') || nameLower.includes('普吉') || nameLower.includes('芭達雅')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇹🇭 泰國旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">終年炎熱，建議穿著輕薄透氣衣物，備好防曬與雨具。進出寺廟衣著需端莊（不可露肩短褲）。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🛵 交通與叫車提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>叫車：推薦使用 Grab 或 Bolt。市區可多利用 BTS/MRT 避開塞車。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">💳 支付與小費</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>夜市小吃多收現金，可至當地 SuperRich 換匯。按摩或服務良好建議給 20-100 銖小費。</li>
+                            <li>插頭：電壓 220V，圓形或扁平兩用。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>觀光警察：1155 | 警察局：191 | 醫療：1669</li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥當地網卡、萬用轉接頭與海外旅遊平安險。</p>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+        window.renderRemindersByRules = renderRemindersByRules;
+
+        function initLanguageModule(projectName) {
+            let nameLower = projectName.toLowerCase();
+            let destKey = 'general';
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) destKey = 'korea';
+            else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都')) destKey = 'japan';
+            else if (nameLower.includes('泰國') || nameLower.includes('曼谷') || nameLower.includes('清邁')) destKey = 'thailand';
+
+            const currentLangPack = languageData[destKey];
+            currentDestinationLang = currentLangPack.langCode;
+            currentActivePhrase = { cn: "請選取左側分類與右側句子", foreign: "Ready to Speak ✨" };
+            document.getElementById('display-cn').innerText = currentActivePhrase.cn;
+            document.getElementById('display-foreign').innerText = currentActivePhrase.foreign;
+
+            const catContainer = document.getElementById('lang-categories');
+            catContainer.innerHTML = '';
+            currentLangPack.categories.forEach((cat, idx) => {
+                let btn = document.createElement('button');
+                btn.className = `w-full text-left text-xs font-black p-3 rounded-2xl transition border ${idx === 0 ? 'bg-[#d98262] text-white border-[#d98262] shadow-sm' : 'bg-white text-gray-700 border-[#eae1d7] hover:bg-[#fffaf5]'}`;
+                btn.innerText = cat.name;
+                btn.onclick = () => {
+                    document.querySelectorAll('#lang-categories button').forEach(b => {
+                        b.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-white text-gray-700 border-[#eae1d7] hover:bg-[#fffaf5]";
+                    });
+                    btn.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-[#d98262] text-white border-[#d98262] shadow-sm";
+                    renderPhrases(currentLangPack.phrases[cat.id]);
+                };
+                catContainer.appendChild(btn);
+            });
+            renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
+        }
+        window.initLanguageModule = initLanguageModule;
+
+        function renderPhrases(phrases) {
+            const phraseContainer = document.getElementById('lang-phrases');
+            if (!phraseContainer) return;
+            phraseContainer.innerHTML = '';
+            phrases.forEach(p => {
+                let card = document.createElement('div');
+                card.className = "cute-card p-3.5 bg-white hover:bg-[#fffaf5] border border-[#eae1d7] cursor-pointer transition flex justify-between items-center";
+                card.innerHTML = `<div><p class="text-xs text-gray-800 font-bold">${p.cn}</p></div>`;
+                card.onclick = () => {
+                    currentActivePhrase = p;
+                    document.getElementById('display-cn').innerText = p.cn;
+                    document.getElementById('display-foreign').innerText = p.foreign;
+                };
+                phraseContainer.appendChild(card);
+            });
+        }
+        window.renderPhrases = renderPhrases;
+
+        function loadMembersAndExpenses(projId) {
+            const membersRef = collection(db, "projects", projId, "members");
+            if (unsubscribeMembers) unsubscribeMembers();
+            unsubscribeMembers = onSnapshot(membersRef, (snapshot) => {
+                allMembersData = [];
+                snapshot.forEach(docSnap => {
+                    allMembersData.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderMemberListUI();
+                updateExpenseModalDropdowns();
+            });
+
+            const expensesRef = collection(db, "projects", projId, "expenses");
+            if (unsubscribeExpenses) unsubscribeExpenses();
+            unsubscribeExpenses = onSnapshot(query(expensesRef, orderBy("createdAt", "desc")), (snapshot) => {
+                allExpensesData = [];
+                snapshot.forEach(docSnap => {
+                    allExpensesData.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderExpenseUI();
+            });
+        }
+        window.loadMembersAndExpenses = loadMembersAndExpenses;
+
+        function loadCheckins(projId) {
+            const checkinsRef = collection(db, "projects", projId, "checkins");
+            if (unsubscribeCheckins) unsubscribeCheckins();
+            unsubscribeCheckins = onSnapshot(checkinsRef, (snapshot) => {
+                allCheckinsData = {};
+                snapshot.forEach(docSnap => {
+                    let data = docSnap.data();
+                    if (data.uploader === currentMyName) {
+                        allCheckinsData[data.scheduleId] = data;
+                    }
+                });
+                renderQuestUI();
+            });
+        }
+        window.loadCheckins = loadCheckins;
+
+        function loadSchedules(projId) {
+            const schedulesRef = collection(db, "projects", projId, "schedules");
+            const q = query(schedulesRef, orderBy("createdAt", "asc"));
+            if (unsubscribeSchedules) unsubscribeSchedules();
+            unsubscribeSchedules = onSnapshot(q, (snapshot) => {
+                allSchedulesData = [];
+                snapshot.forEach((docSnap) => { allSchedulesData.push({ id: docSnap.id, ...docSnap.data() }); });
+                renderDayPills();
+                renderScheduleUI();
+                renderQuestUI();
+            });
+        }
+        window.loadSchedules = loadSchedules;
+
+        function cleanDisplayTitle(title) {
+            if (!title) return '';
+            return title.replace(/^\d{1,2}[:：]\d{2}\s*/, '').trim();
+        }
+        window.cleanDisplayTitle = cleanDisplayTitle;
+
+        function renderMemberListUI() {
             const container = document.getElementById('member-list-display');
             if (!container) return;
             container.innerHTML = '';
@@ -689,9 +965,10 @@
                 `;
                 container.appendChild(div);
             });
-        };
+        }
+        window.renderMemberListUI = renderMemberListUI;
 
-        window.renderExpenseUI = function() {
+        function renderExpenseUI() {
             const container = document.getElementById('expense-list-container');
             const totalEl = document.getElementById('total-expense-twd');
             const breakdownEl = document.getElementById('currency-breakdown');
@@ -741,9 +1018,10 @@
                 });
                 breakdownEl.innerHTML = bdHtml;
             }
-        };
+        }
+        window.renderExpenseUI = renderExpenseUI;
 
-        window.renderQuestUI = function() {
+        function renderQuestUI() {
             const container = document.getElementById('quest-list-container');
             const countEl = document.getElementById('quest-total-count');
             const percentEl = document.getElementById('quest-percent');
@@ -752,7 +1030,7 @@
 
             let questItems = [];
             allSchedulesData.forEach(s => {
-                let category = window.classifyScheduleItem(s.title);
+                let category = classifyScheduleItem(s.title);
                 if (category !== null) {
                     let myCheckin = allCheckinsData[s.id];
                     questItems.push({ 
@@ -814,7 +1092,7 @@
 
                 let listHtml = `<div id="${sectionId}" class="hidden p-3 space-y-2.5 bg-white">`;
                 items.forEach(s => {
-                    let cleanTitle = window.cleanDisplayTitle(s.title);
+                    let cleanTitle = cleanDisplayTitle(s.title);
                     let statusBadge = s.completed ? 
                         `<span onclick="event.stopPropagation(); window.openQuestEditModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-black cursor-pointer hover:bg-green-200">✔️ 已打卡</span>` : 
                         `<span onclick="window.openQuestPhotoModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-1 rounded-full font-black cursor-pointer hover:bg-[#e2c8b8]">打卡</span>`;
@@ -838,7 +1116,8 @@
                 dayBox.innerHTML = headerHtml + listHtml;
                 container.appendChild(dayBox);
             });
-        };
+        }
+        window.renderQuestUI = renderQuestUI;
 
         window.renderDayPills = function() {
             const pillsContainer = document.getElementById('day-pills-container');
@@ -881,7 +1160,7 @@
             }
 
             const nextItem = allSchedulesData[0];
-            const cleanNextTitle = window.cleanDisplayTitle(nextItem.title);
+            const cleanNextTitle = cleanDisplayTitle(nextItem.title);
             if (upcomingContainer) {
                 upcomingContainer.innerHTML = `
                     <div id="upcoming-card" class="cute-card p-4 bg-gradient-to-r from-[#fffaf5] to-[#fbf2e9] border-2 border-[#d98262]/40 space-y-2 relative shadow-md cursor-pointer">
@@ -919,7 +1198,7 @@
                 let listHtml = `<div id="${sectionId}" class="${isExpanded ? '' : 'hidden'} p-3 space-y-2.5 bg-white">`;
 
                 items.forEach(s => {
-                    let cleanTitle = window.cleanDisplayTitle(s.title);
+                    let cleanTitle = cleanDisplayTitle(s.title);
                     listHtml += `
                         <div id="sched_item_${s.id}" class="p-3.5 bg-[#fffaf5] hover:bg-[#fbf2e9] rounded-2xl border border-[#eae1d7] flex justify-between items-center cursor-pointer transition">
                             <div class="space-y-0.5">
@@ -987,12 +1266,111 @@
             }
         }
 
-        window.backToProjects = backToProjects;
-        window.shareCurrentProject = shareCurrentProject;
-        window.enterProject = enterProject;
-        window.proceedEnterProject = proceedEnterProject;
-        window.renderRemindersByRules = renderRemindersByRules;
-        window.initLanguageModule = initLanguageModule;
+        window.openNewProjectModal = function() {
+            document.getElementById('new-proj-name').value = '';
+            document.getElementById('new-proj-dates').value = '01/01 - 01/05';
+            document.getElementById('new-proj-startdate').value = '';
+            document.getElementById('new-project-modal').classList.remove('hidden');
+        };
+
+        window.closeNewProjectModal = function() {
+            document.getElementById('new-project-modal').classList.add('hidden');
+        };
+
+        window.submitNewProject = async function() {
+            const name = document.getElementById('new-proj-name').value.trim();
+            const year = document.getElementById('new-proj-year').value;
+            const dates = document.getElementById('new-proj-dates').value.trim();
+            const startDate = document.getElementById('new-proj-startdate').value;
+
+            if (!name) { alert("請輸入專案名稱！"); return; }
+
+            try {
+                const newId = 'proj_' + Date.now();
+                const randomPin = Math.floor(100000 + Math.random() * 900000).toString();
+                let fullDatesText = `${year}年 ${dates}`;
+                await setDoc(doc(db, "projects", newId), { 
+                    name, 
+                    dates: fullDatesText, 
+                    startDate: startDate || '', 
+                    pin: randomPin, 
+                    createdAt: Date.now() 
+                });
+                await saveMyProjectId(newId);
+                closeNewProjectModal();
+                renderProjects();
+                alert(`✨ 新專案建立成功！專案 6 位數代碼為：【${randomPin}】`);
+            } catch (e) { alert("新增失敗"); }
+        };
+
+        window.openImportProjectModal = function() {
+            document.getElementById('import-code-input').value = '';
+            document.getElementById('import-project-modal').classList.remove('hidden');
+        };
+
+        window.closeImportProjectModal = function() {
+            document.getElementById('import-project-modal').classList.add('hidden');
+        };
+
+        window.submitImportProject = async function() {
+            const pinCode = document.getElementById('import-code-input').value.trim();
+            if (pinCode.length !== 6) {
+                alert("請輸入正確的 6 位數專案代碼！");
+                return;
+            }
+
+            try {
+                const q = query(collection(db, "projects"), where("pin", "==", pinCode));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    alert("找不到此專案代碼！");
+                    return;
+                }
+
+                let foundId = null;
+                querySnapshot.forEach((docSnap) => { foundId = docSnap.id; });
+
+                if (foundId) {
+                    await saveMyProjectId(foundId);
+                    closeImportProjectModal();
+                    renderProjects();
+                    alert("✨ 成功導入專案！");
+                }
+            } catch (e) { alert("導入失敗"); }
+        };
+
+        window.removeProjectFromMyList = async function(id) {
+            if (confirm("確定要從你的畫面上移除這個專案嗎？")) {
+                await removeMyProjectId(id);
+                renderProjects();
+            }
+        };
+
+        window.submitLoginName = async function() {
+            const name = document.getElementById('login-name-input').value.trim();
+            if (!name) { alert("請輸入名字！"); return; }
+            currentMyName = name;
+            localStorage.setItem('my_travel_nickname', name);
+            document.getElementById('login-modal').classList.add('hidden');
+
+            try {
+                let localProjects = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
+                const userDocRef = doc(db, "user_profiles", currentMyName);
+                const userSnap = await getDoc(userDocRef);
+                if (userSnap.exists()) {
+                    let cloudProjects = userSnap.data().projects || [];
+                    let merged = Array.from(new Set([...localProjects, ...cloudProjects]));
+                    localStorage.setItem('my_subscribed_projects', JSON.stringify(merged));
+                    await setDoc(userDocRef, { projects: merged }, { merge: true });
+                } else {
+                    await setDoc(userDocRef, { projects: localProjects });
+                }
+
+                await addDoc(collection(db, "projects", currentProjectId, "members"), { name: currentMyName });
+            } catch (e) {}
+
+            window.proceedEnterProject();
+        };
 
         async function initApp() {
             const urlParams = new URLSearchParams(window.location.search);
