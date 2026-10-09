@@ -33,6 +33,11 @@ nav button.on{background:var(--ye);border-color:var(--ink)}
 .mask{position:fixed;inset:0;background:rgba(62,58,57,.45);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px}
 .sheet{width:100%;max-width:400px;max-height:88vh;overflow:auto;margin:0}
 input,textarea,select{font:inherit;font-size:16px!important;width:100%;border:3px solid var(--ink);border-radius:16px;background:#fff;padding:8px 12px;margin:4px 0 8px;color:var(--ink)}
+/* 🌸 淺灰色 placeholder 提示字 */
+::placeholder { color: #b0a8a0; opacity: 1; }
+:-ms-input-placeholder { color: #b0a8a0; }
+::-ms-input-placeholder { color: #b0a8a0; }
+
 label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:0 10px 6px 0}.chk input{width:auto;margin:0}
 .bar{height:16px;border:3px solid var(--ink);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--gr);transition:width .5s}
 .badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
@@ -81,7 +86,6 @@ const getDestType = n => {
 };
 const dest = n => getDestType(n);
 
-/* ---------- 🌸 根據國家自動取得對應國旗 Emoji ---------- */
 const getFlagEmoji = n => {
     const type = getDestType(n);
     if(type === 'korea') return '🇰🇷';
@@ -97,7 +101,7 @@ const getFlagEmoji = n => {
 const dn=s=>+String(s||'').replace(/\D/g,'')||1,clean=t=>(t||'').replace(/^\d{1,2}[:：]\d{2}\s*/,'').trim();
 const RATE={TWD:1,KRW:.024,JPY:.21,THB:.92,SGD:24,MYR:7.2,HKD:4.1,MOP:4.1,USD:32};
 
-/* ---------- SVG 插圖 (僅首頁保留大圖) ---------- */
+/* ---------- SVG 插圖 ---------- */
 const K='stroke="#3E3A39" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"';
 const cloud=(x,y)=>`<g transform="translate(${x} ${y})"><g class="dr"><path d="M0 18q-2-14 14-12q8-12 22 0q14-2 12 12z" fill="#FFFCF6" ${K}/></g></g>`;
 const hill=(c,y)=>`<path d="M-4 140V${y}Q80 ${y-24} 160 ${y}T324 ${y-6}V140z" fill="${c}" ${K}/>`;
@@ -118,7 +122,7 @@ if(ok)q(m,'.ok').onclick=async()=>{if(await onOk(m)!==false)c()};document.body.a
 const val=(m,s)=>q(m,s).value.trim();
 const copy=async t=>{try{await navigator.clipboard.writeText(t);alert('已複製 ✨')}catch{prompt('請手動複製',t)}};
 
-/* ---------- 精準倒數計算與天數解析 ---------- */
+/* ---------- 倒數計算 ---------- */
 const getCountdownInfo = datesStr => {
     if(!datesStr) return { text: '未定日期', days: 999999 };
     const match = datesStr.match(/(\d{4})[年/.-]?\s*(\d{1,2})[月/.-]\s*(\d{1,2})/);
@@ -156,7 +160,7 @@ async function renderProjects(){
     l.innerHTML = '';
     list.forEach(p => {
         const isExpired = p.days >= 888888;
-        const flag = getFlagEmoji(p.name); // 🌸 自動抓取國旗 Emoji
+        const flag = getFlagEmoji(p.name);
         const d=document.createElement('div');
         d.className='box item';
         d.style.display='flex'; d.style.justifyContent='space-between'; d.style.alignItems='center';
@@ -218,15 +222,39 @@ function detail(id){
 const s=S.sch.find(x=>x.id===id);if(!s)return;
 const t=clean(s.title);
 const getQuery = () => { const kw = q(m,'#map-kw')?.value?.trim(); if(kw) return kw; return (/濟州/.test(S.name)&&!t.includes('濟州')?'濟州島 ':'')+t; };
-const m=modal(esc(t),`<div style="margin:6px 0 10px"><div style="margin-bottom:6px"><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span></div><input id="map-kw" placeholder="輸入電話或當地語言名稱" value="${esc(s.mapKeyword||'')}"></div><div class="box" style="margin:8px 0;white-space:pre-line">📝 備註：${esc(s.location||'無')}</div><div class="row gap" style="justify-content:flex-start">${dest(S.name)==='korea'?`<a class="btn gr" id="btn-naver" target="_blank" rel="noopener" href="#">💚 Naver</a>`:''}<a class="btn aq" id="btn-google" target="_blank" rel="noopener" href="#">💙 Google</a><button class="btn" id="dl">🗑 刪除</button></div>`);
+
+/* 🌸 備註改為直接點擊即可修改的輸入框，無備註時顯示淺灰色「備註」 */
+const m=modal(esc(t),`
+<div style="margin:6px 0 10px">
+    <div style="margin-bottom:6px"><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span></div>
+    <input id="map-kw" placeholder="輸入電話或當地語言名稱" value="${esc(s.mapKeyword||'')}">
+</div>
+<div style="margin:8px 0">
+    <input id="sched-loc" placeholder="備註" value="${esc(s.location||'')}">
+</div>
+<div class="row gap" style="justify-content:flex-start">
+    ${dest(S.name)==='korea'?`<a class="btn gr" id="btn-naver" target="_blank" rel="noopener" href="#">💚 Naver</a>`:''}
+    <a class="btn aq" id="btn-google" target="_blank" rel="noopener" href="#">💙 Google</a>
+    <button class="btn" id="dl">🗑 刪除</button>
+</div>`);
+
 const updateLinks = () => { const kw = encodeURIComponent(getQuery()); q(m,'#btn-naver')?.setAttribute('href', `https://m.map.naver.com/search2/search.naver?query=${kw}`); q(m,'#btn-google').href = `https://www.google.com/maps/search/?api=1&query=${kw}`; };
 updateLinks(); q(m,'#map-kw').oninput = updateLinks;
+
 q(m,'#dl').onclick=async()=>{if(confirm('確定刪除這個行程？')){await deleteDoc(doc(db,'projects',S.id,'schedules',id));m.remove()}};
-const saveKw = async () => { const kw = q(m,'#map-kw')?.value?.trim() || ''; if(kw !== (s.mapKeyword||'')) await updateDoc(doc(db,'projects',S.id,'schedules',id),{ mapKeyword: kw }); };
-q(m,'.cl').onclick = async () => { await saveKw(); m.remove(); }; q(m,'.x').onclick = async () => { await saveKw(); m.remove(); };
+
+const saveData = async () => {
+    const kw = q(m,'#map-kw')?.value?.trim() || '';
+    const loc = q(m,'#sched-loc')?.value?.trim() || '';
+    if(kw !== (s.mapKeyword||'') || loc !== (s.location||'')){
+        await updateDoc(doc(db,'projects',S.id,'schedules',id),{ mapKeyword: kw, location: loc });
+    }
+};
+q(m,'.cl').onclick = async () => { await saveData(); m.remove(); };
+q(m,'.x').onclick = async () => { await saveData(); m.remove(); };
 }
 
-$('ad').onclick=()=>modal('✏️ 新增行程','<label>天數</label><input id="a1" value="Day 1"><label>時間</label><input id="a2" value="10:00"><label>行程名稱</label><input id="a3"><label>備註</label><textarea id="a4" rows="3"></textarea>','新增',async m=>{const title=val(m,'#a3');if(!title){alert('請輸入名稱');return false}
+$('ad').onclick=()=>modal('✏️ 新增行程','<label>天數</label><input id="a1" value="Day 1"><label>時間</label><input id="a2" value="10:00"><label>行程名稱</label><input id="a3"><label>備註</label><textarea id="a4" rows="3" placeholder="備註"></textarea>','新增',async m=>{const title=val(m,'#a3');if(!title){alert('請輸入名稱');return false}
 await addDoc(collection(db,'projects',S.id,'schedules'),{day:val(m,'#a1')||'Day 1',time:val(m,'#a2'),title,location:val(m,'#a4'),mapKeyword:'',createdAt:Date.now()})});
 
 $('sp').onclick=()=>modal('✨ 智慧導入行程','<textarea id="p1" rows="9" placeholder="貼上行程，例如：&#10;Day 1&#10;10:00 抵達機場&#10;備註：…"></textarea>','開始拆解',async m=>{const lines=val(m,'#p1').split('\n').map(l=>l.trim()).filter(Boolean);if(!lines.length){alert('請先貼上行程');return false}
@@ -307,13 +335,13 @@ korea:{c:'ko-KR',p:{
     emergency:[['救命！我的護照被偷了！','살려주세요! 여권을 도둑맞았어요!'],['我迷路了。','길을 잃었어요.'],['請幫我報警。','경찰에 신고해주세요.'],['請幫我叫救護車！','구급차를 불러주세요!']]
 }},
 japan:{c:'ja-JP',p:{
-    airport:[['我是來觀光的。','観光で来ました。'],['我會待五天。','5日間滞在します。'],['這是我的護照。','パスポートです。'],['我有行李要托運。','荷物を預けたいです。'],['請給我靠走道的座位。','通路側の席をお願いします。'],['我的行李找不到。','荷물が見つかりません。']],
-    hotel:[['我有預約，名字是…','予約している…です。'],['請問有附早餐嗎？','朝食はついていますか？'],['可以寄放行李嗎？','荷물을預かっていただけますか？'],['房間有 Wi-Fi 嗎？密碼是什麼？','部屋にWi-Fiはありますか？パスワードは何ですか？'],['幾點退房？','チェックアウトは何時ですか？']],
+    airport:[['我是來觀光的。','観光で来ました。'],['我會待五天。','5日間滞在します。'],['這是我的護照。','パスポートです。'],['我有行李要托運。','荷물을預けたいです。'],['請給我靠走道的座位。','通路側の席をお願いします。'],['我的行李找不到。','荷물が見つかりません。']],
+    hotel:[['我有預約，名字是…','予約している…です。'],['請問有附早餐嗎？','朝食はついていますか？'],['可以寄放行李嗎？','荷물을預かっていただけますか？'],['房間有 Wi-Fi 嗎？密碼是什麼？','部屋にWi-Fi은ありますか？パスワードは何ですか？'],['幾點退房？','チェックアウトは何時ですか？']],
     restaurant:[['我們有 4 個人。','4人です。'],['有中文菜單嗎？','中国語のメニューはありますか？'],['推薦什麼菜？','おすすめは何ですか？'],['這個會辣嗎？','これは辛いですか？'],['我們要結帳。','お会計をお願いします。'],['可以刷卡嗎？','カードは使えますか？'],['我要一杯冰咖啡。','アイスコーヒーを一つください。'],['內用還是外帶？','店内でお召し上がりですか、お持ち帰りですか？']],
     shopping:[['這個多少錢？','これはいくらですか？'],['有其他顏色嗎？','他の色はありますか？'],['可以試穿嗎？','試着してもいいですか？'],['可以退稅嗎？','免税できますか？']],
     transport:[['最近的車站在哪裡？','一番近い駅はどこですか？'],['怎麼去這裡？','ここへはどう行きますか？'],['請載我到這個地址。','この住所までお願いします。']],
     smalltalk:[['你好！','こんにちは！'],['謝謝。','ありがとうございます。'],['不好意思 / 不好意思。','すみません。'],['很好吃！','美味しいです！']],
-    health:[['身體很不舒服。','気分が悪いです。'],['我頭痛。','頭が痛いです。'],['附近有藥局嗎？','近くに藥局はありますか？']],
+    health:[['身體很不舒服。','気分が悪いです。'],['我頭痛。','頭が痛いです。'],['附近有藥局嗎？','近くに薬局はありますか？']],
     emergency:[['救命！護照被偷了！','助けてください！パスポートが盗まれました！'],['我迷路了。','道に迷いました。'],['請幫我叫警察。','警察を呼んでください。']]
 }},
 thailand:{c:'th-TH',p:{
