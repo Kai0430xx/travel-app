@@ -565,7 +565,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -675,7 +675,49 @@
             }
         };
 
-        // 🌟 在頂層完整宣告所有函式與 window 掛載
+        // 🌟 優先在頂層完整宣告所有核心函式與 window 掛載
+        async function renderProjects() {
+            const list = document.getElementById('project-list');
+            try {
+                let myIds = await getMyProjectIds();
+                if (myIds.length === 0) {
+                    list.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前沒有專案。點上方按鈕新增，或輸入 6 位數專案號碼導入！✨</p>`;
+                    return;
+                }
+                list.innerHTML = '';
+                
+                for (let id of myIds) {
+                    try {
+                        const docRef = doc(db, "projects", id);
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            const p = docSnap.data();
+                            const card = document.createElement('div');
+                            card.className = "cute-card p-5 space-y-3 relative transition hover:border-[#d98262] cursor-pointer";
+                            card.onclick = () => window.enterProject(id);
+                            card.innerHTML = `
+                                <div class="flex justify-between items-center gap-2 w-full">
+                                    <span class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black shrink-0">進行中 🚗</span>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span class="text-xs text-gray-500 font-bold">${p.dates || '未定日期'}</span>
+                                        <button onclick="event.stopPropagation(); window.removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1 shrink-0" title="從我的清單移除">🗑️</button>
+                                    </div>
+                                </div>
+                                <div class="space-y-1">
+                                    <h3 class="font-black text-gray-900 text-base break-words">🌸 ${p.name}</h3>
+                                </div>
+                            `;
+                            list.appendChild(card);
+                        }
+                    } catch (e) { console.error("單一專案載入錯誤", e); }
+                }
+            } catch (e) {
+                console.error("專案列表載入失敗", e);
+                list.innerHTML = `<p class="text-center text-xs text-red-400 py-8">載入專案發生錯誤，請重新整理頁面！</p>`;
+            }
+        }
+        window.renderProjects = renderProjects;
+
         function backToProjects() {
             currentProjectId = null;
             currentProjectName = "";
@@ -1243,28 +1285,6 @@
             }
             return 'spot';
         };
-
-        function updateBadges(fDone, fTotal, sDone, sTotal, shDone, shTotal) {
-            const fBadge = document.getElementById('badge-food');
-            const sBadge = document.getElementById('badge-spot');
-            const shBadge = document.getElementById('badge-shop');
-            const fTitle = document.getElementById('badge-food-title');
-            const sTitle = document.getElementById('badge-spot-title');
-            const shTitle = document.getElementById('badge-shop-title');
-
-            if (fBadge) {
-                if (fTotal > 0 && fDone === fTotal) { fBadge.className = "badge-circle unlocked"; fTitle.innerText = "美食雷達全開"; }
-                else { fBadge.className = "badge-circle"; fTitle.innerText = `美食 (${fDone}/${fTotal})`; }
-            }
-            if (sBadge) {
-                if (sTotal > 0 && sDone === sTotal) { sBadge.className = "badge-circle unlocked"; sTitle.innerText = "深度冒險家"; }
-                else { sBadge.className = "badge-circle"; sTitle.innerText = `景點 (${sDone}/${sTotal})`; }
-            }
-            if (shBadge) {
-                if (shTotal > 0 && shDone === shTotal) { shBadge.className = "badge-circle unlocked"; shTitle.innerText = "精品大收割"; }
-                else { shBadge.className = "badge-circle"; shTitle.innerText = `購物 (${shDone}/${shTotal})`; }
-            }
-        }
 
         window.openNewProjectModal = function() {
             document.getElementById('new-proj-name').value = '';
