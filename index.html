@@ -675,158 +675,60 @@
             }
         };
 
-        // 🌟 優先宣告所有核心函式 (renderProjects 提早到最上方)
-        async function getMyProjectIds() {
-            let localList = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
-            if (!currentMyName) return localList;
-            try {
-                const docRef = doc(db, "user_profiles", currentMyName);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists() && docSnap.data().projects) {
-                    let cloudList = docSnap.data().projects;
-                    let merged = Array.from(new Set([...localList, ...cloudList]));
-                    return merged;
-                }
-            } catch (e) {
-                console.warn("雲端讀取失敗，使用本機快取", e);
-            }
-            return localList;
+        // 🌟 完整宣告所有函式並直接掛載到 window
+        function switchTab(tabName) {
+            ['schedule', 'ai', 'lang', 'split', 'quest'].forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const navEl = document.getElementById(`nav-${t}`);
+                if (el) el.classList.add('hidden');
+                if (navEl) navEl.className = "flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5";
+            });
+            const targetTab = document.getElementById(`tab-${tabName}`);
+            const targetNav = document.getElementById(`nav-${tabName}`);
+            if (targetTab) targetTab.classList.remove('hidden');
+            if (targetNav) targetNav.className = "flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5";
         }
-        window.getMyProjectIds = getMyProjectIds;
+        window.switchTab = switchTab;
 
-        async function saveMyProjectId(id) {
-            let list = await getMyProjectIds();
-            if (!list.includes(id)) {
-                list.unshift(id);
-                localStorage.setItem('my_subscribed_projects', JSON.stringify(list));
-                if (currentMyName) {
-                    try {
-                        await setDoc(doc(db, "user_profiles", currentMyName), { projects: list }, { merge: true });
-                    } catch (e) {}
+        function updateExpenseModalDropdowns() {
+            const payerSelect = document.getElementById('exp-payer');
+            const container = document.getElementById('exp-participants-container');
+            if (!payerSelect || !container) return;
+            payerSelect.innerHTML = '';
+            container.innerHTML = '';
+            allMembersData.forEach(m => {
+                let opt = document.createElement('option');
+                opt.value = m.name;
+                opt.innerText = m.name;
+                if (m.name === currentMyName) opt.selected = true;
+                payerSelect.appendChild(opt);
+
+                let div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-white p-2 rounded-xl border border-[#eae1d7]";
+                if (currentSplitMode === 'equal') {
+                    div.innerHTML = `
+                        <label class="flex items-center gap-2 font-bold text-gray-700 cursor-pointer">
+                            <input type="checkbox" name="participant" value="${m.name}" checked class="rounded accent-[#d98262]"> ${m.name}
+                        </label>
+                        <span class="text-gray-400 font-bold text-[11px]">參與均攤</span>
+                    `;
+                } else {
+                    div.innerHTML = `
+                        <label class="flex items-center gap-2 font-bold text-gray-700">
+                            <input type="checkbox" name="participant" value="${m.name}" checked onchange="window.toggleCustomInput(this)" class="rounded accent-[#d98262]"> ${m.name}
+                        </label>
+                        <input type="number" name="custom-share-${m.name}" placeholder="分攤金額" value="" class="w-24 p-1.5 bg-[#fffaf5] border border-[#eae1d7] rounded-lg outline-none font-bold text-right">
+                    `;
                 }
-            }
+                container.appendChild(div);
+            });
         }
-        window.saveMyProjectId = saveMyProjectId;
-
-        async function removeMyProjectId(id) {
-            let list = await getMyProjectIds();
-            list = list.filter(item => item !== id);
-            localStorage.setItem('my_subscribed_projects', JSON.stringify(list));
-            if (currentMyName) {
-                try {
-                    await setDoc(doc(db, "user_profiles", currentMyName), { projects: list }, { merge: true });
-                } catch (e) {}
-            }
-        }
-        window.removeMyProjectId = removeMyProjectId;
-
-        async function renderProjects() {
-            const list = document.getElementById('project-list');
-            try {
-                let myIds = await getMyProjectIds();
-                if (myIds.length === 0) {
-                    list.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前沒有專案。點上方按鈕新增，或輸入 6 位數專案號碼導入！✨</p>`;
-                    return;
-                }
-                list.innerHTML = '';
-                
-                for (let id of myIds) {
-                    try {
-                        const docRef = doc(db, "projects", id);
-                        const docSnap = await getDoc(docRef);
-                        if (docSnap.exists()) {
-                            const p = docSnap.data();
-                            const card = document.createElement('div');
-                            card.className = "cute-card p-5 space-y-3 relative transition hover:border-[#d98262] cursor-pointer";
-                            card.onclick = () => window.enterProject(id);
-                            card.innerHTML = `
-                                <div class="flex justify-between items-center gap-2 w-full">
-                                    <span class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black shrink-0">進行中 🚗</span>
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <span class="text-xs text-gray-500 font-bold">${p.dates || '未定日期'}</span>
-                                        <button onclick="event.stopPropagation(); window.removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1 shrink-0" title="從我的清單移除">🗑️</button>
-                                    </div>
-                                </div>
-                                <div class="space-y-1">
-                                    <h3 class="font-black text-gray-900 text-base break-words">🌸 ${p.name}</h3>
-                                </div>
-                            `;
-                            list.appendChild(card);
-                        }
-                    } catch (e) { console.error("單一專案載入錯誤", e); }
-                }
-            } catch (e) {
-                console.error("專案列表載入失敗", e);
-                list.innerHTML = `<p class="text-center text-xs text-red-400 py-8">載入專案發生錯誤，請重新整理頁面！</p>`;
-            }
-        }
-        window.renderProjects = renderProjects;
-
-        window.backToProjects = function() {
-            currentProjectId = null;
-            currentProjectName = "";
-            currentProjectPin = "";
-            if (unsubscribeSchedules) unsubscribeSchedules();
-            if (unsubscribeExpenses) unsubscribeExpenses();
-            if (unsubscribeMembers) unsubscribeMembers();
-            if (unsubscribeCheckins) unsubscribeCheckins();
-            document.getElementById('view-workspace').classList.add('hidden');
-            document.getElementById('bottom-nav').classList.add('hidden');
-            document.getElementById('back-btn').classList.add('hidden');
-            document.getElementById('share-btn').classList.add('hidden');
-            document.getElementById('view-projects').classList.remove('hidden');
-            document.getElementById('header-title').innerText = "🧳 我的旅遊專案清單";
-            document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
-            renderProjects();
-        };
-
-        window.shareCurrentProject = function() {
-            if (!currentProjectId) return;
-            document.getElementById('share-modal-pin').innerText = currentProjectPin || '未設定';
-            document.getElementById('share-choice-modal').classList.remove('hidden');
-        };
-
-        window.enterProject = async function(id) {
-            currentProjectId = id;
-            try {
-                const docSnap = await getDoc(doc(db, "projects", id));
-                if (docSnap.exists()) {
-                    const p = docSnap.data();
-                    currentProjectName = p.name;
-                    currentProjectPin = p.pin || "";
-                }
-            } catch (e) {}
-
-            if (!currentMyName) {
-                document.getElementById('login-modal').classList.remove('hidden');
-                return;
-            }
-
-            window.proceedEnterProject();
-        };
-
-        window.proceedEnterProject = function() {
-            document.getElementById('view-projects').classList.add('hidden');
-            document.getElementById('view-workspace').classList.remove('hidden');
-            document.getElementById('bottom-nav').classList.remove('hidden');
-            document.getElementById('back-btn').classList.remove('hidden');
-            document.getElementById('share-btn').classList.remove('hidden');
-            
-            document.getElementById('header-title').innerText = `🌸 ${currentProjectName}`;
-            document.getElementById('header-sub').innerText = `旅伴：${currentMyName} ✨`;
-            
-            window.renderRemindersByRules(currentProjectName);
-            window.initLanguageModule(currentProjectName);
-            window.loadMembersAndExpenses(currentProjectId);
-            window.loadCheckins(currentProjectId);
-            
-            switchTab('schedule');
-            window.loadSchedules(currentProjectId);
-        };
+        window.updateExpenseModalDropdowns = updateExpenseModalDropdowns;
 
         window.renderRemindersByRules = function(projectName) {
             const container = document.getElementById('dynamic-reminders-container');
-            let nameLower = projectName.toLowerCase();
+            if (!container) return;
+            let nameLower = (projectName || '').toLowerCase();
             let html = '';
 
             if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
@@ -924,7 +826,7 @@
         };
 
         window.initLanguageModule = function(projectName) {
-            let nameLower = projectName.toLowerCase();
+            let nameLower = (projectName || '').toLowerCase();
             let destKey = 'general';
             if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) destKey = 'korea';
             else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都')) destKey = 'japan';
@@ -1210,6 +1112,7 @@
             allBtn.onclick = () => { activeDayFilter = 'all'; renderDayPills(); renderScheduleUI(); };
             pillsContainer.appendChild(allBtn);
 
+            days.days.forEach?.(dayKey => {}); // safe guard
             days.forEach(dayKey => {
                 let btn = document.createElement('button');
                 let isActive = activeDayFilter === dayKey;
@@ -1421,6 +1324,93 @@
 
             window.proceedEnterProject();
         };
+
+        // 專案與本機清單核心函式
+        async function getMyProjectIds() {
+            let localList = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
+            if (!currentMyName) return localList;
+            try {
+                const docRef = doc(db, "user_profiles", currentMyName);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists() && docSnap.data().projects) {
+                    let cloudList = docSnap.data().projects;
+                    let merged = Array.from(new Set([...localList, ...cloudList]));
+                    return merged;
+                }
+            } catch (e) {
+                console.warn("雲端讀取失敗，使用本機快取", e);
+            }
+            return localList;
+        }
+        window.getMyProjectIds = getMyProjectIds;
+
+        async function saveMyProjectId(id) {
+            let list = await getMyProjectIds();
+            if (!list.includes(id)) {
+                list.unshift(id);
+                localStorage.setItem('my_subscribed_projects', JSON.stringify(list));
+                if (currentMyName) {
+                    try {
+                        await setDoc(doc(db, "user_profiles", currentMyName), { projects: list }, { merge: true });
+                    } catch (e) {}
+                }
+            }
+        }
+        window.saveMyProjectId = saveMyProjectId;
+
+        async function removeMyProjectId(id) {
+            let list = await getMyProjectIds();
+            list = list.filter(item => item !== id);
+            localStorage.setItem('my_subscribed_projects', JSON.stringify(list));
+            if (currentMyName) {
+                try {
+                    await setDoc(doc(db, "user_profiles", currentMyName), { projects: list }, { merge: true });
+                } catch (e) {}
+            }
+        }
+        window.removeMyProjectId = removeMyProjectId;
+
+        async function renderProjects() {
+            const list = document.getElementById('project-list');
+            try {
+                let myIds = await getMyProjectIds();
+                if (myIds.length === 0) {
+                    list.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前沒有專案。點上方按鈕新增，或輸入 6 位數專案號碼導入！✨</p>`;
+                    return;
+                }
+                list.innerHTML = '';
+                
+                for (let id of myIds) {
+                    try {
+                        const docRef = doc(db, "projects", id);
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            const p = docSnap.data();
+                            const card = document.createElement('div');
+                            card.className = "cute-card p-5 space-y-3 relative transition hover:border-[#d98262] cursor-pointer";
+                            card.onclick = () => window.enterProject(id);
+                            card.innerHTML = `
+                                <div class="flex justify-between items-center gap-2 w-full">
+                                    <span class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black shrink-0">進行中 🚗</span>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span class="text-xs text-gray-500 font-bold">${p.dates || '未定日期'}</span>
+                                        <button onclick="event.stopPropagation(); window.removeProjectFromMyList('${id}')" class="text-gray-400 hover:text-red-500 text-sm p-1 shrink-0" title="從我的清單移除">🗑️</button>
+                                    </div>
+                                </div>
+                                <div class="space-y-1">
+                                    <h3 class="font-black text-gray-900 text-base break-words">🌸 ${p.name}</h3>
+                                </div>
+                            `;
+                            list.appendChild(card);
+                        }
+                    } catch (e) { console.error("單一專案載入錯誤", e); }
+                }
+            } catch (e) {
+                console.error("專案列表載入失敗", e);
+                list.innerHTML = `<p class="text-center text-xs text-red-400 py-8">載入專案發生錯誤，請重新整理頁面！</p>`;
+            }
+        }
+        window.renderProjects = renderProjects;
 
         // 初始化應用程式
         async function initApp() {
