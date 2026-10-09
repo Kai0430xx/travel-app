@@ -10,7 +10,7 @@
 <style>
 :root{--ink:#3E3A39;--paper:#FFFCF6;--co:#F2A497;--ye:#F6D27A;--aq:#A8D3E6;--gr:#B9DAA5}
 *{box-sizing:border-box}[hidden]{display:none!important}
-body{margin:0 auto;max-width:480px;min-height:100vh;background:var(--paper);color:var(--ink);font:15px/1.6 "Huninn","Noto Sans TC",system-ui,sans-serif;padding:0 14px calc(140px + env(safe-area-inset-bottom))}
+body{margin:0 auto;max-width:480px;min-height:100vh;background:var(--paper);color:var(--ink);font:15px/1.6 "Huninn","Noto Sans TC",system-ui,sans-serif;padding:0 14px calc(90px + env(safe-area-inset-bottom))}
 h2,h3{margin:0}small{opacity:.7}.mute{text-align:center;opacity:.6;padding:18px 0}
 .box{border:3px solid var(--ink);border-radius:24px;background:var(--paper);box-shadow:3px 3px 0 var(--ink);padding:14px;margin:12px 0}
 .btn{font:inherit;font-size:13px;color:var(--ink);background:var(--ye);border:3px solid var(--ink);border-radius:999px;padding:4px 14px;cursor:pointer;box-shadow:2px 2px 0 var(--ink);text-decoration:none;display:inline-block}
@@ -24,10 +24,10 @@ header div{flex:1;min-width:0}header b,header small{display:block;white-space:no
 .tag{display:inline-block;background:var(--ye);border:2px solid var(--ink);border-radius:999px;padding:0 10px;font-size:12px;margin-bottom:4px}
 .item{cursor:pointer;display:block}.item b{display:block}
 
-/* 🌸 底部導覽列：拿掉外框與陰影，改成類似頂部用一條線隔開 */
-nav{position:fixed;left:0;right:0;bottom:0;width:100%;max-width:480px;margin:0 auto;background:var(--paper);border-top:3px solid var(--ink);display:flex;justify-content:space-around;padding:10px 6px calc(10px + env(safe-area-inset-bottom));z-index:9999}
-nav button{font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:none;color:var(--ink);padding:4px 12px;cursor:pointer;pointer-events:auto}
-nav button span{display:block;font-size:20px}
+/* 🌸 底部導覽列：更緊貼底部，拿掉外框與陰影，以一條線隔開 */
+nav{position:fixed;left:0;right:0;bottom:0;width:100%;max-width:480px;margin:0 auto;background:var(--paper);border-top:3px solid var(--ink);display:flex;justify-content:space-around;padding:6px 6px calc(4px + env(safe-area-inset-bottom));z-index:9999}
+nav button{font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:none;color:var(--ink);padding:2px 10px;cursor:pointer;pointer-events:auto}
+nav button span{display:block;font-size:18px}
 nav button.on{background:var(--ye);border-color:var(--ink)}
 
 .mask{position:fixed;inset:0;background:rgba(62,58,57,.45);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px}
@@ -36,7 +36,7 @@ input,textarea,select{font:inherit;width:100%;border:3px solid var(--ink);border
 label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:0 10px 6px 0}.chk input{width:auto;margin:0}
 .bar{height:16px;border:3px solid var(--ink);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--gr);transition:width .5s}
 .badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
-.bd{width:64px;height:64px;margin:0 auto;border:3px dashed var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;filter:grayscale(1);opacity:.5}
+.bd{width:60px;height:60px;margin:0 auto;border:3px dashed var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;filter:grayscale(1);opacity:.5}
 .bd.on{border-style:solid;filter:none;opacity:1}
 .lang{display:grid;grid-template-columns:104px 1fr;gap:10px}.lang .btn{display:block;width:100%;text-align:left;margin-bottom:8px;font-size:12px}.lang .btn.on{background:var(--co)}
 @keyframes fl{50%{transform:translateY(-5px)}}@keyframes dr{from{transform:translateX(-9px)}to{transform:translateX(9px)}}
@@ -376,7 +376,7 @@ general:{c:'en-US',p:{
 }}};
 
 function rLang(){const P=LG[dest(S.name)].p;const show=id=>{$('lc').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===id));$('lp').innerHTML=(P[id]||[]).map((p,i)=>`<button class="box item" style="width:100%;font:inherit;color:inherit;text-align:left;margin:0 0 10px" data-i="${i}"><b>${esc(p[0])}</b><small style="color:var(--co)">${esc(p[1])}</small></button>`).join('');
-$('lp').querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=P[id][b.dataset.i];S.phrase=p;$('dc').textContent=p[0];$('df').textContent=p[1]})};$('lc').innerHTML=CATS.map(c=>`<button class="btn" data-c="${c[0]}">${c[1]}</button>`).join('');$('lc').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.c));show('airport')}$('say').onclick=()=>{if(!S.phrase)return;const u=new SpeechSynthesisUtterance(S.phrase[S.lang==='en-US'?0:1]);u.lang=S.lang;speechSynthesis.speak(u)};
+$('lp').querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=P[id][b.dataset.i];S.phrase=p;$('dc').textContent=p[0];$('df',p[1])})};$('lc').innerHTML=CATS.map(c=>`<button class="btn" data-c="${c[0]}">${c[1]}</button>`).join('');$('lc').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.c));show('airport')}$('say').onclick=()=>{if(!S.phrase)return;const u=new SpeechSynthesisUtterance(S.phrase[S.lang==='en-US'?0:1]);u.lang=S.lang;speechSynthesis.speak(u)};
 
 /* ---------- 分帳 ---------- */
 const money=n=>'NT$ '+Math.round(n).toLocaleString();
@@ -476,16 +476,36 @@ Object.entries(origGroups).forEach(([cur, subB])=>{
 modal('📊 結算明細', resHtml || '<p class="mute">目前不需要轉帳 🎉</p>');
 };
 
-/* ---------- 闖關與超強自動壓縮上傳 ---------- */
+/* ---------- 闖關與打卡 (精準分類計數與 100% 達成解鎖) ---------- */
 const cls=t=>{t=t||'';if(/交通|機場|租車|還車|출발|空港/.test(t))return null;if(/餐廳|美食|咖啡|晚餐|午餐|早餐|烤肉|料理|吃|맛집|식당|카페/.test(t))return'food';if(/購物|免稅|超市|商場|買|마트|쇼핑/.test(t))return'shop';return'spot'};
 const BD={food:['美食家','var(--co)'],spot:['探險家','var(--aq)'],shop:['購物達人','var(--ye)']};
-function rQuest(){const it=S.sch.map(s=>({...s,k:cls(s.title)})).filter(s=>s.k),n=it.filter(s=>S.chk[s.id]).length,p=it.length?Math.round(n/it.length*100):0;
-$('qc').textContent=`已打卡 ${n} / ${it.length}`;$('qp').textContent=p+'\%';$('qb').style.width=p+'%';
-for(const k in BD){const on=it.some(s=>s.k===k&&S.chk[s.id]),b=$('b-'+k),was=b.classList.contains('on');b.classList.toggle('on',on);b.style.background=on?BD[k][1]:'';$('bt-'+k).textContent=on?BD[k][0]:'未解鎖';if(on&&!was){b.classList.add('bn')}}
-$('ql').innerHTML=it.length?it.map(s=>`<div class="box item" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><b>${esc(clean(s.title))}</b></div><button class="btn ${S.chk[s.id]?'gr':''}" data-i="${s.id}">${S.chk[s.id]?'✔ 已解鎖':'📍 打卡'}</button></div>`).join(''):'<p class="mute">行程中還沒有可打卡的景點、美食或購物 ✨</p>';
-$('ql').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>checkin(b.dataset.i))}
 
-// 🌸 強效自動壓縮：將任何尺寸照片強制等比縮至最大 500px，畫質壓至 0.6，保證 100% 成功存入
+function rQuest(){
+const allIt = S.sch.map(s=>({...s,k:cls(s.title)})).filter(s=>s.k);
+const totalChk = allIt.filter(s=>S.chk[s.id]).length;
+const totalP = allIt.length ? Math.round(totalChk/allIt.length*100) : 0;
+
+$('qc').textContent=`已打卡 ${totalChk} / ${allIt.length}`;
+$('qp').textContent=totalP+'\%';$('qb').style.width=totalP+'%';
+
+for(const k in BD){
+    const catItems = allIt.filter(s=>s.k===k);
+    const catTotal = catItems.length;
+    const catDone = catItems.filter(s=>S.chk[s.id]).length;
+    // 必須全部完成 (catDone === catTotal 且大於 0) 才會點亮布章
+    const unlocked = catTotal > 0 && catDone === catTotal;
+    
+    const b = $('b-'+k), was = b.classList.contains('on');
+    b.classList.toggle('on', unlocked);
+    b.style.background = unlocked ? BD[k][1] : '';
+    $('bt-'+k).textContent = catTotal > 0 ? `${catDone}/${catTotal}` : '0/0';
+    if(unlocked && !was) b.classList.add('bn');
+}
+
+$('ql').innerHTML=allIt.length?allIt.map(s=>`<div class="box item" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><b>${esc(clean(s.title))}</b></div><button class="btn ${S.chk[s.id]?'gr':''}" data-i="${s.id}">${S.chk[s.id]?'✔ 已解鎖':'📍 打卡'}</button></div>`).join(''):'<p class="mute">行程中還沒有可打卡的景點、美食或購物 ✨</p>';
+$('ql').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>checkin(b.dataset.i))
+}
+
 function compressAndConvert(file) {
     return new Promise((resolve) => {
         const reader = new FileReader();
@@ -493,16 +513,11 @@ function compressAndConvert(file) {
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
+                let width = img.width; let height = img.height;
                 const MAX_DIM = 500;
-                if (width > height) {
-                    if (width > MAX_DIM) { height *= MAX_DIM / width; width = MAX_DIM; }
-                } else {
-                    if (height > MAX_DIM) { width *= MAX_DIM / height; height = MAX_DIM; }
-                }
-                canvas.width = width;
-                canvas.height = height;
+                if (width > height) { if (width > MAX_DIM) { height *= MAX_DIM / width; width = MAX_DIM; } }
+                else { if (height > MAX_DIM) { width *= MAX_DIM / height; height = MAX_DIM; } }
+                canvas.width = width; canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
                 resolve(canvas.toDataURL('image/jpeg', 0.6));
