@@ -24,9 +24,9 @@ header div{flex:1;min-width:0}header b,header small{display:block;white-space:no
 .tag{display:inline-block;background:var(--ye);border:2px solid var(--ink);border-radius:999px;padding:0 10px;font-size:12px;margin-bottom:4px}
 .item{cursor:pointer;display:block}.item b{display:block}
 
-/* 🌸 完美修復導覽列穿透：強制最高圖層與絕對不透明背景 */
+/* 🌸 完美修復導覽列：不透明背景與絕對最高層級，防止內容穿透 */
 nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));width:calc(100% - 28px);max-width:452px;background:#FFFCF6;border:3px solid var(--ink);border-radius:26px;box-shadow:0 -8px 20px rgba(62,58,57,0.12), 3px 3px 0 var(--ink);display:flex;justify-content:space-around;padding:6px;z-index:9999}
-nav button{font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:#FFFCF6;color:var(--ink);padding:4px 8px;cursor:pointer}
+nav button{font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:#FFFCF6;color:var(--ink);padding:4px 8px;cursor:pointer;pointer-events:auto}
 nav button span{display:block;font-size:20px}
 nav button.on{background:var(--ye);border-color:var(--ink)}
 
@@ -137,7 +137,14 @@ $('bk').onclick=()=>{S.un.forEach(f=>f());S.un=[];S.id=null;$('v0').hidden=false
 
 const TABS=[['schedule','📅','行程'],['ai','💡','提醒'],['lang','🗣','對話'],['split','💰','分帳'],['quest','🎯','闖關']];
 $('nav').innerHTML=TABS.map(t=>`<button data-t="${t[0]}"><span>${t[1]}</span>${t[2]}</button>`).join('');
-$('nav').querySelectorAll('button').forEach(b=>b.onclick=()=>{tab(b.dataset.t);b.classList.add('bn')});
+
+// 🌸 完美修復導覽列點擊無反應（雙擊才有效）問題：綁定 touchend 與 click
+$('nav').querySelectorAll('button').forEach(b=>{
+    const action = () => { tab(b.dataset.t); b.classList.add('bn'); };
+    b.onclick = action;
+    b.ontouchend = e => { e.preventDefault(); action(); };
+});
+
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.hidden=e.id!=='t-'+t);$('nav').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.t===t);if(b.dataset.t!==t)b.classList.remove('bn')})}
 
 /* ---------- 行程 ---------- */
