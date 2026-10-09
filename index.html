@@ -10,7 +10,7 @@
 <style>
 :root{--ink:#3E3A39;--paper:#FFFCF6;--co:#F2A497;--ye:#F6D27A;--aq:#A8D3E6;--gr:#B9DAA5}
 *{box-sizing:border-box}[hidden]{display:none!important}
-body{margin:0 auto;max-width:480px;min-height:100vh;background:var(--paper);color:var(--ink);font:15px/1.6 "Huninn","Noto Sans TC",system-ui,sans-serif;padding:0 14px calc(140px + env(safe-area-inset-bottom))}
+body{margin:0 auto;max-width:480px;min-height:100vh;background:var(--paper);color:var(--ink);font:15px/1.6 "Huninn","Noto Sans TC",system-ui,sans-serif;padding:0 14px calc(180px + env(safe-area-inset-bottom))}
 h2,h3{margin:0}small{opacity:.7}.mute{text-align:center;opacity:.6;padding:18px 0}
 .box{border:3px solid var(--ink);border-radius:24px;background:var(--paper);box-shadow:3px 3px 0 var(--ink);padding:14px;margin:12px 0}
 .btn{font:inherit;font-size:13px;color:var(--ink);background:var(--ye);border:3px solid var(--ink);border-radius:999px;padding:4px 14px;cursor:pointer;box-shadow:2px 2px 0 var(--ink);text-decoration:none;display:inline-block}
@@ -23,9 +23,13 @@ header div{flex:1;min-width:0}header b,header small{display:block;white-space:no
 .pill{font:inherit;flex:none;border:3px solid var(--ink);border-radius:999px;background:var(--paper);padding:2px 14px;cursor:pointer;color:var(--ink)}.pill.on{background:var(--aq)}
 .tag{display:inline-block;background:var(--ye);border:2px solid var(--ink);border-radius:999px;padding:0 10px;font-size:12px;margin-bottom:4px}
 .item{cursor:pointer;display:block}.item b{display:block}
-/* 🌸 完美修復：導覽列設為不透明背景與最高層級，徹底阻擋內容穿透 */
-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:calc(100% - 28px);max-width:452px;background:var(--paper);border:3px solid var(--ink);border-radius:26px;box-shadow:0 -4px 12px rgba(62,58,57,0.08), 3px 3px 0 var(--ink);display:flex;justify-content:space-around;padding:6px;z-index:100}
-nav button{font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:var(--paper);color:var(--ink);padding:2px 8px;cursor:pointer}nav button span{display:block;font-size:20px}nav .on{background:var(--ye);border-color:var(--ink)}
+
+/* 🌸 絕對不透明導覽列，完美解決內容穿透 */
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:calc(100% - 28px);max-width:452px;background:var(--paper);border:3px solid var(--ink);border-radius:26px;box-shadow:0 8px 24px rgba(62,58,57,0.15), 3px 3px 0 var(--ink);display:flex;justify-content:space-around;padding:6px;z-index:100}
+nav button{font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:var(--paper);color:var(--ink);padding:4px 8px;cursor:pointer}
+nav button span{display:block;font-size:20px}
+nav button.on{background:var(--ye);border-color:var(--ink)}
+
 .mask{position:fixed;inset:0;background:rgba(62,58,57,.45);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px}
 .sheet{width:100%;max-width:400px;max-height:88vh;overflow:auto;margin:0}
 input,textarea,select{font:inherit;width:100%;border:3px solid var(--ink);border-radius:16px;background:#fff;padding:8px 12px;margin:4px 0 8px;color:var(--ink)}
@@ -366,7 +370,7 @@ general:{c:'en-US',p:{
 }}};
 
 function rLang(){const P=LG[dest(S.name)].p;const show=id=>{$('lc').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===id));$('lp').innerHTML=(P[id]||[]).map((p,i)=>`<button class="box item" style="width:100%;font:inherit;color:inherit;text-align:left;margin:0 0 10px" data-i="${i}"><b>${esc(p[0])}</b><small style="color:var(--co)">${esc(p[1])}</small></button>`).join('');
-$('lp').querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=P[id][b.dataset.i];S.phrase=p;$('dc').textContent=p[0];$('df').textContent=p[1]})};$('lc').innerHTML=CATS.map(c=>`<button class="btn" data-c="${c[0]}">${c[1]}</button>`).join('');$('lc').querySelectorAll('button').forEach(b=>b.onclick=()=>show(c[0]));show('airport')}$('say').onclick=()=>{if(!S.phrase)return;const u=new SpeechSynthesisUtterance(S.phrase[S.lang==='en-US'?0:1]);u.lang=S.lang;speechSynthesis.speak(u)};
+$('lp').querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=P[id][b.dataset.i];S.phrase=p;$('dc').textContent=p[0];$('df').textContent=p[1]})};$('lc').innerHTML=CATS.map(c=>`<button class="btn" data-c="${c[0]}">${c[1]}</button>`).join('');$('lc').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.c));show('airport')}$('say').onclick=()=>{if(!S.phrase)return;const u=new SpeechSynthesisUtterance(S.phrase[S.lang==='en-US'?0:1]);u.lang=S.lang;speechSynthesis.speak(u)};
 
 /* ---------- 分帳 ---------- */
 const money=n=>'NT$ '+Math.round(n).toLocaleString();
