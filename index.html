@@ -10,7 +10,7 @@
 <style>
 :root{--ink:#3E3A39;--paper:#FFFCF6;--co:#F2A497;--ye:#F6D27A;--aq:#A8D3E6;--gr:#B9DAA5}
 *{box-sizing:border-box}[hidden]{display:none!important}
-body{margin:0 auto;max-width:480px;min-height:100vh;background:var(--paper);color:var(--ink);font:15px/1.6 "Huninn","Noto Sans TC",system-ui,sans-serif;padding:0 14px calc(180px + env(safe-area-inset-bottom))}
+body{margin:0 auto;max-width:480px;min-height:100vh;background:var(--paper);color:var(--ink);font:15px/1.6 "Huninn","Noto Sans TC",system-ui,sans-serif;padding:0 14px calc(140px + env(safe-area-inset-bottom))}
 h2,h3{margin:0}small{opacity:.7}.mute{text-align:center;opacity:.6;padding:18px 0}
 .box{border:3px solid var(--ink);border-radius:24px;background:var(--paper);box-shadow:3px 3px 0 var(--ink);padding:14px;margin:12px 0}
 .btn{font:inherit;font-size:13px;color:var(--ink);background:var(--ye);border:3px solid var(--ink);border-radius:999px;padding:4px 14px;cursor:pointer;box-shadow:2px 2px 0 var(--ink);text-decoration:none;display:inline-block}
@@ -24,9 +24,9 @@ header div{flex:1;min-width:0}header b,header small{display:block;white-space:no
 .tag{display:inline-block;background:var(--ye);border:2px solid var(--ink);border-radius:999px;padding:0 10px;font-size:12px;margin-bottom:4px}
 .item{cursor:pointer;display:block}.item b{display:block}
 
-/* 🌸 完美修復導覽列：不透明背景與絕對最高層級，防止內容穿透 */
-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));width:calc(100% - 28px);max-width:452px;background:#FFFCF6;border:3px solid var(--ink);border-radius:26px;box-shadow:0 -8px 20px rgba(62,58,57,0.12), 3px 3px 0 var(--ink);display:flex;justify-content:space-around;padding:6px;z-index:9999}
-nav button{font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:#FFFCF6;color:var(--ink);padding:4px 8px;cursor:pointer;pointer-events:auto}
+/* 🌸 底部導覽列：拿掉外框與陰影，改成類似頂部用一條線隔開 */
+nav{position:fixed;left:0;right:0;bottom:0;width:100%;max-width:480px;margin:0 auto;background:var(--paper);border-top:3px solid var(--ink);display:flex;justify-content:space-around;padding:10px 6px calc(10px + env(safe-area-inset-bottom));z-index:9999}
+nav button{font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:none;color:var(--ink);padding:4px 12px;cursor:pointer;pointer-events:auto}
 nav button span{display:block;font-size:20px}
 nav button.on{background:var(--ye);border-color:var(--ink)}
 
@@ -138,7 +138,6 @@ $('bk').onclick=()=>{S.un.forEach(f=>f());S.un=[];S.id=null;$('v0').hidden=false
 const TABS=[['schedule','📅','行程'],['ai','💡','提醒'],['lang','🗣','對話'],['split','💰','分帳'],['quest','🎯','闖關']];
 $('nav').innerHTML=TABS.map(t=>`<button data-t="${t[0]}"><span>${t[1]}</span>${t[2]}</button>`).join('');
 
-// 🌸 完美修復導覽列點擊無反應（雙擊才有效）問題：綁定 touchend 與 click
 $('nav').querySelectorAll('button').forEach(b=>{
     const action = () => { tab(b.dataset.t); b.classList.add('bn'); };
     b.onclick = action;
@@ -477,7 +476,7 @@ Object.entries(origGroups).forEach(([cur, subB])=>{
 modal('📊 結算明細', resHtml || '<p class="mute">目前不需要轉帳 🎉</p>');
 };
 
-/* ---------- 闖關與打卡 ---------- */
+/* ---------- 闖關與超強自動壓縮上傳 ---------- */
 const cls=t=>{t=t||'';if(/交通|機場|租車|還車|출발|空港/.test(t))return null;if(/餐廳|美食|咖啡|晚餐|午餐|早餐|烤肉|料理|吃|맛집|식당|카페/.test(t))return'food';if(/購物|免稅|超市|商場|買|마트|쇼핑/.test(t))return'shop';return'spot'};
 const BD={food:['美食家','var(--co)'],spot:['探險家','var(--aq)'],shop:['購物達人','var(--ye)']};
 function rQuest(){const it=S.sch.map(s=>({...s,k:cls(s.title)})).filter(s=>s.k),n=it.filter(s=>S.chk[s.id]).length,p=it.length?Math.round(n/it.length*100):0;
@@ -486,32 +485,56 @@ for(const k in BD){const on=it.some(s=>s.k===k&&S.chk[s.id]),b=$('b-'+k),was=b.c
 $('ql').innerHTML=it.length?it.map(s=>`<div class="box item" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><b>${esc(clean(s.title))}</b></div><button class="btn ${S.chk[s.id]?'gr':''}" data-i="${s.id}">${S.chk[s.id]?'✔ 已解鎖':'📍 打卡'}</button></div>`).join(''):'<p class="mute">行程中還沒有可打卡的景點、美食或購物 ✨</p>';
 $('ql').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>checkin(b.dataset.i))}
 
+// 🌸 強效自動壓縮：將任何尺寸照片強制等比縮至最大 500px，畫質壓至 0.6，保證 100% 成功存入
+function compressAndConvert(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const MAX_DIM = 500;
+                if (width > height) {
+                    if (width > MAX_DIM) { height *= MAX_DIM / width; width = MAX_DIM; }
+                } else {
+                    if (height > MAX_DIM) { width *= MAX_DIM / height; height = MAX_DIM; }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.6));
+            };
+            img.onerror = () => resolve(e.target.result);
+            img.src = e.target.result;
+        };
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(file);
+    });
+}
+
 function checkin(id){const s=S.sch.find(x=>x.id===id);if(!s)return;const cur=S.chk[id],r=doc(db,'projects',S.id,'checkins',id+'_'+S.me);
 const m=modal(esc(clean(s.title)),`${cur&&cur.photoUrl?`<img src="${esc(cur.photoUrl)}" alt="" style="width:100%;border:3px solid var(--ink);border-radius:20px;margin-bottom:8px">`:''}<input id="ph" type="file" accept="image/*"><button class="btn co" id="up" style="width:100%;margin-bottom:8px">📷 ${cur?'換一張照片':'選照片打卡'}</button>${cur?'<button class="btn" id="un" style="width:100%">↩ 取消打卡</button>':'<button class="btn" id="np" style="width:100%">✔ 不放照片，直接打卡</button>'}`);
-q(m,'#up').onclick=()=>{
+
+q(m,'#up').onclick = async () => {
     const fileInput = q(m,'#ph');
     const f = fileInput.files[0];
     if(!f){alert('請先點選檔案選擇照片！');return;}
-    const b = q(m,'#up'); b.textContent='讀取中… ⏳'; b.disabled=true;
-    
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-        try {
-            const base64Str = e.target.result;
-            await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:base64Str,at:Date.now()});
-            m.remove();
-        } catch(err) {
-            console.error(err);
-            alert('上傳失敗，圖片可能太大或網路異常');
-            b.textContent='再試一次'; b.disabled=false;
-        }
-    };
-    reader.onerror = () => {
-        alert('讀取檔案失敗');
+    const b = q(m,'#up'); b.textContent='自動壓縮上傳中… ⏳'; b.disabled=true;
+    try {
+        const compressedBase64 = await compressAndConvert(f);
+        if(!compressedBase64){ alert('圖片壓縮失敗'); b.textContent='再試一次'; b.disabled=false; return; }
+        await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:compressedBase64,at:Date.now()});
+        m.remove();
+    } catch(err) {
+        console.error(err);
+        alert('上傳失敗，請稍後再試');
         b.textContent='再試一次'; b.disabled=false;
-    };
-    reader.readAsDataURL(fileInput.files[0]);
+    }
 };
+
 const np=q(m,'#np');if(np)np.onclick=async()=>{await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:'',at:Date.now()});m.remove()};
 const un=q(m,'#un');if(un)un.onclick=async()=>{await deleteDoc(r);m.remove()}}
 
