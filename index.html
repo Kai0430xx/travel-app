@@ -166,7 +166,7 @@ const box=(t,b)=>`<div class="box"><h3>${t}</h3><div style="font-size:14px;margi
 let h='';
 if(dest(S.name)==='korea'){
     h+=box('🇰🇷 韓國天氣與穿搭指南','早晚溫差大且風大，建議採洋蔥式穿搭，必備防風外套與好走的布鞋 🧥👟。');
-    h+=box('🚗 自駕與導航攻略','建議下載 Naver Map 或 Kakao Map（輸入地點電話號碼查詢最精準）。韓國道路速限嚴格，沿途測速相機很多，請務必遵守速限。');
+    h+=box('🚗 自駕與導航攻略','建議下載 Naver Map 或 Kakao Map（輸入地點電話號碼查詢最準）。韓國道路速限嚴格，沿途測速相機很多，請務必遵守速限。');
     h+=box('💳 支付與換匯建議','信用卡在韓國幾乎 100% 普及，但建議身上備妥 5~10 萬韓元現金以備不時之需（如傳統市場或小型路邊攤）。');
     h+=box('🔌 電壓與插頭規格','韓國電壓為 220V，插頭為「歐規圓形雙孔」，請記得攜帶萬用轉接頭。');
     h+=box('🛍️ 退稅與購物須知','現場退稅（Tax Refund）單筆消費滿 30,000 韓元即可出示護照辦理，市區退稅或機場自助機台退稅請保留好收據。');
@@ -368,28 +368,11 @@ general:{c:'en-US',p:{
 function rLang(){const P=LG[dest(S.name)].p;const show=id=>{$('lc').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===id));$('lp').innerHTML=(P[id]||[]).map((p,i)=>`<button class="box item" style="width:100%;font:inherit;color:inherit;text-align:left;margin:0 0 10px" data-i="${i}"><b>${esc(p[0])}</b><small style="color:var(--co)">${esc(p[1])}</small></button>`).join('');
 $('lp').querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=P[id][b.dataset.i];S.phrase=p;$('dc').textContent=p[0];$('df').textContent=p[1]})};$('lc').innerHTML=CATS.map(c=>`<button class="btn" data-c="${c[0]}">${c[1]}</button>`).join('');$('lc').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.c));show('airport')}$('say').onclick=()=>{if(!S.phrase)return;const u=new SpeechSynthesisUtterance(S.phrase[S.lang==='en-US'?0:1]);u.lang=S.lang;speechSynthesis.speak(u)};
 
-/* ---------- 分帳 (完美修復結算幣別與原幣別顯示) ---------- */
+/* ---------- 分帳 (完美修復：依每筆帳目的 settle 獨立結算) ---------- */
 const money=n=>'NT$ '+Math.round(n).toLocaleString();
-function bal(){
-const b={};S.mem.forEach(n=>b[n]={});
-S.exp.forEach(e=>{
-    const cur=e.cur||'TWD';
-    if(!b[e.payer][cur]) b[e.payer][cur]=0;
-    const sp=e.split&&Object.keys(e.split).length?e.split:{[e.payer]:e.amount};
-    const totalSplitAmt=Object.values(sp).reduce((a,v)=>a+v,0)||e.amount;
-    b[e.payer][cur]+=e.amount;
-    Object.entries(sp).forEach(([n,shareAmt])=>{
-        if(!b[n]) b[n]={};
-        if(!b[n][cur]) b[n][cur]=0;
-        b[n][cur]-=shareAmt;
-    });
-});
-return b;
-}
-
 function rSplit(){const by={};let tot=0;S.exp.forEach(e=>{by[e.cur]=(by[e.cur]||0)+e.amount;tot+=e.amount*(RATE[e.cur]||1)});
 $('tot').textContent=money(tot);$('brk').textContent=Object.entries(by).map(([c,v])=>`${c} ${Math.round(v).toLocaleString()}`).join(' ');
-$('el').innerHTML=S.exp.length?S.exp.slice().reverse().map(e=>`<div class="box item" style="display:flex;justify-content:space-between;gap:8px"><div><b>${esc(e.title)}</b><small>${esc(e.payer)} 先付 · ${e.cur} ${Math.round(e.amount).toLocaleString()}</small></div><div style="text-align:right"><b>約 ${money(e.amount*(RATE[e.cur]||1))}</b><br><button class="btn" data-d="${e.id}" style="padding:0 8px">刪</button></div></div>`).join(''):'<p class="mute">還沒有記帳，點「記一筆」開始吧 ✨</p>';
+$('el').innerHTML=S.exp.length?S.exp.slice().reverse().map(e=>`<div class="box item" style="display:flex;justify-content:space-between;gap:8px"><div><b>${esc(e.title)}</b><small>${esc(e.payer)} 先付 · ${e.cur} ${Math.round(e.amount).toLocaleString()} (${e.settle==='orig'?'原幣':'台幣'})</small></div><div style="text-align:right"><b>約 ${money(e.amount*(RATE[e.cur]||1))}</b><br><button class="btn" data-d="${e.id}" style="padding:0 8px">刪</button></div></div>`).join(''):'<p class="mute">還沒有記帳，點「記一筆」開始吧 ✨</p>';
 $('el').querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>confirm('刪除這筆帳？')&&deleteDoc(doc(db,'projects',S.id,'expenses',b.dataset.d)))}
 
 $('mb').onclick=()=>{const m=modal('👥 旅伴成員',`<div id="ml"></div><input id="m1" placeholder="新增成員名字"><button class="btn gr" id="m2">＋ 加入</button>`);
@@ -422,34 +405,69 @@ q(m,'#m-cust').onclick=()=>{S.splitMode='custom';q(m,'#m-cust').style.background
 };
 
 $('st').onclick=()=>{
-const b=bal(), curSet=new Set();
-S.exp.forEach(e=>curSet.add(e.cur||'TWD'));
-const curArr=[...curSet];
-let resHtml='';
+// 分別計算「原幣別結算」與「台幣結算」
+const origGroups = {}; // { KRW: { person: netAmount }, JPY: { ... } }
+let twdSubB = {}; S.mem.forEach(n=>twdSubB[n]=0);
 
-curArr.forEach(cur=>{
-    const settleType = S.exp.find(e=>(e.cur||'TWD')===cur)?.settle || 'twd';
-    const subB={}; S.mem.forEach(n=>subB[n]=0);
-    S.exp.filter(e=>(e.cur||'TWD')===cur).forEach(e=>{
-        subB[e.payer]=(subB[e.payer]||0)+e.amount;
-        const sp=e.split&&Object.keys(e.split).length?e.split:{[e.payer]:e.amount};
-        Object.entries(sp).forEach(([n,v])=>{subB[n]=(subB[n]||0)-v});
-    });
-    const cr=[],de=[];
-    Object.entries(subB).forEach(([n,v])=>{if(v>0.1)cr.push([n,v]);else if(v<-1)de.push([n,-v])});
-    const tr=[];
-    while(cr.length&&de.length){
-        cr.sort((a,b)=>b[1]-a[1]);de.sort((a,b)=>b[1]-a[1]);
-        const x=Math.min(cr[0][1],de[0][1]);
-        tr.push(`${esc(de[0][0])} ➜ ${esc(cr[0][0])} ${cur} ${Math.round(x).toLocaleString()}`);
-        cr[0][1]-=x;de[0][1]-=x;if(cr[0][1]<0.1)cr.shift();if(de[0][1]<0.1)de.shift();
-    }
-    if(tr.length){
-        resHtml+=`<div style="margin-bottom:10px"><b style="color:var(--co)">📍 幣別：${cur} (${settleType==='orig'?'原幣別結算':'折合台幣'})</b>${tr.map(t=>`<div class="box" style="margin:4px 0;background:var(--aq)">${t}</div>`).join('')}</div>`;
+S.exp.forEach(e=>{
+    const cur = e.cur || 'TWD';
+    const settle = e.settle || 'twd';
+    const sp = e.split && Object.keys(e.split).length ? e.split : {[e.payer]: e.amount};
+    
+    if(settle === 'orig' && cur !== 'TWD'){
+        if(!origGroups[cur]) { origGroups[cur] = {}; S.mem.forEach(n=>origGroups[cur][n]=0); }
+        origGroups[cur][e.payer] = (origGroups[cur][e.payer] || 0) + e.amount;
+        Object.entries(sp).forEach(([n, shareAmt])=>{
+            origGroups[cur][n] = (origGroups[cur][n] || 0) - shareAmt;
+        });
+    } else {
+        const amtTwd = e.amount * (RATE[cur] || 1);
+        twdSubB[e.payer] = (twdSubB[e.payer] || 0) + amtTwd;
+        const totalSplit = Object.values(sp).reduce((a,v)=>a+v,0) || e.amount;
+        Object.entries(sp).forEach(([n, shareAmt])=>{
+            const shareTwd = amtTwd * (shareAmt / totalSplit);
+            twdSubB[n] = (twdSubB[n] || 0) - shareTwd;
+        });
     }
 });
 
-modal('📊 結算明細',resHtml||'<p class="mute">目前不需要轉帳 🎉</p>');
+let resHtml = '';
+
+// 1. 處理原幣別群組結算
+Object.entries(origGroups).forEach(([cur, subB])=>{
+    const cr=[], de=[];
+    Object.entries(subB).forEach(([n,v])=>{if(v>0.1)cr.push([n,v]);else if(v<-0.1)de.push([n,-v])});
+    const tr=[];
+    while(cr.length&&de.length){
+        cr.sort((a,b)=>b[1]-a[1]); de.sort((a,b)=>b[1]-a[1]);
+        const x = Math.min(cr[0][1], de[0][1]);
+        tr.push(`${esc(de[0][0])} ➜ ${esc(cr[0][0])} ${cur} ${Math.round(x).toLocaleString()}`);
+        cr[0][1]-=x; de[0][1]-=x;
+        if(cr[0][1]<0.1) cr.shift(); if(de[0][1]<0.1) de.shift();
+    }
+    if(tr.length){
+        resHtml += `<div style="margin-bottom:12px"><b style="color:var(--co)">📍 原幣別結算：${cur}</b>${tr.map(t=>`<div class="box" style="margin:4px 0;background:var(--aq)">${t}</div>`).join('')}</div>`;
+    }
+});
+
+// 2. 處理台幣群組結算
+{
+    const cr=[], de=[];
+    Object.entries(twdSubB).forEach(([n,v])=>{if(v>1)cr.push([n,v]);else if(v<-1)de.push([n,-v])});
+    const tr=[];
+    while(cr.length&&de.length){
+        cr.sort((a,b)=>b[1]-a[1]); de.sort((a,b)=>b[1]-a[1]);
+        const x = Math.min(cr[0][1], de[0][1]);
+        tr.push(`${esc(de[0][0])} ➜ ${esc(cr[0][0])} ${money(x)}`);
+        cr[0][1]-=x; de[0][1]-=x;
+        if(cr[0][1]<1) cr.shift(); if(de[0][1]<1) de.shift();
+    }
+    if(tr.length){
+        resHtml += `<div style="margin-bottom:12px"><b style="color:var(--co)">📍 台幣結算 (TWD)</b>${tr.map(t=>`<div class="box" style="margin:4px 0;background:var(--aq)">${t}</div>`).join('')}</div>`;
+    }
+}
+
+modal('📊 結算明細', resHtml || '<p class="mute">目前不需要轉帳 🎉</p>');
 };
 
 /* ---------- 闖關與打卡 ---------- */
