@@ -565,7 +565,7 @@
                     hotel: [
                         { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
+                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷物を預かっていただけますか？" },
                         { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
                     ],
                     emergency: [
@@ -675,7 +675,51 @@
             }
         };
 
-        // 🌟 優先在頂層完整宣告所有核心函式與 window 掛載
+        // 🌟 優先宣告所有資料與專案管理函式
+        async function getMyProjectIds() {
+            let localList = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
+            if (!currentMyName) return localList;
+            try {
+                const docRef = doc(db, "user_profiles", currentMyName);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists() && docSnap.data().projects) {
+                    let cloudList = docSnap.data().projects;
+                    let merged = Array.from(new Set([...localList, ...cloudList]));
+                    return merged;
+                }
+            } catch (e) {
+                console.warn("雲端讀取失敗，使用本機快取", e);
+            }
+            return localList;
+        }
+        window.getMyProjectIds = getMyProjectIds;
+
+        async function saveMyProjectId(id) {
+            let list = await getMyProjectIds();
+            if (!list.includes(id)) {
+                list.unshift(id);
+                localStorage.setItem('my_subscribed_projects', JSON.stringify(list));
+                if (currentMyName) {
+                    try {
+                        await setDoc(doc(db, "user_profiles", currentMyName), { projects: list }, { merge: true });
+                    } catch (e) {}
+                }
+            }
+        }
+        window.saveMyProjectId = saveMyProjectId;
+
+        async function removeMyProjectId(id) {
+            let list = await getMyProjectIds();
+            list = list.filter(item => item !== id);
+            localStorage.setItem('my_subscribed_projects', JSON.stringify(list));
+            if (currentMyName) {
+                try {
+                    await setDoc(doc(db, "user_profiles", currentMyName), { projects: list }, { merge: true });
+                } catch (e) {}
+            }
+        }
+        window.removeMyProjectId = removeMyProjectId;
+
         async function renderProjects() {
             const list = document.getElementById('project-list');
             try {
@@ -718,7 +762,8 @@
         }
         window.renderProjects = renderProjects;
 
-        function backToProjects() {
+        // 🌟 完整掛載所有導覽、Modal 與業務邏輯函式至 window
+        window.backToProjects = function() {
             currentProjectId = null;
             currentProjectName = "";
             currentProjectPin = "";
@@ -734,17 +779,15 @@
             document.getElementById('header-title').innerText = "🧳 我的旅遊專案清單";
             document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
             renderProjects();
-        }
-        window.backToProjects = backToProjects;
+        };
 
-        function shareCurrentProject() {
+        window.shareCurrentProject = function() {
             if (!currentProjectId) return;
             document.getElementById('share-modal-pin').innerText = currentProjectPin || '未設定';
             document.getElementById('share-choice-modal').classList.remove('hidden');
-        }
-        window.shareCurrentProject = shareCurrentProject;
+        };
 
-        async function enterProject(id) {
+        window.enterProject = async function(id) {
             currentProjectId = id;
             try {
                 const docSnap = await getDoc(doc(db, "projects", id));
@@ -760,11 +803,10 @@
                 return;
             }
 
-            proceedEnterProject();
-        }
-        window.enterProject = enterProject;
+            window.proceedEnterProject();
+        };
 
-        function proceedEnterProject() {
+        window.proceedEnterProject = function() {
             document.getElementById('view-projects').classList.add('hidden');
             document.getElementById('view-workspace').classList.remove('hidden');
             document.getElementById('bottom-nav').classList.remove('hidden');
@@ -774,17 +816,16 @@
             document.getElementById('header-title').innerText = `🌸 ${currentProjectName}`;
             document.getElementById('header-sub').innerText = `旅伴：${currentMyName} ✨`;
             
-            renderRemindersByRules(currentProjectName);
-            initLanguageModule(currentProjectName);
-            loadMembersAndExpenses(currentProjectId);
-            loadCheckins(currentProjectId);
+            window.renderRemindersByRules(currentProjectName);
+            window.initLanguageModule(currentProjectName);
+            window.loadMembersAndExpenses(currentProjectId);
+            window.loadCheckins(currentProjectId);
             
             switchTab('schedule');
-            loadSchedules(currentProjectId);
-        }
-        window.proceedEnterProject = proceedEnterProject;
+            window.loadSchedules(currentProjectId);
+        };
 
-        function renderRemindersByRules(projectName) {
+        window.renderRemindersByRules = function(projectName) {
             const container = document.getElementById('dynamic-reminders-container');
             let nameLower = projectName.toLowerCase();
             let html = '';
@@ -881,10 +922,9 @@
             }
 
             container.innerHTML = html;
-        }
-        window.renderRemindersByRules = renderRemindersByRules;
+        };
 
-        function initLanguageModule(projectName) {
+        window.initLanguageModule = function(projectName) {
             let nameLower = projectName.toLowerCase();
             let destKey = 'general';
             if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) destKey = 'korea';
@@ -908,15 +948,14 @@
                         b.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-white text-gray-700 border-[#eae1d7] hover:bg-[#fffaf5]";
                     });
                     btn.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-[#d98262] text-white border-[#d98262] shadow-sm";
-                    renderPhrases(currentLangPack.phrases[cat.id]);
+                    window.renderPhrases(currentLangPack.phrases[cat.id]);
                 };
                 catContainer.appendChild(btn);
             });
-            renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
-        }
-        window.initLanguageModule = initLanguageModule;
+            window.renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
+        };
 
-        function renderPhrases(phrases) {
+        window.renderPhrases = function(phrases) {
             const phraseContainer = document.getElementById('lang-phrases');
             if (!phraseContainer) return;
             phraseContainer.innerHTML = '';
@@ -931,10 +970,9 @@
                 };
                 phraseContainer.appendChild(card);
             });
-        }
-        window.renderPhrases = renderPhrases;
+        };
 
-        function loadMembersAndExpenses(projId) {
+        window.loadMembersAndExpenses = function(projId) {
             const membersRef = collection(db, "projects", projId, "members");
             if (unsubscribeMembers) unsubscribeMembers();
             unsubscribeMembers = onSnapshot(membersRef, (snapshot) => {
@@ -955,10 +993,9 @@
                 });
                 renderExpenseUI();
             });
-        }
-        window.loadMembersAndExpenses = loadMembersAndExpenses;
+        };
 
-        function loadCheckins(projId) {
+        window.loadCheckins = function(projId) {
             const checkinsRef = collection(db, "projects", projId, "checkins");
             if (unsubscribeCheckins) unsubscribeCheckins();
             unsubscribeCheckins = onSnapshot(checkinsRef, (snapshot) => {
@@ -971,10 +1008,9 @@
                 });
                 renderQuestUI();
             });
-        }
-        window.loadCheckins = loadCheckins;
+        };
 
-        function loadSchedules(projId) {
+        window.loadSchedules = function(projId) {
             const schedulesRef = collection(db, "projects", projId, "schedules");
             const q = query(schedulesRef, orderBy("createdAt", "asc"));
             if (unsubscribeSchedules) unsubscribeSchedules();
@@ -985,16 +1021,14 @@
                 renderScheduleUI();
                 renderQuestUI();
             });
-        }
-        window.loadSchedules = loadSchedules;
+        };
 
-        function cleanDisplayTitle(title) {
+        window.cleanDisplayTitle = function(title) {
             if (!title) return '';
             return title.replace(/^\d{1,2}[:：]\d{2}\s*/, '').trim();
-        }
-        window.cleanDisplayTitle = cleanDisplayTitle;
+        };
 
-        function renderMemberListUI() {
+        window.renderMemberListUI = function() {
             const container = document.getElementById('member-list-display');
             if (!container) return;
             container.innerHTML = '';
@@ -1007,10 +1041,9 @@
                 `;
                 container.appendChild(div);
             });
-        }
-        window.renderMemberListUI = renderMemberListUI;
+        };
 
-        function renderExpenseUI() {
+        window.renderExpenseUI = function() {
             const container = document.getElementById('expense-list-container');
             const totalEl = document.getElementById('total-expense-twd');
             const breakdownEl = document.getElementById('currency-breakdown');
@@ -1060,10 +1093,9 @@
                 });
                 breakdownEl.innerHTML = bdHtml;
             }
-        }
-        window.renderExpenseUI = renderExpenseUI;
+        };
 
-        function renderQuestUI() {
+        window.renderQuestUI = function() {
             const container = document.getElementById('quest-list-container');
             const countEl = document.getElementById('quest-total-count');
             const percentEl = document.getElementById('quest-percent');
@@ -1158,8 +1190,7 @@
                 dayBox.innerHTML = headerHtml + listHtml;
                 container.appendChild(dayBox);
             });
-        }
-        window.renderQuestUI = renderQuestUI;
+        };
 
         window.renderDayPills = function() {
             const pillsContainer = document.getElementById('day-pills-container');
