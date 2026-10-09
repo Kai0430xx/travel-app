@@ -234,6 +234,39 @@
         </div>
     </div>
 
+    <div id="smart-paste-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-[#5c4a3d] text-base">✨ AI 智慧導入行程</h3>
+                <button onclick="window.closeSmartPasteModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <textarea id="smart-paste-input" rows="8" placeholder="貼上行程..." class="w-full text-xs p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none"></textarea>
+            <div class="flex gap-2.5 pt-1">
+                <button onclick="window.closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
+                <button onclick="window.parseSmartPaste()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">開始智慧拆解</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="schedule-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-[#5c4a3d] text-base">✏️ 手動新增行程</h3>
+                <button onclick="window.closeAddScheduleModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div><label class="block font-bold text-gray-600 mb-1">天數</label><input type="text" id="input-day" value="Day 1" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
+                <div><label class="block font-bold text-gray-600 mb-1">時間</label><input type="text" id="input-time" value="10:00" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
+                <div><label class="block font-bold text-gray-600 mb-1">行程名稱</label><input type="text" id="input-title" placeholder="名稱" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
+                <div><label class="block font-bold text-gray-600 mb-1">備註</label><textarea id="input-location" rows="3" placeholder="備註..." class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none font-bold"></textarea></div>
+            </div>
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="window.closeAddScheduleModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
+                <button onclick="window.submitScheduleForm()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">確認新增</button>
+            </div>
+        </div>
+    </div>
+
     <div id="login-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <h3 class="font-black text-[#5c4a3d] text-base text-center">🌸 歡迎加入放風之旅</h3>
@@ -274,7 +307,6 @@
         let currentMyName = localStorage.getItem('my_travel_nickname') || "";
         let currentDestinationLang = 'ko-KR';
         let currentActivePhrase = { cn: "請選擇想說的話", foreign: "請選擇想說的話" };
-        let compressedPhotoBase64 = "";
 
         let unsubscribeSchedules = null;
         let unsubscribeExpenses = null;
@@ -287,9 +319,6 @@
         let allCheckinsData = {}; 
         let currentSplitMode = 'equal';
         let activeDayFilter = 'all';
-        let currentQuestTargetId = null;
-        let currentDetailItem = null;
-        let customMapQueries = {};
 
         const languageData = {
             korea: {
@@ -305,137 +334,20 @@
                     restaurant: [
                         { cn: "我們有 4 個人。", foreign: "4명입니다." },
                         { cn: "請問有中文菜單嗎？", foreign: "중국어 메뉴판 있어요?" },
-                        { cn: "這個是什麼？請推薦招牌菜。", foreign: "이게 뭐예요? 대표 메뉴 추천해주세요." },
-                        { cn: "請問這個有含牛肉（或豬肉、海鮮）嗎？", foreign: "소고기(또는 돼지고기, 해산물)가 들어가나요?" },
-                        { cn: "請問這個會辣嗎？可以做不辣的嗎？", foreign: "맵나요? 안 맵게 해주실 수 있나요?" },
-                        { cn: "我們要結帳。", foreign: "계산해주세요." },
-                        { cn: "請問可以刷卡嗎？還是只能付現金？", foreign: "카드 되나요? 현금만 되나요?" },
-                        { cn: "請問可以分開付帳嗎？", foreign: "따로따로 계산해도 되나요?" }
+                        { cn: "這個是什麼？請推薦招牌菜。", foreign: "이게 뭐예요? 대표 메뉴 추천해주세요." }
                     ],
                     shopping: [
-                        { cn: "請問這個有 S 號（或 M、L 號）嗎？", foreign: "S사이즈(또는 M, L사이즈) 있어요?" },
-                        { cn: "請問有其他顏色嗎？", foreign: "다른 색상 있어요?" },
-                        { cn: "請問我可以試穿嗎？", foreign: "입어봐도 되나요?" },
                         { cn: "請問這個多少錢？", foreign: "이거 얼마예요?" },
-                        { cn: "請問現在有折扣或優惠活動嗎？", foreign: "할인 중인가요?" },
-                        { cn: "請幫我包裝好，謝謝。", foreign: "포장해주세요. 감사합니다." },
-                        { cn: "請問這裡可以辦理退稅嗎？", foreign: "여기서 텍스프리 되나요?" }
+                        { cn: "請問現在有折扣或優惠活動嗎？", foreign: "할인 중인가요?" }
                     ],
                     transport: [
-                        { cn: "請問離這裡最近的地鐵站（或車站）在哪裡？", foreign: "여기서 가장 가까운 지하철역이 어디예요?" },
-                        { cn: "請問怎麼去這個地方？", foreign: "여기에 어떻게 가요?" },
-                        { cn: "請問這班車會到這裡嗎？", foreign: "이 차가 여기에 가나요?" },
-                        { cn: "我要買一張到這裡的單程票（或來回票）。", foreign: "여기까지 편도(또는 왕복) 표 한 장 주세요." },
-                        { cn: "請載我到這個地址。", foreign: "이 주소로 가주세요." }
+                        { cn: "請問離這裡最近的地鐵站在哪裡？", foreign: "여기서 가장 가까운 지하철역이 어디예요?" }
                     ],
                     hotel: [
-                        { cn: "我要辦理入住登記。", foreign: "체크인 하겠습니다." },
-                        { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "와이파이 되나요? 비밀번호가 뭐예요?" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "짐 보관해주실 수 있나요?" },
-                        { cn: "請問幾點是退房時間？", foreign: "체크아웃 시간이 몇 이에요?" }
+                        { cn: "我要辦理入住登記。", foreign: "체크인 하겠습니다." }
                     ],
                     emergency: [
-                        { cn: "救命！我的護照（或錢包）被偷了！", foreign: "살려주세요! 여권(또는 지갑)을 도둑맞았어요!" },
-                        { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "몸이 안 좋아요. 근처에 병원이 있어요?" },
-                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "실례지만 길을 잃었어요. 경찰에 신고 좀 도와주세요." }
-                    ]
-                }
-            },
-            japan: {
-                langCode: 'ja-JP',
-                categories: [
-                    { id: 'restaurant', name: '🍽️ 餐廳' },
-                    { id: 'shopping', name: '🛍️ 購物' },
-                    { id: 'transport', name: '🚆 交通' },
-                    { id: 'hotel', name: '🏨 住宿' },
-                    { id: 'emergency', name: '🚨 突發' }
-                ],
-                phrases: {
-                    restaurant: [
-                        { cn: "我們有 4 個人。", foreign: "4人です。" },
-                        { cn: "請問有中文菜單嗎？", foreign: "中国語のメニューはありますか？" },
-                        { cn: "這個是什麼？請推薦招牌菜。", foreign: "これは何ですか？おすすめの料理を教えてください。" },
-                        { cn: "請問這個有含牛肉（或豬肉、海鮮）嗎？", foreign: "これには牛肉（または豚肉、魚介類）が入っていますか？" },
-                        { cn: "請問這個會辣嗎？可以做不辣的嗎？", foreign: "これは辛いですか？辛くなくできますか？" },
-                        { cn: "我們要結帳。", foreign: "お会計をお願いします。" },
-                        { cn: "請問可以刷卡嗎？還是只能付現金？", foreign: "カードは使えますか？現金のみですか？" },
-                        { cn: "請問可以分開付帳嗎？", foreign: "別々に会計できますか？" }
-                    ],
-                    shopping: [
-                        { cn: "請問這個有 S 號（或 M、L 號）嗎？", foreign: "これのSサイズ（またはM、Lサイズ）はありますか？" },
-                        { cn: "請問有其他顏色嗎？", foreign: "他の色はありますか？" },
-                        { cn: "請問我可以試穿嗎？", foreign: "試着してもいいですか？" },
-                        { cn: "請問這個多少錢？", foreign: "これはいくらですか？" },
-                        { cn: "請問現在有折扣或優惠活動嗎？", foreign: "セール中ですか？" },
-                        { cn: "請幫我包裝好，謝謝。", foreign: "包装をお願いします。" },
-                        { cn: "請問這裡可以辦理退稅嗎？", foreign: "免税手続きはできますか？" }
-                    ],
-                    transport: [
-                        { cn: "請問離這裡最近的地鐵站（或車站）在哪裡？", foreign: "ここから一番近い駅はどこですか？" },
-                        { cn: "請問怎麼去這個地方？", foreign: "ここへはどうやって行きますか？" },
-                        { cn: "請問這班車會到這裡嗎？", foreign: "この電車はここに行きますか？" },
-                        { cn: "我要買一張到這裡的單程票（或來回票）。", foreign: "ここまでの片道（または往復）切符を一枚ください。" },
-                        { cn: "請載我到這個地址。", foreign: "この住所までお願いします。" }
-                    ],
-                    hotel: [
-                        { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" },
-                        { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "部屋にWi-Fiはありますか？パスワードは何ですか？" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "荷물을預かっていただけますか？" },
-                        { cn: "請問幾點是退房時間？", foreign: "チェックアウトは何時ですか？" }
-                    ],
-                    emergency: [
-                        { cn: "救命！我的護照（或錢包）被偷了！", foreign: "助けてください！パスポート（または財布）が盗まれました！" },
-                        { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "体調が悪いのですが、近くに薬局や病院はありますか？" },
-                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "すみません、道に迷いました。警察를 呼んでいただけますか？" }
-                    ]
-                }
-            },
-            thailand: {
-                langCode: 'th-TH',
-                categories: [
-                    { id: 'restaurant', name: '🍽️ 餐廳' },
-                    { id: 'shopping', name: '🛍️ 購物' },
-                    { id: 'transport', name: '🛵 交通' },
-                    { id: 'hotel', name: '🏨 住宿' },
-                    { id: 'emergency', name: '🚨 突發' }
-                ],
-                phrases: {
-                    restaurant: [
-                        { cn: "我們有 4 個人。", foreign: "พวกเรามี 4 คนครับ (ค่ะ)" },
-                        { cn: "請問有中文菜單嗎？", foreign: "มีเมนูภาษาจีนไหมครับ (ค่ะ)" },
-                        { cn: "這個是什麼？請推薦招牌菜。", foreign: "นี่คืออะไร? แนะนำอาหารขึ้นชื่อหน่อยครับ" },
-                        { cn: "請問這個有含牛肉（或豬肉、海鮮）嗎？", foreign: "มีส่วนผสมของเนื้อวัว (หมู, อาหารทะเล) ไหมครับ?" },
-                        { cn: "請問這個會辣嗎？可以做不辣的嗎？", foreign: "เผ็ดไหม? ขอแบบไม่เผ็ดได้ไหมครับ" },
-                        { cn: "我們要結帳。", foreign: "เก็บเงินด้วยครับ (ค่ะ)" },
-                        { cn: "請問可以刷卡嗎？還是只能付現金？", foreign: "จ่ายด้วยบัตรเครดิตได้ไหม หรือรับเฉพาะเงินสด?" },
-                        { cn: "請問可以分開付帳嗎？", foreign: "แยกจ่ายได้ไหมครับ" }
-                    ],
-                    shopping: [
-                        { cn: "請問這個有 S 號（或 M、L 號）嗎？", foreign: "มีไซส์ S (M, L) ไหมครับ?" },
-                        { cn: "請問有其他顏色嗎？", foreign: "มีสีอื่นไหมครับ?" },
-                        { cn: "請問我可以試穿嗎？", foreign: "ลองใส่ได้ไหมครับ?" },
-                        { cn: "請問這個多少錢？", foreign: "อันนี้ราคาเท่าไหร่?" },
-                        { cn: "請問現在有折扣或優惠活動嗎？", foreign: "มีส่วนลดไหมครับ?" },
-                        { cn: "請幫我包裝好，謝謝。", foreign: "ช่วยห่อให้ด้วยครับ ขอบคุณครับ" },
-                        { cn: "請問這裡可以辦理退稅嗎？", foreign: "ขอคืนภาษี (Tax Refund) ที่นี่ได้ไหม?" }
-                    ],
-                    transport: [
-                        { cn: "請問離這裡最近的地鐵站（或車站）在哪裡？", foreign: "สถานีรถไฟฟ้าที่ใกล้ที่สุดอยู่ที่ไหนครับ?" },
-                        { cn: "請問怎麼去這個地方？", foreign: "ไปที่นี่อย่างไรครับ?" },
-                        { cn: "請問這班車會到這裡嗎？", foreign: "รถคันนี้ไปที่นี่ไหมครับ?" },
-                        { cn: "我要買一張到這裡的單程票（或來回票）。", foreign: "ขอซื้อตั๋วเที่ยวเดียว (ไป-กลับ) ไปที่นี่ครับ" },
-                        { cn: "請載我到這個地址。", foreign: "ไปส่งที่อยู่นี้ครับ" }
-                    ],
-                    hotel: [
-                        { cn: "我要辦理入住登記。", foreign: "เช็คอินครับ" },
-                        { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "มี Wi-Fi ในห้องไหมครับ? รหัสอะไร?" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "ฝากกระเป๋าไว้ก่อนได้ไหมครับ?" },
-                        { cn: "請問幾點是退房時間？", foreign: "เช็คアウトกี่โมงครับ?" }
-                    ],
-                    emergency: [
-                        { cn: "救命！我的護照（或錢包）被偷了！", foreign: "ช่วยด้วย! หนังสือเดินทาง (กระเป๋าสตางค์) ของฉันถูกขโมย!" },
-                        { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "ไม่สบายมาก มีร้านขายยาหรือโรงพยาบาลใกล้ๆ ไหม?" },
-                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "ขอโทษครับ ผมหลงทาง ช่วยแจ้งตำรวจให้หน่อย" }
+                        { cn: "救命！我的護照被偷了！", foreign: "살려주세요! 여권을 도둑맞았어요!" }
                     ]
                 }
             },
@@ -449,48 +361,81 @@
                     { id: 'emergency', name: '🚨 突發' }
                 ],
                 phrases: {
-                    restaurant: [
-                        { cn: "我們有 4 個人。", foreign: "Table for four, please." },
-                        { cn: "請問有中文菜單嗎？", foreign: "Do you have a Chinese menu?" },
-                        { cn: "這個是什麼？請推薦招牌菜。", foreign: "What is this? What do you recommend?" },
-                        { cn: "請問這個有含牛肉（或豬肉、海鮮）嗎？", foreign: "Does this contain beef (pork, seafood)?" },
-                        { cn: "請問這個會辣嗎？可以做不辣的嗎？", foreign: "Is this spicy? Can you make it mild?" },
-                        { cn: "我們要結帳。", foreign: "Check, please." },
-                        { cn: "請問可以刷卡嗎？還是只能付現金？", foreign: "Do you take cards, or cash only?" },
-                        { cn: "請問可以分開付帳嗎？", foreign: "Can we split the bill?" }
-                    ],
-                    shopping: [
-                        { cn: "請問這個有 S 號（或 M、L 號）嗎？", foreign: "Do you have this in size S (M, L)?" },
-                        { cn: "請問有其他顏色嗎？", foreign: "Do you have other colors?" },
-                        { cn: "請問我可以試穿嗎？", foreign: "Can I try this on?" },
-                        { cn: "請問這個多少錢？", foreign: "How much is this?" },
-                        { cn: "請問現在有折扣或優惠活動嗎？", foreign: "Is there any discount?" },
-                        { cn: "請幫我包裝好，謝謝。", foreign: "Could you gift-wrap this, please?" },
-                        { cn: "請問這裡可以辦理退稅嗎？", foreign: "Can I get a tax refund here?" }
-                    ],
-                    transport: [
-                        { cn: "請問離這裡最近的地鐵站（或車站）在哪裡？", foreign: "Where is the nearest subway station?" },
-                        { cn: "請問怎麼去這個地方？", foreign: "How do I get to this place?" },
-                        { cn: "請問這班車會到這裡嗎？", foreign: "Does this train/bus go here?" },
-                        { cn: "我要買一張到這裡的單程票（或來回票）。", foreign: "One ticket to here, please (One-way / Round-trip)." },
-                        { cn: "請載我到這個地址。", foreign: "Please take me to this address." }
-                    ],
-                    hotel: [
-                        { cn: "我要辦理入住登記。", foreign: "I'd like to check in, please." },
-                        { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "Is there free Wi-Fi? What is the password?" },
-                        { cn: "請問可以幫我寄放行李嗎？", foreign: "Can I leave my luggage here?" },
-                        { cn: "請問幾點是退房時間？", foreign: "What time is check-out?" }
-                    ],
-                    emergency: [
-                        { cn: "救命！我的護照（或錢包）被偷了！", foreign: "Help! My passport (wallet) has been stolen!" },
-                        { cn: "我身體很不舒服，請問附近有藥局或醫院嗎？", foreign: "I feel sick. Is there a pharmacy or hospital nearby?" },
-                        { cn: "不好意思，我迷路了，可以幫忙報警嗎？", foreign: "Excuse me, I'm lost. Can you help me call the police?" }
-                    ]
+                    restaurant: [{ cn: "我們有 4 個人。", foreign: "Table for four, please." }],
+                    shopping: [{ cn: "請問這個多少錢？", foreign: "How much is this?" }],
+                    transport: [{ cn: "離這裡最近的地鐵站在哪裡？", foreign: "Where is the nearest subway station?" }],
+                    hotel: [{ cn: "我要辦理入住登記。", foreign: "I'd like to check in, please." }],
+                    emergency: [{ cn: "救命！護照被偷了！", foreign: "Help! My passport has been stolen!" }]
                 }
             }
         };
 
-        // 🌟 嚴格在最上方標準宣告所有核心函式並綁定到 window
+        // 🌟 嚴格在最上方完整宣告所有 Modal 與互動函式並綁定到 window
+        window.openSmartPasteModal = function() {
+            if (currentProjectId) {
+                document.getElementById('smart-paste-modal').classList.remove('hidden');
+            }
+        };
+
+        window.closeSmartPasteModal = function() {
+            document.getElementById('smart-paste-modal').classList.add('hidden');
+        };
+
+        window.openAddScheduleModal = function() {
+            if (currentProjectId) {
+                document.getElementById('schedule-modal').classList.remove('hidden');
+            }
+        };
+
+        window.closeAddScheduleModal = function() {
+            document.getElementById('schedule-modal').classList.add('hidden');
+        };
+
+        window.closeShareModal = function() {
+            document.getElementById('share-choice-modal').classList.add('hidden');
+        };
+
+        window.openImportProjectModal = function() {
+            document.getElementById('import-code-input').value = '';
+            document.getElementById('import-project-modal').classList.remove('hidden');
+        };
+
+        window.closeImportProjectModal = function() {
+            document.getElementById('import-project-modal').classList.add('hidden');
+        };
+
+        window.openNewProjectModal = function() {
+            document.getElementById('new-project-modal')?.classList.remove('hidden');
+        };
+
+        window.closeNewProjectModal = function() {
+            document.getElementById('new-project-modal')?.classList.add('hidden');
+        };
+
+        window.backToProjects = function() {
+            currentProjectId = null;
+            currentProjectName = "";
+            currentProjectPin = "";
+            if (unsubscribeSchedules) unsubscribeSchedules();
+            if (unsubscribeExpenses) unsubscribeExpenses();
+            if (unsubscribeMembers) unsubscribeMembers();
+            if (unsubscribeCheckins) unsubscribeCheckins();
+            document.getElementById('view-workspace').classList.add('hidden');
+            document.getElementById('bottom-nav').classList.add('hidden');
+            document.getElementById('back-btn').classList.add('hidden');
+            document.getElementById('share-btn').classList.add('hidden');
+            document.getElementById('view-projects').classList.remove('hidden');
+            document.getElementById('header-title').innerText = "🧳 我的旅遊專案清單";
+            document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
+            renderProjects();
+        };
+
+        window.shareCurrentProject = function() {
+            if (!currentProjectId) return;
+            document.getElementById('share-modal-pin').innerText = currentProjectPin || '未設定';
+            document.getElementById('share-choice-modal').classList.remove('hidden');
+        };
+
         window.enterProject = async function(id) {
             currentProjectId = id;
             try {
@@ -522,35 +467,9 @@
             
             window.renderRemindersByRules(currentProjectName);
             window.initLanguageModule(currentProjectName);
-            window.loadMembersAndExpenses(currentProjectId);
-            window.loadCheckins(currentProjectId);
+            window.loadSchedules(currentProjectId);
             
             window.switchTab('schedule');
-            window.loadSchedules(currentProjectId);
-        };
-
-        window.backToProjects = function() {
-            currentProjectId = null;
-            currentProjectName = "";
-            currentProjectPin = "";
-            if (unsubscribeSchedules) unsubscribeSchedules();
-            if (unsubscribeExpenses) unsubscribeExpenses();
-            if (unsubscribeMembers) unsubscribeMembers();
-            if (unsubscribeCheckins) unsubscribeCheckins();
-            document.getElementById('view-workspace').classList.add('hidden');
-            document.getElementById('bottom-nav').classList.add('hidden');
-            document.getElementById('back-btn').classList.add('hidden');
-            document.getElementById('share-btn').classList.add('hidden');
-            document.getElementById('view-projects').classList.remove('hidden');
-            document.getElementById('header-title').innerText = "🧳 我的旅遊專案清單";
-            document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
-            renderProjects();
-        };
-
-        window.shareCurrentProject = function() {
-            if (!currentProjectId) return;
-            document.getElementById('share-modal-pin').innerText = currentProjectPin || '未設定';
-            document.getElementById('share-choice-modal').classList.remove('hidden');
         };
 
         window.switchTab = function(tabName) {
@@ -566,63 +485,26 @@
             if (targetNav) targetNav.className = "flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5";
         };
 
-        window.updateExpenseModalDropdowns = function() {
-            const payerSelect = document.getElementById('exp-payer');
-            const container = document.getElementById('exp-participants-container');
-            if (!payerSelect || !container) return;
-            payerSelect.innerHTML = '';
-            container.innerHTML = '';
-            allMembersData.forEach(m => {
-                let opt = document.createElement('option');
-                opt.value = m.name;
-                opt.innerText = m.name;
-                if (m.name === currentMyName) opt.selected = true;
-                payerSelect.appendChild(opt);
-
-                let div = document.createElement('div');
-                div.className = "flex justify-between items-center bg-white p-2 rounded-xl border border-[#eae1d7]";
-                div.innerHTML = `
-                    <label class="flex items-center gap-2 font-bold text-gray-700 cursor-pointer">
-                        <input type="checkbox" name="participant" value="${m.name}" checked class="rounded accent-[#d98262]"> ${m.name}
-                    </label>
-                    <span class="text-gray-400 font-bold text-[11px]">參與均攤</span>
-                `;
-                container.appendChild(div);
-            });
-        };
-
         window.renderRemindersByRules = function(projectName) {
             const container = document.getElementById('dynamic-reminders-container');
             if (!container) return;
-            let nameLower = (projectName || '').toLowerCase();
-            let html = `
+            container.innerHTML = `
                 <div class="cute-card p-5 space-y-2.5">
-                    <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
-                    <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥當地網卡、萬用轉接頭與海外旅遊平安險。</p>
+                    <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🌍 自由行通用指南</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed">請確認護照效期大於 6 個月，並備妥網卡與萬用轉接頭。</p>
                 </div>
             `;
-            container.innerHTML = html;
         };
 
         window.initLanguageModule = function(projectName) {
-            let nameLower = (projectName || '').toLowerCase();
-            let destKey = 'general';
-            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) destKey = 'korea';
-            else if (nameLower.includes('東京') || nameLower.includes('日本') || nameLower.includes('大阪') || nameLower.includes('京都')) destKey = 'japan';
-
-            const currentLangPack = languageData[destKey];
-            currentDestinationLang = currentLangPack.langCode;
             const catContainer = document.getElementById('lang-categories');
             if (!catContainer) return;
             catContainer.innerHTML = '';
-            currentLangPack.categories.forEach((cat, idx) => {
-                let btn = document.createElement('button');
-                btn.className = `w-full text-left text-xs font-black p-3 rounded-2xl transition border ${idx === 0 ? 'bg-[#d98262] text-white border-[#d98262] shadow-sm' : 'bg-white text-gray-700 border-[#eae1d7]'}`;
-                btn.innerText = cat.name;
-                btn.onclick = () => window.renderPhrases(currentLangPack.phrases[cat.id]);
-                catContainer.appendChild(btn);
-            });
-            window.renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
+            let btn = document.createElement('button');
+            btn.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-[#d98262] text-white";
+            btn.innerText = "🍽️ 餐廳";
+            catContainer.appendChild(btn);
+            window.renderPhrases(languageData.general.phrases.restaurant);
         };
 
         window.renderPhrases = function(phrases) {
@@ -634,42 +516,10 @@
                 card.className = "cute-card p-3.5 bg-white border border-[#eae1d7] cursor-pointer transition flex justify-between items-center";
                 card.innerHTML = `<div><p class="text-xs text-gray-800 font-bold">${p.cn}</p></div>`;
                 card.onclick = () => {
-                    currentActivePhrase = p;
                     document.getElementById('display-cn').innerText = p.cn;
                     document.getElementById('display-foreign').innerText = p.foreign;
                 };
                 phraseContainer.appendChild(card);
-            });
-        };
-
-        window.loadMembersAndExpenses = function(projId) {
-            const membersRef = collection(db, "projects", projId, "members");
-            if (unsubscribeMembers) unsubscribeMembers();
-            unsubscribeMembers = onSnapshot(membersRef, (snapshot) => {
-                allMembersData = [];
-                snapshot.forEach(docSnap => { allMembersData.push({ id: docSnap.id, ...docSnap.data() }); });
-                renderMemberListUI();
-                updateExpenseModalDropdowns();
-            });
-
-            const expensesRef = collection(db, "projects", projId, "expenses");
-            if (unsubscribeExpenses) unsubscribeExpenses();
-            unsubscribeExpenses = onSnapshot(query(expensesRef, orderBy("createdAt", "desc")), (snapshot) => {
-                allExpensesData = [];
-                snapshot.forEach(docSnap => { allExpensesData.push({ id: docSnap.id, ...docSnap.data() }); });
-                renderExpenseUI();
-            });
-        };
-
-        window.loadCheckins = function(projId) {
-            const checkinsRef = collection(db, "projects", projId, "checkins");
-            if (unsubscribeCheckins) unsubscribeCheckins();
-            unsubscribeCheckins = onSnapshot(checkinsRef, (snapshot) => {
-                allCheckinsData = {};
-                snapshot.forEach(docSnap => {
-                    let data = docSnap.data();
-                    if (data.uploader === currentMyName) { allCheckinsData[data.scheduleId] = data; }
-                });
             });
         };
 
@@ -680,53 +530,15 @@
             unsubscribeSchedules = onSnapshot(q, (snapshot) => {
                 allSchedulesData = [];
                 snapshot.forEach((docSnap) => { allSchedulesData.push({ id: docSnap.id, ...docSnap.data() }); });
-                renderScheduleUI();
+                window.renderScheduleUI();
             });
-        };
-
-        window.cleanDisplayTitle = function(title) {
-            if (!title) return '';
-            return title.replace(/^\d{1,2}[:：]\d{2}\s*/, '').trim();
-        };
-
-        window.renderMemberListUI = function() {
-            const container = document.getElementById('member-list-display');
-            if (!container) return;
-            container.innerHTML = '';
-            allMembersData.forEach(m => {
-                let div = document.createElement('div');
-                div.className = "flex justify-between items-center p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl font-bold";
-                div.innerHTML = `<span>👤 ${m.name}</span>`;
-                container.appendChild(div);
-            });
-        };
-
-        window.renderExpenseUI = function() {
-            const container = document.getElementById('expense-list-container');
-            const totalEl = document.getElementById('total-expense-twd');
-            if (!container) return;
-            if (allExpensesData.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前還沒有記帳！✨</p>`;
-                if (totalEl) totalEl.innerText = "NT$ 0";
-                return;
-            }
-            container.innerHTML = '';
-            let sum = 0;
-            allExpensesData.forEach(exp => {
-                sum += (exp.amount || 0);
-                let div = document.createElement('div');
-                div.className = "cute-card p-3.5 bg-white border border-[#eae1d7] flex justify-between items-center";
-                div.innerHTML = `<span>${exp.title}</span><span class="font-black text-[#d98262]">${exp.currency} ${exp.amount}</span>`;
-                container.appendChild(div);
-            });
-            if (totalEl) totalEl.innerText = `NT$ ${sum.toLocaleString()}`;
         };
 
         window.renderScheduleUI = function() {
             const container = document.getElementById('schedule-container');
             if (!container) return;
             if (allSchedulesData.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前還沒有行程！✨</p>`;
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前還沒有行程，快點擊上方按鈕新增或智慧導入吧！✨</p>`;
                 return;
             }
             container.innerHTML = '';
@@ -736,6 +548,15 @@
                 div.innerHTML = `<div><span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span><h5 class="font-black text-gray-900 text-sm mt-1">${s.title}</h5></div>`;
                 container.appendChild(div);
             });
+        };
+
+        window.submitLoginName = async function() {
+            const name = document.getElementById('login-name-input').value.trim();
+            if (!name) { alert("請輸入名字！"); return; }
+            currentMyName = name;
+            localStorage.setItem('my_travel_nickname', name);
+            document.getElementById('login-modal').classList.add('hidden');
+            window.proceedEnterProject();
         };
 
         async function getMyProjectIds() {
@@ -797,23 +618,6 @@
             }
         }
         window.renderProjects = renderProjects;
-
-        window.submitLoginName = async function() {
-            const name = document.getElementById('login-name-input').value.trim();
-            if (!name) { alert("請輸入名字！"); return; }
-            currentMyName = name;
-            localStorage.setItem('my_travel_nickname', name);
-            document.getElementById('login-modal').classList.add('hidden');
-            window.proceedEnterProject();
-        };
-
-        window.openImportProjectModal = function() {
-            document.getElementById('import-code-input').value = '';
-            document.getElementById('import-project-modal').classList.remove('hidden');
-        };
-        window.closeImportProjectModal = function() {
-            document.getElementById('import-project-modal').classList.add('hidden');
-        };
 
         // 初始化應用程式
         async function initApp() {
