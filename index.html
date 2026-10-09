@@ -293,6 +293,49 @@
         </div>
     </div>
 
+    <!-- 記帳與結算 Modal -->
+    <div id="expense-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-md p-6 space-y-3.5 shadow-2xl text-xs max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-[#5c4a3d] text-base">✍️ 新增記帳</h3>
+                <button onclick="window.closeAddExpenseModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <div><label class="block font-bold text-gray-600 mb-1">項目名稱</label><input type="text" id="exp-title" placeholder="晚餐" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
+            <div class="grid grid-cols-2 gap-2">
+                <div><label class="block font-bold text-gray-600 mb-1">金額</label><input type="number" id="exp-amount" placeholder="金額" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
+                <div>
+                    <label class="block font-bold text-gray-600 mb-1">幣別</label>
+                    <select id="exp-currency" onchange="window.toggleExchangeRate()" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold">
+                        <option value="TWD">TWD</option><option value="KRW" selected>KRW</option><option value="JPY">JPY</option><option value="THB">THB</option><option value="USD">USD</option>
+                    </select>
+                </div>
+            </div>
+            <div id="rate-box"><label class="block font-bold text-gray-600 mb-1">對台幣匯率</label><input type="number" id="exp-rate" value="0.024" step="0.0001" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
+            <div><label class="block font-bold text-gray-600 mb-1">誰付錢？</label><select id="exp-payer" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></select></div>
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="window.closeAddExpenseModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
+                <button onclick="window.submitExpense()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成員與結算 Modal -->
+    <div id="member-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
+            <div class="flex justify-between items-center"><h3 class="font-black text-[#5c4a3d] text-base">👥 成員管理</h3><button onclick="window.closeAddMemberModal()" class="text-gray-400 font-black">✕</button></div>
+            <div class="flex gap-2"><input type="text" id="new-member-name" placeholder="名字" class="flex-1 p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"><button onclick="window.addMember()" class="bg-[#d98262] text-white px-4 py-3 rounded-2xl font-black">新增</button></div>
+            <div id="member-list-display" class="space-y-2 max-h-48 overflow-y-auto"></div>
+            <button onclick="window.closeAddMemberModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">完成</button>
+        </div>
+    </div>
+
+    <div id="settlement-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs">
+            <div id="settlement-content" class="space-y-3 max-h-72 overflow-y-auto pr-1"></div>
+            <button onclick="window.closeSettlementModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button>
+        </div>
+    </div>
+
     <div id="login-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <h3 class="font-black text-[#5c4a3d] text-base text-center">🌸 歡迎加入放風之旅</h3>
@@ -397,25 +440,22 @@
             }
         };
 
-        // 🌟 完整掛載所有 Modal 與點擊互動函式到 window
+        // 🌟 完整掛載所有控制函式到 window
         window.openSmartPasteModal = function() {
             if (currentProjectId) document.getElementById('smart-paste-modal').classList.remove('hidden');
         };
         window.closeSmartPasteModal = function() {
             document.getElementById('smart-paste-modal').classList.add('hidden');
         };
-
         window.openAddScheduleModal = function() {
             if (currentProjectId) document.getElementById('schedule-modal').classList.remove('hidden');
         };
         window.closeAddScheduleModal = function() {
             document.getElementById('schedule-modal').classList.add('hidden');
         };
-
         window.closeShareModal = function() {
             document.getElementById('share-choice-modal').classList.add('hidden');
         };
-
         window.openImportProjectModal = function() {
             document.getElementById('import-code-input').value = '';
             document.getElementById('import-project-modal').classList.remove('hidden');
@@ -423,20 +463,18 @@
         window.closeImportProjectModal = function() {
             document.getElementById('import-project-modal').classList.add('hidden');
         };
-
         window.openNewProjectModal = function() {
             document.getElementById('new-project-modal')?.classList.remove('hidden');
         };
         window.closeNewProjectModal = function() {
             document.getElementById('new-project-modal')?.classList.add('hidden');
         };
-
         window.closeDetailModal = function() {
             document.getElementById('detail-modal').classList.add('hidden');
             currentDetailItem = null;
         };
 
-        // 🌟 點擊行程卡片開啟詳細與 MAP 導航 Modal
+        // 🌟 點擊整張行程卡片直接開啟詳細與 MAP 導航
         window.openDetailModal = function(scheduleId) {
             const item = allSchedulesData.find(s => s.id === scheduleId);
             if (!item) return;
@@ -584,8 +622,10 @@
             window.renderRemindersByRules(currentProjectName);
             window.initLanguageModule(currentProjectName);
             window.loadSchedules(currentProjectId);
+            window.loadMembersAndExpenses(currentProjectId);
+            window.loadCheckins(currentProjectId);
             
-            switchTab('schedule');
+            window.switchTab('schedule');
         };
 
         window.switchTab = function(tabName) {
@@ -650,6 +690,28 @@
             });
         };
 
+        window.loadMembersAndExpenses = function(projId) {
+            const membersRef = collection(db, "projects", projId, "members");
+            if (unsubscribeMembers) unsubscribeMembers();
+            unsubscribeMembers = onSnapshot(membersRef, (snapshot) => {
+                allMembersData = [];
+                snapshot.forEach(docSnap => { allMembersData.push({ id: docSnap.id, ...docSnap.data() }); });
+            });
+        };
+
+        window.loadCheckins = function(projId) {
+            const checkinsRef = collection(db, "projects", projId, "checkins");
+            if (unsubscribeCheckins) unsubscribeCheckins();
+            unsubscribeCheckins = onSnapshot(checkinsRef, (snapshot) => {
+                allCheckinsData = {};
+                snapshot.forEach(docSnap => {
+                    let data = docSnap.data();
+                    if (data.uploader === currentMyName) { allCheckinsData[data.scheduleId] = data; }
+                });
+            });
+        };
+
+        // 🌟 簡潔漂亮的行程列表渲染（點擊整張卡片直接開啟 Modal，無多餘查看按鈕）
         window.renderScheduleUI = function() {
             const container = document.getElementById('schedule-container');
             if (!container) return;
@@ -661,13 +723,12 @@
             allSchedulesData.forEach(s => {
                 let cleanTitle = window.cleanDisplayTitle(s.title);
                 let div = document.createElement('div');
-                div.className = "p-3.5 bg-[#fffaf5] hover:bg-[#fbf2e9] rounded-2xl border border-[#eae1d7] flex justify-between items-center cursor-pointer transition";
+                div.className = "p-4 bg-[#fffaf5] hover:bg-[#fbf2e9] rounded-2xl border border-[#eae1d7] cursor-pointer transition flex justify-between items-center";
                 div.innerHTML = `
-                    <div>
+                    <div class="space-y-1">
                         <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
                         <h5 class="font-black text-gray-900 text-sm mt-1">${cleanTitle}</h5>
                     </div>
-                    <span class="text-xs text-gray-400 font-bold">查看 🔍</span>
                 `;
                 div.onclick = () => window.openDetailModal(s.id);
                 container.appendChild(div);
