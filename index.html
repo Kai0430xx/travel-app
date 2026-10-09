@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>🧳 放風之旅</title>
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="放風 ✈">
 <meta name="theme-color" content="#FFFCF6">
@@ -10,7 +10,7 @@
 <style>
 :root{--ink:#3E3A39;--paper:#FFFCF6;--co:#F2A497;--ye:#F6D27A;--aq:#A8D3E6;--gr:#B9DAA5}
 *{box-sizing:border-box}[hidden]{display:none!important}
-body{margin:0 auto;max-width:480px;min-height:100vh;background:var(--paper);color:var(--ink);font:15px/1.6 "Huninn","Noto Sans TC",system-ui,sans-serif;padding:0 14px calc(75px + env(safe-area-inset-bottom))}
+body{margin:0 auto;max-width:480px;min-height:100vh;background:var(--paper);color:var(--ink);font:15px/1.6 "Huninn","Noto Sans TC",system-ui,sans-serif;padding:0 14px calc(75px + env(safe-area-inset-bottom));touch-action:manipulation}
 h2,h3{margin:0}small{opacity:.7}.mute{text-align:center;opacity:.6;padding:18px 0}
 .box{border:3px solid var(--ink);border-radius:24px;background:var(--paper);box-shadow:3px 3px 0 var(--ink);padding:14px;margin:12px 0}
 .btn{font:inherit;font-size:13px;color:var(--ink);background:var(--ye);border:3px solid var(--ink);border-radius:999px;padding:4px 14px;cursor:pointer;box-shadow:2px 2px 0 var(--ink);text-decoration:none;display:inline-block}
@@ -24,7 +24,7 @@ header div{flex:1;min-width:0}header b,header small{display:block;white-space:no
 .tag{display:inline-block;background:var(--ye);border:2px solid var(--ink);border-radius:999px;padding:0 10px;font-size:12px;margin-bottom:4px}
 .item{cursor:pointer;display:block}.item b{display:block}
 
-/* 🌸 導覽列：極致貼底、無外框、僅上方一條黑線、選項集中 */
+/* 🌸 導覽列：緊貼底部、無外圍線條、上方一條黑線 */
 nav{position:fixed;left:0;right:0;bottom:0;width:100%;max-width:480px;margin:0 auto;background:var(--paper);border-top:3px solid var(--ink);display:flex;justify-content:center;gap:16px;padding:6px 12px calc(4px + env(safe-area-inset-bottom));z-index:9999}
 nav button{font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:none;color:var(--ink);padding:2px 10px;cursor:pointer;pointer-events:auto}
 nav button span{display:block;font-size:18px}
@@ -32,7 +32,7 @@ nav button.on{background:var(--ye);border-color:var(--ink)}
 
 .mask{position:fixed;inset:0;background:rgba(62,58,57,.45);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px}
 .sheet{width:100%;max-width:400px;max-height:88vh;overflow:auto;margin:0}
-input,textarea,select{font:inherit;width:100%;border:3px solid var(--ink);border-radius:16px;background:#fff;padding:8px 12px;margin:4px 0 8px;color:var(--ink)}
+input,textarea,select{font:inherit;font-size:16px!important;width:100%;border:3px solid var(--ink);border-radius:16px;background:#fff;padding:8px 12px;margin:4px 0 8px;color:var(--ink)}
 label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:0 10px 6px 0}.chk input{width:auto;margin:0}
 .bar{height:16px;border:3px solid var(--ink);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--gr);transition:width .5s}
 .badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
@@ -62,14 +62,27 @@ label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:
 <nav id="nav" hidden></nav>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import{getFirestore,collection,addDoc,getDoc,getDocs,deleteDoc,doc,setDoc,onSnapshot,query,where,orderBy}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import{getFirestore,collection,addDoc,getDoc,getDocs,deleteDoc,doc,setDoc,onSnapshot,query,where,orderBy,updateDoc}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyBcKmZhJaZn5emOlHRV95-uC9q01wFxt4M",authDomain:"my-travel-app-6e00c.firebaseapp.com",projectId:"my-travel-app-6e00c",storageBucket:"my-travel-app-6e00c.firebasestorage.app",messagingSenderId:"135860333246",appId:"1:135860333246:web:a25402eb743d6cebc9ccef"});const db=getFirestore(app);
 const $=i=>document.getElementById(i),q=(m,s)=>m.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const S={id:null,name:'',pin:'',me:localStorage.getItem('my_travel_nickname')||'',sch:[],mem:[],exp:[],all:[],chk:{},day:'all',un:[],phrase:null,lang:'en-US',splitMode:'equal'};
-const dest=n=>/濟州|韓國|釜山|首爾/.test(n||'')?'korea':/日本|東京|大阪|京都|沖繩/.test(n||'')?'japan':'general';
+
+/* ---------- 地點與國家判定 ---------- */
+const getDestType = n => {
+    if(/濟州|韓國|釜山|首爾/.test(n||'')) return 'korea';
+    if(/日本|東京|大阪|京都|沖繩|北海道/.test(n||'')) return 'japan';
+    if(/曼谷|泰國|清邁|普吉島|芭達雅/.test(n||'')) return 'thailand';
+    if(/新加坡/.test(n||'')) return 'singapore';
+    if(/馬來西亞|吉隆坡|檳城|沙巴|蘭卡威/.test(n||'')) return 'malaysia';
+    if(/香港/.test(n||'')) return 'hongkong';
+    if(/澳門/.test(n||'')) return 'macau';
+    return 'general';
+};
+const dest = n => getDestType(n);
+
 const dn=s=>+String(s||'').replace(/\D/g,'')||1,clean=t=>(t||'').replace(/^\d{1,2}[:：]\d{2}\s*/,'').trim();
-const RATE={TWD:1,KRW:.024,JPY:.21,USD:32};
+const RATE={TWD:1,KRW:.024,JPY:.21,THB:.92,SGD:24,MYR:7.2,HKD:4.1,MOP:4.1,USD:32};
 
 /* ---------- SVG 插圖 (僅首頁保留大圖) ---------- */
 const K='stroke="#3E3A39" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"';
@@ -78,8 +91,11 @@ const hill=(c,y)=>`<path d="M-4 140V${y}Q80 ${y-24} 160 ${y}T324 ${y-6}V140z" fi
 const SC={
 korea:`<rect width="320" height="140" fill="#A8D3E6"/>${cloud(24,22)}<g class="fl"><circle cx="270" cy="36" r="19" fill="#F6D27A" ${K}/></g><path d="M-4 140V98Q70 34 150 74Q215 58 324 100V140z" fill="#B9DAA5" ${K}/><g class="fl"><circle cx="62" cy="98" r="17" fill="#F6D27A" ${K}/><path d="M62 81q4-9 13-8" fill="none" ${K}/></g><g class="fl"><circle cx="100" cy="110" r="13" fill="#F6D27A" ${K}/></g><g class="dr"><rect x="190" y="98" width="62" height="24" rx="9" fill="#F2A497" ${K}/><rect x="204" y="86" width="32" height="16" rx="6" fill="#FFFCF6" ${K}/><circle cx="206" cy="124" r="7" fill="#FFFCF6" ${K}/><circle cx="238" cy="124" r="7" fill="#FFFCF6" ${K}/></g>`,
 japan:`<rect width="320" height="140" fill="#F6D27A"/><g class="fl"><circle cx="58" cy="38" r="19" fill="#F2A497" ${K}/></g>${cloud(196,16)}<path d="M70 124L138 34h24l68 90z" fill="#A8D3E6" ${K}/><path d="M126 52l12-18h24l12 18l-12 7l-12-7l-12 7z" fill="#FFFCF6" ${K}/>${hill('#B9DAA5',116)}<g class="fl"><rect x="250" y="72" width="8" height="46" fill="#F2A497" ${K}/><rect x="284" y="72" width="8" height="46" fill="#F2A497" ${K}/><path d="M240 64h60l-6 11h-48z" fill="#F2A497" ${K}/></g>`,
+thailand:`<rect width="320" height="140" fill="#F2A497"/>${cloud(40,20)}<g class="fl"><circle cx="260" cy="40" r="20" fill="#F6D27A" ${K}/></g><path d="M-4 140V105Q80 60 160 95T324 85V140z" fill="#B9DAA5" ${K}/><g class="dr"><path d="M120 95l15-35h20l15 35z" fill="#FFFCF6" ${K}/><path d="M132 60l18-18l18 18z" fill="#A8D3E6" ${K}/></g>`,
+singapore:`<rect width="320" height="140" fill="#A8D3E6"/>${cloud(30,20)}<path d="M-4 140V110Q80 80 160 100T324 105V140z" fill="#B9DAA5" ${K}/><g class="fl"><path d="M220 110l15-50h20l15 50z" fill="#F2A497" ${K}/><circle cx="250" cy="50" r="16" fill="#F6D27A" ${K}/></g>`,
+malaysia:`<rect width="320" height="140" fill="#B9DAA5"/>${cloud(50,25)}<path d="M-4 140V100Q80 60 160 90T324 95V140z" fill="#A8D3E6" ${K}/><g class="fl"><rect x="140" y="45" width="8" height="60" fill="#F6D27A" ${K}/><rect x="160" y="45" width="8" height="60" fill="#F6D27A" ${K}/><path d="M136 45h36l-4-12h-28z" fill="#F6D27A" ${K}/></g>`,
 general:`<rect width="320" height="140" fill="#A8D3E6"/>${cloud(18,30)}${cloud(220,64)}<g class="dr"><path d="M80 60l92-12q24-2 24 8t-24 8l-92-4z" fill="#F6D27A" ${K}/><path d="M124 58l-18-26h14l30 26z" fill="#F2A497" ${K}/></g>${hill('#B9DAA5',112)}<g class="fl"><rect x="232" y="92" width="44" height="34" rx="8" fill="#F2A497" ${K}/><path d="M244 92v-9h20v9" fill="none" ${K}/></g>`};
-const scene=n=>`<svg viewBox="0 0 320 140" role="img" aria-label="旅行插圖">${SC[dest(n)]}</svg>`;
+const scene=n=>`<svg viewBox="0 0 320 140" role="img" aria-label="旅行插圖">${SC[dest(n)]||SC.general}</svg>`;
 
 /* ---------- 共用 UI ---------- */
 function modal(title,body,ok,onOk){const m=document.createElement('div');m.className='mask';
@@ -89,13 +105,15 @@ if(ok)q(m,'.ok').onclick=async()=>{if(await onOk(m)!==false)c()};document.body.a
 const val=(m,s)=>q(m,s).value.trim();
 const copy=async t=>{try{await navigator.clipboard.writeText(t);alert('已複製 ✨')}catch{prompt('請手動複製',t)}};
 
-/* ---------- 計算出發倒數 ---------- */
+/* ---------- 精準倒數計數（完美解析 2027年1/1 或 2027/1/1 等格式） ---------- */
 const getCountdown=datesStr=>{
 if(!datesStr)return'';
 const match=datesStr.match(/(\d{4})[年/.-]?\s*(\d{1,2})[月/.-]\s*(\d{1,2})/);
 if(!match)return'';
-const[,y,m,d]=match,start=new Date(`${y}-${m}-${d}T00:00:00`),now=new Date();
-now.setHours(0,0,0,0);const diff=Math.ceil((start-now)/(1000*60*60*24));
+const[,y,m,d]=match;
+const start=new Date(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}T00:00:00`);
+const now=new Date(); now.setHours(0,0,0,0);
+const diff=Math.ceil((start-now)/(1000*60*60*24));
 if(diff>0)return`🔥 倒數 ${diff} 天`;if(diff===0)return`🎉 今天出發！`;return`✈️ 進行中/已結束`};
 
 /* ---------- 專案列表與刪除 ---------- */
@@ -117,7 +135,7 @@ window.delProj = async id => {
     }
 };
 
-$('new').onclick=()=>modal('🌸 新增旅程','<label>旅程名稱</label><input id="n1" placeholder="例如：濟州島四日遊"><label>日期（請包含年份，例如：2026年 11/23-11/27）</label><input id="n2" placeholder="2026年 11/23 - 11/27">','建立',async m=>{const name=val(m,'#n1');if(!name){alert('請輸入名稱');return false}
+$('new').onclick=()=>modal('🌸 新增旅程','<label>旅程名稱</label><input id="n1" placeholder="例如：曼谷五日遊"><label>日期（請包含年份，例如：2027年 1/1-1/8）</label><input id="n2" placeholder="2027年 1/1 - 1/8">','建立',async m=>{const name=val(m,'#n1');if(!name){alert('請輸入名稱');return false}
 const pin=String(Math.floor(100000+Math.random()*900000)),r=await addDoc(collection(db,'projects'),{name,dates:val(m,'#n2'),pin,createdAt:Date.now()});saveIds([r.id,...ids()]);renderProjects()});
 $('imp').onclick=()=>modal('📥 輸入 6 位數專案號碼','<input id="c1" maxlength="6" inputmode="numeric" placeholder="例如：883921" style="text-align:center;font-size:20px;letter-spacing:4px">','導入',async m=>{const c=val(m,'#c1'),r=await getDocs(query(collection(db,'projects'),where('pin','==',c)));
 if(r.empty){alert('找不到這個專案號碼');return false}saveIds([r.docs[0].id,...ids()]);renderProjects()});
@@ -139,13 +157,8 @@ const TABS=[['schedule','📅','行程'],['ai','💡','提醒'],['lang','🗣','
 $('nav').innerHTML=TABS.map(t=>`<button data-t="${t[0]}"><span>${t[1]}</span>${t[2]}</button>`).join('');
 
 $('nav').querySelectorAll('button').forEach(b=>{
-    const action = () => { 
-        tab(b.dataset.t); 
-        b.classList.add('bn'); 
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // 🌸 切換分頁時自動捲動至最上方
-    };
-    b.onclick = action;
-    b.ontouchend = e => { e.preventDefault(); action(); };
+    const action = () => { tab(b.dataset.t); b.classList.add('bn'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    b.onclick = action; b.ontouchend = e => { e.preventDefault(); action(); };
 });
 
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.hidden=e.id!=='t-'+t);$('nav').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.t===t);if(b.dataset.t!==t)b.classList.remove('bn')})}
@@ -159,39 +172,71 @@ const l=S.sch.filter(s=>S.day==='all'||(s.day||'Day 1')===S.day).sort((a,b)=>dn(
 $('sl').innerHTML=l.length?l.map(s=>`<div class="box item${pop?' bn':''}" data-i="${s.id}"><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><b>${esc(clean(s.title))}</b></div>`).join(''):'<p class="mute">還沒有行程，按「新增」或「智慧導入」吧 ✨</p>';
 $('sl').querySelectorAll('.item').forEach(e=>e.onclick=()=>detail(e.dataset.i))}
 
-function detail(id){const s=S.sch.find(x=>x.id===id);if(!s)return;const t=clean(s.title),k=encodeURIComponent((/濟州/.test(S.name)&&!t.includes('濟州')?'濟州島 ':'')+t);
-const m=modal(esc(t),`<span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span>${s.location?`<div class="box" style="margin:8px 0;white-space:pre-line">📝 ${esc(s.location)}</div>`:''}
-<div class="row gap" style="justify-content:flex-start">${dest(S.name)==='korea'?`<a class="btn gr" target="_blank" rel="noopener" href="https://m.map.naver.com/search2/search.naver?query=${k}">💚 Naver</a>`:''}<a class="btn aq" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${k}">💙 Google</a><button class="btn" id="dl">🗑 刪除</button></div>`);
-q(m,'#dl').onclick=async()=>{if(confirm('確定刪除這個行程？')){await deleteDoc(doc(db,'projects',S.id,'schedules',id));m.remove()}}}
+function detail(id){
+const s=S.sch.find(x=>x.id===id);if(!s)return;
+const t=clean(s.title);
+const getQuery = () => { const kw = q(m,'#map-kw')?.value?.trim(); if(kw) return kw; return (/濟州/.test(S.name)&&!t.includes('濟州')?'濟州島 ':'')+t; };
+const m=modal(esc(t),`<div class="row" style="margin:4px 0 8px"><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><input id="map-kw" placeholder="輸入電話或當地語言名稱（選填）" value="${esc(s.mapKeyword||'')}"></div><div class="box" style="margin:8px 0;white-space:pre-line">📝 備註：${esc(s.location||'無')}</div><div class="row gap" style="justify-content:flex-start">${dest(S.name)==='korea'?`<a class="btn gr" id="btn-naver" target="_blank" rel="noopener" href="#">💚 Naver</a>`:''}<a class="btn aq" id="btn-google" target="_blank" rel="noopener" href="#">💙 Google</a><button class="btn" id="dl">🗑 刪除</button></div>`);
+const updateLinks = () => { const kw = encodeURIComponent(getQuery()); q(m,'#btn-naver')?.setAttribute('href', `https://m.map.naver.com/search2/search.naver?query=${kw}`); q(m,'#btn-google').href = `https://www.google.com/maps/search/?api=1&query=${kw}`; };
+updateLinks(); q(m,'#map-kw').oninput = updateLinks;
+q(m,'#dl').onclick=async()=>{if(confirm('確定刪除這個行程？')){await deleteDoc(doc(db,'projects',S.id,'schedules',id));m.remove()}};
+const saveKw = async () => { const kw = q(m,'#map-kw')?.value?.trim() || ''; if(kw !== (s.mapKeyword||'')) await updateDoc(doc(db,'projects',S.id,'schedules',id),{ mapKeyword: kw }); };
+q(m,'.cl').onclick = async () => { await saveKw(); m.remove(); }; q(m,'.x').onclick = async () => { await saveKw(); m.remove(); };
+}
 
 $('ad').onclick=()=>modal('✏️ 新增行程','<label>天數</label><input id="a1" value="Day 1"><label>時間</label><input id="a2" value="10:00"><label>行程名稱</label><input id="a3"><label>備註</label><textarea id="a4" rows="3"></textarea>','新增',async m=>{const title=val(m,'#a3');if(!title){alert('請輸入名稱');return false}
-await addDoc(collection(db,'projects',S.id,'schedules'),{day:val(m,'#a1')||'Day 1',time:val(m,'#a2'),title,location:val(m,'#a4'),createdAt:Date.now()})});
+await addDoc(collection(db,'projects',S.id,'schedules'),{day:val(m,'#a1')||'Day 1',time:val(m,'#a2'),title,location:val(m,'#a4'),mapKeyword:'',createdAt:Date.now()})});
 
 $('sp').onclick=()=>modal('✨ 智慧導入行程','<textarea id="p1" rows="9" placeholder="貼上行程，例如：&#10;Day 1&#10;10:00 抵達機場&#10;備註：…"></textarea>','開始拆解',async m=>{const lines=val(m,'#p1').split('\n').map(l=>l.trim()).filter(Boolean);if(!lines.length){alert('請先貼上行程');return false}
 const CN='一二三四五六七八九十';let day='Day 1',cur=null;const out=[];
 for(const raw of lines){const dm=raw.match(/Day\s*(\d+)|第([一二三四五六七八九十])天/i);if(dm){if(cur)out.push(cur);cur=null;day='Day '+(dm[1]||CN.indexOf(dm[2])+1);continue}
 const line=raw.replace(/：/g,':'),tm=line.match(/(\d{1,2}):(\d{2})/);
-if(tm&&!/備註|營業時間/.test(line)){if(cur)out.push(cur);cur={day,time:tm[0],title:line.replace(/^[•\-\s]*\d{1,2}:\d{2}\s*/,'').trim(),location:'',createdAt:Date.now()+out.length}}else if(cur)cur.location+=(cur.location?'\n':'')+raw}
+if(tm&&!/備註|營業時間/.test(line)){if(cur)out.push(cur);cur={day,time:tm[0],title:line.replace(/^[•\-\s]*\d{1,2}:\d{2}\s*/,'').trim(),location:'',mapKeyword:'',createdAt:Date.now()+out.length}}else if(cur)cur.location+=(cur.location?'\n':'')+raw}
 if(cur)out.push(cur);await Promise.all(out.map(i=>addDoc(collection(db,'projects',S.id,'schedules'),i)));alert(`✨ 成功導入 ${out.length} 筆行程！`)});
 
-/* ---------- 提醒 ---------- */
+/* ---------- 多國旅遊提醒 (涵蓋 韓、日、泰、新、馬、港、澳門) ---------- */
 function rRemind(){
 const box=(t,b)=>`<div class="box"><h3>${t}</h3><div style="font-size:14px;margin-top:6px">${b}</div></div>`;
-let h='';
-if(dest(S.name)==='korea'){
+let h=''; const type = dest(S.name);
+if(type==='korea'){
     h+=box('🇰🇷 韓國天氣與穿搭指南','早晚溫差大且風大，建議採洋蔥式穿搭，必備防風外套與好走的布鞋 🧥👟。');
-    h+=box('🚗 自駕與導航攻略','建議下載 Naver Map 或 Kakao Map（輸入地點電話號碼查詢最準）。韓國道路速限嚴格，沿途測速相機很多，請務必遵守速限。');
-    h+=box('💳 支付與換匯建議','信用卡在韓國幾乎 100% 普及，但建議身上備妥 5~10 萬韓元現金以備不時之需（如傳統市場或小型路邊攤）。');
-    h+=box('🔌 電壓與插頭規格','韓國電壓為 220V，插頭為「歐規圓形雙孔」，請記得攜帶萬用轉接頭。');
-    h+=box('🛍️ 退稅與購物須知','現場退稅（Tax Refund）單筆消費滿 30,000 韓元即可出示護照辦理，市區退稅或機場自助機台退稅請保留好收據。');
-    h+=box('🚨 緊急求助電話','警察局：112 ｜ 救護車/消防：119 ｜ 中文旅遊諮詢熱線：1330');
-}else if(dest(S.name)==='japan'){
-    h+=box('🇯🇵 日本旅遊與交通須知','行程多以步行與地鐵為主，請準備舒適布鞋。建議將 Suica 或 Pasmo 卡加入手機 Apple Pay 方便搭車 🚆。');
-    h+=box('💳 支付與現金準備','部分拉麵販賣機、小餐館或寺廟御守仍需使用現金，建議隨身攜帶適量日幣。');
-    h+=box('🔌 電壓與插頭規格','日本電壓為 100V，雙孔扁平插頭（與台灣相同），一般電器不需轉接頭。');
-    h+=box('🚨 緊急求助電話','警察局：110 ｜ 救護車/消防：119');
+    h+=box('🚗 自駕與導航攻略','建議下載 Naver Map 或 Kakao Map，沿途測速相機很多，請依速限行駛。');
+    h+=box('💳 支付與換匯建議','信用卡極為普及，建議備妥 5~10 萬韓元現金以備不時之需。');
+    h+=box('🔌 電壓與插頭規格','220V，歐規圓形雙孔插頭，需帶萬用轉接頭。');
+    h+=box('🚨 緊急求助電話','警察局：112 ｜ 消防/救護：119 ｜ 中文旅遊熱線：1330');
+}else if(type==='japan'){
+    h+=box('🇯🇵 日本旅遊與交通須知','步行與地鐵為主，準備舒適布鞋。手機可綁定 Suica / Pasmo 卡搭車 🚆。');
+    h+=box('💳 支付與現金準備','部分小餐館或販賣機仍需現金，建議隨身攜帶日幣。');
+    h+=box('🔌 電壓與插頭規格','100V，雙孔扁平插頭（與台灣相同）。');
+    h+=box('🚨 緊急求助電話','警察局：110 ｜ 消防/救護：119');
+}else if(type==='thailand'){
+    h+=box('🇹🇭 泰國氣候與穿搭指南','常年炎熱，進入寺廟需服裝端莊（遮住肩膀與膝蓋），室內冷氣強建議備薄外套。');
+    h+=box('🚗 交通與 Grab App','推薦下載 Grab 或 Bolt App 叫車，避免計程車喊價。曼谷塞車嚴重，搭乘 BTS/MRT 最便捷。');
+    h+=box('💳 支付與換匯','夜市與小吃多收現金，建議準備泰銖現金。部分大型商場可刷卡。');
+    h+=box('🔌 電壓與插頭規格','220V，雙孔美規/歐規綜合插頭。');
+    h+=box('🚨 緊急求助電話','觀光警察：1155 ｜ 警察局：191 ｜ 醫療救護：1669');
+}else if(type==='singapore'){
+    h+=box('🇸🇬 新加坡旅遊與交通','地鐵（MRT）四通八達，建議使用感應式信用卡或 EZ-Link 卡搭乘。');
+    h+=box('💳 支付與消費','高度無現金化，幾乎全境支援行動支付與信用卡。');
+    h+=box('🔌 電壓與插頭規格','230V，英規三孔方形插頭，需準備轉接頭。');
+    h+=box('🚨 緊急求助電話','報警：999 ｜ 救護/消防：995');
+}else if(type==='malaysia'){
+    h+=box('🇲🇾 馬來西亞旅遊與交通','推薦使用 Grab 叫車，經濟又方便。');
+    h+=box('💳 支付與換匯','吉隆坡等大城市刷卡普及，夜市與小鎮需備好令吉（MYR）現金。');
+    h+=box('🔌 電壓與插頭規格','240V，英規三孔方形插頭，需準備轉接頭。');
+    h+=box('🚨 緊急求助電話','緊急求助：999');
+}else if(type==='hongkong'){
+    h+=box('🇭🇰 香港旅遊與交通','必備八達通卡（Octopus），搭乘地鐵、叮叮車及超商購物皆可使用。');
+    h+=box('💳 支付與現金','八達通與信用卡極為普及，部分茶餐廳備有港幣現金更方便。');
+    h+=box('🔌 電壓與插頭規格','220V，英規三孔方形插頭。');
+    h+=box('🚨 緊急求助電話','緊急報警/救護：999');
+}else if(type==='macau'){
+    h+=box('🇲🇦 澳門旅遊與交通','大型賭場酒店多有免費穿梭巴士（發財巴），善加利用省交通費。');
+    h+=box('💳 支付與現金','支援澳門幣與港幣，部分店家通用。');
+    h+=box('🔌 電壓與插頭規格','220V，英規三孔方形插頭。');
+    h+=box('🚨 緊急求助電話','緊急求助：999');
 }else{
-    h+=box('🌍 國際自由行通用須知','請確認護照效期大於 6 個月，備好網卡與萬用轉接頭與海外旅遊平安險 ✈️。');
+    h+=box('🌍 國際自由行通用須知','請確認護照效期大於 6 個月，備好網卡、萬用轉接頭與海外旅遊平安險 ✈️。');
 }
 $('t-ai').innerHTML=h;
 }
@@ -207,180 +252,56 @@ const CATS=[
     ['emergency','🚨 緊急求助']
 ];
 
+/* ---------- 多國語言對話庫 (中、英、韓、日、泰) ---------- */
 const LG={
 korea:{c:'ko-KR',p:{
-    airport:[
-        ['我是來觀光的。','관광하러 왔습니다.'],
-        ['我會待七天。','7일 동안 머물 예정입니다.'],
-        ['這是我的護照和機票。','여권과 항공권입니다.'],
-        ['請問海關申報單在哪裡填寫？','세관 신고서는 어디서 작성하나요?'],
-        ['我有行李要托運。','짐을 부치겠습니다.'],
-        ['請給我靠窗的座位。','창가 쪽 자리로 주세요.'],
-        ['我的行李不見了。','제 짐이 없어졌어요.']
-    ],
-    hotel:[
-        ['我有訂房，名字是…','예약했습니다. 이름은…입니다.'],
-        ['請問有含早餐嗎？','조식이 포함되어 있나요?'],
-        ['可以幫我寄放行李嗎？','짐을 맡겨도 될까요?'],
-        ['請問房間有 Wi-Fi 嗎？密碼是什麼？','와이파이 되나요? 비밀번호가 뭐예요?'],
-        ['請問幾點是退房時間？','체크아웃 시간이 몇 시예요?']
-    ],
-    restaurant:[
-        ['我們有 4 個人。','4명입니다.'],
-        ['請問有中文菜單嗎？','중국어 메뉴판 있어요?'],
-        ['請推薦招牌菜。','대표 메뉴 추천해주세요.'],
-        ['這個會辣嗎？可以做不辣的嗎？','맵나요? 안 맵게 해주실 수 있나요?'],
-        ['請問這個有含牛肉（或豬肉）嗎？','소고기(또는 돼지고기)가 들어가나요?'],
-        ['我們要結帳。','계산해주세요.'],
-        ['請問可以刷卡嗎？','카드 되나요?'],
-        ['我要一杯冰美式咖啡。','아이스 아메리카노 한 잔 주세요.'],
-        ['請問可以內用還是外帶？','매장에서 드시겠어요, 포장이십니까?'],
-        ['請幫我加熱。','데워주세요.']
-    ],
-    shopping:[
-        ['請問這個多少錢？','이거 얼마예요?'],
-        ['請問有其他顏色（或尺寸）嗎？','다른 색상(또는 사이즈) 있어요?'],
-        ['請問我可以試穿嗎？','입어봐도 되나요?'],
-        ['請問現在有折扣嗎？','할인 중인가요?'],
-        ['請問這裡可以辦理退稅嗎？','여기서 텍스프리 되나요?']
-    ],
-    transport:[
-        ['最近的地鐵站在哪裡？','가장 가까운 지하철역이 어디예요?'],
-        ['請問怎麼去這個地方？','여기에 어떻게 가요?'],
-        ['請載我到這個地址。','이 주소로 가주세요.'],
-        ['請問到這裡要多少錢？','여기까지 얼마나 걸립니까(요금)?']
-    ],
-    smalltalk:[
-        ['你好！','안녕하세요!'],
-        ['謝謝你。','감사합니다.'],
-        ['對不起 / 不好意思。','죄송합니다 / 실례합니다.'],
-        ['這很好吃！','맛있어요!'],
-        ['很高興認識你。','반갑습니다.']
-    ],
-    health:[
-        ['我身體很不舒服。','몸이 안 좋아요.'],
-        ['我頭痛（或肚子痛）。','머리가 아파요(또는 배가 아파요).'],
-        ['附近有藥局嗎？','근처에 약국이 있어요?'],
-        ['請給我消化藥。','소화제 주세요.']
-    ],
-    emergency:[
-        ['救命！我的護照被偷了！','살려주세요! 여권을 도둑맞았어요!'],
-        ['我迷路了。','길을 잃었어요.'],
-        ['請幫我報警。','경찰에 신고해주세요.'],
-        ['請幫我叫救護車！','구급차를 불러주세요!']
-    ]
+    airport:[['我是來觀光的。','관광하러 왔습니다.'],['我會待七天。','7일 동안 머물 예정입니다.'],['這是我的護照和機票。','여권과 항공권입니다.'],['請問海關申報單在哪裡填寫？','세관 신고서는 어디서 작성하나요?'],['我有行李要托運。','짐을 부치겠습니다.'],['請給我靠窗的座位。','창가 쪽 자리로 주세요.'],['我的行李不見了。','제 짐이 없어졌어요.']],
+    hotel:[['我有訂房，名字是…','예약했습니다. 이름은…입니다.'],['請問有含早餐嗎？','조식이 포함되어 있나요?'],['可以幫我寄放行李嗎？','짐을 맡겨도 될까요?'],['請問房間有 Wi-Fi 嗎？密碼是什麼？','와이파이 되나요? 비밀번호가 뭐예요?'],['請問幾點是退房時間？','체크아웃 시간이 몇 시예요?']],
+    restaurant:[['我們有 4 個人。','4명입니다.'],['請問有中文菜單嗎？','중국어 메뉴판 있어요?'],['請推薦招牌菜。','대표 메뉴 추천해주세요.'],['這個會辣嗎？可以做不辣的嗎？','맵나요? 안 맵게 해주실 수 있나요?'],['我們要結帳。','계산해주세요.'],['請問可以刷卡嗎？','카드 되나요?'],['我要一杯冰美式咖啡。','아이스 아메리카노 한 잔 주세요.'],['請問可以內用還是外帶？','매장에서 드시겠어요, 포장이십니까?']],
+    shopping:[['請問這個多少錢？','이거 얼마예요?'],['請問有其他顏色（或尺寸）嗎？','다른 색상(또는 사이즈) 있어요?'],['請問我可以試穿嗎？','입어봐도 되나요?'],['請問現在有折扣嗎？','할인 중인가요?'],['請問這裡可以辦理退稅嗎？','여기서 텍스프리 되나요?']],
+    transport:[['最近的地鐵站在哪裡？','가장 가까운 지하철역이 어디예요?'],['請問怎麼去這個地方？','여기에 어떻게 가요?'],['請載我到這個地址。','이 주소로 가주세요.'],['請問到這裡要多少錢？','여기까지 얼마나 걸립니까(요금)?']],
+    smalltalk:[['你好！','안녕하세요!'],['謝謝你。','감사합니다.'],['對不起 / 不好意思。','죄송합니다 / 실례합니다.'],['這很好吃！','맛있어요!'],['很高興認識你。','반갑습니다.']],
+    health:[['我身體很不舒服。','몸이 안 좋아요.'],['我頭痛（或肚子痛）。','머리가 아파요(또는 배가 아파요).'],['附近有藥局嗎？','근처에 약국이 있어요?'],['請給我消化藥。','소화제 주세요.']],
+    emergency:[['救命！我的護照被偷了！','살려주세요! 여권을 도둑맞았어요!'],['我迷路了。','길을 잃었어요.'],['請幫我報警。','경찰에 신고해주세요.'],['請幫我叫救護車！','구급차를 불러주세요!']]
 }},
 japan:{c:'ja-JP',p:{
-    airport:[
-        ['我是來觀光的。','観光で来ました。'],
-        ['我會待五天。','5日間滞在します。'],
-        ['這是我的護照。','パスポートです。'],
-        ['我有行李要托運。','荷물을預けたいです。'],
-        ['請給我靠走道的座位。','通路側の席をお願いします。'],
-        ['我的行李找不到。','荷물が見つかりません。']
-    ],
-    hotel:[
-        ['我有預約，名字是…','予約している…です。'],
-        ['請問有附早餐嗎？','朝食はついていますか？'],
-        ['可以寄放行李嗎？','荷물을預かっていただけますか？'],
-        ['房間有 Wi-Fi 嗎？密碼是什麼？','部屋にWi-Fiはありますか？パスワードは何ですか？'],
-        ['幾點退房？','チェックアウトは何時ですか？']
-    ],
-    restaurant:[
-        ['我們有 4 個人。','4人です。'],
-        ['有中文菜單嗎？','中国語のメニューはありますか？'],
-        ['推薦什麼菜？','おすすめは何ですか？'],
-        ['這個會辣嗎？','これは辛いですか？'],
-        ['我們要結帳。','お会計をお願いします。'],
-        ['可以刷卡嗎？','カードは使えますか？'],
-        ['我要一杯冰咖啡。','アイスコーヒーを一つください。'],
-        ['內用還是外帶？','店内でお召し上がりですか、お持ち帰りですか？']
-    ],
-    shopping:[
-        ['這個多少錢？','これはいくらですか？'],
-        ['有其他顏色嗎？','他の色はありますか？'],
-        ['可以試穿嗎？','試着してもいいですか？'],
-        ['可以退稅嗎？','免税できますか？']
-    ],
-    transport:[
-        ['最近的車站在哪裡？','一番近い駅はどこですか？'],
-        ['怎麼去這裡？','ここへはどう行きますか？'],
-        ['請載我到這個地址。','この住所までお願いします。']
-    ],
-    smalltalk:[
-        ['你好！','こんにちは！'],
-        ['謝謝。','ありがとうございます。'],
-        ['不好意思 / 對不起。','すみません。'],
-        ['很好吃！','美味しいです！']
-    ],
-    health:[
-        ['身體很不舒服。','気分が悪いです。'],
-        ['我頭痛。','頭が痛いです。'],
-        ['附近有藥局嗎？','近くに薬局はありますか？']
-    ],
-    emergency:[
-        ['救命！護照被偷了！','助けてください！パスポートが盗まれました！'],
-        ['我迷路了。','道に迷いました。'],
-        ['請幫我叫警察。','警察を呼んでください。']
-    ]
+    airport:[['我是來觀光的。','観光で来ました。'],['我會待五天。','5日間滞在します。'],['這是我的護照。','パスポートです。'],['我有行李要托運。','荷物を預けたいです。'],['請給我靠走道的座位。','通路側の席をお願いします。'],['我的行李找不到。','荷物が見つかりません。']],
+    hotel:[['我有預約，名字是…','予約している…です。'],['請問有附早餐嗎？','朝食はついていますか？'],['可以寄放行李嗎？','荷물을預かっていただけますか？'],['房間有 Wi-Fi 嗎？密碼是什麼？','部屋にWi-Fiはありますか？パスワードは何ですか？'],['幾點退房？','チェックアウトは何時ですか？']],
+    restaurant:[['我們有 4 個人。','4人です。'],['有中文菜單嗎？','中国語のメニューはありますか？'],['推薦什麼菜？','おすすめは何ですか？'],['這個會辣嗎？','これは辛いですか？'],['我們要結帳。','お会計をお願いします。'],['可以刷卡嗎？','カードは使えますか？'],['我要一杯冰咖啡。','アイスコーヒーを一つください。'],['內用還是外帶？','店内でお召し上がりですか、お持ち帰りですか？']],
+    shopping:[['這個多少錢？','これはいくらですか？'],['有其他顏色嗎？','他の色はありますか？'],['可以試穿嗎？','試着してもいいですか？'],['可以退稅嗎？','免税できますか？']],
+    transport:[['最近的車站在哪裡？','一番近い駅はどこですか？'],['怎麼去這裡？','ここへはどう行きますか？'],['請載我到這個地址。','この住所までお願いします。']],
+    smalltalk:[['你好！','こんにちは！'],['謝謝。','ありがとうございます。'],['不好意思 / 對不起。','すみません。'],['很好吃！','美味しいです！']],
+    health:[['身體很不舒服。','気分が悪いです。'],['我頭痛。','頭が痛いです。'],['附近有藥局嗎？','近くに薬局はありますか？']],
+    emergency:[['救命！護照被偷了！','助けてください！パスポートが盗まれました！'],['我迷路了。','道に迷いました。'],['請幫我叫警察。','警察を呼んでください。']]
+}},
+thailand:{c:'th-TH',p:{
+    airport:[['我是來觀光的。','ฉันมาท่องเที่ยวค่ะ/ครับ'],['我會待五天。','ฉันจะอยู่ 5 วัน'],['這是我的護照。','นี่คือหนังสือเดินทางของฉัน'],['我有行李要托運。','ฉันต้องการโหลดกระเป๋าเดินทาง']],
+    hotel:[['我有訂房，名字是…','ฉันจองห้องไว้ ชื่อ...'],['請問有含早餐嗎？','รวมอาหารเช้าด้วยไหมคะ/ครับ'],['可以幫我寄放行李嗎？','ฝากกระเป๋าไว้ก่อนได้ไหมคะ/ครับ'],['請問房間有 Wi-Fi 嗎？','มี Wi-Fi ในห้องไหมคะ/ครับ'],['幾點退房？','เช็คเอาท์กี่โมงคะ/ครับ']],
+    restaurant:[['我們有 4 個人。','มา 4 คนค่ะ/ครับ'],['請問有中文（或英文）菜單嗎？','มีเมนูภาษาจีนหรืออังกฤษไหมคะ/ครับ'],['請推薦招牌菜。','แนะนำเมนูเด็ดหน่อยค่ะ/ครับ'],['不要太辣。','ไม่เผ็ดมากค่ะ/ครับ'],['買單 / 結帳。','เก็บเงินด้วยค่ะ/ครับ'],['可以刷卡嗎？','จ่ายด้วยบัตรเครดิตได้ไหมคะ/ครับ'],['我要一杯冰泰式奶茶。','ขอชานมเย็น 1 แก้วค่ะ/ครับ']],
+    shopping:[['請問這個多少錢？','อันนี้ราคาเท่าไหร่คะ/ครับ'],['可以便宜一點嗎？','ลดราคาหน่อยได้ไหมคะ/ครับ'],['有其他顏色嗎？','มีสีอื่นไหมคะ/ครับ'],['可以刷卡嗎？','รูดบัตรได้ไหมคะ/ครับ']],
+    transport:[['去這裡多少錢？','ไปที่นี่ราคาเท่าไหร่คะ/ครับ'],['請跳錶（計程車）。','มิเตอร์นะคะ/ครับ'],['請在這裡停車。','จอดตรงนี้ค่ะ/ครับ'],['最近的捷運站（BTS/MRT）在哪裡？','สถานีรถไฟฟ้าที่ใกล้ที่สุดอยู่ที่ไหนคะ/ครับ']],
+    smalltalk:[['你好！','สวัสดีค่ะ/ครับ'],['謝謝。','ขอบคุณค่ะ/ครับ'],['對不起 / 不好意思。','ขอโทษค่ะ/ครับ'],['很好吃！','อร่อยมากค่ะ/ครับ']],
+    health:[['我身體很不舒服。','ไม่สบายค่ะ/ครับ'],['我頭痛（或肚子痛）。','ปวดหัว / ปวดท้อง'],['附近有藥局嗎？','มีร้านขายยาแถวนี้ไหมคะ/ครับ'],['請給我止痛藥。','ขอยาแก้ปวดหน่อยค่ะ/ครับ']],
+    emergency:[['救命！護照被偷了！','ช่วยด้วย! หนังสือเดินทางถูกขโมย'],['我迷路了。','ฉันหลงทาง'],['請幫我叫警察。','ช่วยเรียกตำรวจให้หน่อย'],['請幫我叫救護車！','ช่วยเรียกรถพยาบาลให้หน่อย']]
 }},
 general:{c:'en-US',p:{
-    airport:[
-        ['I’m here for sightseeing.','我是來觀光的。'],
-        ['I’ll be staying for five days.','我會待五天。'],
-        ['Do you have any luggage to check?','您有行李要托運嗎？'],
-        ['Window seat, please.','請給我靠窗的座位。'],
-        ['My luggage is missing.','我的行李不見了。']
-    ],
-    hotel:[
-        ['I have a reservation under the name...','我有訂房，名字是...'],
-        ['Is breakfast included?','請問有包含早餐嗎？'],
-        ['Could I store my luggage here?','可以幫我寄放行李嗎？'],
-        ['What is the Wi-Fi password?','Wi-Fi 密碼是什麼？'],
-        ['What time is check-out?','幾點退房？']
-    ],
-    restaurant:[
-        ['Table for four, please.','我們有 4 個人。'],
-        ['Do you have a Chinese menu?','請問有中文菜單嗎？'],
-        ['What do you recommend?','請推薦招牌菜。'],
-        ['Is this spicy? Can you make it mild?','這個會辣嗎？可以做不辣的嗎？'],
-        ['Check, please.','我們要結帳。'],
-        ['Do you take cards?','可以刷卡嗎？'],
-        ['An iced Americano, please.','請給我一杯冰美式咖啡。'],
-        ['For here or to go?','內用還是外帶？']
-    ],
-    shopping:[
-        ['How much is this?','請問這個多少錢？'],
-        ['Do you have other colors?','有其他顏色嗎？'],
-        ['Can I try this on?','我可以試穿嗎？'],
-        ['Can I get a tax refund here?','這裡可以辦理退稅嗎？']
-    ],
-    transport:[
-        ['Where is the nearest subway station?','離這裡最近的地鐵站在哪裡？'],
-        ['How do I get to this place?','怎麼去這個地方？'],
-        ['Please take me to this address.','請載我到這個地址。']
-    ],
-    smalltalk:[
-        ['Hello!','你好！'],
-        ['Thank you very much.','非常感謝。'],
-        ['Excuse me / I am sorry.','不好意思 / 對不起。'],
-        ['This is delicious!','這很好吃！']
-    ],
-    health:[
-        ['I feel sick.','我身體很不舒服。'],
-        ['I have a headache.','我頭痛。'],
-        ['Is there a pharmacy nearby?','附近有藥局嗎？']
-    ],
-    emergency:[
-        ['Help! My passport has been stolen!','救命！我的護照被偷了！'],
-        ['I am lost.','我迷路了。'],
-        ['Can you help me call the police?','可以幫我報警嗎？'],
-        ['Call an ambulance, please!','請幫我叫救護車！']
-    ]
+    airport:[['I’m here for sightseeing.','我是來觀光的。'],['I’ll be staying for five days.','我會待五天。'],['Do you have any luggage to check?','您有行李要托運嗎？']],
+    hotel:[['I have a reservation under the name...','我有訂房，名字是...'],['Is breakfast included?','請問有包含早餐嗎？'],['Could I store my luggage here?','可以幫我寄放行李嗎？']],
+    restaurant:[['Table for four, please.','我們有 4 個人。'],['Do you have an English menu?','請問有英文菜單嗎？'],['Check, please.','我們要結帳。'],['Do you take cards?','可以刷卡嗎？']],
+    shopping:[['How much is this?','請問這個多少錢？'],['Do you have other colors?','有其他顏色嗎？'],['Can I get a tax refund?','可以退稅嗎？']],
+    transport:[['Where is the nearest station?','離這裡最近的車站在哪裡？'],['Please take me to this address.','請載我到這個地址。']],
+    smalltalk:[['Hello!','你好！'],['Thank you very much.','非常感謝。'],['Excuse me.','不好意思。'],['This is delicious!','這很好吃！']],
+    health:[['I feel sick.','我身體很不舒服。'],['Is there a pharmacy nearby?','附近有藥局嗎？']],
+    emergency:[['Help! My passport has been stolen!','救命！我的護照被偷了！'],['Call the police, please!','請幫我報警！']]
 }}};
+LG.singapore = LG.malaysia = LG.hongkong = LG.macau = LG.general;
 
-function rLang(){const P=LG[dest(S.name)].p;const show=id=>{$('lc').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===id));$('lp').innerHTML=(P[id]||[]).map((p,i)=>`<button class="box item" style="width:100%;font:inherit;color:inherit;text-align:left;margin:0 0 10px" data-i="${i}"><b>${esc(p[0])}</b><small style="color:var(--co)">${esc(p[1])}</small></button>`).join('');
-$('lp').querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=P[id][b.dataset.i];S.phrase=p;$('dc').textContent=p[0];$('df').textContent=p[1]})};$('lc').innerHTML=CATS.map(c=>`<button class="btn" data-c="${c[0]}">${c[1]}</button>`).join('');$('lc').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.c));show('airport')}$('say').onclick=()=>{if(!S.phrase)return;const u=new SpeechSynthesisUtterance(S.phrase[S.lang==='en-US'?0:1]);u.lang=S.lang;speechSynthesis.speak(u)};
+function rLang(){
+const P=LG[dest(S.name)].p;
+const show=id=>{$('lc').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===id));$('lp').innerHTML=(P[id]||[]).map((p,i)=>`<button class="box item" style="width:100%;font:inherit;color:inherit;text-align:left;margin:0 0 10px" data-i="${i}"><b>${esc(p[0])}</b><small style="color:var(--co)">${esc(p[1])}</small></button>`).join('');
+$('lp').querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=P[id][b.dataset.i];S.phrase=p;$('dc').textContent=p[0];$('df').textContent=p[1]})};$('lc').innerHTML=CATS.map(c=>`<button class="btn" data-c="${c[0]}">${c[1]}</button>`).join('');$('lc').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.c));show('airport')
+}
+$('say').onclick=()=>{if(!S.phrase)return;const u=new SpeechSynthesisUtterance(S.phrase[1]);u.lang=LG[dest(S.name)].c;speechSynthesis.speak(u)};
 
 /* ---------- 分帳 ---------- */
 const money=n=>'NT$ '+Math.round(n).toLocaleString();
@@ -393,7 +314,9 @@ $('mb').onclick=()=>{const m=modal('👥 旅伴成員',`<div id="ml"></div><inpu
 const draw=()=>{q(m,'#ml').innerHTML=S.mem.map(n=>`<span class="tag" style="margin-right:6px">${esc(n)} <a data-n="${esc(n)}" style="cursor:pointer">✕</a></span>`).join('');q(m,'#ml').querySelectorAll('a').forEach(a=>a.onclick=async()=>{await deleteDoc(doc(db,'projects',S.id,'members',a.dataset.n));setTimeout(draw,400)})};draw();
 q(m,'#m2').onclick=async()=>{const n=val(m,'#m1');if(!n)return;await setDoc(doc(db,'projects',S.id,'members',n),{name:n});q(m,'#m1').value='';setTimeout(draw,400)}};
 
-$('ae').onclick=()=>{if(!S.mem.length){alert('請先在專案中加入旅伴');return}const dc={korea:'KRW',japan:'JPY'}[dest(S.name)]||'TWD';
+$('ae').onclick=()=>{if(!S.mem.length){alert('請先在專案中加入旅伴');return}
+const curMap={korea:'KRW',japan:'JPY',thailand:'THB',singapore:'SGD',malaysia:'MYR',hongkong:'HKD',macau:'MOP'};
+const dc=curMap[dest(S.name)]||'TWD';
 const m=modal('💸 記一筆',`<label>項目</label><input id="e1"><label>金額</label><input id="e2" type="number" inputmode="decimal"><label>幣別</label><select id="e3">${Object.keys(RATE).map(c=>`<option ${c===dc?'selected':''}>${c}</option>`).join('')}</select><label>誰先付</label><select id="e4">${S.mem.map(n=>`<option ${n===S.me?'selected':''}>${esc(n)}</option>`).join('')}</select>
 <div class="row" style="margin:8px 0"><label>分攤模式</label><span><button type="button" class="btn" id="m-eq" style="background:var(--aq)">均攤</button> <button type="button" class="btn" id="m-cust">自訂金額</button></span></div>
 <div id="e5"></div><label style="margin-top:8px">收款結算幣別</label><select id="e-settle"><option value="orig">依原幣別</option><option value="twd">折合台幣 (TWD)</option></select>`,'儲存',async m=>{
@@ -421,91 +344,63 @@ q(m,'#m-cust').onclick=()=>{S.splitMode='custom';q(m,'#m-cust').style.background
 $('st').onclick=()=>{
 const origGroups = {};
 let twdSubB = {}; S.mem.forEach(n=>twdSubB[n]=0);
-
 S.exp.forEach(e=>{
-    const cur = e.cur || 'TWD';
-    const settle = e.settle || 'twd';
+    const cur = e.cur || 'TWD'; const settle = e.settle || 'twd';
     const sp = e.split && Object.keys(e.split).length ? e.split : {[e.payer]: e.amount};
-    
     if(settle === 'orig' && cur !== 'TWD'){
         if(!origGroups[cur]) { origGroups[cur] = {}; S.mem.forEach(n=>origGroups[cur][n]=0); }
         origGroups[cur][e.payer] = (origGroups[cur][e.payer] || 0) + e.amount;
-        Object.entries(sp).forEach(([n, shareAmt])=>{
-            origGroups[cur][n] = (origGroups[cur][n] || 0) - shareAmt;
-        });
+        Object.entries(sp).forEach(([n, shareAmt])=>{ origGroups[cur][n] = (origGroups[cur][n] || 0) - shareAmt; });
     } else {
         const amtTwd = e.amount * (RATE[cur] || 1);
         twdSubB[e.payer] = (twdSubB[e.payer] || 0) + amtTwd;
         const totalSplit = Object.values(sp).reduce((a,v)=>a+v,0) || e.amount;
-        Object.entries(sp).forEach(([n, shareAmt])=>{
-            const shareTwd = amtTwd * (shareAmt / totalSplit);
-            twdSubB[n] = (twdSubB[n] || 0) - shareTwd;
-        });
+        Object.entries(sp).forEach(([n, shareAmt])=>{ const shareTwd = amtTwd * (shareAmt / totalSplit); twdSubB[n] = (twdSubB[n] || 0) - shareTwd; });
     }
 });
-
 let resHtml = '';
 Object.entries(origGroups).forEach(([cur, subB])=>{
-    const cr=[], de=[];
-    Object.entries(subB).forEach(([n,v])=>{if(v>0.1)cr.push([n,v]);else if(v<-0.1)de.push([n,-v])});
+    const cr=[], de=[]; Object.entries(subB).forEach(([n,v])=>{if(v>0.1)cr.push([n,v]);else if(v<-0.1)de.push([n,-v])});
     const tr=[];
     while(cr.length&&de.length){
         cr.sort((a,b)=>b[1]-a[1]); de.sort((a,b)=>b[1]-a[1]);
         const x = Math.min(cr[0][1], de[0][1]);
         tr.push(`${esc(de[0][0])} ➜ ${esc(cr[0][0])} ${cur} ${Math.round(x).toLocaleString()}`);
-        cr[0][1]-=x; de[0][1]-=x;
-        if(cr[0][1]<0.1) cr.shift(); if(de[0][1]<0.1) de.shift();
+        cr[0][1]-=x; de[0][1]-=x; if(cr[0][1]<0.1) cr.shift(); if(de[0][1]<0.1) de.shift();
     }
-    if(tr.length){
-        resHtml += `<div style="margin-bottom:12px"><b style="color:var(--co)">📍 原幣別結算：${cur}</b>${tr.map(t=>`<div class="box" style="margin:4px 0;background:var(--aq)">${t}</div>`).join('')}</div>`;
-    }
+    if(tr.length) resHtml += `<div style="margin-bottom:12px"><b style="color:var(--co)">📍 原幣別結算：${cur}</b>${tr.map(t=>`<div class="box" style="margin:4px 0;background:var(--aq)">${t}</div>`).join('')}</div>`;
 });
-
 {
-    const cr=[], de=[];
-    Object.entries(twdSubB).forEach(([n,v])=>{if(v>1)cr.push([n,v]);else if(v<-1)de.push([n,-v])});
+    const cr=[], de=[]; Object.entries(twdSubB).forEach(([n,v])=>{if(v>1)cr.push([n,v]);else if(v<-1)de.push([n,-v])});
     const tr=[];
     while(cr.length&&de.length){
         cr.sort((a,b)=>b[1]-a[1]); de.sort((a,b)=>b[1]-a[1]);
         const x = Math.min(cr[0][1], de[0][1]);
         tr.push(`${esc(de[0][0])} ➜ ${esc(cr[0][0])} ${money(x)}`);
-        cr[0][1]-=x; de[0][1]-=x;
-        if(cr[0][1]<1) cr.shift(); if(de[0][1]<1) de.shift();
+        cr[0][1]-=x; de[0][1]-=x; if(cr[0][1]<1) cr.shift(); if(de[0][1]<1) de.shift();
     }
-    if(tr.length){
-        resHtml += `<div style="margin-bottom:12px"><b style="color:var(--co)">📍 台幣結算 (TWD)</b>${tr.map(t=>`<div class="box" style="margin:4px 0;background:var(--aq)">${t}</div>`).join('')}</div>`;
-    }
+    if(tr.length) resHtml += `<div style="margin-bottom:12px"><b style="color:var(--co)">📍 台幣結算 (TWD)</b>${tr.map(t=>`<div class="box" style="margin:4px 0;background:var(--aq)">${t}</div>`).join('')}</div>`;
 }
-
 modal('📊 結算明細', resHtml || '<p class="mute">目前不需要轉帳 🎉</p>');
 };
 
-/* ---------- 闖關與打卡 (精準分類 0/7 計數與 100% 達成解鎖) ---------- */
-const cls=t=>{t=t||'';if(/交通|機場|租車|還車|출발|空港/.test(t))return null;if(/餐廳|美食|咖啡|晚餐|午餐|早餐|烤肉|料理|吃|맛집|식당|카페/.test(t))return'food';if(/購物|免稅|超市|商場|買|마트|쇼핑/.test(t))return'shop';return'spot'};
+/* ---------- 闖關與打卡 ---------- */
+const cls=t=>{t=t||'';if(/交通|機場|租車|還車|출발|空港/.test(t))return null;if(/餐廳|美食|咖啡|晚餐|午餐|早餐|烤肉|料理|吃|맛집|식당|카페|ร้านอาหาร/.test(t))return'food';if(/購物|免稅|超市|商場|買|마트|쇼핑|ช้อปปิ้ง/.test(t))return'shop';return'spot'};
 const BD={food:['美食家','var(--co)'],spot:['探險家','var(--aq)'],shop:['購物達人','var(--ye)']};
 
 function rQuest(){
 const allIt = S.sch.map(s=>({...s,k:cls(s.title)})).filter(s=>s.k);
 const totalChk = allIt.filter(s=>S.chk[s.id]).length;
 const totalP = allIt.length ? Math.round(totalChk/allIt.length*100) : 0;
-
-$('qc').textContent=`已打卡 ${totalChk} / ${allIt.length}`;
-$('qp').textContent=totalP+'\%';$('qb').style.width=totalP+'%';
-
+$('qc').textContent=`已打卡 ${totalChk} / ${allIt.length}`; $('qp').textContent=totalP+'\%';$('qb').style.width=totalP+'%';
 for(const k in BD){
-    const catItems = allIt.filter(s=>s.k===k);
-    const catTotal = catItems.length;
-    const catDone = catItems.filter(s=>S.chk[s.id]).length;
-    // 必須全部完成 (catDone === catTotal 且大於 0) 才會點亮布章
+    const catItems = allIt.filter(s=>s.k===k); const catTotal = catItems.length; const catDone = catItems.filter(s=>S.chk[s.id]).length;
     const unlocked = catTotal > 0 && catDone === catTotal;
-    
     const b = $('b-'+k), was = b.classList.contains('on');
-    b.classList.toggle('on', unlocked);
-    b.style.background = unlocked ? BD[k][1] : '';
+    b.classList.toggle('on', unlocked); b.style.background = unlocked ? BD[k][1] : '';
     $('bt-'+k).textContent = catTotal > 0 ? `${catDone}/${catTotal}` : '0/0';
     if(unlocked && !was) b.classList.add('bn');
 }
-
 $('ql').innerHTML=allIt.length?allIt.map(s=>`<div class="box item" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><b>${esc(clean(s.title))}</b></div><button class="btn ${S.chk[s.id]?'gr':''}" data-i="${s.id}">${S.chk[s.id]?'✔ 已解鎖':'📍 打卡'}</button></div>`).join(''):'<p class="mute">行程中還沒有可打卡的景點、美食或購物 ✨</p>';
 $('ql').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>checkin(b.dataset.i))
 }
@@ -517,43 +412,31 @@ function compressAndConvert(file) {
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                let width = img.width; let height = img.height;
-                const MAX_DIM = 500;
+                let width = img.width; let height = img.height; const MAX_DIM = 500;
                 if (width > height) { if (width > MAX_DIM) { height *= MAX_DIM / width; width = MAX_DIM; } }
                 else { if (height > MAX_DIM) { width *= MAX_DIM / height; height = MAX_DIM; } }
                 canvas.width = width; canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
+                const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
                 resolve(canvas.toDataURL('image/jpeg', 0.6));
             };
-            img.onerror = () => resolve(e.target.result);
-            img.src = e.target.result;
+            img.onerror = () => resolve(e.target.result); img.src = e.target.result;
         };
-        reader.onerror = () => resolve('');
-        reader.readAsDataURL(file);
+        reader.onerror = () => resolve(''); reader.readAsDataURL(file);
     });
 }
 
 function checkin(id){const s=S.sch.find(x=>x.id===id);if(!s)return;const cur=S.chk[id],r=doc(db,'projects',S.id,'checkins',id+'_'+S.me);
 const m=modal(esc(clean(s.title)),`${cur&&cur.photoUrl?`<img src="${esc(cur.photoUrl)}" alt="" style="width:100%;border:3px solid var(--ink);border-radius:20px;margin-bottom:8px">`:''}<input id="ph" type="file" accept="image/*"><button class="btn co" id="up" style="width:100%;margin-bottom:8px">📷 ${cur?'換一張照片':'選照片打卡'}</button>${cur?'<button class="btn" id="un" style="width:100%">↩ 取消打卡</button>':'<button class="btn" id="np" style="width:100%">✔ 不放照片，直接打卡</button>'}`);
-
 q(m,'#up').onclick = async () => {
-    const fileInput = q(m,'#ph');
-    const f = fileInput.files[0];
+    const fileInput = q(m,'#ph'); const f = fileInput.files[0];
     if(!f){alert('請先點選檔案選擇照片！');return;}
     const b = q(m,'#up'); b.textContent='自動壓縮上傳中… ⏳'; b.disabled=true;
     try {
         const compressedBase64 = await compressAndConvert(f);
         if(!compressedBase64){ alert('圖片壓縮失敗'); b.textContent='再試一次'; b.disabled=false; return; }
-        await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:compressedBase64,at:Date.now()});
-        m.remove();
-    } catch(err) {
-        console.error(err);
-        alert('上傳失敗，請稍後再試');
-        b.textContent='再試一次'; b.disabled=false;
-    }
+        await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:compressedBase64,at:Date.now()}); m.remove();
+    } catch(err) { console.error(err); alert('上傳失敗請稍後再試'); b.textContent='再試一次'; b.disabled=false; }
 };
-
 const np=q(m,'#np');if(np)np.onclick=async()=>{await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:'',at:Date.now()});m.remove()};
 const un=q(m,'#un');if(un)un.onclick=async()=>{await deleteDoc(r);m.remove()}}
 
