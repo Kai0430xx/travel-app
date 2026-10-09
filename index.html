@@ -33,11 +33,7 @@ nav button.on{background:var(--ye);border-color:var(--ink)}
 .mask{position:fixed;inset:0;background:rgba(62,58,57,.45);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px}
 .sheet{width:100%;max-width:400px;max-height:88vh;overflow:auto;margin:0}
 input,textarea,select{font:inherit;font-size:16px!important;width:100%;border:3px solid var(--ink);border-radius:16px;background:#fff;padding:8px 12px;margin:4px 0 8px;color:var(--ink)}
-/* 🌸 淺灰色 placeholder 提示字 */
 ::placeholder { color: #b0a8a0; opacity: 1; }
-:-ms-input-placeholder { color: #b0a8a0; }
-::-ms-input-placeholder { color: #b0a8a0; }
-
 label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:0 10px 6px 0}.chk input{width:auto;margin:0}
 .bar{height:16px;border:3px solid var(--ink);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--gr);transition:width .5s}
 .badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
@@ -223,7 +219,7 @@ const s=S.sch.find(x=>x.id===id);if(!s)return;
 const t=clean(s.title);
 const getQuery = () => { const kw = q(m,'#map-kw')?.value?.trim(); if(kw) return kw; return (/濟州/.test(S.name)&&!t.includes('濟州')?'濟州島 ':'')+t; };
 
-/* 🌸 備註改為直接點擊即可修改的輸入框，無備註時顯示淺灰色「備註」 */
+/* 🌸 導航按鈕更新為直接以目前位置導航 (dir_action=navigate&travelmode=driving) */
 const m=modal(esc(t),`
 <div style="margin:6px 0 10px">
     <div style="margin-bottom:6px"><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span></div>
@@ -238,7 +234,12 @@ const m=modal(esc(t),`
     <button class="btn" id="dl">🗑 刪除</button>
 </div>`);
 
-const updateLinks = () => { const kw = encodeURIComponent(getQuery()); q(m,'#btn-naver')?.setAttribute('href', `https://m.map.naver.com/search2/search.naver?query=${kw}`); q(m,'#btn-google').href = `https://www.google.com/maps/search/?api=1&query=${kw}`; };
+const updateLinks = () => {
+    const kw = encodeURIComponent(getQuery());
+    q(m,'#btn-naver')?.setAttribute('href', `https://m.map.naver.com/search2/search.naver?query=${kw}`);
+    // 🌸 Google 導航直接導向開車模式
+    q(m,'#btn-google').href = `https://www.google.com/maps/dir/?api=1&destination=${kw}&travelmode=driving`;
+};
 updateLinks(); q(m,'#map-kw').oninput = updateLinks;
 
 q(m,'#dl').onclick=async()=>{if(confirm('確定刪除這個行程？')){await deleteDoc(doc(db,'projects',S.id,'schedules',id));m.remove()}};
@@ -335,7 +336,7 @@ korea:{c:'ko-KR',p:{
     emergency:[['救命！我的護照被偷了！','살려주세요! 여권을 도둑맞았어요!'],['我迷路了。','길을 잃었어요.'],['請幫我報警。','경찰에 신고해주세요.'],['請幫我叫救護車！','구급차를 불러주세요!']]
 }},
 japan:{c:'ja-JP',p:{
-    airport:[['我是來觀光的。','観光で来ました。'],['我會待五天。','5日間滞在します。'],['這是我的護照。','パスポートです。'],['我有行李要托運。','荷물을預けたいです。'],['請給我靠走道的座位。','通路側の席をお願いします。'],['我的行李找不到。','荷물が見つかりません。']],
+    airport:[['我是來觀光的。','観光で来ました。'],['我會待五天。','5日間滞在します。'],['這是我的護照。','パスポートです。'],['我有行李要托運。','荷物を預けたいです。'],['請給我靠走道的座位。','通路側の席をお願いします。'],['我的行李找不到。','荷물が見つかりません。']],
     hotel:[['我有預約，名字是…','予約している…です。'],['請問有附早餐嗎？','朝食はついていますか？'],['可以寄放行李嗎？','荷물을預かっていただけますか？'],['房間有 Wi-Fi 嗎？密碼是什麼？','部屋にWi-Fi은ありますか？パスワードは何ですか？'],['幾點退房？','チェックアウトは何時ですか？']],
     restaurant:[['我們有 4 個人。','4人です。'],['有中文菜單嗎？','中国語のメニューはありますか？'],['推薦什麼菜？','おすすめは何ですか？'],['這個會辣嗎？','これは辛いですか？'],['我們要結帳。','お会計をお願いします。'],['可以刷卡嗎？','カードは使えますか？'],['我要一杯冰咖啡。','アイスコーヒーを一つください。'],['內用還是外帶？','店内でお召し上がりですか、お持ち帰りですか？']],
     shopping:[['這個多少錢？','これはいくらですか？'],['有其他顏色嗎？','他の色はありますか？'],['可以試穿嗎？','試着してもいいですか？'],['可以退稅嗎？','免税できますか？']],
@@ -447,7 +448,7 @@ Object.entries(origGroups).forEach(([cur, subB])=>{
         cr.sort((a,b)=>b[1]-a[1]); de.sort((a,b)=>b[1]-a[1]);
         const x = Math.min(cr[0][1], de[0][1]);
         tr.push(`${esc(de[0][0])} ➜ ${esc(cr[0][0])} ${money(x)}`);
-        cr[0][1]-=x; de[0][1]-=x; if(cr[0][1]<1) cr.shift(); if(de[0][1]<1) de.shift();
+        cr[0][1]-=x; de[0][1]-=x; if(cr[0][1]<1) cr.shift(); if(de[0][1]<1) cr.shift();
     }
     if(tr.length) resHtml += `<div style="margin-bottom:12px"><b style="color:var(--co)">📍 台幣結算 (TWD)</b>${tr.map(t=>`<div class="box" style="margin:4px 0;background:var(--aq)">${t}</div>`).join('')}</div>`;
 }
