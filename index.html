@@ -234,6 +234,54 @@
         </div>
     </div>
 
+    <!-- 🌸 拍照打卡 Modal -->
+    <div id="quest-photo-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-[#5c4a3d] text-base" id="quest-modal-title">📸 打卡上傳</h3>
+                <button onclick="window.closeQuestPhotoModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <div id="quest-photo-preview-container" class="hidden w-full h-40 bg-gray-50 rounded-2xl border border-[#eae1d7] overflow-hidden flex items-center justify-center">
+                <img id="quest-photo-preview" src="" alt="預覽照片" class="w-full h-full object-cover">
+            </div>
+            <div>
+                <label class="block font-bold text-gray-600 mb-1">選擇照片 (會自動優化壓縮)</label>
+                <input type="file" id="quest-file-input" accept="image/*" onchange="window.previewQuestPhoto(event)" class="w-full text-xs p-2.5 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
+            </div>
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="window.closeQuestPhotoModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
+                <button onclick="window.submitQuestPhoto()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認打卡</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌸 已打卡項目管理 Modal -->
+    <div id="quest-edit-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-[#5c4a3d] text-base" id="edit-quest-modal-title">✨ 已打卡項目管理</h3>
+                <button onclick="window.closeQuestEditModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <p class="text-gray-500 font-bold">您可以選擇更換照片，或是取消打卡晚點再上傳！</p>
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="window.openChangePhotoFromEdit()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">📷 更換照片</button>
+                <button onclick="window.cancelQuestCheckin()" class="flex-1 bg-red-100 text-red-600 py-3 rounded-full font-black">❌ 取消打卡</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌸 照片回憶寫真冊 Modal -->
+    <div id="photo-gallery-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center shrink-0">
+                <h3 class="font-black text-[#5c4a3d] text-base">📸 旅伴共同寫真冊</h3>
+                <button onclick="window.closePhotoGalleryModal()" class="text-gray-400 font-black text-base">✕</button>
+            </div>
+            <div id="photo-gallery-grid" class="grid grid-cols-2 gap-3 overflow-y-auto pr-1 flex-1"></div>
+            <div class="pt-2 shrink-0"><button onclick="window.closePhotoGalleryModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button></div>
+        </div>
+    </div>
+
     <div id="smart-paste-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
@@ -333,6 +381,7 @@
         let currentMyName = localStorage.getItem('my_travel_nickname') || "";
         let currentDestinationLang = 'ko-KR';
         let currentActivePhrase = { cn: "請選擇想說的話", foreign: "請選擇想說的話" };
+        let compressedPhotoBase64 = "";
 
         let unsubscribeSchedules = null;
         let unsubscribeExpenses = null;
@@ -345,6 +394,7 @@
         let allCheckinsData = {}; 
         let currentSplitMode = 'equal';
         let activeDayFilter = 'all';
+        let currentQuestTargetId = null;
         let currentDetailItem = null;
 
         const languageData = {
@@ -364,8 +414,7 @@
                         { cn: "這個是什麼？請推薦招牌菜。", foreign: "이게 뭐예요? 대표 메뉴 추천해주세요." }
                     ],
                     shopping: [
-                        { cn: "請問這個多少錢？", foreign: "이거 얼마예요?" },
-                        { cn: "請問現在有折扣或優惠活動嗎？", foreign: "할인 중인가요?" }
+                        { cn: "請問這個多少錢？", foreign: "이거 얼마예요?" }
                     ],
                     transport: [
                         { cn: "請問離這裡最近的地鐵站在哪裡？", foreign: "여기서 가장 가까운 지하철역이 어디예요?" }
@@ -375,35 +424,6 @@
                     ],
                     emergency: [
                         { cn: "救命！我的護照被偷了！", foreign: "살려주세요! 여권을 도둑맞았어요!" }
-                    ]
-                }
-            },
-            japan: {
-                langCode: 'ja-JP',
-                categories: [
-                    { id: 'restaurant', name: '🍽️ 餐廳' },
-                    { id: 'shopping', name: '🛍️ 購物' },
-                    { id: 'transport', name: '🚆 交通' },
-                    { id: 'hotel', name: '🏨 住宿' },
-                    { id: 'emergency', name: '🚨 突發' }
-                ],
-                phrases: {
-                    restaurant: [
-                        { cn: "我們有 4 個人。", foreign: "4人です。" },
-                        { cn: "請問有中文菜單嗎？", foreign: "中国語のメニューはありますか？" },
-                        { cn: "這個是什麼？請推薦招牌菜。", foreign: "これは何ですか？おすすめの料理を教えてください。" }
-                    ],
-                    shopping: [
-                        { cn: "請問這個多少錢？", foreign: "これはいくらですか？" }
-                    ],
-                    transport: [
-                        { cn: "請問離這裡最近的地鐵站在哪裡？", foreign: "ここから一番近い駅はどこですか？" }
-                    ],
-                    hotel: [
-                        { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" }
-                    ],
-                    emergency: [
-                        { cn: "救命！護照被偷了！", foreign: "助けてください！パスポートが盗まれました！" }
                     ]
                 }
             },
@@ -426,7 +446,7 @@
             }
         };
 
-        // 🌟 完整掛載所有控制與互動函式到 window
+        // 🌟 完整掛載所有控制與打卡互動函式到 window
         window.openSmartPasteModal = function() {
             if (currentProjectId) document.getElementById('smart-paste-modal').classList.remove('hidden');
         };
@@ -460,6 +480,119 @@
             currentDetailItem = null;
         };
 
+        // 🌟 闖關打卡與照片處理函式
+        window.openQuestPhotoModal = function(scheduleId, title) {
+            currentQuestTargetId = scheduleId;
+            document.getElementById('quest-modal-title').innerText = `📸 打卡：${title}`;
+            document.getElementById('quest-file-input').value = '';
+            document.getElementById('quest-photo-preview-container').classList.add('hidden');
+            compressedPhotoBase64 = "";
+            document.getElementById('quest-photo-modal').classList.remove('hidden');
+        };
+        window.closeQuestPhotoModal = function() {
+            document.getElementById('quest-photo-modal').classList.add('hidden');
+            currentQuestTargetId = null;
+        };
+
+        window.previewQuestPhoto = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 600;
+                    const MAX_HEIGHT = 600;
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > height) {
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    } else {
+                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    document.getElementById('quest-photo-preview').src = compressedPhotoBase64;
+                    document.getElementById('quest-photo-preview-container').classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.submitQuestPhoto = async function() {
+            if (!currentProjectId || !currentQuestTargetId) return;
+            if (!compressedPhotoBase64) { alert("請先選擇要上傳的照片！"); return; }
+            try {
+                const checkinRef = doc(db, "projects", currentProjectId, "checkins", `${currentQuestTargetId}_${currentMyName}`);
+                await setDoc(checkinRef, {
+                    scheduleId: currentQuestTargetId,
+                    uploader: currentMyName,
+                    photoUrl: compressedPhotoBase64,
+                    createdAt: Date.now()
+                });
+                closeQuestPhotoModal();
+                alert("✨ 打卡成功！");
+            } catch (e) { alert("打卡上傳失敗"); }
+        };
+
+        window.openQuestEditModal = function(scheduleId, title) {
+            currentQuestTargetId = scheduleId;
+            document.getElementById('edit-quest-modal-title').innerText = `✨ 已打卡：${title}`;
+            document.getElementById('quest-edit-modal').classList.remove('hidden');
+        };
+        window.closeQuestEditModal = function() {
+            document.getElementById('quest-edit-modal').classList.add('hidden');
+            currentQuestTargetId = null;
+        };
+
+        window.openChangePhotoFromEdit = function() {
+            closeQuestEditModal();
+            window.openQuestPhotoModal(currentQuestTargetId, "更換打卡照片");
+        };
+
+        window.cancelQuestCheckin = async function() {
+            if (!currentProjectId || !currentQuestTargetId) return;
+            if (confirm("確定要取消這次的打卡記錄嗎？")) {
+                try {
+                    await deleteDoc(doc(db, "projects", currentProjectId, "checkins", `${currentQuestTargetId}_${currentMyName}`));
+                    closeQuestEditModal();
+                    alert("✨ 已取消打卡！");
+                } catch (e) { alert("取消失敗"); }
+            }
+        };
+
+        window.openPhotoGalleryModal = function() {
+            const grid = document.getElementById('photo-gallery-grid');
+            grid.innerHTML = '';
+            let count = 0;
+            Object.keys(allCheckinsData).forEach(schedId => {
+                let data = allCheckinsData[schedId];
+                if (data && data.photoUrl) {
+                    count++;
+                    let div = document.createElement('div');
+                    div.className = "relative rounded-2xl overflow-hidden border border-[#eae1d7] h-36 bg-gray-50 flex flex-col";
+                    div.innerHTML = `
+                        <img src="${data.photoUrl}" class="w-full h-full object-cover cursor-pointer" onclick="window.open('${data.photoUrl}', '_blank')">
+                        <div class="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[9px] p-1 font-bold truncate text-center">👤 ${data.uploader}</div>
+                    `;
+                    grid.appendChild(div);
+                }
+            });
+            if (count === 0) {
+                grid.innerHTML = `<p class="col-span-2 text-center text-xs text-gray-400 py-8">目前還沒有旅伴上傳打卡照片！快去景點美食打卡吧 📸</p>`;
+            }
+            document.getElementById('photo-gallery-modal').classList.remove('hidden');
+        };
+        window.closePhotoGalleryModal = function() {
+            document.getElementById('photo-gallery-modal').classList.add('hidden');
+        };
+
         // 🌟 點擊整張行程卡片開啟詳細與 MAP 導航
         window.openDetailModal = function(scheduleId) {
             const item = allSchedulesData.find(s => s.id === scheduleId);
@@ -481,7 +614,6 @@
 
             const mapBtnContainer = document.getElementById('modal-map-btn-container');
             let isKoreaTrip = currentProjectName && (currentProjectName.includes("濟州") || currentProjectName.includes("韓國") || currentProjectName.includes("釜山") || currentProjectName.includes("首爾"));
-            let isJapanTrip = currentProjectName && (currentProjectName.includes("日本") || currentProjectName.includes("東京") || currentProjectName.includes("大阪") || currentProjectName.includes("京都") || currentProjectName.includes("沖繩"));
             
             let mapBtnsHtml = '';
             let searchKeyword = window.cleanDisplayTitle(item.title);
@@ -628,7 +760,6 @@
             if (targetNav) targetNav.className = "flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5";
         };
 
-        // 🌟 完整恢復提醒分頁
         window.renderRemindersByRules = function(projectName) {
             const container = document.getElementById('dynamic-reminders-container');
             if (!container) return;
@@ -657,14 +788,13 @@
                 html = `
                     <div class="cute-card p-5 space-y-2.5">
                         <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥當地網卡與萬用轉接頭。</p>
+                        <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥網卡與萬用轉接頭。</p>
                     </div>
                 `;
             }
             container.innerHTML = html;
         };
 
-        // 🌟 完整恢復語言分頁
         window.initLanguageModule = function(projectName) {
             let nameLower = (projectName || '').toLowerCase();
             let destKey = 'general';
@@ -754,7 +884,7 @@
             });
         };
 
-        // 🌟 完整恢復闖關分頁與徽章進度
+        // 🌟 完整恢復帶有打卡上傳按鈕的闖關分頁
         window.renderQuestUI = function() {
             const container = document.getElementById('quest-list-container');
             const countEl = document.getElementById('quest-total-count');
@@ -795,14 +925,23 @@
             container.innerHTML = '';
             questItems.forEach(s => {
                 let cleanTitle = window.cleanDisplayTitle(s.title);
+                let statusBadge = s.completed ? 
+                    `<span onclick="window.openQuestEditModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-green-100 text-green-700 px-3 py-1.5 rounded-full font-black cursor-pointer hover:bg-green-200">✔️ 已打卡</span>` : 
+                    `<span onclick="window.openQuestPhotoModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-[#f0dcd0] text-[#735848] px-3 py-1.5 rounded-full font-black cursor-pointer hover:bg-[#e2c8b8]">📸 拍照打卡</span>`;
+                
+                let photoThumbnail = s.photoUrl ? `<img src="${s.photoUrl}" class="w-10 h-10 rounded-xl object-cover border border-[#eae1d7] shrink-0 ml-2">` : '';
+
                 let div = document.createElement('div');
                 div.className = "p-4 bg-white rounded-2xl border border-[#eae1d7] flex justify-between items-center";
                 div.innerHTML = `
-                    <div>
+                    <div class="space-y-1 min-w-0 flex-1 pr-2">
                         <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.day || 'Day 1'} • ${s.time || '全天'}</span>
-                        <h5 class="font-black text-gray-900 text-sm mt-1">${cleanTitle}</h5>
+                        <h5 class="font-black text-gray-900 text-sm mt-1 truncate">${cleanTitle}</h5>
                     </div>
-                    <span class="text-xs font-bold ${s.completed ? 'text-green-600' : 'text-gray-400'}">${s.completed ? '✔️ 已解鎖' : '📍 待解鎖'}</span>
+                    <div class="flex items-center shrink-0">
+                        ${statusBadge}
+                        ${photoThumbnail}
+                    </div>
                 `;
                 container.appendChild(div);
             });
