@@ -664,7 +664,7 @@
                         { cn: "我要辦理入住登記。", foreign: "I'd like to check in, please." },
                         { cn: "請問房間有無線網路嗎？密碼是什麼？", foreign: "Is there free Wi-Fi? What is the password?" },
                         { cn: "請問可以幫我寄放行李嗎？", foreign: "Can I leave my luggage here?" },
-                        { cn: "請問幾點是退房時間？", foreign: "What time is check-out?" }
+                        { cn: "Questions? What time is check-out?", foreign: "What time is check-out?" }
                     ],
                     emergency: [
                         { cn: "救命！我的護照（或錢包）被偷了！", foreign: "Help! My passport (wallet) has been stolen!" },
@@ -675,55 +675,44 @@
             }
         };
 
-        // 🌟 完整宣告所有函式並直接掛載到 window
-        function switchTab(tabName) {
-            ['schedule', 'ai', 'lang', 'split', 'quest'].forEach(t => {
-                const el = document.getElementById(`tab-${t}`);
-                const navEl = document.getElementById(`nav-${t}`);
-                if (el) el.classList.add('hidden');
-                if (navEl) navEl.className = "flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5";
-            });
-            const targetTab = document.getElementById(`tab-${tabName}`);
-            const targetNav = document.getElementById(`nav-${tabName}`);
-            if (targetTab) targetTab.classList.remove('hidden');
-            if (targetNav) targetNav.className = "flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5";
-        }
-        window.switchTab = switchTab;
-
-        function updateExpenseModalDropdowns() {
-            const payerSelect = document.getElementById('exp-payer');
-            const container = document.getElementById('exp-participants-container');
-            if (!payerSelect || !container) return;
-            payerSelect.innerHTML = '';
-            container.innerHTML = '';
-            allMembersData.forEach(m => {
-                let opt = document.createElement('option');
-                opt.value = m.name;
-                opt.innerText = m.name;
-                if (m.name === currentMyName) opt.selected = true;
-                payerSelect.appendChild(opt);
-
-                let div = document.createElement('div');
-                div.className = "flex justify-between items-center bg-white p-2 rounded-xl border border-[#eae1d7]";
-                if (currentSplitMode === 'equal') {
-                    div.innerHTML = `
-                        <label class="flex items-center gap-2 font-bold text-gray-700 cursor-pointer">
-                            <input type="checkbox" name="participant" value="${m.name}" checked class="rounded accent-[#d98262]"> ${m.name}
-                        </label>
-                        <span class="text-gray-400 font-bold text-[11px]">參與均攤</span>
-                    `;
-                } else {
-                    div.innerHTML = `
-                        <label class="flex items-center gap-2 font-bold text-gray-700">
-                            <input type="checkbox" name="participant" value="${m.name}" checked onchange="window.toggleCustomInput(this)" class="rounded accent-[#d98262]"> ${m.name}
-                        </label>
-                        <input type="number" name="custom-share-${m.name}" placeholder="分攤金額" value="" class="w-24 p-1.5 bg-[#fffaf5] border border-[#eae1d7] rounded-lg outline-none font-bold text-right">
-                    `;
+        // 🌟 完整宣告所有進入專案與點擊互動的核心函式，並安全掛載到 window
+        window.enterProject = async function(id) {
+            currentProjectId = id;
+            try {
+                const docSnap = await getDoc(doc(db, "projects", id));
+                if (docSnap.exists()) {
+                    const p = docSnap.data();
+                    currentProjectName = p.name;
+                    currentProjectPin = p.pin || "";
                 }
-                container.appendChild(div);
-            });
-        }
-        window.updateExpenseModalDropdowns = updateExpenseModalDropdowns;
+            } catch (e) {}
+
+            if (!currentMyName) {
+                document.getElementById('login-modal').classList.remove('hidden');
+                return;
+            }
+
+            window.proceedEnterProject();
+        };
+
+        window.proceedEnterProject = function() {
+            document.getElementById('view-projects').classList.add('hidden');
+            document.getElementById('view-workspace').classList.remove('hidden');
+            document.getElementById('bottom-nav').classList.remove('hidden');
+            document.getElementById('back-btn').classList.remove('hidden');
+            document.getElementById('share-btn').classList.remove('hidden');
+            
+            document.getElementById('header-title').innerText = `🌸 ${currentProjectName}`;
+            document.getElementById('header-sub').innerText = `旅伴：${currentMyName} ✨`;
+            
+            window.renderRemindersByRules(currentProjectName);
+            window.initLanguageModule(currentProjectName);
+            window.loadMembersAndExpenses(currentProjectId);
+            window.loadCheckins(currentProjectId);
+            
+            switchTab('schedule');
+            window.loadSchedules(currentProjectId);
+        };
 
         window.renderRemindersByRules = function(projectName) {
             const container = document.getElementById('dynamic-reminders-container');
@@ -1112,7 +1101,6 @@
             allBtn.onclick = () => { activeDayFilter = 'all'; renderDayPills(); renderScheduleUI(); };
             pillsContainer.appendChild(allBtn);
 
-            days.days.forEach?.(dayKey => {}); // safe guard
             days.forEach(dayKey => {
                 let btn = document.createElement('button');
                 let isActive = activeDayFilter === dayKey;
