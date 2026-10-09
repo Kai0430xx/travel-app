@@ -33,7 +33,7 @@ label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:
 .badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
 .bd{width:64px;height:64px;margin:0 auto;border:3px dashed var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;filter:grayscale(1);opacity:.5}
 .bd.on{border-style:solid;filter:none;opacity:1}
-.lang{display:grid;grid-template-columns:96px 1fr;gap:10px}.lang .btn{display:block;width:100%;text-align:left;margin-bottom:8px}.lang .btn.on{background:var(--co)}
+.lang{display:grid;grid-template-columns:104px 1fr;gap:10px}.lang .btn{display:block;width:100%;text-align:left;margin-bottom:8px;font-size:12px}.lang .btn.on{background:var(--co)}
 @keyframes fl{50%{transform:translateY(-5px)}}@keyframes dr{from{transform:translateX(-9px)}to{transform:translateX(9px)}}
 @keyframes bn{0%{transform:scale(.82)}55%{transform:scale(1.1)}100%{transform:scale(1)}}
 .fl{animation:fl 3s ease-in-out infinite}.dr{animation:dr 6s ease-in-out infinite alternate}.bn{animation:bn .5s cubic-bezier(.3,1.6,.5,1)}
@@ -48,7 +48,7 @@ label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:
 <section id="v1" hidden>
 <div id="t-schedule" class="tab"><div class="art" id="hero-schedule"></div><div class="row"><h3>📅 行程時間軸</h3><span><button id="sp" class="btn">✨ 智慧導入</button> <button id="ad" class="btn co">＋ 新增</button></span></div><div class="pills" id="pills"></div><div id="sl"></div></div>
 <div id="t-ai" class="tab" hidden><div class="art" id="hero-ai"></div></div>
-<div id="t-lang" class="tab" hidden><div class="art" id="hero-lang"></div><div class="box" style="text-align:center;background:var(--ye)"><small id="dc">請點選下方句子</small><h2 id="df" style="margin:4px 0 10px">想說什麼呢？</h2><button id="say" class="btn co">🔊 朗讀</button></div><div class="lang"><div id="lc"></div><div id="lp"></div></div></div>
+<div id="t-lang" class="tab" hidden><div class="art" id="hero-lang"></div><div class="box" style="text-align:center;background:var(--ye)"><small id="dc">請點選下方對話情境與句子</small><h2 id="df" style="margin:4px 0 10px">想說什麼呢？</h2><button id="say" class="btn co">🔊 朗讀</button></div><div class="lang"><div id="lc"></div><div id="lp"></div></div></div>
 <div id="t-split" class="tab" hidden><div class="art" id="hero-split"></div><div class="box" style="background:var(--co)"><div class="row" style="margin:0"><small>旅程總花費（折合台幣）</small><button id="mb" class="btn">👥 成員</button></div><h2 id="tot">NT$ 0</h2><small id="brk"></small></div>
 <div class="row"><h3>💰 帳目</h3><span><button id="st" class="btn aq">📊 結算</button> <button id="ae" class="btn co">＋ 記一筆</button></span></div><div id="el"></div></div>
 <div id="t-quest" class="tab" hidden><div class="art" id="hero-quest"></div><div class="box" style="background:var(--gr)"><div class="row" style="margin:0 0 6px"><b id="qc">已打卡 0 / 0</b><b id="qp">0%</b></div><div class="bar" style="background:var(--paper)"><i id="qb" style="width:0"></i></div>
@@ -108,7 +108,9 @@ if(diff>0)return`🔥 倒數 ${diff} 天`;if(diff===0)return`🎉 今天出發�
 const ids=()=>JSON.parse(localStorage.getItem('my_subscribed_projects')||'[]');
 const saveIds=a=>localStorage.setItem('my_subscribed_projects',JSON.stringify([...new Set(a)]));
 
-async function renderProjects(){const l=$('pl'),a=ids();if(!a.length){l.innerHTML='<p class="mute">還沒有專案，新增一個或輸入 6 位數號碼導入吧 ✨</p>';return}
+async function renderProjects(){
+const l=$('pl'),a=ids();
+if(!a.length){l.innerHTML='<p class="mute">還沒有專案，新增一個或輸入 6 位數號碼導入吧 ✨</p>';return}
 const snaps=await Promise.all(a.map(i=>getDoc(doc(db,'projects',i)).catch(()=>null)));l.innerHTML='';
 snaps.forEach(s=>{if(!s||!s.exists())return;const p=s.data(),d=document.createElement('div');d.className='box item';
 d.style.display='flex';d.style.justifyContent='space-between';d.style.alignItems='center';
@@ -142,7 +144,7 @@ sub('checkins',0,a=>{S.all=a;S.chk={};a.filter(c=>c.uploader===S.me).forEach(c=>
 
 $('bk').onclick=()=>{S.un.forEach(f=>f());S.un=[];S.id=null;$('v0').hidden=false;$('v1').hidden=true;$('nav').hidden=true;$('bk').hidden=true;$('sh').hidden=true;$('ht').textContent='🧳 放風之旅';$('hs').textContent='選擇你的冒險旅程 ✨';renderProjects()};
 
-const TABS=[['schedule','📅','行程'],['ai','💡','提醒'],['lang','🗣','語言'],['split','💰','分帳'],['quest','🎯','闖關']];
+const TABS=[['schedule','📅','行程'],['ai','💡','提醒'],['lang','🗣','對話'],['split','💰','分帳'],['quest','🎯','闖關']];
 $('nav').innerHTML=TABS.map(t=>`<button data-t="${t[0]}"><span>${t[1]}</span>${t[2]}</button>`).join('');
 $('nav').querySelectorAll('button').forEach(b=>b.onclick=()=>{tab(b.dataset.t);b.classList.add('bn')});
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.hidden=e.id!=='t-'+t);$('nav').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.t===t);if(b.dataset.t!==t)b.classList.remove('bn')})}
@@ -171,17 +173,122 @@ const line=raw.replace(/：/g,':'),tm=line.match(/(\d{1,2}):(\d{2})/);
 if(tm&&!/備註|營業時間/.test(line)){if(cur)out.push(cur);cur={day,time:tm[0],title:line.replace(/^[•\-\s]*\d{1,2}:\d{2}\s*/,'').trim(),location:'',createdAt:Date.now()+out.length}}else if(cur)cur.location+=(cur.location?'\n':'')+raw}
 if(cur)out.push(cur);await Promise.all(out.map(i=>addDoc(collection(db,'projects',S.id,'schedules'),i)));alert(`✨ 成功導入 ${out.length} 筆行程！`)});
 
-/* ---------- 提醒 / 語言 ---------- */
+/* ---------- 提醒 / 對話 (擴充 TutorABC 實用對話) ---------- */
 function rRemind(){const c=t=>`<div class="box"><h3>${t[0]}</h3><div style="font-size:14px">${t[1]}</div></div>`;
 $('t-ai').innerHTML=tabScene('ai')+(dest(S.name)==='korea'?[['🇰🇷 天氣小提醒','早晚溫差大、風也大，記得帶防風外套 🧥'],['🚗 自駕導航','推薦 Naver Map 或 Kakao Map，用電話號碼搜尋最準。沿途測速相機很多，請依速限行駛。'],['🚨 緊急電話','警察 112 ｜ 救護・消防 119 ｜ 中文旅遊熱線 1330']].map(c).join(''):c(['🌍 出發前確認','護照效期需大於 6 個月，備好網卡與萬用轉接頭 🔌']))}
 
-const CATS=[['restaurant','🍽️ 餐廳'],['shopping','🛍️ 購物'],['transport','🚗 交通'],['hotel','🏨 住宿'],['emergency','🚨 突發']];
-const LG={korea:{c:'ko-KR',p:{restaurant:[['我們有 4 個人。','4명입니다.'],['請問有中文菜單嗎？','중국어 메뉴판 있어요?'],['請推薦招牌菜。','대표 메뉴 추천해주세요.']],shopping:[['請問這個多少錢？','이거 얼마예요?'],['現在有折扣嗎？','할인 중인가요?']],transport:[['最近的地鐵站在哪裡？','가장 가까운 지하철역이 어디예요?']],hotel:[['我要辦理入住。','체크인 하겠습니다.']],emergency:[['救命！護照被偷了！','살려주세요! 여권을 도둑맞았어요!']]}},
-japan:{c:'ja-JP',p:{restaurant:[['我們有 4 個人。','4人です。'],['請問有中文菜單嗎？','中国語のメニューはありますか？'],['請推薦招牌菜。','おすすめの料理を教えてください。']],shopping:[['請問這個多少錢？','これはいくらですか？']],transport:[['最近的車站在哪裡？','一番近い駅はどこですか？']],hotel:[['我要辦理入住。','チェックインお願いします。']],emergency:[['救命！護照被偷了！','助けてください！パスポートが盗まれました！']]}},
-general:{c:'en-US',p:{restaurant:[['我們有 4 個人。','Table for four, please.']],shopping:[['請問這個多少錢？','How much is this?']],transport:[['最近的地鐵站在哪裡？','Where is the nearest subway station?']],hotel:[['我要辦理入住。',"I'd like to check in, please."]],emergency:[['救命！護照被偷了！','Help! My passport has been stolen!']]}}};
+const CATS=[
+    ['airport','✈️ 機場海關'],
+    ['hotel','🏨 飯店住宿'],
+    ['restaurant','🍽️ 餐廳點餐'],
+    ['shopping','🛍️ 購物商場'],
+    ['transport','🚗 問路交通'],
+    ['emergency','🚨 緊急求助']
+];
 
-function rLang(){const P=LG[dest(S.name)].p;const show=id=>{$('lc').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===id));$('lp').innerHTML=(P[id]||[]).map((p,i)=>`<button class="box item" style="width:100%;font:inherit;color:inherit;text-align:left;margin:0 0 10px" data-i="${i}">${esc(p[0])}</button>`).join('');
-$('lp').querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=P[id][b.dataset.i];S.phrase=p;$('dc').textContent=p[0];$('df').textContent=p[1]})};$('lc').innerHTML=CATS.map(c=>`<button class="btn" data-c="${c[0]}">${c[1]}</button>`).join('');$('lc').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.c));show('restaurant')}$('say').onclick=()=>{if(!S.phrase)return;const u=new SpeechSynthesisUtterance(S.phrase[1]);u.lang=S.lang;speechSynthesis.speak(u)};
+const LG={
+korea:{c:'ko-KR',p:{
+    airport:[
+        ['我有行李要托運。','짐을 부치겠습니다.'],
+        ['我是來觀光的。','관광하러 왔습니다.'],
+        ['我會待七天。','7일 동안 머물 예정입니다.']
+    ],
+    hotel:[
+        ['我有訂房，名字是…','예약했습니다. 이름은…입니다.'],
+        ['請問有含早餐嗎？','조식이 포함되어 있나요?'],
+        ['可以幫我寄放行李嗎？','짐을 맡겨도 될까요?']
+    ],
+    restaurant:[
+        ['我們有 4 個人。','4명입니다.'],
+        ['請問有中文菜單嗎？','중국어 메뉴판 있어요?'],
+        ['這個會辣嗎？可以做不辣的嗎？','맵나요? 안 맵게 해주실 수 있나요?'],
+        ['我們要結帳。','계산해주세요.']
+    ],
+    shopping:[
+        ['請問這個多少錢？','이거 얼마예요?'],
+        ['請問有其他顏色嗎？','다른 색상 있어요?'],
+        ['請問這裡可以退稅嗎？','여기서 텍스프리 되나요?']
+    ],
+    transport:[
+        ['最近的地鐵站在哪裡？','가장 가까운 지하철역이 어디예요?'],
+        ['請問怎麼去這個地方？','여기에 어떻게 가요?'],
+        ['請載我到這個地址。','이 주소로 가주세요.']
+    ],
+    emergency:[
+        ['救命！我的護照被偷了！','살려주세요! 여권을 도둑맞았어요!'],
+        ['我身體很不舒服。','몸이 안 좋아요.'],
+        ['請幫我報警。','경찰에 신고해주세요.']
+    ]
+}},
+japan:{c:'ja-JP',p:{
+    airport:[
+        ['我有行李要托運。','荷物を預けたいです。'],
+        ['我是來觀光的。','観光で来ました。'],
+        ['我會待五天。','5日間滞在します。']
+    ],
+    hotel:[
+        ['我有訂房，名字是…','予約している…です。'],
+        ['請問房價有含早餐嗎？','朝食は料金に含まれていますか？'],
+        ['可以幫我寄放行李嗎？','荷物を預かっていただけますか？']
+    ],
+    restaurant:[
+        ['我們有 4 個人。','4人です。'],
+        ['請問有中文菜單嗎？','中国語のメニューはありますか？'],
+        ['請問這個會辣嗎？','これは辛いですか？'],
+        ['お会計をお願いします。','我們要結帳。']
+    ],
+    shopping:[
+        ['請問這個多少錢？','これはいくらですか？'],
+        ['有其他顏色嗎？','他の色はありますか？'],
+        ['可以退稅嗎？','免税できますか？']
+    ],
+    transport:[
+        ['最近的車站在哪裡？','一番近い駅はどこですか？'],
+        ['怎麼去這裡？','ここへはどう行きますか？'],
+        ['請載我到這裡。','ここまでお願いします。']
+    ],
+    emergency:[
+        ['救命！護照被偷了！','助けてください！パスポートが盗まれました！'],
+        ['身體很不舒服。','気分が悪いです。'],
+        ['請幫我報警。','警察を呼んでください。']
+    ]
+}},
+general:{c:'en-US',p:{
+    airport:[
+        ['Do you have any luggage to check?','您有行李要托運嗎？'],
+        ['I’m here for sightseeing.','我是來觀光的。'],
+        ['I’ll be staying for five days.','我會待五天。']
+    ],
+    hotel:[
+        ['I have a reservation under the name...','我有訂房，名字是...'],
+        ['Is breakfast included?','請問有包含早餐嗎？'],
+        ['Could I store my luggage here?','可以幫我寄放行李嗎？']
+    ],
+    restaurant:[
+        ['Table for four, please.','我們有 4 個人。'],
+        ['Do you have a Chinese menu?','請問有中文菜單嗎？'],
+        ['Is this spicy? Can you make it mild?','這個會辣嗎？可以做不辣的嗎？'],
+        ['Check, please.','我們要結帳。']
+    ],
+    shopping:[
+        ['How much is this?','請問這個多少錢？'],
+        ['Do you have other colors?','有其他顏色嗎？'],
+        ['Can I get a tax refund here?','這裡可以辦理退稅嗎？']
+    ],
+    transport:[
+        ['Where is the nearest subway station?','離這裡最近的地鐵站在哪裡？'],
+        ['How do I get to this place?','怎麼去這個地方？'],
+        ['Please take me to this address.','請載我到這個地址。']
+    ],
+    emergency:[
+        ['Help! My passport has been stolen!','救命！我的護照被偷了！'],
+        ['I feel sick.','我身體很不舒服。'],
+        ['Can you help me call the police?','可以幫我報警嗎？']
+    ]
+}}};
+
+function rLang(){const P=LG[dest(S.name)].p;const show=id=>{$('lc').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===id));$('lp').innerHTML=(P[id]||[]).map((p,i)=>`<button class="box item" style="width:100%;font:inherit;color:inherit;text-align:left;margin:0 0 10px" data-i="${i}"><b>${esc(p[0])}</b><small style="color:var(--co)">${esc(p[1])}</small></button>`).join('');
+$('lp').querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=P[id][b.dataset.i];S.phrase=p;$('dc').textContent=p[0];$('df').textContent=p[1]})};$('lc').innerHTML=CATS.map(c=>`<button class="btn" data-c="${c[0]}">${c[1]}</button>`).join('');$('lc').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.c));show('airport')}$('say').onclick=()=>{if(!S.phrase)return;const u=new SpeechSynthesisUtterance(S.phrase[S.lang==='en-US'?0:1]);u.lang=S.lang;speechSynthesis.speak(u)};
 
 /* ---------- 分帳 ---------- */
 const money=n=>'NT$ '+Math.round(n).toLocaleString();
