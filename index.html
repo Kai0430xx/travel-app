@@ -293,49 +293,6 @@
         </div>
     </div>
 
-    <!-- 記帳與結算 Modal -->
-    <div id="expense-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-md p-6 space-y-3.5 shadow-2xl text-xs max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">✍️ 新增記帳</h3>
-                <button onclick="window.closeAddExpenseModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <div><label class="block font-bold text-gray-600 mb-1">項目名稱</label><input type="text" id="exp-title" placeholder="晚餐" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-            <div class="grid grid-cols-2 gap-2">
-                <div><label class="block font-bold text-gray-600 mb-1">金額</label><input type="number" id="exp-amount" placeholder="金額" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1">幣別</label>
-                    <select id="exp-currency" onchange="window.toggleExchangeRate()" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold">
-                        <option value="TWD">TWD</option><option value="KRW" selected>KRW</option><option value="JPY">JPY</option><option value="THB">THB</option><option value="USD">USD</option>
-                    </select>
-                </div>
-            </div>
-            <div id="rate-box"><label class="block font-bold text-gray-600 mb-1">對台幣匯率</label><input type="number" id="exp-rate" value="0.024" step="0.0001" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-            <div><label class="block font-bold text-gray-600 mb-1">誰付錢？</label><select id="exp-payer" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></select></div>
-            <div class="flex gap-2.5 pt-2">
-                <button onclick="window.closeAddExpenseModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.submitExpense()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確定</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 成員與結算 Modal -->
-    <div id="member-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
-            <div class="flex justify-between items-center"><h3 class="font-black text-[#5c4a3d] text-base">👥 成員管理</h3><button onclick="window.closeAddMemberModal()" class="text-gray-400 font-black">✕</button></div>
-            <div class="flex gap-2"><input type="text" id="new-member-name" placeholder="名字" class="flex-1 p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"><button onclick="window.addMember()" class="bg-[#d98262] text-white px-4 py-3 rounded-2xl font-black">新增</button></div>
-            <div id="member-list-display" class="space-y-2 max-h-48 overflow-y-auto"></div>
-            <button onclick="window.closeAddMemberModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">完成</button>
-        </div>
-    </div>
-
-    <div id="settlement-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs">
-            <div id="settlement-content" class="space-y-3 max-h-72 overflow-y-auto pr-1"></div>
-            <button onclick="window.closeSettlementModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button>
-        </div>
-    </div>
-
     <div id="login-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
             <h3 class="font-black text-[#5c4a3d] text-base text-center">🌸 歡迎加入放風之旅</h3>
@@ -421,6 +378,35 @@
                     ]
                 }
             },
+            japan: {
+                langCode: 'ja-JP',
+                categories: [
+                    { id: 'restaurant', name: '🍽️ 餐廳' },
+                    { id: 'shopping', name: '🛍️ 購物' },
+                    { id: 'transport', name: '🚆 交通' },
+                    { id: 'hotel', name: '🏨 住宿' },
+                    { id: 'emergency', name: '🚨 突發' }
+                ],
+                phrases: {
+                    restaurant: [
+                        { cn: "我們有 4 個人。", foreign: "4人です。" },
+                        { cn: "請問有中文菜單嗎？", foreign: "中国語のメニューはありますか？" },
+                        { cn: "這個是什麼？請推薦招牌菜。", foreign: "これは何ですか？おすすめの料理を教えてください。" }
+                    ],
+                    shopping: [
+                        { cn: "請問這個多少錢？", foreign: "これはいくらですか？" }
+                    ],
+                    transport: [
+                        { cn: "請問離這裡最近的地鐵站在哪裡？", foreign: "ここから一番近い駅はどこですか？" }
+                    ],
+                    hotel: [
+                        { cn: "我要辦理入住登記。", foreign: "チェックインお願いします。" }
+                    ],
+                    emergency: [
+                        { cn: "救命！護照被偷了！", foreign: "助けてください！パスポートが盗まれました！" }
+                    ]
+                }
+            },
             general: {
                 langCode: 'en-US',
                 categories: [
@@ -440,7 +426,7 @@
             }
         };
 
-        // 🌟 完整掛載所有控制函式到 window
+        // 🌟 完整掛載所有控制與互動函式到 window
         window.openSmartPasteModal = function() {
             if (currentProjectId) document.getElementById('smart-paste-modal').classList.remove('hidden');
         };
@@ -474,7 +460,7 @@
             currentDetailItem = null;
         };
 
-        // 🌟 點擊整張行程卡片直接開啟詳細與 MAP 導航
+        // 🌟 點擊整張行程卡片開啟詳細與 MAP 導航
         window.openDetailModal = function(scheduleId) {
             const item = allSchedulesData.find(s => s.id === scheduleId);
             if (!item) return;
@@ -495,6 +481,7 @@
 
             const mapBtnContainer = document.getElementById('modal-map-btn-container');
             let isKoreaTrip = currentProjectName && (currentProjectName.includes("濟州") || currentProjectName.includes("韓國") || currentProjectName.includes("釜山") || currentProjectName.includes("首爾"));
+            let isJapanTrip = currentProjectName && (currentProjectName.includes("日本") || currentProjectName.includes("東京") || currentProjectName.includes("大阪") || currentProjectName.includes("京都") || currentProjectName.includes("沖繩"));
             
             let mapBtnsHtml = '';
             let searchKeyword = window.cleanDisplayTitle(item.title);
@@ -625,7 +612,7 @@
             window.loadMembersAndExpenses(currentProjectId);
             window.loadCheckins(currentProjectId);
             
-            window.switchTab('schedule');
+            switchTab('schedule');
         };
 
         window.switchTab = function(tabName) {
@@ -641,42 +628,96 @@
             if (targetNav) targetNav.className = "flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5";
         };
 
+        // 🌟 完整恢復提醒分頁
         window.renderRemindersByRules = function(projectName) {
             const container = document.getElementById('dynamic-reminders-container');
             if (!container) return;
-            container.innerHTML = `
-                <div class="cute-card p-5 space-y-2.5">
-                    <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🌍 自由行通用指南</h3>
-                    <p class="text-xs text-gray-600 leading-relaxed">請確認護照效期大於 6 個月，並備妥網卡與萬用轉接頭。</p>
-                </div>
-            `;
+            let nameLower = (projectName || '').toLowerCase();
+            let html = '';
+
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">當地早晚溫差較大且風大，建議準備防風外套 🧥。</p>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
+                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>導航 App：推薦使用 Naver Map 或 Kakao Map（以電話號碼查詢最準確）。</li>
+                            <li>速限嚴格：沿途有大量測速照相，務必依速限行駛。</li>
+                        </ul>
+                    </div>
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
+                        <p class="text-xs text-gray-600">警察局：112 | 救護車/消防：119 | 中文旅遊熱線：1330</p>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="cute-card p-5 space-y-2.5">
+                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥當地網卡與萬用轉接頭。</p>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
         };
 
+        // 🌟 完整恢復語言分頁
         window.initLanguageModule = function(projectName) {
+            let nameLower = (projectName || '').toLowerCase();
+            let destKey = 'general';
+            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) destKey = 'korea';
+            else if (nameLower.includes('日本') || nameLower.includes('東京') || nameLower.includes('大阪') || nameLower.includes('京都')) destKey = 'japan';
+
+            const currentLangPack = languageData[destKey] || languageData.general;
+            currentDestinationLang = currentLangPack.langCode;
             const catContainer = document.getElementById('lang-categories');
             if (!catContainer) return;
             catContainer.innerHTML = '';
-            let btn = document.createElement('button');
-            btn.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-[#d98262] text-white";
-            btn.innerText = "🍽️ 餐廳";
-            catContainer.appendChild(btn);
-            window.renderPhrases(languageData.general.phrases.restaurant);
+            currentLangPack.categories.forEach((cat, idx) => {
+                let btn = document.createElement('button');
+                btn.className = `w-full text-left text-xs font-black p-3 rounded-2xl transition border ${idx === 0 ? 'bg-[#d98262] text-white border-[#d98262]' : 'bg-white text-gray-700 border-[#eae1d7]'}`;
+                btn.innerText = cat.name;
+                btn.onclick = () => {
+                    document.querySelectorAll('#lang-categories button').forEach(b => {
+                        b.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-white text-gray-700 border-[#eae1d7]";
+                    });
+                    btn.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-[#d98262] text-white border-[#d98262]";
+                    window.renderPhrases(currentLangPack.phrases[cat.id]);
+                };
+                catContainer.appendChild(btn);
+            });
+            window.renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
         };
 
         window.renderPhrases = function(phrases) {
             const phraseContainer = document.getElementById('lang-phrases');
             if (!phraseContainer) return;
             phraseContainer.innerHTML = '';
+            if (!phrases || phrases.length === 0) {
+                phraseContainer.innerHTML = `<div class="cute-card p-4 text-center text-xs text-gray-400">此分類尚無常用句</div>`;
+                return;
+            }
             phrases.forEach(p => {
                 let card = document.createElement('div');
                 card.className = "cute-card p-3.5 bg-white border border-[#eae1d7] cursor-pointer transition flex justify-between items-center";
                 card.innerHTML = `<div><p class="text-xs text-gray-800 font-bold">${p.cn}</p></div>`;
                 card.onclick = () => {
+                    currentActivePhrase = p;
                     document.getElementById('display-cn').innerText = p.cn;
                     document.getElementById('display-foreign').innerText = p.foreign;
                 };
                 phraseContainer.appendChild(card);
             });
+        };
+
+        window.speakCurrentPhrase = function() {
+            if (!currentActivePhrase || !currentActivePhrase.foreign) return;
+            const utterance = new SpeechSynthesisUtterance(currentActivePhrase.foreign);
+            utterance.lang = currentDestinationLang;
+            window.speechSynthesis.speak(utterance);
         };
 
         window.loadSchedules = function(projId) {
@@ -687,6 +728,7 @@
                 allSchedulesData = [];
                 snapshot.forEach((docSnap) => { allSchedulesData.push({ id: docSnap.id, ...docSnap.data() }); });
                 window.renderScheduleUI();
+                window.renderQuestUI();
             });
         };
 
@@ -708,10 +750,78 @@
                     let data = docSnap.data();
                     if (data.uploader === currentMyName) { allCheckinsData[data.scheduleId] = data; }
                 });
+                renderQuestUI();
             });
         };
 
-        // 🌟 簡潔漂亮的行程列表渲染（點擊整張卡片直接開啟 Modal，無多餘查看按鈕）
+        // 🌟 完整恢復闖關分頁與徽章進度
+        window.renderQuestUI = function() {
+            const container = document.getElementById('quest-list-container');
+            const countEl = document.getElementById('quest-total-count');
+            const percentEl = document.getElementById('quest-percent');
+            const progressBar = document.getElementById('quest-progress-bar');
+            if (!container) return;
+
+            let questItems = [];
+            allSchedulesData.forEach(s => {
+                let category = classifyScheduleItem(s.title);
+                if (category !== null) {
+                    let myCheckin = allCheckinsData[s.id];
+                    questItems.push({ 
+                        ...s, 
+                        category, 
+                        completed: !!myCheckin, 
+                        photoUrl: myCheckin ? myCheckin.photoUrl : ''
+                    });
+                }
+            });
+
+            if (questItems.length === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前行程中尚無符合的打卡任務！✨</p>`;
+                if (countEl) countEl.innerText = `已打卡 0 / 0`;
+                if (percentEl) percentEl.innerText = `0%`;
+                if (progressBar) progressBar.style.width = `0%`;
+                return;
+            }
+
+            let totalCount = questItems.length;
+            let completedCount = questItems.filter(i => i.completed).length;
+            let percent = Math.round((completedCount / totalCount) * 100);
+
+            if (countEl) countEl.innerText = `已打卡 ${completedCount} / ${totalCount}`;
+            if (percentEl) percentEl.innerText = `${percent}%`;
+            if (progressBar) progressBar.style.width = `${percent}%`;
+
+            container.innerHTML = '';
+            questItems.forEach(s => {
+                let cleanTitle = window.cleanDisplayTitle(s.title);
+                let div = document.createElement('div');
+                div.className = "p-4 bg-white rounded-2xl border border-[#eae1d7] flex justify-between items-center";
+                div.innerHTML = `
+                    <div>
+                        <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.day || 'Day 1'} • ${s.time || '全天'}</span>
+                        <h5 class="font-black text-gray-900 text-sm mt-1">${cleanTitle}</h5>
+                    </div>
+                    <span class="text-xs font-bold ${s.completed ? 'text-green-600' : 'text-gray-400'}">${s.completed ? '✔️ 已解鎖' : '📍 待解鎖'}</span>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        window.classifyScheduleItem = function(title) {
+            let t = (title || '').toLowerCase();
+            if (t.includes('交通') || t.includes('機場') || t.includes('租車') || t.includes('還車') || t.includes('出發') || t.includes('前往') || t.includes('搭車') || t.includes('班機') || t.includes('住宿') || t.includes('飯店') || t.includes('民宿')) {
+                return null;
+            }
+            if (t.includes('餐廳') || t.includes('美食') || t.includes('咖啡') || t.includes('晚餐') || t.includes('午餐') || t.includes('早餐') || t.includes('烤肉') || t.includes('料理') || t.includes('吃')) {
+                return 'food';
+            }
+            if (t.includes('購物') || t.includes('免稅') || t.includes('超市') || t.includes('商場') || t.includes('買')) {
+                return 'shop';
+            }
+            return 'spot';
+        };
+
         window.renderScheduleUI = function() {
             const container = document.getElementById('schedule-container');
             if (!container) return;
