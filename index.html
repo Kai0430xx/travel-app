@@ -105,27 +105,53 @@ if(ok)q(m,'.ok').onclick=async()=>{if(await onOk(m)!==false)c()};document.body.a
 const val=(m,s)=>q(m,s).value.trim();
 const copy=async t=>{try{await navigator.clipboard.writeText(t);alert('已複製 ✨')}catch{prompt('請手動複製',t)}};
 
-/* ---------- 精準倒數計數（完美解析 2027年1/1 或 2027/1/1 等格式） ---------- */
-const getCountdown=datesStr=>{
-if(!datesStr)return'';
-const match=datesStr.match(/(\d{4})[年/.-]?\s*(\d{1,2})[月/.-]\s*(\d{1,2})/);
-if(!match)return'';
-const[,y,m,d]=match;
-const start=new Date(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}T00:00:00`);
-const now=new Date(); now.setHours(0,0,0,0);
-const diff=Math.ceil((start-now)/(1000*60*60*24));
-if(diff>0)return`🔥 倒數 ${diff} 天`;if(diff===0)return`🎉 今天出發！`;return`✈️ 進行中/已結束`};
+/* ---------- 精準倒數計算與天數解析 ---------- */
+const getCountdownInfo = datesStr => {
+    if(!datesStr) return { text: '未定日期', days: 999999 };
+    const match = datesStr.match(/(\d{4})[年/.-]?\s*(\d{1,2})[月/.-]\s*(\d{1,2})/);
+    if(!match) return { text: '', days: 999999 };
+    const [,y,m,d] = match;
+    const start = new Date(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}T00:00:00`);
+    const now = new Date(); now.setHours(0,0,0,0);
+    const diff = Math.ceil((start - now) / (1000 * 60 * 60 * 24));
+    
+    if(diff > 0) return { text: `🔥 倒數 ${diff} 天`, days: diff };
+    if(diff === 0) return { text: `🎉 今天出發！`, days: 0 };
+    return { text: `✈️ 進行中/已結束`, days: 888888 + Math.abs(diff) };
+};
 
-/* ---------- 專案列表與刪除 ---------- */
+/* ---------- 專案列表排序與渲染 ---------- */
 const ids=()=>JSON.parse(localStorage.getItem('my_subscribed_projects')||'[]');
 const saveIds=a=>localStorage.setItem('my_subscribed_projects',JSON.stringify([...new Set(a)]));
 
-async function renderProjects(){const l=$('pl'),a=ids();if(!a.length){l.innerHTML='<p class="mute">還沒有專案，新增一個或輸入 6 位數號碼導入吧 ✨</p>';return}
-const snaps=await Promise.all(a.map(i=>getDoc(doc(db,'projects',i)).catch(()=>null)));l.innerHTML='';
-snaps.forEach(s=>{if(!s||!s.exists())return;const p=s.data(),d=document.createElement('div');d.className='box item';
-d.style.display='flex';d.style.justifyContent='space-between';d.style.alignItems='center';
-d.innerHTML=`<div style="flex:1;min-width:0" onclick="window.enterProj('${s.id}')"><div class="row" style="margin:0"><span class="tag">${esc(p.dates||'未定日期')}</span><small style="color:var(--co);font-weight:bold">${getCountdown(p.dates)}</small></div><b style="font-size:16px;margin-top:4px">🌸 ${esc(p.name)}</b></div><button class="btn" style="background:#ffdddd;padding:6px 10px;margin-left:8px" onclick="event.stopPropagation();window.delProj('${s.id}')">🗑️</button>`;
-l.appendChild(d)})}
+async function renderProjects(){
+    const l=$('pl'), a=ids();
+    if(!a.length){ l.innerHTML='<p class="mute">還沒有專案，新增一個或輸入 6 位數號碼導入吧 ✨</p>'; return; }
+    
+    const snaps = await Promise.all(a.map(i=>getDoc(doc(db,'projects',i)).catch(()=>null)));
+    let list = [];
+    snaps.forEach(s=>{
+        if(s && s.exists()){
+            const p = s.data();
+            const info = getCountdownInfo(p.dates);
+            list.push({ id: s.id, ...p, days: info.days, countdownText: info.text });
+        }
+    });
+
+    list.sort((x, y) => x.days - y.days);
+
+    l.innerHTML = '';
+    list.forEach(p => {
+        const isExpired = p.days >= 888888;
+        const d=document.createElement('div');
+        d.className='box item';
+        d.style.display='flex'; d.style.justifyContent='space-between'; d.style.alignItems='center';
+        if(isExpired) { d.style.opacity = '0.5'; }
+        
+        d.innerHTML=`<div style="flex:1;min-width:0" onclick="window.enterProj('${p.id}')"><div class="row" style="margin:0"><span class="tag">${esc(p.dates||'未定日期')}</span><small style="color:var(--co);font-weight:bold">${p.countdownText}</small></div><b style="font-size:16px;margin-top:4px">🌸 ${esc(p.name)}</b></div><button class="btn" style="background:#ffdddd;padding:6px 10px;margin-left:8px" onclick="event.stopPropagation();window.delProj('${p.id}')">🗑️</button>`;
+        l.appendChild(d);
+    });
+}
 
 window.enterProj = id => enter(id);
 window.delProj = async id => {
@@ -176,7 +202,21 @@ function detail(id){
 const s=S.sch.find(x=>x.id===id);if(!s)return;
 const t=clean(s.title);
 const getQuery = () => { const kw = q(m,'#map-kw')?.value?.trim(); if(kw) return kw; return (/濟州/.test(S.name)&&!t.includes('濟州')?'濟州島 ':'')+t; };
-const m=modal(esc(t),`<div class="row" style="margin:4px 0 8px"><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><input id="map-kw" placeholder="輸入電話或當地語言名稱（選填）" value="${esc(s.mapKeyword||'')}"></div><div class="box" style="margin:8px 0;white-space:pre-line">📝 備註：${esc(s.location||'無')}</div><div class="row gap" style="justify-content:flex-start">${dest(S.name)==='korea'?`<a class="btn gr" id="btn-naver" target="_blank" rel="noopener" href="#">💚 Naver</a>`:''}<a class="btn aq" id="btn-google" target="_blank" rel="noopener" href="#">💙 Google</a><button class="btn" id="dl">🗑 刪除</button></div>`);
+
+
+/* 🌸 調整排版：左側時間標籤獨立一行或不擠壓，右側輸入框獨立一行 */
+const m=modal(esc(t),`
+<div style="margin:6px 0 10px">
+    <div style="margin-bottom:6px"><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span></div>
+    <input id="map-kw" placeholder="輸入電話或當地語言名稱" value="${esc(s.mapKeyword||'')}">
+</div>
+<div class="box" style="margin:8px 0;white-space:pre-line">📝 備註：${esc(s.location||'無')}</div>
+<div class="row gap" style="justify-content:flex-start">
+    ${dest(S.name)==='korea'?`<a class="btn gr" id="btn-naver" target="_blank" rel="noopener" href="#">💚 Naver</a>`:''}
+    <a class="btn aq" id="btn-google" target="_blank" rel="noopener" href="#">💙 Google</a>
+    <button class="btn" id="dl">🗑 刪除</button>
+</div>`);
+
 const updateLinks = () => { const kw = encodeURIComponent(getQuery()); q(m,'#btn-naver')?.setAttribute('href', `https://m.map.naver.com/search2/search.naver?query=${kw}`); q(m,'#btn-google').href = `https://www.google.com/maps/search/?api=1&query=${kw}`; };
 updateLinks(); q(m,'#map-kw').oninput = updateLinks;
 q(m,'#dl').onclick=async()=>{if(confirm('確定刪除這個行程？')){await deleteDoc(doc(db,'projects',S.id,'schedules',id));m.remove()}};
@@ -194,7 +234,7 @@ const line=raw.replace(/：/g,':'),tm=line.match(/(\d{1,2}):(\d{2})/);
 if(tm&&!/備註|營業時間/.test(line)){if(cur)out.push(cur);cur={day,time:tm[0],title:line.replace(/^[•\-\s]*\d{1,2}:\d{2}\s*/,'').trim(),location:'',mapKeyword:'',createdAt:Date.now()+out.length}}else if(cur)cur.location+=(cur.location?'\n':'')+raw}
 if(cur)out.push(cur);await Promise.all(out.map(i=>addDoc(collection(db,'projects',S.id,'schedules'),i)));alert(`✨ 成功導入 ${out.length} 筆行程！`)});
 
-/* ---------- 多國旅遊提醒 (涵蓋 韓、日、泰、新、馬、港、澳門) ---------- */
+/* ---------- 多國旅遊提醒 ---------- */
 function rRemind(){
 const box=(t,b)=>`<div class="box"><h3>${t}</h3><div style="font-size:14px;margin-top:6px">${b}</div></div>`;
 let h=''; const type = dest(S.name);
@@ -252,7 +292,7 @@ const CATS=[
     ['emergency','🚨 緊急求助']
 ];
 
-/* ---------- 多國語言對話庫 (中、英、韓、日、泰) ---------- */
+/* ---------- 多國語言對話庫 ---------- */
 const LG={
 korea:{c:'ko-KR',p:{
     airport:[['我是來觀光的。','관광하러 왔습니다.'],['我會待七天。','7일 동안 머물 예정입니다.'],['這是我的護照和機票。','여권과 항공권입니다.'],['請問海關申報單在哪裡填寫？','세관 신고서는 어디서 작성하나요?'],['我有行李要托運。','짐을 부치겠습니다.'],['請給我靠窗的座位。','창가 쪽 자리로 주세요.'],['我的行李不見了。','제 짐이 없어졌어요.']],
