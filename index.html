@@ -1,1070 +1,177 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🧳 我的旅遊專案清單</title>
-    <!-- PWA 手機桌面 App 圖標與全螢幕設定 -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="放風 ✈">
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" type="image/png" href="icon.png">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { 
-            background-color: #f7f3ee; 
-            max-width: 480px; 
-            margin: auto; 
-            min-height: 100vh; 
-            position: relative; 
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            letter-spacing: 0.4px;
-            color: #4a403b;
-        }
-        .cute-card {
-            background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(180, 150, 130, 0.08);
-            border: 1.5px solid #eae1d7;
-        }
-        .badge-circle {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border: 2px dashed #d98262;
-            background: #fffaf5;
-            transition: all 0.3s ease;
-        }
-        .badge-circle.unlocked {
-            border: 2px solid #d98262;
-            background: #f0dcd0;
-            box-shadow: 0 4px 12px rgba(217, 130, 98, 0.2);
-        }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #e2d3c3; border-radius: 4px; }
-    </style>
-</head>
-<body class="pb-28 text-gray-800">
-
-    <!-- 頂部標題區 -->
-    <header class="bg-[#f3e9de] text-[#5c4a3d] px-4 py-4 shadow-sm sticky top-0 z-50 flex justify-between items-center rounded-b-[24px] border-b border-[#eae1d7]">
-        <div class="flex items-center gap-2 min-w-0 pr-2">
-            <button id="back-btn" onclick="window.backToProjects()" class="hidden bg-white/90 hover:bg-white text-[#5c4a3d] px-3 py-1.5 rounded-full text-xs font-bold shadow-sm transition active:scale-95 shrink-0 border border-[#eae1d7]">
-                專案
-            </button>
-            <div class="min-w-0">
-                <h1 id="header-title" class="text-sm font-black truncate flex items-center gap-1">🧳 我的旅遊專案清單</h1>
-                <p id="header-sub" class="text-[11px] text-[#8c7868] opacity-90 truncate mt-0.5">選擇你的冒險旅程 ✨</p>
-            </div>
-        </div>
-        <button id="share-btn" onclick="window.shareCurrentProject()" class="hidden bg-white/90 hover:bg-white text-[#5c4a3d] text-xs px-3.5 py-1.5 rounded-full font-bold shadow-sm transition active:scale-95 shrink-0 border border-[#eae1d7]">
-            ✨ 分享
-        </button>
-    </header>
-
-    <!-- 內容容器 -->
-    <main class="p-4 space-y-4">
-        
-        <!-- 視圖 0：專案選擇首頁 -->
-        <div id="view-projects" class="space-y-4">
-            <div class="flex justify-between items-center px-1">
-                <h2 class="font-black text-[#5c4a3d] text-sm tracking-wide">我的旅遊小專案 ✈</h2>
-                <div class="flex gap-2">
-                    <button onclick="window.openImportProjectModal()" class="bg-white text-[#d98262] border border-[#d98262]/40 text-xs px-3 py-2.5 rounded-full font-black shadow-sm transition active:scale-95">
-                        📥 導入專案
-                    </button>
-                    <button onclick="window.openNewProjectModal()" class="bg-gradient-to-r from-[#d98262] to-[#e69c7c] text-white text-xs px-4 py-2.5 rounded-full font-black shadow-md shadow-orange-900/10 transition active:scale-95">
-                        ＋ 新增專案
-                    </button>
-                </div>
-            </div>
-            <div id="project-list" class="space-y-3.5">
-                <p class="text-center text-xs text-gray-400 py-8">載入中... ☁️</p>
-            </div>
-        </div>
-
-        <!-- 視圖 1：專案內部功能 (預設隱藏) -->
-        <div id="view-workspace" class="hidden space-y-4">
-            
-            <!-- 分頁 1：行程 -->
-            <div id="tab-schedule" class="tab-content space-y-4">
-                <div id="upcoming-card-container"></div>
-                <div id="day-pills-container" class="flex gap-2 overflow-x-auto pb-1 pt-0.5 px-1 scrollbar-none"></div>
-                <div class="flex justify-between items-center px-1 pt-1">
-                    <h3 class="font-black text-[#736052] text-xs tracking-wider">📅 完整行程時間軸</h3>
-                    <div class="flex gap-2">
-                        <button onclick="window.openSmartPasteModal()" class="bg-white hover:bg-orange-50 text-[#d98262] border border-[#d98262]/30 text-xs px-3 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">✨ 智慧導入</button>
-                        <button onclick="window.openAddScheduleModal()" class="bg-[#d98262] text-white text-xs px-3.5 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">＋ 新增</button>
-                    </div>
-                </div>
-                <div id="schedule-container" class="space-y-3">
-                    <p class="text-center text-xs text-gray-400 py-6">正在載入行程... ⏳</p>
-                </div>
-            </div>
-
-            <!-- 分頁 2：提醒 -->
-            <div id="tab-ai" class="tab-content hidden space-y-3.5">
-                <div id="dynamic-reminders-container" class="space-y-3.5"></div>
-            </div>
-
-            <!-- 分頁 3：語言 -->
-            <div id="tab-lang" class="tab-content hidden space-y-4">
-                <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-3 shadow-md text-center relative border-[#e2d3c3]">
-                    <div class="absolute top-3 left-4">
-                        <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2.5 py-0.5 rounded-full font-black">🗣 實用翻譯發音</span>
-                    </div>
-                    <div class="pt-3 space-y-1">
-                        <p id="display-cn" class="text-xs text-[#8c7868] font-bold">請點選下方分類與句子 ▼</p>
-                        <h2 id="display-foreign" class="text-xl font-black text-[#5c4a3d] mt-1 break-words">請選擇想說的話 ✨</h2>
-                    </div>
-                    <div class="pt-1">
-                        <button onclick="window.speakCurrentPhrase()" class="bg-[#d98262] text-white px-5 py-2.5 rounded-full text-xs font-black shadow-md shadow-orange-900/10 transition active:scale-95 inline-flex items-center gap-1.5">🔊 點擊朗讀</button>
-                    </div>
-                </div>
-                <div class="grid grid-cols-12 gap-3">
-                    <div id="lang-categories" class="col-span-4 space-y-2"></div>
-                    <div id="lang-phrases" class="col-span-8 space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
-                        <div class="cute-card p-4 text-center text-xs text-gray-400">請先點選左側分類</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 分頁 4：分帳 -->
-            <div id="tab-split" class="tab-content hidden space-y-4">
-                <div class="bg-gradient-to-r from-[#d98262] to-[#e08e6d] text-white p-5 rounded-[24px] shadow-lg shadow-orange-900/10 space-y-2">
-                    <div class="flex justify-between items-center">
-                        <p class="text-xs opacity-90 font-medium">✨ 旅程總花費 (折合台幣)</p>
-                        <button onclick="window.openAddMemberModal()" class="bg-white/20 hover:bg-white/30 text-white text-[11px] px-3 py-1.5 rounded-full font-bold transition">＋ 管理成員</button>
-                    </div>
-                    <h3 id="total-expense-twd" class="text-2xl font-black tracking-tight">NT$ 0</h3>
-                    <div id="currency-breakdown" class="text-[11px] opacity-90 flex gap-3 pt-1 border-t border-white/20 flex-wrap"></div>
-                </div>
-                <div class="flex justify-between items-center px-1">
-                    <h3 class="font-black text-[#736052] text-xs tracking-wider">💰 帳目與結算</h3>
-                    <div class="flex gap-2">
-                        <button onclick="window.openSettlementModal()" class="bg-[#f0dcd0] text-[#735848] text-xs px-3.5 py-2 rounded-full font-black shadow-sm transition active:scale-95">📊 查看結算</button>
-                        <button onclick="window.openAddExpenseModal()" class="bg-gradient-to-r from-[#d98262] to-[#e69c7c] text-white text-xs px-3.5 py-2 rounded-full font-black shadow-sm transition active:scale-95">＋ 記一筆</button>
-                    </div>
-                </div>
-                <div id="expense-list-container" class="space-y-2.5">
-                    <p class="text-center text-xs text-gray-400 py-6">目前還沒有記帳，點上方按鈕開始記帳吧！✨</p>
-                </div>
-            </div>
-
-            <!-- 分頁 5：闖關 -->
-            <div id="tab-quest" class="tab-content hidden space-y-4">
-                <div class="cute-card p-5 bg-gradient-to-br from-[#fffaf5] to-[#fbf2e9] space-y-4 shadow-md border-[#e2d3c3]">
-                    <div class="flex justify-between items-center">
-                        <span id="quest-total-count" class="text-xs font-black text-[#d98262]">已打卡 0 / 0</span>
-                        <button onclick="window.openPhotoGalleryModal()" class="bg-[#d98262] text-white text-[11px] px-3.5 py-1.5 rounded-full font-black shadow-sm transition active:scale-95">📸 旅程回憶寫真冊</button>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-xs font-black text-[#736052] mb-1">
-                            <span>整體解鎖進度</span>
-                            <span id="quest-percent">0%</span>
-                        </div>
-                        <div class="w-full bg-[#eae1d7] h-3 rounded-full overflow-hidden">
-                            <div id="quest-progress-bar" class="bg-[#d98262] h-full transition-all duration-500 rounded-full" style="width: 0%"></div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-3 pt-2 border-t border-[#eae1d7] text-center">
-                        <div class="flex flex-col items-center">
-                            <div id="badge-food" class="badge-circle">
-                                <span class="text-lg">🍽️</span>
-                                <span class="text-[9px] font-black text-[#735848] mt-0.5">美食</span>
-                            </div>
-                            <p class="text-[10px] font-black text-[#5c4a3d] mt-1.5" id="badge-food-title">未解鎖</p>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <div id="badge-spot" class="badge-circle">
-                                <span class="text-lg">🗺️</span>
-                                <span class="text-[9px] font-black text-[#735848] mt-0.5">景點</span>
-                            </div>
-                            <p class="text-[10px] font-black text-[#5c4a3d] mt-1.5" id="badge-spot-title">未解鎖</p>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <div id="badge-shop" class="badge-circle">
-                                <span class="text-lg">🛍️</span>
-                                <span class="text-[9px] font-black text-[#735848] mt-0.5">購物</span>
-                            </div>
-                            <p class="text-[10px] font-black text-[#5c4a3d] mt-1.5" id="badge-shop-title">未解鎖</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="quest-list-container" class="space-y-3">
-                    <p class="text-center text-xs text-gray-400 py-6">正在載入闖關任務... ⏳</p>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <!-- Modals -->
-    <div id="import-project-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">📥 輸入 6 位數專案號碼</h3>
-                <button onclick="window.closeImportProjectModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <input type="text" id="import-code-input" maxlength="6" placeholder="例如：883921" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-center text-lg tracking-widest">
-            <div class="flex gap-2.5 pt-2">
-                <button onclick="window.closeImportProjectModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.submitImportProject()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認導入</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="share-choice-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs text-center">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">✨ 分享此專案</h3>
-                <button onclick="window.closeShareModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <p id="share-modal-pin" class="text-2xl font-black text-[#d98262] tracking-widest">------</p>
-            <button onclick="window.copySharePin()" class="w-full bg-[#f0dcd0] text-[#735848] py-2 rounded-xl font-black">📋 複製 6 位數代碼</button>
-            <button onclick="window.copyShareUrl()" class="w-full bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">🔗 複製專屬網址</button>
-        </div>
-    </div>
-
-    <!-- 🌸 拍照打卡 Modal -->
-    <div id="quest-photo-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base" id="quest-modal-title">📸 打卡上傳</h3>
-                <button onclick="window.closeQuestPhotoModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <div id="quest-photo-preview-container" class="hidden w-full h-40 bg-gray-50 rounded-2xl border border-[#eae1d7] overflow-hidden flex items-center justify-center">
-                <img id="quest-photo-preview" src="" alt="預覽照片" class="w-full h-full object-cover">
-            </div>
-            <div>
-                <label class="block font-bold text-gray-600 mb-1">選擇照片 (會自動優化壓縮)</label>
-                <input type="file" id="quest-file-input" accept="image/*" onchange="window.previewQuestPhoto(event)" class="w-full text-xs p-2.5 bg-[#fffaf5] border border-[#eae1d7] rounded-xl outline-none font-bold">
-            </div>
-            <div class="flex gap-2.5 pt-2">
-                <button onclick="window.closeQuestPhotoModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-full font-black">取消</button>
-                <button onclick="window.submitQuestPhoto()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">確認打卡</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 🌸 已打卡項目管理 Modal -->
-    <div id="quest-edit-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base" id="edit-quest-modal-title">✨ 已打卡項目管理</h3>
-                <button onclick="window.closeQuestEditModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <p class="text-gray-500 font-bold">您可以選擇更換照片，或是取消打卡晚點再上傳！</p>
-            <div class="flex gap-2.5 pt-2">
-                <button onclick="window.openChangePhotoFromEdit()" class="flex-1 bg-[#d98262] text-white py-3 rounded-full font-black shadow-md">📷 更換照片</button>
-                <button onclick="window.cancelQuestCheckin()" class="flex-1 bg-red-100 text-red-600 py-3 rounded-full font-black">❌ 取消打卡</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 🌸 照片回憶寫真冊 Modal -->
-    <div id="photo-gallery-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl text-xs max-h-[85vh] flex flex-col">
-            <div class="flex justify-between items-center shrink-0">
-                <h3 class="font-black text-[#5c4a3d] text-base">📸 旅伴共同寫真冊</h3>
-                <button onclick="window.closePhotoGalleryModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <div id="photo-gallery-grid" class="grid grid-cols-2 gap-3 overflow-y-auto pr-1 flex-1"></div>
-            <div class="pt-2 shrink-0"><button onclick="window.closePhotoGalleryModal()" class="w-full bg-gray-100 text-gray-600 py-3 rounded-full font-black">關閉</button></div>
-        </div>
-    </div>
-
-    <div id="smart-paste-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-md p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">✨ AI 智慧導入行程</h3>
-                <button onclick="window.closeSmartPasteModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <textarea id="smart-paste-input" rows="8" placeholder="貼上行程..." class="w-full text-xs p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none"></textarea>
-            <div class="flex gap-2.5 pt-1">
-                <button onclick="window.closeSmartPasteModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
-                <button onclick="window.parseSmartPaste()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">開始智慧拆解</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="schedule-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-[#5c4a3d] text-base">✏️ 手動新增行程</h3>
-                <button onclick="window.closeAddScheduleModal()" class="text-gray-400 font-black text-base">✕</button>
-            </div>
-            <div class="space-y-3 text-xs">
-                <div><label class="block font-bold text-gray-600 mb-1">天數</label><input type="text" id="input-day" value="Day 1" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-                <div><label class="block font-bold text-gray-600 mb-1">時間</label><input type="text" id="input-time" value="10:00" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-                <div><label class="block font-bold text-gray-600 mb-1">行程名稱</label><input type="text" id="input-title" placeholder="名稱" class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold"></div>
-                <div><label class="block font-bold text-gray-600 mb-1">備註</label><textarea id="input-location" rows="3" placeholder="備註..." class="w-full p-3 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none resize-none font-bold"></textarea></div>
-            </div>
-            <div class="flex gap-2.5 pt-2">
-                <button onclick="window.closeAddScheduleModal()" class="flex-1 bg-gray-100 text-gray-600 text-xs py-3 rounded-full font-black">取消</button>
-                <button onclick="window.submitScheduleForm()" class="flex-1 bg-[#d98262] text-white text-xs py-3 rounded-full font-black shadow-md">確認新增</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 行程詳細與 MAP 導航 Modal -->
-    <div id="detail-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl">
-            <div id="modal-view-mode" class="space-y-4">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <span id="modal-day" class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black">Day 1</span>
-                        <span id="modal-time" class="text-xs text-gray-400 font-bold ml-2">12:00</span>
-                    </div>
-                    <button onclick="window.closeDetailModal()" class="text-gray-400 hover:text-gray-600 text-base font-black">✕</button>
-                </div>
-                <div>
-                    <h3 id="modal-title" class="font-black text-gray-900 text-base mt-2">行程名稱</h3>
-                    <div id="modal-location-container" class="mt-2 hidden bg-[#fffaf5] p-3 rounded-2xl border border-[#eae1d7]">
-                        <p class="text-xs text-gray-600 font-bold mb-0.5">📝 備註：</p>
-                        <p id="modal-location" class="text-xs text-gray-800 whitespace-pre-line font-medium"></p>
-                    </div>
-                </div>
-                <div id="modal-map-btn-container" class="pt-2 flex gap-2.5"></div>
-                <div class="pt-2 flex gap-2.5">
-                    <button onclick="window.closeDetailModal()" class="w-full bg-gray-100 text-gray-600 text-xs py-2.5 rounded-full font-bold">關閉</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="login-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="cute-card bg-white w-full max-w-sm p-6 space-y-4 shadow-2xl text-xs">
-            <h3 class="font-black text-[#5c4a3d] text-base text-center">🌸 歡迎加入放風之旅</h3>
-            <input type="text" id="login-name-input" placeholder="例如：小明" class="w-full p-3.5 bg-[#fffaf5] border border-[#eae1d7] rounded-2xl outline-none font-bold text-center text-sm">
-            <button onclick="window.submitLoginName()" class="w-full bg-[#d98262] text-white py-3.5 rounded-full font-black shadow-md">進入旅程 🚀</button>
-        </div>
-    </div>
-
-    <!-- 底部導覽列 -->
-    <nav id="bottom-nav" class="hidden fixed bottom-3 left-4 right-4 max-w-[448px] mx-auto bg-white/95 backdrop-blur-md border border-[#eae1d7] flex justify-around py-3 rounded-2xl shadow-xl z-50">
-        <button onclick="window.switchTab('schedule')" id="nav-schedule" class="flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5"><span class="text-xl">📅</span>行程</button>
-        <button onclick="window.switchTab('ai')" id="nav-ai" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💡</span>提醒</button>
-        <button onclick="window.switchTab('lang')" id="nav-lang" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🗣</span>語言</button>
-        <button onclick="window.switchTab('split')" id="nav-split" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">💰</span>分帳</button>
-        <button onclick="window.switchTab('quest')" id="nav-quest" class="flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5"><span class="text-xl">🎯</span>闖關</button>
-    </nav>
-
-    <!-- Firebase 與邏輯控制 -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDoc, getDocs, deleteDoc, doc, setDoc, updateDoc, onSnapshot, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBcKmZhJaZn5emOlHRV95-uC9q01wFxt4M",
-            authDomain: "my-travel-app-6e00c.firebaseapp.com",
-            projectId: "my-travel-app-6e00c",
-            storageBucket: "my-travel-app-6e00c.firebasestorage.app",
-            messagingSenderId: "135860333246",
-            appId: "1:135860333246:web:a25402eb743d6cebc9ccef"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        let currentProjectId = null;
-        let currentProjectName = "";
-        let currentProjectPin = "";
-        let currentMyName = localStorage.getItem('my_travel_nickname') || "";
-        let currentDestinationLang = 'ko-KR';
-        let currentActivePhrase = { cn: "請選擇想說的話", foreign: "請選擇想說的話" };
-        let compressedPhotoBase64 = "";
-
-        let unsubscribeSchedules = null;
-        let unsubscribeExpenses = null;
-        let unsubscribeMembers = null;
-        let unsubscribeCheckins = null;
-
-        let allSchedulesData = [];
-        let allExpensesData = [];
-        let allMembersData = [];
-        let allCheckinsData = {}; 
-        let currentSplitMode = 'equal';
-        let activeDayFilter = 'all';
-        let currentQuestTargetId = null;
-        let currentDetailItem = null;
-
-        const languageData = {
-            korea: {
-                langCode: 'ko-KR',
-                categories: [
-                    { id: 'restaurant', name: '🍽️ 餐廳' },
-                    { id: 'shopping', name: '🛍️ 購物' },
-                    { id: 'transport', name: '🚗 交通' },
-                    { id: 'hotel', name: '🏨 住宿' },
-                    { id: 'emergency', name: '🚨 突發' }
-                ],
-                phrases: {
-                    restaurant: [
-                        { cn: "我們有 4 個人。", foreign: "4명입니다." },
-                        { cn: "請問有中文菜單嗎？", foreign: "중국어 메뉴판 있어요?" },
-                        { cn: "這個是什麼？請推薦招牌菜。", foreign: "이게 뭐예요? 대표 메뉴 추천해주세요." }
-                    ],
-                    shopping: [
-                        { cn: "請問這個多少錢？", foreign: "이거 얼마예요?" }
-                    ],
-                    transport: [
-                        { cn: "請問離這裡最近的地鐵站在哪裡？", foreign: "여기서 가장 가까운 지하철역이 어디예요?" }
-                    ],
-                    hotel: [
-                        { cn: "我要辦理入住登記。", foreign: "체크인 하겠습니다." }
-                    ],
-                    emergency: [
-                        { cn: "救命！我的護照被偷了！", foreign: "살려주세요! 여권을 도둑맞았어요!" }
-                    ]
-                }
-            },
-            general: {
-                langCode: 'en-US',
-                categories: [
-                    { id: 'restaurant', name: '🍽️ 餐廳' },
-                    { id: 'shopping', name: '🛍️ 購物' },
-                    { id: 'transport', name: '🚕 交通' },
-                    { id: 'hotel', name: '🏨 住宿' },
-                    { id: 'emergency', name: '🚨 突發' }
-                ],
-                phrases: {
-                    restaurant: [{ cn: "我們有 4 個人。", foreign: "Table for four, please." }],
-                    shopping: [{ cn: "請問這個多少錢？", foreign: "How much is this?" }],
-                    transport: [{ cn: "離這裡最近的地鐵站在哪裡？", foreign: "Where is the nearest subway station?" }],
-                    hotel: [{ cn: "我要辦理入住登記。", foreign: "I'd like to check in, please." }],
-                    emergency: [{ cn: "救命！護照被偷了！", foreign: "Help! My passport has been stolen!" }]
-                }
-            }
-        };
-
-        // 🌟 完整掛載所有控制與打卡互動函式到 window
-        window.openSmartPasteModal = function() {
-            if (currentProjectId) document.getElementById('smart-paste-modal').classList.remove('hidden');
-        };
-        window.closeSmartPasteModal = function() {
-            document.getElementById('smart-paste-modal').classList.add('hidden');
-        };
-        window.openAddScheduleModal = function() {
-            if (currentProjectId) document.getElementById('schedule-modal').classList.remove('hidden');
-        };
-        window.closeAddScheduleModal = function() {
-            document.getElementById('schedule-modal').classList.add('hidden');
-        };
-        window.closeShareModal = function() {
-            document.getElementById('share-choice-modal').classList.add('hidden');
-        };
-        window.openImportProjectModal = function() {
-            document.getElementById('import-code-input').value = '';
-            document.getElementById('import-project-modal').classList.remove('hidden');
-        };
-        window.closeImportProjectModal = function() {
-            document.getElementById('import-project-modal').classList.add('hidden');
-        };
-        window.openNewProjectModal = function() {
-            document.getElementById('new-project-modal')?.classList.remove('hidden');
-        };
-        window.closeNewProjectModal = function() {
-            document.getElementById('new-project-modal')?.classList.add('hidden');
-        };
-        window.closeDetailModal = function() {
-            document.getElementById('detail-modal').classList.add('hidden');
-            currentDetailItem = null;
-        };
-
-        // 🌟 闖關打卡與照片處理函式
-        window.openQuestPhotoModal = function(scheduleId, title) {
-            currentQuestTargetId = scheduleId;
-            document.getElementById('quest-modal-title').innerText = `📸 打卡：${title}`;
-            document.getElementById('quest-file-input').value = '';
-            document.getElementById('quest-photo-preview-container').classList.add('hidden');
-            compressedPhotoBase64 = "";
-            document.getElementById('quest-photo-modal').classList.remove('hidden');
-        };
-        window.closeQuestPhotoModal = function() {
-            document.getElementById('quest-photo-modal').classList.add('hidden');
-            currentQuestTargetId = null;
-        };
-
-        window.previewQuestPhoto = function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 600;
-                    const MAX_HEIGHT = 600;
-                    let width = img.width;
-                    let height = img.height;
-                    if (width > height) {
-                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                    } else {
-                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                    
-                    document.getElementById('quest-photo-preview').src = compressedPhotoBase64;
-                    document.getElementById('quest-photo-preview-container').classList.remove('hidden');
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        };
-
-        window.submitQuestPhoto = async function() {
-            if (!currentProjectId || !currentQuestTargetId) return;
-            if (!compressedPhotoBase64) { alert("請先選擇要上傳的照片！"); return; }
-            try {
-                const checkinRef = doc(db, "projects", currentProjectId, "checkins", `${currentQuestTargetId}_${currentMyName}`);
-                await setDoc(checkinRef, {
-                    scheduleId: currentQuestTargetId,
-                    uploader: currentMyName,
-                    photoUrl: compressedPhotoBase64,
-                    createdAt: Date.now()
-                });
-                closeQuestPhotoModal();
-                alert("✨ 打卡成功！");
-            } catch (e) { alert("打卡上傳失敗"); }
-        };
-
-        window.openQuestEditModal = function(scheduleId, title) {
-            currentQuestTargetId = scheduleId;
-            document.getElementById('edit-quest-modal-title').innerText = `✨ 已打卡：${title}`;
-            document.getElementById('quest-edit-modal').classList.remove('hidden');
-        };
-        window.closeQuestEditModal = function() {
-            document.getElementById('quest-edit-modal').classList.add('hidden');
-            currentQuestTargetId = null;
-        };
-
-        window.openChangePhotoFromEdit = function() {
-            closeQuestEditModal();
-            window.openQuestPhotoModal(currentQuestTargetId, "更換打卡照片");
-        };
-
-        window.cancelQuestCheckin = async function() {
-            if (!currentProjectId || !currentQuestTargetId) return;
-            if (confirm("確定要取消這次的打卡記錄嗎？")) {
-                try {
-                    await deleteDoc(doc(db, "projects", currentProjectId, "checkins", `${currentQuestTargetId}_${currentMyName}`));
-                    closeQuestEditModal();
-                    alert("✨ 已取消打卡！");
-                } catch (e) { alert("取消失敗"); }
-            }
-        };
-
-        window.openPhotoGalleryModal = function() {
-            const grid = document.getElementById('photo-gallery-grid');
-            grid.innerHTML = '';
-            let count = 0;
-            Object.keys(allCheckinsData).forEach(schedId => {
-                let data = allCheckinsData[schedId];
-                if (data && data.photoUrl) {
-                    count++;
-                    let div = document.createElement('div');
-                    div.className = "relative rounded-2xl overflow-hidden border border-[#eae1d7] h-36 bg-gray-50 flex flex-col";
-                    div.innerHTML = `
-                        <img src="${data.photoUrl}" class="w-full h-full object-cover cursor-pointer" onclick="window.open('${data.photoUrl}', '_blank')">
-                        <div class="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[9px] p-1 font-bold truncate text-center">👤 ${data.uploader}</div>
-                    `;
-                    grid.appendChild(div);
-                }
-            });
-            if (count === 0) {
-                grid.innerHTML = `<p class="col-span-2 text-center text-xs text-gray-400 py-8">目前還沒有旅伴上傳打卡照片！快去景點美食打卡吧 📸</p>`;
-            }
-            document.getElementById('photo-gallery-modal').classList.remove('hidden');
-        };
-        window.closePhotoGalleryModal = function() {
-            document.getElementById('photo-gallery-modal').classList.add('hidden');
-        };
-
-        // 🌟 點擊整張行程卡片開啟詳細與 MAP 導航
-        window.openDetailModal = function(scheduleId) {
-            const item = allSchedulesData.find(s => s.id === scheduleId);
-            if (!item) return;
-            currentDetailItem = item;
-
-            document.getElementById('modal-day').innerText = item.day || 'Day 1';
-            document.getElementById('modal-time').innerText = item.time || '全天';
-            document.getElementById('modal-title').innerText = window.cleanDisplayTitle(item.title);
-
-            const locContainer = document.getElementById('modal-location-container');
-            const locText = document.getElementById('modal-location');
-            if (item.location && item.location.trim() !== '') {
-                locText.innerText = item.location;
-                locContainer.classList.remove('hidden');
-            } else {
-                locContainer.classList.add('hidden');
-            }
-
-            const mapBtnContainer = document.getElementById('modal-map-btn-container');
-            let isKoreaTrip = currentProjectName && (currentProjectName.includes("濟州") || currentProjectName.includes("韓國") || currentProjectName.includes("釜山") || currentProjectName.includes("首爾"));
-            
-            let mapBtnsHtml = '';
-            let searchKeyword = window.cleanDisplayTitle(item.title);
-            if (currentProjectName && !searchKeyword.includes("濟州") && isKoreaTrip) {
-                searchKeyword = `濟州島 ${searchKeyword}`;
-            }
-
-            if (isKoreaTrip) {
-                mapBtnsHtml += `<button onclick="window.launchMap('naver', '${searchKeyword}')" class="flex-1 bg-[#2db400] text-white text-xs py-3 rounded-full font-black shadow-md flex items-center justify-center gap-1.5">💚 Naver Map</button>`;
-            }
-            mapBtnsHtml += `<button onclick="window.launchMap('google', '${searchKeyword}')" class="flex-1 bg-[#4285f4] text-white text-xs py-3 rounded-full font-black shadow-md flex items-center justify-center gap-1.5">💙 Google Maps</button>`;
-            
-            mapBtnContainer.innerHTML = mapBtnsHtml;
-            document.getElementById('detail-modal').classList.remove('hidden');
-        };
-
-        window.launchMap = function(mapType, queryStr) {
-            const queryText = encodeURIComponent(queryStr);
-            let url = (mapType === 'naver') ? 
-                `https://m.map.naver.com/search2/search.naver?query=${queryText}` : 
-                `https://www.google.com/maps/search/?api=1&query=${queryText}`;
-            window.open(url, '_blank');
-        };
-
-        window.cleanDisplayTitle = function(title) {
-            if (!title) return '';
-            return title.replace(/^\d{1,2}[:：]\d{2}\s*/, '').trim();
-        };
-
-        window.parseSmartPaste = async function() {
-            const rawText = document.getElementById('smart-paste-input').value.trim();
-            if (!rawText) { alert("請先輸入行程！"); return; }
-            alert("✨ AI 正在拆解行程...");
-            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            let currentDay = "Day 1";
-            let parsedItems = [];
-            let currentItem = null;
-
-            for (let i = 0; i < lines.length; i++) {
-                let line = lines[i];
-                let dayMatch = line.match(/(Day\s*\d+|第[一二三四五六七八九十]+天)/i);
-                if (dayMatch) {
-                    if (currentItem) { parsedItems.push(currentItem); currentItem = null; }
-                    currentDay = dayMatch[0];
-                    continue;
-                }
-                let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
-                let hasNoteKeyword = line.includes("備註") || line.includes("營業時間");
-                let isNewItem = timeMatch && !hasNoteKeyword;
-                if (isNewItem) {
-                    if (currentItem) parsedItems.push(currentItem);
-                    currentItem = { 
-                        day: currentDay, 
-                        time: timeMatch[1], 
-                        title: line.replace(/^\s*•?\s*\d{1,2}[:：]\d{2}\s*/, '').trim(), 
-                        location: "", 
-                        createdAt: Date.now() + parsedItems.length 
-                    };
-                } else if (currentItem) {
-                    currentItem.location = currentItem.location ? (currentItem.location + "\n" + line) : line;
-                }
-            }
-            if (currentItem) parsedItems.push(currentItem);
-
-            for (let i = 0; i < parsedItems.length; i++) {
-                await addDoc(collection(db, "projects", currentProjectId, "schedules"), parsedItems[i]);
-            }
-            closeSmartPasteModal();
-            alert(`✨ 成功導入 ${parsedItems.length} 筆行程！`);
-        };
-
-        window.backToProjects = function() {
-            currentProjectId = null;
-            currentProjectName = "";
-            currentProjectPin = "";
-            if (unsubscribeSchedules) unsubscribeSchedules();
-            if (unsubscribeExpenses) unsubscribeExpenses();
-            if (unsubscribeMembers) unsubscribeMembers();
-            if (unsubscribeCheckins) unsubscribeCheckins();
-            document.getElementById('view-workspace').classList.add('hidden');
-            document.getElementById('bottom-nav').classList.add('hidden');
-            document.getElementById('back-btn').classList.add('hidden');
-            document.getElementById('share-btn').classList.add('hidden');
-            document.getElementById('view-projects').classList.remove('hidden');
-            document.getElementById('header-title').innerText = "🧳 我的旅遊專案清單";
-            document.getElementById('header-sub').innerText = "選擇你的冒險旅程 ✨";
-            renderProjects();
-        };
-
-        window.shareCurrentProject = function() {
-            if (!currentProjectId) return;
-            document.getElementById('share-modal-pin').innerText = currentProjectPin || '未設定';
-            document.getElementById('share-choice-modal').classList.remove('hidden');
-        };
-
-        window.enterProject = async function(id) {
-            currentProjectId = id;
-            try {
-                const docSnap = await getDoc(doc(db, "projects", id));
-                if (docSnap.exists()) {
-                    const p = docSnap.data();
-                    currentProjectName = p.name;
-                    currentProjectPin = p.pin || "";
-                }
-            } catch (e) {}
-
-            if (!currentMyName) {
-                document.getElementById('login-modal').classList.remove('hidden');
-                return;
-            }
-
-            window.proceedEnterProject();
-        };
-
-        window.proceedEnterProject = function() {
-            document.getElementById('view-projects').classList.add('hidden');
-            document.getElementById('view-workspace').classList.remove('hidden');
-            document.getElementById('bottom-nav').classList.remove('hidden');
-            document.getElementById('back-btn').classList.remove('hidden');
-            document.getElementById('share-btn').classList.remove('hidden');
-            
-            document.getElementById('header-title').innerText = `🌸 ${currentProjectName}`;
-            document.getElementById('header-sub').innerText = `旅伴：${currentMyName} ✨`;
-            
-            window.renderRemindersByRules(currentProjectName);
-            window.initLanguageModule(currentProjectName);
-            window.loadSchedules(currentProjectId);
-            window.loadMembersAndExpenses(currentProjectId);
-            window.loadCheckins(currentProjectId);
-            
-            switchTab('schedule');
-        };
-
-        window.switchTab = function(tabName) {
-            ['schedule', 'ai', 'lang', 'split', 'quest'].forEach(t => {
-                const el = document.getElementById(`tab-${t}`);
-                const navEl = document.getElementById(`nav-${t}`);
-                if (el) el.classList.add('hidden');
-                if (navEl) navEl.className = "flex flex-col items-center text-gray-400 text-xs font-bold gap-0.5";
-            });
-            const targetTab = document.getElementById(`tab-${tabName}`);
-            const targetNav = document.getElementById(`nav-${tabName}`);
-            if (targetTab) targetTab.classList.remove('hidden');
-            if (targetNav) targetNav.className = "flex flex-col items-center text-[#d98262] text-xs font-black gap-0.5";
-        };
-
-        window.renderRemindersByRules = function(projectName) {
-            const container = document.getElementById('dynamic-reminders-container');
-            if (!container) return;
-            let nameLower = (projectName || '').toLowerCase();
-            let html = '';
-
-            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🇰🇷 韓國旅遊與天氣指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">當地早晚溫差較大且風大，建議準備防風外套 🧥。</p>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚗 自駕與導航提醒</h3>
-                        <ul class="text-xs text-gray-600 space-y-1.5 list-disc list-inside leading-relaxed">
-                            <li>導航 App：推薦使用 Naver Map 或 Kakao Map（以電話號碼查詢最準確）。</li>
-                            <li>速限嚴格：沿途有大量測速照相，務必依速限行駛。</li>
-                        </ul>
-                    </div>
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🚨 緊急聯絡資訊</h3>
-                        <p class="text-xs text-gray-600">警察局：112 | 救護車/消防：119 | 中文旅遊熱線：1330</p>
-                    </div>
-                `;
-            } else {
-                html = `
-                    <div class="cute-card p-5 space-y-2.5">
-                        <h3 class="font-black text-[#5c4a3d] text-sm flex items-center gap-1.5">🌍 國際自由行通用指南</h3>
-                        <p class="text-xs text-gray-600 leading-relaxed">請留意護照效期（需大於 6 個月）、備妥網卡與萬用轉接頭。</p>
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-        };
-
-        window.initLanguageModule = function(projectName) {
-            let nameLower = (projectName || '').toLowerCase();
-            let destKey = 'general';
-            if (nameLower.includes('濟州') || nameLower.includes('韓國') || nameLower.includes('釜山') || nameLower.includes('首爾')) destKey = 'korea';
-            else if (nameLower.includes('日本') || nameLower.includes('東京') || nameLower.includes('大阪') || nameLower.includes('京都')) destKey = 'japan';
-
-            const currentLangPack = languageData[destKey] || languageData.general;
-            currentDestinationLang = currentLangPack.langCode;
-            const catContainer = document.getElementById('lang-categories');
-            if (!catContainer) return;
-            catContainer.innerHTML = '';
-            currentLangPack.categories.forEach((cat, idx) => {
-                let btn = document.createElement('button');
-                btn.className = `w-full text-left text-xs font-black p-3 rounded-2xl transition border ${idx === 0 ? 'bg-[#d98262] text-white border-[#d98262]' : 'bg-white text-gray-700 border-[#eae1d7]'}`;
-                btn.innerText = cat.name;
-                btn.onclick = () => {
-                    document.querySelectorAll('#lang-categories button').forEach(b => {
-                        b.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-white text-gray-700 border-[#eae1d7]";
-                    });
-                    btn.className = "w-full text-left text-xs font-black p-3 rounded-2xl transition border bg-[#d98262] text-white border-[#d98262]";
-                    window.renderPhrases(currentLangPack.phrases[cat.id]);
-                };
-                catContainer.appendChild(btn);
-            });
-            window.renderPhrases(currentLangPack.phrases[currentLangPack.categories[0].id]);
-        };
-
-        window.renderPhrases = function(phrases) {
-            const phraseContainer = document.getElementById('lang-phrases');
-            if (!phraseContainer) return;
-            phraseContainer.innerHTML = '';
-            if (!phrases || phrases.length === 0) {
-                phraseContainer.innerHTML = `<div class="cute-card p-4 text-center text-xs text-gray-400">此分類尚無常用句</div>`;
-                return;
-            }
-            phrases.forEach(p => {
-                let card = document.createElement('div');
-                card.className = "cute-card p-3.5 bg-white border border-[#eae1d7] cursor-pointer transition flex justify-between items-center";
-                card.innerHTML = `<div><p class="text-xs text-gray-800 font-bold">${p.cn}</p></div>`;
-                card.onclick = () => {
-                    currentActivePhrase = p;
-                    document.getElementById('display-cn').innerText = p.cn;
-                    document.getElementById('display-foreign').innerText = p.foreign;
-                };
-                phraseContainer.appendChild(card);
-            });
-        };
-
-        window.speakCurrentPhrase = function() {
-            if (!currentActivePhrase || !currentActivePhrase.foreign) return;
-            const utterance = new SpeechSynthesisUtterance(currentActivePhrase.foreign);
-            utterance.lang = currentDestinationLang;
-            window.speechSynthesis.speak(utterance);
-        };
-
-        window.loadSchedules = function(projId) {
-            const schedulesRef = collection(db, "projects", projId, "schedules");
-            const q = query(schedulesRef, orderBy("createdAt", "asc"));
-            if (unsubscribeSchedules) unsubscribeSchedules();
-            unsubscribeSchedules = onSnapshot(q, (snapshot) => {
-                allSchedulesData = [];
-                snapshot.forEach((docSnap) => { allSchedulesData.push({ id: docSnap.id, ...docSnap.data() }); });
-                window.renderScheduleUI();
-                window.renderQuestUI();
-            });
-        };
-
-        window.loadMembersAndExpenses = function(projId) {
-            const membersRef = collection(db, "projects", projId, "members");
-            if (unsubscribeMembers) unsubscribeMembers();
-            unsubscribeMembers = onSnapshot(membersRef, (snapshot) => {
-                allMembersData = [];
-                snapshot.forEach(docSnap => { allMembersData.push({ id: docSnap.id, ...docSnap.data() }); });
-            });
-        };
-
-        window.loadCheckins = function(projId) {
-            const checkinsRef = collection(db, "projects", projId, "checkins");
-            if (unsubscribeCheckins) unsubscribeCheckins();
-            unsubscribeCheckins = onSnapshot(checkinsRef, (snapshot) => {
-                allCheckinsData = {};
-                snapshot.forEach(docSnap => {
-                    let data = docSnap.data();
-                    if (data.uploader === currentMyName) { allCheckinsData[data.scheduleId] = data; }
-                });
-                renderQuestUI();
-            });
-        };
-
-        // 🌟 完整恢復帶有打卡上傳按鈕的闖關分頁
-        window.renderQuestUI = function() {
-            const container = document.getElementById('quest-list-container');
-            const countEl = document.getElementById('quest-total-count');
-            const percentEl = document.getElementById('quest-percent');
-            const progressBar = document.getElementById('quest-progress-bar');
-            if (!container) return;
-
-            let questItems = [];
-            allSchedulesData.forEach(s => {
-                let category = classifyScheduleItem(s.title);
-                if (category !== null) {
-                    let myCheckin = allCheckinsData[s.id];
-                    questItems.push({ 
-                        ...s, 
-                        category, 
-                        completed: !!myCheckin, 
-                        photoUrl: myCheckin ? myCheckin.photoUrl : ''
-                    });
-                }
-            });
-
-            if (questItems.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前行程中尚無符合的打卡任務！✨</p>`;
-                if (countEl) countEl.innerText = `已打卡 0 / 0`;
-                if (percentEl) percentEl.innerText = `0%`;
-                if (progressBar) progressBar.style.width = `0%`;
-                return;
-            }
-
-            let totalCount = questItems.length;
-            let completedCount = questItems.filter(i => i.completed).length;
-            let percent = Math.round((completedCount / totalCount) * 100);
-
-            if (countEl) countEl.innerText = `已打卡 ${completedCount} / ${totalCount}`;
-            if (percentEl) percentEl.innerText = `${percent}%`;
-            if (progressBar) progressBar.style.width = `${percent}%`;
-
-            container.innerHTML = '';
-            questItems.forEach(s => {
-                let cleanTitle = window.cleanDisplayTitle(s.title);
-                let statusBadge = s.completed ? 
-                    `<span onclick="window.openQuestEditModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-green-100 text-green-700 px-3 py-1.5 rounded-full font-black cursor-pointer hover:bg-green-200">✔️ 已打卡</span>` : 
-                    `<span onclick="window.openQuestPhotoModal('${s.id}', '${cleanTitle}')" class="text-[10px] bg-[#f0dcd0] text-[#735848] px-3 py-1.5 rounded-full font-black cursor-pointer hover:bg-[#e2c8b8]">📸 拍照打卡</span>`;
-                
-                let photoThumbnail = s.photoUrl ? `<img src="${s.photoUrl}" class="w-10 h-10 rounded-xl object-cover border border-[#eae1d7] shrink-0 ml-2">` : '';
-
-                let div = document.createElement('div');
-                div.className = "p-4 bg-white rounded-2xl border border-[#eae1d7] flex justify-between items-center";
-                div.innerHTML = `
-                    <div class="space-y-1 min-w-0 flex-1 pr-2">
-                        <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.day || 'Day 1'} • ${s.time || '全天'}</span>
-                        <h5 class="font-black text-gray-900 text-sm mt-1 truncate">${cleanTitle}</h5>
-                    </div>
-                    <div class="flex items-center shrink-0">
-                        ${statusBadge}
-                        ${photoThumbnail}
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        };
-
-        window.classifyScheduleItem = function(title) {
-            let t = (title || '').toLowerCase();
-            if (t.includes('交通') || t.includes('機場') || t.includes('租車') || t.includes('還車') || t.includes('出發') || t.includes('前往') || t.includes('搭車') || t.includes('班機') || t.includes('住宿') || t.includes('飯店') || t.includes('民宿')) {
-                return null;
-            }
-            if (t.includes('餐廳') || t.includes('美食') || t.includes('咖啡') || t.includes('晚餐') || t.includes('午餐') || t.includes('早餐') || t.includes('烤肉') || t.includes('料理') || t.includes('吃')) {
-                return 'food';
-            }
-            if (t.includes('購物') || t.includes('免稅') || t.includes('超市') || t.includes('商場') || t.includes('買')) {
-                return 'shop';
-            }
-            return 'spot';
-        };
-
-        window.renderScheduleUI = function() {
-            const container = document.getElementById('schedule-container');
-            if (!container) return;
-            if (allSchedulesData.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">目前還沒有行程，快點擊上方按鈕新增或智慧導入吧！✨</p>`;
-                return;
-            }
-            container.innerHTML = '';
-            allSchedulesData.forEach(s => {
-                let cleanTitle = window.cleanDisplayTitle(s.title);
-                let div = document.createElement('div');
-                div.className = "p-4 bg-[#fffaf5] hover:bg-[#fbf2e9] rounded-2xl border border-[#eae1d7] cursor-pointer transition flex justify-between items-center";
-                div.innerHTML = `
-                    <div class="space-y-1">
-                        <span class="text-[10px] bg-[#f0dcd0] text-[#735848] px-2 py-0.5 rounded-md font-black">${s.time || '全天'}</span>
-                        <h5 class="font-black text-gray-900 text-sm mt-1">${cleanTitle}</h5>
-                    </div>
-                `;
-                div.onclick = () => window.openDetailModal(s.id);
-                container.appendChild(div);
-            });
-        };
-
-        window.submitLoginName = async function() {
-            const name = document.getElementById('login-name-input').value.trim();
-            if (!name) { alert("請輸入名字！"); return; }
-            currentMyName = name;
-            localStorage.setItem('my_travel_nickname', name);
-            document.getElementById('login-modal').classList.add('hidden');
-            window.proceedEnterProject();
-        };
-
-        async function getMyProjectIds() {
-            let localList = JSON.parse(localStorage.getItem('my_subscribed_projects')) || [];
-            if (!currentMyName) return localList;
-            try {
-                const docRef = doc(db, "user_profiles", currentMyName);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists() && docSnap.data().projects) {
-                    let cloudList = docSnap.data().projects;
-                    return Array.from(new Set([...localList, ...cloudList]));
-                }
-            } catch (e) {}
-            return localList;
-        }
-
-        async function saveMyProjectId(id) {
-            let list = await getMyProjectIds();
-            if (!list.includes(id)) {
-                list.unshift(id);
-                localStorage.setItem('my_subscribed_projects', JSON.stringify(list));
-            }
-        }
-
-        async function renderProjects() {
-            const list = document.getElementById('project-list');
-            if (!list) return;
-            try {
-                let myIds = await getMyProjectIds();
-                if (myIds.length === 0) {
-                    list.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">目前沒有專案。點上方按鈕新增，或輸入 6 位數專案號碼導入！✨</p>`;
-                    return;
-                }
-                list.innerHTML = '';
-                for (let id of myIds) {
-                    try {
-                        const docRef = doc(db, "projects", id);
-                        const docSnap = await getDoc(docRef);
-                        if (docSnap.exists()) {
-                            const p = docSnap.data();
-                            const card = document.createElement('div');
-                            card.className = "cute-card p-5 space-y-3 relative transition hover:border-[#d98262] cursor-pointer";
-                            card.onclick = () => window.enterProject(id);
-                            card.innerHTML = `
-                                <div class="flex justify-between items-center gap-2 w-full">
-                                    <span class="text-xs bg-[#f0dcd0] text-[#735848] px-3 py-1 rounded-full font-black shrink-0">進行中 🚗</span>
-                                    <span class="text-xs text-gray-500 font-bold">${p.dates || '未定日期'}</span>
-                                </div>
-                                <div class="space-y-1">
-                                    <h3 class="font-black text-gray-900 text-base break-words">🌸 ${p.name}</h3>
-                                </div>
-                            `;
-                            list.appendChild(card);
-                        }
-                    } catch (e) {}
-                }
-            } catch (e) {
-                list.innerHTML = `<p class="text-center text-xs text-red-400 py-8">載入專案發生錯誤！</p>`;
-            }
-        }
-        window.renderProjects = renderProjects;
-
-        // 初始化應用程式
-        async function initApp() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const sharedProjId = urlParams.get('project');
-            if (sharedProjId) {
-                await saveMyProjectId(sharedProjId);
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-            renderProjects();
-        }
-
-        initApp();
-    </script>
-</body>
-</html>
+<html lang="zh-TW"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>🧳 放風之旅</title>
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="放風 ✈">
+<meta name="theme-color" content="#FFFCF6">
+<link rel="apple-touch-icon" href="icon.png"><link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#3E3A39;--paper:#FFFCF6;--co:#F2A497;--ye:#F6D27A;--aq:#A8D3E6;--gr:#B9DAA5}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0 auto;max-width:480px;min-height:100vh;background:var(--paper);color:var(--ink);font:15px/1.6 "Huninn","Noto Sans TC",system-ui,sans-serif;padding:0 14px calc(100px + env(safe-area-inset-bottom))}
+h2,h3{margin:0}small{opacity:.7}.mute{text-align:center;opacity:.6;padding:18px 0}
+.box{border:3px solid var(--ink);border-radius:24px;background:var(--paper);box-shadow:3px 3px 0 var(--ink);padding:14px;margin:12px 0}
+.btn{font:inherit;font-size:13px;color:var(--ink);background:var(--ye);border:3px solid var(--ink);border-radius:999px;padding:4px 14px;cursor:pointer;box-shadow:2px 2px 0 var(--ink);text-decoration:none;display:inline-block}
+.btn:active{transform:translate(2px,2px);box-shadow:none}.co{background:var(--co)}.aq{background:var(--aq)}.gr{background:var(--gr)}
+header{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:3px solid var(--ink);margin:0 -14px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;gap:8px;justify-content:space-between}
+header div{flex:1;min-width:0}header b,header small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:12px 0}.gap{justify-content:flex-end}
+.art{border:3px solid var(--ink);border-radius:24px;overflow:hidden;margin:12px 0;box-shadow:3px 3px 0 var(--ink);line-height:0}.art svg{width:100%;height:auto}
+.pills{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px}
+.pill{font:inherit;flex:none;border:3px solid var(--ink);border-radius:999px;background:var(--paper);padding:2px 14px;cursor:pointer;color:var(--ink)}.pill.on{background:var(--aq)}
+.tag{display:inline-block;background:var(--ye);border:2px solid var(--ink);border-radius:999px;padding:0 10px;font-size:12px;margin-bottom:4px}
+.item{cursor:pointer;display:block}.item b{display:block}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:calc(100% - 28px);max-width:452px;background:var(--paper);border:3px solid var(--ink);border-radius:26px;box-shadow:3px 3px 0 var(--ink);display:flex;justify-content:space-around;padding:6px;z-index:5}
+nav button{font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:none;color:var(--ink);padding:2px 8px;cursor:pointer}nav button span{display:block;font-size:20px}nav .on{background:var(--ye);border-color:var(--ink)}
+.mask{position:fixed;inset:0;background:rgba(62,58,57,.45);z-index:9;display:flex;align-items:center;justify-content:center;padding:16px}
+.sheet{width:100%;max-width:400px;max-height:88vh;overflow:auto;margin:0}
+input,textarea,select{font:inherit;width:100%;border:3px solid var(--ink);border-radius:16px;background:#fff;padding:8px 12px;margin:4px 0 8px;color:var(--ink)}
+label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:0 10px 6px 0}.chk input{width:auto;margin:0}
+.bar{height:16px;border:3px solid var(--ink);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--gr);transition:width .5s}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.bd{width:64px;height:64px;margin:0 auto;border:3px dashed var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;filter:grayscale(1);opacity:.5}
+.bd.on{border-style:solid;filter:none;opacity:1}
+.lang{display:grid;grid-template-columns:96px 1fr;gap:10px}.lang .btn{display:block;width:100%;text-align:left;margin-bottom:8px}.lang .btn.on{background:var(--co)}
+@keyframes fl{50%{transform:translateY(-5px)}}@keyframes dr{from{transform:translateX(-9px)}to{transform:translateX(9px)}}
+@keyframes bn{0%{transform:scale(.82)}55%{transform:scale(1.1)}100%{transform:scale(1)}}
+.fl{animation:fl 3s ease-in-out infinite}.dr{animation:dr 6s ease-in-out infinite alternate}.bn{animation:bn .5s cubic-bezier(.3,1.6,.5,1)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style></head>
+<body>
+<header><button id="bk" class="btn aq" hidden>← 專案</button><div><b id="ht">🧳 放風之旅</b><small id="hs">選擇你的冒險旅程 ✨</small></div><button id="sh" class="btn gr" hidden>✨ 分享</button></header>
+<main>
+<section id="v0"><div class="art" id="hero0"></div>
+<div class="row"><h2>我的旅程 ✈</h2><span><button id="imp" class="btn">📥 導入</button> <button id="new" class="btn co">＋ 新增</button></span></div><div id="pl"><p class="mute">載入中…☁️</p></div></section>
+<section id="v1" hidden><div class="art" id="hero"></div>
+<div id="t-schedule" class="tab"><div class="row"><h3>📅 行程時間軸</h3><span><button id="sp" class="btn">✨ 智慧導入</button> <button id="ad" class="btn co">＋ 新增</button></span></div><div class="pills" id="pills"></div><div id="sl"></div></div>
+<div id="t-ai" class="tab" hidden></div>
+<div id="t-lang" class="tab" hidden><div class="box" style="text-align:center;background:var(--ye)"><small id="dc">請點選下方句子</small><h2 id="df" style="margin:4px 0 10px">想說什麼呢？</h2><button id="say" class="btn co">🔊 朗讀</button></div><div class="lang"><div id="lc"></div><div id="lp"></div></div></div>
+<div id="t-split" class="tab" hidden><div class="box" style="background:var(--co)"><div class="row" style="margin:0"><small>旅程總花費（折合台幣）</small><button id="mb" class="btn">👥 成員</button></div><h2 id="tot">NT$ 0</h2><small id="brk"></small></div>
+<div class="row"><h3>💰 帳目</h3><span><button id="st" class="btn aq">📊 結算</button> <button id="ae" class="btn co">＋ 記一筆</button></span></div><div id="el"></div></div>
+<div id="t-quest" class="tab" hidden><div class="box" style="background:var(--gr)"><div class="row" style="margin:0 0 6px"><b id="qc">已打卡 0 / 0</b><b id="qp">0%</b></div><div class="bar" style="background:var(--paper)"><i id="qb" style="width:0"></i></div>
+<button id="gal" class="btn aq" style="margin-top:12px">📸 回憶寫真冊</button><div class="badges" style="margin-top:12px"><div><div class="bd" id="b-food">🍽️</div><small id="bt-food"></small></div><div><div class="bd" id="b-spot">🗺️</div><small id="bt-spot"></small></div><div><div class="bd" id="b-shop">🛍️</div><small id="bt-shop"></small></div></div></div><div id="ql"></div></div>
+</section></main>
+<nav id="nav" hidden></nav>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import{getFirestore,collection,addDoc,getDoc,getDocs,deleteDoc,doc,setDoc,onSnapshot,query,where,orderBy}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import{getStorage,ref,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+const app=initializeApp({apiKey:"AIzaSyBcKmZhJaZn5emOlHRV95-uC9q01wFxt4M",authDomain:"my-travel-app-6e00c.firebaseapp.com",projectId:"my-travel-app-6e00c",storageBucket:"my-travel-app-6e00c.firebasestorage.app",messagingSenderId:"135860333246",appId:"1:135860333246:web:a25402eb743d6cebc9ccef"});const db=getFirestore(app),st=getStorage(app);
+const $=i=>document.getElementById(i),q=(m,s)=>m.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const S={id:null,name:'',pin:'',me:localStorage.getItem('my_travel_nickname')||'',sch:[],mem:[],exp:[],all:[],chk:{},day:'all',un:[],phrase:null,lang:'en-US'};
+const dest=n=>/濟州|韓國|釜山|首爾/.test(n||'')?'korea':/日本|東京|大阪|京都|沖繩/.test(n||'')?'japan':'general';
+const dn=s=>+String(s||'').replace(/\D/g,'')||1,clean=t=>(t||'').replace(/^\d{1,2}[:：]\d{2}\s*/,'').trim();
+const RATE={TWD:1,KRW:.024,JPY:.21,USD:32};
+/* ---------- SVG 插圖 ---------- */
+const K='stroke="#3E3A39" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"';
+const cloud=(x,y)=>`<g transform="translate(${x} ${y})"><g class="dr"><path d="M0 18q-2-14 14-12q8-12 22 0q14-2 12 12z" fill="#FFFCF6" ${K}/></g></g>`;
+const hill=(c,y)=>`<path d="M-4 140V${y}Q80 ${y-24} 160 ${y}T324 ${y-6}V140z" fill="${c}" ${K}/>`;
+const SC={
+korea:`<rect width="320" height="140" fill="#A8D3E6"/>${cloud(24,22)}<g class="fl"><circle cx="270" cy="36" r="19" fill="#F6D27A" ${K}/></g><path d="M-4 140V98Q70 34 150 74Q215 58 324 100V140z" fill="#B9DAA5" ${K}/><g class="fl"><circle cx="62" cy="98" r="17" fill="#F6D27A" ${K}/><path d="M62 81q4-9 13-8" fill="none" ${K}/></g><g class="fl"><circle cx="100" cy="110" r="13" fill="#F6D27A" ${K}/></g><g class="dr"><rect x="190" y="98" width="62" height="24" rx="9" fill="#F2A497" ${K}/><rect x="204" y="86" width="32" height="16" rx="6" fill="#FFFCF6" ${K}/><circle cx="206" cy="124" r="7" fill="#FFFCF6" ${K}/><circle cx="238" cy="124" r="7" fill="#FFFCF6" ${K}/></g>`,
+japan:`<rect width="320" height="140" fill="#F6D27A"/><g class="fl"><circle cx="58" cy="38" r="19" fill="#F2A497" ${K}/></g>${cloud(196,16)}<path d="M70 124L138 34h24l68 90z" fill="#A8D3E6" ${K}/><path d="M126 52l12-18h24l12 18l-12 7l-12-7l-12 7z" fill="#FFFCF6" ${K}/>${hill('#B9DAA5',116)}<g class="fl"><rect x="250" y="72" width="8" height="46" fill="#F2A497" ${K}/><rect x="284" y="72" width="8" height="46" fill="#F2A497" ${K}/><path d="M240 64h60l-6 11h-48z" fill="#F2A497" ${K}/></g>`,
+general:`<rect width="320" height="140" fill="#A8D3E6"/>${cloud(18,30)}${cloud(220,64)}<g class="dr"><path d="M80 60l92-12q24-2 24 8t-24 8l-92-4z" fill="#F6D27A" ${K}/><path d="M124 58l-18-26h14l30 26z" fill="#F2A497" ${K}/></g>${hill('#B9DAA5',112)}<g class="fl"><rect x="232" y="92" width="44" height="34" rx="8" fill="#F2A497" ${K}/><path d="M244 92v-9h20v9" fill="none" ${K}/></g>`};
+const scene=n=>`<svg viewBox="0 0 320 140" role="img" aria-label="旅行插圖">${SC[dest(n)]}</svg>`;
+/* ---------- 共用 UI ---------- */
+function modal(title,body,ok,onOk){const m=document.createElement('div');m.className='mask';
+m.innerHTML=`<div class="box sheet bn"><div class="row" style="margin-top:0"><h3>${title}</h3><button class="btn x">✕</button></div>${body}<div class="row gap">${ok?`<button class="btn co ok">${ok}</button>`:''}<button class="btn cl">關閉</button></div></div>`;
+const c=()=>m.remove();q(m,'.x').onclick=q(m,'.cl').onclick=c;m.onclick=e=>{if(e.target===m)c()};
+if(ok)q(m,'.ok').onclick=async()=>{if(await onOk(m)!==false)c()};document.body.appendChild(m);return m}
+const val=(m,s)=>q(m,s).value.trim();
+const copy=async t=>{try{await navigator.clipboard.writeText(t);alert('已複製 ✨')}catch{prompt('請手動複製',t)}};
+/* ---------- 專案 ---------- */
+const ids=()=>JSON.parse(localStorage.getItem('my_subscribed_projects')||'[]');
+const saveIds=a=>localStorage.setItem('my_subscribed_projects',JSON.stringify([...new Set(a)]));
+async function renderProjects(){const l=$('pl'),a=ids();if(!a.length){l.innerHTML='<p class="mute">還沒有專案，新增一個或輸入 6 位數號碼導入吧 ✨</p>';return}
+const snaps=await Promise.all(a.map(i=>getDoc(doc(db,'projects',i)).catch(()=>null)));l.innerHTML='';
+snaps.forEach(s=>{if(!s||!s.exists())return;const p=s.data(),d=document.createElement('div');d.className='box item';
+d.innerHTML=`<div class="art" style="margin:0 0 10px;box-shadow:none">${scene(p.name)}</div><span class="tag">${esc(p.dates||'未定日期')}</span><b>🌸 ${esc(p.name)}</b>`;d.onclick=()=>enter(s.id);l.appendChild(d)})}
+$('new').onclick=()=>modal('🌸 新增旅程','<label>旅程名稱（含「濟州」「日本」等會有專屬插圖）</label><input id="n1" placeholder="例如：濟州島四日遊"><label>日期</label><input id="n2" placeholder="例如：11/20 - 11/23">','建立',async m=>{const name=val(m,'#n1');if(!name){alert('請輸入名稱');return false}
+const pin=String(Math.floor(100000+Math.random()*900000)),r=await addDoc(collection(db,'projects'),{name,dates:val(m,'#n2'),pin,createdAt:Date.now()});saveIds([r.id,...ids()]);renderProjects()});
+$('imp').onclick=()=>modal('📥 輸入 6 位數專案號碼','<input id="c1" maxlength="6" inputmode="numeric" placeholder="例如：883921" style="text-align:center;font-size:20px;letter-spacing:4px">','導入',async m=>{const c=val(m,'#c1'),r=await getDocs(query(collection(db,'projects'),where('pin','==',c)));
+if(r.empty){alert('找不到這個專案號碼');return false}saveIds([r.docs[0].id,...ids()]);renderProjects()});
+$('sh').onclick=()=>{const url=location.origin+location.pathname+'?project='+S.id;const m=modal('✨ 分享此專案',`<h1 style="text-align:center;letter-spacing:6px;margin:6px 0">${esc(S.pin||'------')}</h1><button class="btn gr" id="cp" style="width:100%;margin-bottom:8px">📋 複製 6 位數代碼</button><button class="btn aq" id="cu" style="width:100%">🔗 複製專屬網址</button>`);q(m,'#cp').onclick=()=>copy(S.pin);q(m,'#cu').onclick=()=>copy(url)};
+async function enter(id){const s=await getDoc(doc(db,'projects',id));if(!s.exists())return;Object.assign(S,{id,name:s.data().name,pin:s.data().pin||''});
+if(S.me)return open_();modal('🌸 歡迎加入旅程','<input id="nm" placeholder="你的名字，例如：小明">','進入旅程',m=>{const v=val(m,'#nm');if(!v){alert('請輸入名字');return false}S.me=v;localStorage.setItem('my_travel_nickname',v);open_()})}
+function open_(){$('v0').hidden=true;$('v1').hidden=false;$('nav').hidden=false;$('bk').hidden=false;$('sh').hidden=false;$('ht').textContent='🌸 '+S.name;$('hs').textContent='旅伴：'+S.me;
+$('hero').innerHTML=scene(S.name);S.day='all';S.lang=LG[dest(S.name)].c;rRemind();rLang();
+setDoc(doc(db,'projects',S.id,'members',S.me),{name:S.me},{merge:true});
+const sub=(c,o,fn)=>{const r=collection(db,'projects',S.id,c);S.un.push(onSnapshot(o?query(r,orderBy(o)):r,sn=>fn(sn.docs.map(d=>({id:d.id,...d.data()})))))};
+sub('schedules','createdAt',a=>{S.sch=a;rSch();rQuest()});sub('members',0,a=>{S.mem=a.map(m=>m.name||m.id);rSplit()});sub('expenses','createdAt',a=>{S.exp=a;rSplit()});
+sub('checkins',0,a=>{S.all=a;S.chk={};a.filter(c=>c.uploader===S.me).forEach(c=>S.chk[c.scheduleId]=c);rQuest()});tab('schedule')}
+$('bk').onclick=()=>{S.un.forEach(f=>f());S.un=[];S.id=null;$('v0').hidden=false;$('v1').hidden=true;$('nav').hidden=true;$('bk').hidden=true;$('sh').hidden=true;$('ht').textContent='🧳 放風之旅';$('hs').textContent='選擇你的冒險旅程 ✨';renderProjects()};
+const TABS=[['schedule','📅','行程'],['ai','💡','提醒'],['lang','🗣','語言'],['split','💰','分帳'],['quest','🎯','闖關']];
+$('nav').innerHTML=TABS.map(t=>`<button data-t="${t[0]}"><span>${t[1]}</span>${t[2]}</button>`).join('');
+$('nav').querySelectorAll('button').forEach(b=>b.onclick=()=>{tab(b.dataset.t);b.classList.add('bn')});
+function tab(t){document.querySelectorAll('.tab').forEach(e=>e.hidden=e.id!=='t-'+t);$('nav').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.t===t);if(b.dataset.t!==t)b.classList.remove('bn')})}
+/* ---------- 行程 ---------- */
+const tp=t=>String(t||'99:99').padStart(5,'0');
+function rSch(pop){const days=[...new Set(S.sch.map(s=>s.day||'Day 1'))].sort((a,b)=>dn(a)-dn(b));if(S.day!=='all'&&!days.includes(S.day))S.day='all';
+$('pills').innerHTML=['all',...days].map(d=>`<button class="pill ${d===S.day?'on'+(pop?' bn':''):''}" data-d="${esc(d)}">${d==='all'?'全部':esc(d)}</button>`).join('');
+$('pills').querySelectorAll('button').forEach(b=>b.onclick=()=>{S.day=b.dataset.d;rSch(1)});
+const l=S.sch.filter(s=>S.day==='all'||(s.day||'Day 1')===S.day).sort((a,b)=>dn(a.day)-dn(b.day)||tp(a.time).localeCompare(tp(b.time)));
+$('sl').innerHTML=l.length?l.map(s=>`<div class="box item${pop?' bn':''}" data-i="${s.id}"><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><b>${esc(clean(s.title))}</b></div>`).join(''):'<p class="mute">還沒有行程，按「新增」或「智慧導入」吧 ✨</p>';
+$('sl').querySelectorAll('.item').forEach(e=>e.onclick=()=>detail(e.dataset.i))}
+function detail(id){const s=S.sch.find(x=>x.id===id);if(!s)return;const t=clean(s.title),k=encodeURIComponent((/濟州/.test(S.name)&&!t.includes('濟州')?'濟州島 ':'')+t);
+const m=modal(esc(t),`<span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span>${s.location?`<div class="box" style="margin:8px 0;white-space:pre-line">📝 ${esc(s.location)}</div>`:''}
+<div class="row gap" style="justify-content:flex-start">${dest(S.name)==='korea'?`<a class="btn gr" target="_blank" rel="noopener" href="https://m.map.naver.com/search2/search.naver?query=${k}">💚 Naver</a>`:''}<a class="btn aq" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${k}">💙 Google</a><button class="btn" id="dl">🗑 刪除</button></div>`);
+q(m,'#dl').onclick=async()=>{if(confirm('確定刪除這個行程？')){await deleteDoc(doc(db,'projects',S.id,'schedules',id));m.remove()}}}
+$('ad').onclick=()=>modal('✏️ 新增行程','<label>天數</label><input id="a1" value="Day 1"><label>時間</label><input id="a2" value="10:00"><label>行程名稱</label><input id="a3"><label>備註</label><textarea id="a4" rows="3"></textarea>','新增',async m=>{const title=val(m,'#a3');if(!title){alert('請輸入名稱');return false}
+await addDoc(collection(db,'projects',S.id,'schedules'),{day:val(m,'#a1')||'Day 1',time:val(m,'#a2'),title,location:val(m,'#a4'),createdAt:Date.now()})});
+$('sp').onclick=()=>modal('✨ 智慧導入行程','<textarea id="p1" rows="9" placeholder="貼上行程，例如：&#10;Day 1&#10;10:00 抵達機場&#10;備註：…"></textarea>','開始拆解',async m=>{const lines=val(m,'#p1').split('\n').map(l=>l.trim()).filter(Boolean);if(!lines.length){alert('請先貼上行程');return false}
+const CN='一二三四五六七八九十';let day='Day 1',cur=null;const out=[];
+for(const raw of lines){const dm=raw.match(/Day\s*(\d+)|第([一二三四五六七八九十])天/i);if(dm){if(cur)out.push(cur);cur=null;day='Day '+(dm[1]||CN.indexOf(dm[2])+1);continue}
+const line=raw.replace(/：/g,':'),tm=line.match(/(\d{1,2}):(\d{2})/);
+if(tm&&!/備註|營業時間/.test(line)){if(cur)out.push(cur);cur={day,time:tm[0],title:line.replace(/^[•\-\s]*\d{1,2}:\d{2}\s*/,'').trim(),location:'',createdAt:Date.now()+out.length}}else if(cur)cur.location+=(cur.location?'\n':'')+raw}
+if(cur)out.push(cur);await Promise.all(out.map(i=>addDoc(collection(db,'projects',S.id,'schedules'),i)));alert(`✨ 成功導入 ${out.length} 筆行程！`)});
+/* ---------- 提醒 / 語言 ---------- */
+function rRemind(){const c=t=>`<div class="box"><h3>${t[0]}</h3><div style="font-size:14px">${t[1]}</div></div>`;
+$('t-ai').innerHTML=dest(S.name)==='korea'?[['🇰🇷 天氣小提醒','早晚溫差大、風也大，記得帶防風外套 🧥'],['🚗 自駕導航','推薦 Naver Map 或 Kakao Map，用電話號碼搜尋最準。沿途測速相機很多，請依速限行駛。'],['🚨 緊急電話','警察 112 ｜ 救護・消防 119 ｜ 中文旅遊熱線 1330']].map(c).join(''):c(['🌍 出發前確認','護照效期需大於 6 個月，備好網卡與萬用轉接頭 🔌'])}
+const CATS=[['restaurant','🍽️ 餐廳'],['shopping','🛍️ 購物'],['transport','🚗 交通'],['hotel','🏨 住宿'],['emergency','🚨 突發']];
+const LG={korea:{c:'ko-KR',p:{restaurant:[['我們有 4 個人。','4명입니다.'],['請問有中文菜單嗎？','중국어 메뉴판 있어요?'],['請推薦招牌菜。','대표 메뉴 추천해주세요.']],shopping:[['請問這個多少錢？','이거 얼마예요?'],['現在有折扣嗎？','할인 중인가요?']],transport:[['最近的地鐵站在哪裡？','가장 가까운 지하철역이 어디예요?']],hotel:[['我要辦理入住。','체크인 하겠습니다.']],emergency:[['救命！護照被偷了！','살려주세요! 여권을 도둑맞았어요!']]}},
+japan:{c:'ja-JP',p:{restaurant:[['我們有 4 個人。','4人です。'],['請問有中文菜單嗎？','中国語のメニューはありますか？'],['請推薦招牌菜。','おすすめの料理を教えてください。']],shopping:[['請問這個多少錢？','これはいくらですか？']],transport:[['最近的車站在哪裡？','一番近い駅はどこですか？']],hotel:[['我要辦理入住。','チェックインお願いします。']],emergency:[['救命！護照被偷了！','助けてください！パスポートが盗まれました！']]}},
+general:{c:'en-US',p:{restaurant:[['我們有 4 個人。','Table for four, please.']],shopping:[['請問這個多少錢？','How much is this?']],transport:[['最近的地鐵站在哪裡？','Where is the nearest subway station?']],hotel:[['我要辦理入住。',"I'd like to check in, please."]],emergency:[['救命！護照被偷了！','Help! My passport has been stolen!']]}}};
+function rLang(){const P=LG[dest(S.name)].p;const show=id=>{$('lc').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===id));$('lp').innerHTML=(P[id]||[]).map((p,i)=>`<button class="box item" style="width:100%;font:inherit;color:inherit;text-align:left;margin:0 0 10px" data-i="${i}">${esc(p[0])}</button>`).join('');
+$('lp').querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=P[id][b.dataset.i];S.phrase=p;$('dc').textContent=p[0];$('df').textContent=p[1]})};$('lc').innerHTML=CATS.map(c=>`<button class="btn" data-c="${c[0]}">${c[1]}</button>`).join('');$('lc').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.c));show('restaurant')}$('say').onclick=()=>{if(!S.phrase)return;const u=new SpeechSynthesisUtterance(S.phrase[1]);u.lang=S.lang;speechSynthesis.speak(u)};
+/* ---------- 分帳 ---------- */
+const money=n=>'NT$ '+Math.round(n).toLocaleString();
+function bal(){const b={};S.mem.forEach(n=>b[n]=0);S.exp.forEach(e=>{const t=e.amount*(RATE[e.cur]||1),sp=e.split&&e.split.length?e.split:S.mem;b[e.payer]=(b[e.payer]||0)+t;sp.forEach(n=>b[n]=(b[n]||0)-t/sp.length)});return b}
+function rSplit(){const by={};let tot=0;S.exp.forEach(e=>{by[e.cur]=(by[e.cur]||0)+e.amount;tot+=e.amount*(RATE[e.cur]||1)});
+$('tot').textContent=money(tot);$('brk').textContent=Object.entries(by).map(([c,v])=>`${c} ${Math.round(v).toLocaleString()}`).join(' ');
+$('el').innerHTML=S.exp.length?S.exp.slice().reverse().map(e=>`<div class="box item" style="display:flex;justify-content:space-between;gap:8px"><div><b>${esc(e.title)}</b><small>${esc(e.payer)} 先付 · ${(e.split&&e.split.length)||S.mem.length} 人分</small></div><div style="text-align:right"><b>${esc(e.cur)} ${Math.round(e.amount).toLocaleString()}</b><br><button class="btn" data-d="${e.id}" style="padding:0 8px">刪</button></div></div>`).join(''):'<p class="mute">還沒有記帳，點「記一筆」開始吧 ✨</p>';
+$('el').querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>confirm('刪除這筆帳？')&&deleteDoc(doc(db,'projects',S.id,'expenses',b.dataset.d)))}
+$('mb').onclick=()=>{const m=modal('👥 旅伴成員',`<div id="ml"></div><input id="m1" placeholder="新增成員名字"><button class="btn gr" id="m2">＋ 加入</button>`);
+const draw=()=>{q(m,'#ml').innerHTML=S.mem.map(n=>`<span class="tag" style="margin-right:6px">${esc(n)} <a data-n="${esc(n)}" style="cursor:pointer">✕</a></span>`).join('');q(m,'#ml').querySelectorAll('a').forEach(a=>a.onclick=async()=>{await deleteDoc(doc(db,'projects',S.id,'members',a.dataset.n));setTimeout(draw,400)})};draw();
+q(m,'#m2').onclick=async()=>{const n=val(m,'#m1');if(!n)return;await setDoc(doc(db,'projects',S.id,'members',n),{name:n});q(m,'#m1').value='';setTimeout(draw,400)}};
+$('ae').onclick=()=>{if(!S.mem.length){alert('請先在專案中加入旅伴');return}const dc={korea:'KRW',japan:'JPY'}[dest(S.name)]||'TWD';
+modal('💸 記一筆',`<label>項目</label><input id="e1"><label>金額</label><input id="e2" type="number" inputmode="decimal"><label>幣別</label><select id="e3">${Object.keys(RATE).map(c=>`<option ${c===dc?'selected':''}>${c}</option>`).join('')}</select><label>誰先付</label><select id="e4">${S.mem.map(n=>`<option ${n===S.me?'selected':''}>${esc(n)}</option>`).join('')}</select><label>分給誰</label><div id="e5">${S.mem.map(n=>`<label class="chk"><input type="checkbox" checked value="${esc(n)}">${esc(n)}</label>`).join('')}</div>`,'儲存',async m=>{
+const title=val(m,'#e1'),amount=parseFloat(val(m,'#e2')),split=[...m.querySelectorAll('#e5 input:checked')].map(i=>i.value);
+if(!title||!(amount>0)||!split.length){alert('請填寫項目、金額，並至少選一位分攤者');return false}
+await addDoc(collection(db,'projects',S.id,'expenses'),{title,amount,cur:val(m,'#e3'),payer:val(m,'#e4'),split,createdAt:Date.now()})})};
+$('st').onclick=()=>{const b=bal(),cr=[],de=[];Object.entries(b).forEach(([n,v])=>{if(v>1)cr.push([n,v]);else if(v<-1)de.push([n,-v])});const tr=[];
+while(cr.length&&de.length){cr.sort((a,b)=>b[1]-a[1]);de.sort((a,b)=>b[1]-a[1]);const x=Math.min(cr[0][1],de[0][1]);tr.push(`${esc(de[0][0])} ➜ ${esc(cr[0][0])} ${money(x)}`);cr[0][1]-=x;de[0][1]-=x;if(cr[0][1]<1)cr.shift();if(de[0][1]<1)de.shift()}
+modal('📊 結算（折合台幣）',tr.length?tr.map(t=>`<div class="box" style="margin:6px 0;background:var(--aq)">${t}</div>`).join(''):'<p class="mute">目前不需要轉帳 🎉</p>')};
+/* ---------- 闖關與打卡 ---------- */
+const cls=t=>{t=t||'';if(/交通|機場|租車|還車|出發|前往|搭車|班機|住宿|飯店|民宿/.test(t))return null;if(/餐廳|美食|咖啡|晚餐|午餐|早餐|烤肉|料理|吃/.test(t))return'food';if(/購物|免稅|超市|商場|買/.test(t))return'shop';return'spot'};
+const BD={food:['美食家','var(--co)'],spot:['探險家','var(--aq)'],shop:['購物達人','var(--ye)']};
+function rQuest(){const it=S.sch.map(s=>({...s,k:cls(s.title)})).filter(s=>s.k),n=it.filter(s=>S.chk[s.id]).length,p=it.length?Math.round(n/it.length*100):0;
+$('qc').textContent=`已打卡 ${n} / ${it.length}`;$('qp').textContent=p+'\%';$('qb').style.width=p+'%';
+for(const k in BD){const on=it.some(s=>s.k===k&&S.chk[s.id]),b=$('b-'+k),was=b.classList.contains('on');b.classList.toggle('on',on);b.style.background=on?BD[k][1]:'';$('bt-'+k).textContent=on?BD[k][0]:'未解鎖';if(on&&!was){b.classList.add('bn')}}
+$('ql').innerHTML=it.length?it.map(s=>`<div class="box item" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><b>${esc(clean(s.title))}</b></div><button class="btn ${S.chk[s.id]?'gr':''}" data-i="${s.id}">${S.chk[s.id]?'✔ 已解鎖':'📍 打卡'}</button></div>`).join(''):'<p class="mute">行程中還沒有可打卡的景點、美食或購物 ✨</p>';
+$('ql').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>checkin(b.dataset.i))}
+const shrink=f=>new Promise((ok,no)=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const k=Math.min(1,1000/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>b?ok(b):no(),'image/jpeg',.82)};im.onerror=no;im.src=u});
+function checkin(id){const s=S.sch.find(x=>x.id===id);if(!s)return;const cur=S.chk[id],r=doc(db,'projects',S.id,'checkins',id+'_'+S.me);
+const m=modal(esc(clean(s.title)),`${cur&&cur.photoUrl?`<img src="${esc(cur.photoUrl)}" alt="" style="width:100%;border:3px solid var(--ink);border-radius:20px;margin-bottom:8px">`:''}<input id="ph" type="file" accept="image/*" hidden><button class="btn co" id="up" style="width:100%;margin-bottom:8px">📷 ${cur?'換一張照片':'選照片打卡'}</button>${cur?'<button class="btn" id="un" style="width:100%">↩ 取消打卡</button>':'<button class="btn" id="np" style="width:100%">✔ 不放照片，直接打卡</button>'}`);
+q(m,'#up').onclick=()=>q(m,'#ph').click();
+q(m,'#ph').onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=q(m,'#up');b.textContent='上傳中… ⏳';b.disabled=true;
+try{const blob=await shrink(f),p=ref(st,`checkins/${S.id}/${id}_${S.me}_${Date.now()}.jpg`);await uploadBytes(p,blob,{contentType:'image/jpeg'});await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:await getDownloadURL(p),at:Date.now()});m.remove()}catch(x){console.error(x);alert('照片上傳失敗');b.textContent='再試一次';b.disabled=false}};
+const np=q(m,'#np');if(np)np.onclick=async()=>{await setDoc(r,{scheduleId:id,uploader:S.me,photoUrl:'',at:Date.now()});m.remove()};
+const un=q(m,'#un');if(un)un.onclick=async()=>{await deleteDoc(r);m.remove()}}
+$('gal').onclick=()=>{const l=(S.all||[]).filter(c=>c.photoUrl).sort((a,b)=>b.at-a.at);
+modal('📸 旅程回憶寫真冊',l.length?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${l.map((c,i)=>{const s=S.sch.find(x=>x.id===c.scheduleId);return`<div style="border:3px solid var(--ink);border-radius:18px;overflow:hidden;background:#fff;transform:rotate(${i%2?1.5:-1.5}deg)"><img src="${esc(c.photoUrl)}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;display:block"><small style="display:block;padding:2px 8px">${esc(s?clean(s.title):'')} · ${esc(c.uploader)}</small></div>`}).join('')}</div>`:'<p class="mute">還沒有照片，去闖關打卡拍一張吧 📷</p>')};
+/* ---------- 啟動 ---------- */
+$('hero0').innerHTML=scene('');
+(async()=>{const p=new URLSearchParams(location.search).get('project');if(p){saveIds([p,...ids()]);history.replaceState({},'',location.pathname)}renderProjects()})();
+</script></body></html>
