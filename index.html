@@ -42,9 +42,9 @@ label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:
 <body>
 <header><button id="bk" class="btn aq" hidden>← 專案</button><div><b id="ht">🧳 放風之旅</b><small id="hs">選擇你的冒險旅程 ✨</small></div><button id="sh" class="btn gr" hidden>✨ 分享</button></header>
 <main>
-<section id="v0"><div class="art" id="hero0"></div>
+<section id="v0">
 <div class="row"><h2>我的旅程 ✈</h2><span><button id="imp" class="btn">📥 導入</button> <button id="new" class="btn co">＋ 新增</button></span></div><div id="pl"><p class="mute">載入中…☁️</p></div></section>
-<section id="v1" hidden>
+<section id="v1" hidden><div class="art" id="hero"></div>
 <div id="t-schedule" class="tab"><div class="row"><h3>📅 行程時間軸</h3><span><button id="sp" class="btn">✨ 智慧導入</button> <button id="ad" class="btn co">＋ 新增</button></span></div><div class="pills" id="pills"></div><div id="sl"></div></div>
 <div id="t-ai" class="tab" hidden></div>
 <div id="t-lang" class="tab" hidden><div class="box" style="text-align:center;background:var(--ye)"><small id="dc">請點選下方句子</small><h2 id="df" style="margin:4px 0 10px">想說什麼呢？</h2><button id="say" class="btn co">🔊 朗讀</button></div><div class="lang"><div id="lc"></div><div id="lp"></div></div></div>
@@ -81,14 +81,22 @@ const c=()=>m.remove();q(m,'.x').onclick=q(m,'.cl').onclick=c;m.onclick=e=>{if(e
 if(ok)q(m,'.ok').onclick=async()=>{if(await onOk(m)!==false)c()};document.body.appendChild(m);return m}
 const val=(m,s)=>q(m,s).value.trim();
 const copy=async t=>{try{await navigator.clipboard.writeText(t);alert('已複製 ✨')}catch{prompt('請手動複製',t)}};
+/* ---------- 計算出發倒數 ---------- */
+const getCountdown=datesStr=>{
+if(!datesStr)return'';
+const match=datesStr.match(/(\d{4})[年/.-]?\s*(\d{1,2})[月/.-]\s*(\d{1,2})/);
+if(!match)return'';
+const[,y,m,d]=match,start=new Date(`${y}-${m}-${d}T00:00:00`),now=new Date();
+now.setHours(0,0,0,0);const diff=Math.ceil((start-now)/(1000*60*60*24));
+if(diff>0)return`🔥 倒數 ${diff} 天`;if(diff===0)return`🎉 今天出發！`;return`✈️ 旅程進行中/已結束`};
 /* ---------- 專案 ---------- */
 const ids=()=>JSON.parse(localStorage.getItem('my_subscribed_projects')||'[]');
 const saveIds=a=>localStorage.setItem('my_subscribed_projects',JSON.stringify([...new Set(a)]));
 async function renderProjects(){const l=$('pl'),a=ids();if(!a.length){l.innerHTML='<p class="mute">還沒有專案，新增一個或輸入 6 位數號碼導入吧 ✨</p>';return}
 const snaps=await Promise.all(a.map(i=>getDoc(doc(db,'projects',i)).catch(()=>null)));l.innerHTML='';
 snaps.forEach(s=>{if(!s||!s.exists())return;const p=s.data(),d=document.createElement('div');d.className='box item';
-d.innerHTML=`<div class="art" style="margin:0 0 10px;box-shadow:none">${scene(p.name)}</div><span class="tag">${esc(p.dates||'未定日期')}</span><b>🌸 ${esc(p.name)}</b>`;d.onclick=()=>enter(s.id);l.appendChild(d)})}
-$('new').onclick=()=>modal('🌸 新增旅程','<label>旅程名稱（含「濟州」「日本」等會有專屬插圖）</label><input id="n1" placeholder="例如：濟州島四日遊"><label>日期</label><input id="n2" placeholder="例如：11/20 - 11/23">','建立',async m=>{const name=val(m,'#n1');if(!name){alert('請輸入名稱');return false}
+d.innerHTML=`<div class="row" style="margin:0"><span class="tag">${esc(p.dates||'未定日期')}</span><small style="color:var(--co);font-weight:bold">${getCountdown(p.dates)}</small></div><b style="font-size:16px;margin-top:4px">🌸 ${esc(p.name)}</b>`;d.onclick=()=>enter(s.id);l.appendChild(d)})}
+$('new').onclick=()=>modal('🌸 新增旅程','<label>旅程名稱（含「濟州」「日本」等會有專屬插圖）</label><input id="n1" placeholder="例如：濟州島四日遊"><label>日期（請包含年份，例如：2026年 11/23-11/27）</label><input id="n2" placeholder="2026年 11/23 - 11/27">','建立',async m=>{const name=val(m,'#n1');if(!name){alert('請輸入名稱');return false}
 const pin=String(Math.floor(100000+Math.random()*900000)),r=await addDoc(collection(db,'projects'),{name,dates:val(m,'#n2'),pin,createdAt:Date.now()});saveIds([r.id,...ids()]);renderProjects()});
 $('imp').onclick=()=>modal('📥 輸入 6 位數專案號碼','<input id="c1" maxlength="6" inputmode="numeric" placeholder="例如：883921" style="text-align:center;font-size:20px;letter-spacing:4px">','導入',async m=>{const c=val(m,'#c1'),r=await getDocs(query(collection(db,'projects'),where('pin','==',c)));
 if(r.empty){alert('找不到這個專案號碼');return false}saveIds([r.docs[0].id,...ids()]);renderProjects()});
@@ -96,7 +104,7 @@ $('sh').onclick=()=>{const url=location.origin+location.pathname+'?project='+S.i
 async function enter(id){const s=await getDoc(doc(db,'projects',id));if(!s.exists())return;Object.assign(S,{id,name:s.data().name,pin:s.data().pin||''});
 if(S.me)return open_();modal('🌸 歡迎加入旅程','<input id="nm" placeholder="你的名字，例如：小明">','進入旅程',m=>{const v=val(m,'#nm');if(!v){alert('請輸入名字');return false}S.me=v;localStorage.setItem('my_travel_nickname',v);open_()})}
 function open_(){$('v0').hidden=true;$('v1').hidden=false;$('nav').hidden=false;$('bk').hidden=false;$('sh').hidden=false;$('ht').textContent='🌸 '+S.name;$('hs').textContent='旅伴：'+S.me;
-S.day='all';S.lang=LG[dest(S.name)].c;rRemind();rLang();
+$('hero').innerHTML=scene(S.name);S.day='all';S.lang=LG[dest(S.name)].c;rRemind();rLang();
 setDoc(doc(db,'projects',S.id,'members',S.me),{name:S.me},{merge:true});
 const sub=(c,o,fn)=>{const r=collection(db,'projects',S.id,c);S.un.push(onSnapshot(o?query(r,orderBy(o)):r,sn=>fn(sn.docs.map(d=>({id:d.id,...d.data()})))))};
 sub('schedules','createdAt',a=>{S.sch=a;rSch();rQuest()});sub('members',0,a=>{S.mem=a.map(m=>m.name||m.id);rSplit()});sub('expenses','createdAt',a=>{S.exp=a;rSplit()});
@@ -172,6 +180,5 @@ const un=q(m,'#un');if(un)un.onclick=async()=>{await deleteDoc(r);m.remove()}}
 $('gal').onclick=()=>{const l=(S.all||[]).filter(c=>c.photoUrl).sort((a,b)=>b.at-a.at);
 modal('📸 旅程回憶寫真冊',l.length?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${l.map((c,i)=>{const s=S.sch.find(x=>x.id===c.scheduleId);return`<div style="border:3px solid var(--ink);border-radius:18px;overflow:hidden;background:#fff;transform:rotate(${i%2?1.5:-1.5}deg)"><img src="${esc(c.photoUrl)}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;display:block"><small style="display:block;padding:2px 8px">${esc(s?clean(s.title):'')} · ${esc(c.uploader)}</small></div>`}).join('')}</div>`:'<p class="mute">還沒有照片，去闖關打卡拍一張吧 📷</p>')};
 /* ---------- 啟動 ---------- */
-$('hero0').innerHTML=scene('');
 (async()=>{const p=new URLSearchParams(location.search).get('project');if(p){saveIds([p,...ids()]);history.replaceState({},'',location.pathname)}renderProjects()})();
 </script></body></html>
