@@ -139,7 +139,11 @@ const TABS=[['schedule','📅','行程'],['ai','💡','提醒'],['lang','🗣','
 $('nav').innerHTML=TABS.map(t=>`<button data-t="${t[0]}"><span>${t[1]}</span>${t[2]}</button>`).join('');
 
 $('nav').querySelectorAll('button').forEach(b=>{
-    const action = () => { tab(b.dataset.t); b.classList.add('bn'); };
+    const action = () => { 
+        tab(b.dataset.t); 
+        b.classList.add('bn'); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // 🌸 切換分頁時自動捲動至最上方
+    };
     b.onclick = action;
     b.ontouchend = e => { e.preventDefault(); action(); };
 });
