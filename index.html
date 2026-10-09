@@ -412,6 +412,49 @@
             document.getElementById('new-project-modal')?.classList.add('hidden');
         };
 
+        // 🌟 補齊 parseSmartPaste 智慧拆解函式並掛載到 window
+        window.parseSmartPaste = async function() {
+            const rawText = document.getElementById('smart-paste-input').value.trim();
+            if (!rawText) { alert("請先輸入行程！"); return; }
+            alert("✨ AI 正在拆解行程...");
+            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let currentDay = "Day 1";
+            let parsedItems = [];
+            let currentItem = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                let dayMatch = line.match(/(Day\s*\d+|第[一二三四五六七八九十]+天)/i);
+                if (dayMatch) {
+                    if (currentItem) { parsedItems.push(currentItem); currentItem = null; }
+                    currentDay = dayMatch[0];
+                    continue;
+                }
+                let timeMatch = line.match(/(\d{1,2}[:：]\d{2})/);
+                let hasNoteKeyword = line.includes("備註") || line.includes("營業時間");
+                let isNewItem = timeMatch && !hasNoteKeyword;
+                if (isNewItem) {
+                    if (currentItem) parsedItems.push(currentItem);
+                    currentItem = { 
+                        day: currentDay, 
+                        time: timeMatch[1], 
+                        title: line.replace(/^\s*•?\s*\d{1,2}[:：]\d{2}\s*/, '').trim(), 
+                        location: "", 
+                        createdAt: Date.now() + parsedItems.length 
+                    };
+                } else if (currentItem) {
+                    currentItem.location = currentItem.location ? (currentItem.location + "\n" + line) : line;
+                }
+            }
+            if (currentItem) parsedItems.push(currentItem);
+
+            for (let i = 0; i < parsedItems.length; i++) {
+                await addDoc(collection(db, "projects", currentProjectId, "schedules"), parsedItems[i]);
+            }
+            closeSmartPasteModal();
+            alert(`✨ 成功導入 ${parsedItems.length} 筆行程！`);
+        };
+
         window.backToProjects = function() {
             currentProjectId = null;
             currentProjectName = "";
@@ -469,7 +512,7 @@
             window.initLanguageModule(currentProjectName);
             window.loadSchedules(currentProjectId);
             
-            window.switchTab('schedule');
+            switchTab('schedule');
         };
 
         window.switchTab = function(tabName) {
