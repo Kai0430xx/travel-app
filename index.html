@@ -52,7 +52,7 @@ label{font-size:13px}.chk{display:inline-flex;gap:4px;align-items:center;margin:
 <div class="art" id="hero0"></div>
 <div class="row"><h2>我的旅程 ✈</h2><span><button id="imp" class="btn">📥 導入</button> <button id="new" class="btn co">＋ 新增</button></span></div><div id="pl"><p class="mute">載入中…☁️</p></div></section>
 <section id="v1" hidden>
-<div id="t-schedule" class="tab"><div class="row"><h3>📅 行程時間軸</h3><span><button id="sp" class="btn">✨ 智慧導入</button> <button id="ad" class="btn co">＋ 新зов</button></span></div><div class="pills" id="pills"></div><div id="sl"></div></div>
+<div id="t-schedule" class="tab"><div class="row"><h3>📅 行程時間軸</h3><span><button id="sp" class="btn">✨ 智慧導入</button> <button id="ad" class="btn co">＋ 新增</button></span></div><div class="pills" id="pills"></div><div id="sl"></div></div>
 <div id="t-ai" class="tab" hidden></div>
 <div id="t-lang" class="tab" hidden><div class="box" style="text-align:center;background:var(--ye)"><small id="dc">請點選下方對話情境與句子</small><h2 id="df" style="margin:4px 0 10px">想說什麼呢？</h2><button id="say" class="btn co">🔊 朗讀</button></div><div class="lang"><div id="lc"></div><div id="lp"></div></div></div>
 <div id="t-split" class="tab" hidden><div class="box" style="background:var(--co)"><div class="row" style="margin:0"><small>旅程總花費（折合台幣）</small><button id="mb" class="btn">👥 成員</button></div><h2 id="tot">NT$ 0</h2><small id="brk"></small></div>
@@ -112,7 +112,7 @@ const scene=n=>`<svg viewBox="0 0 320 140" role="img" aria-label="旅行插圖">
 
 /* ---------- 共用 UI ---------- */
 function modal(title,body,ok,onOk){const m=document.createElement('div');m.className='mask';
-m.innerHTML=`<div class="box sheet bn"><div class="row" style="margin-top:0"><h3>${title}</h3><button class="btn x">✕</button></div>${body}<div class="row gap">${ok?`<button class="btn co ok">${ok}</button>`:''}<button class="btn cl">關閉</button></div></div>`;
+m.innerHTML=`<div class="box sheet bn"><div class="row" style="margin-top:0"><h3>${title}</h3><button class="btn x">✕</button></div>${body}<div class="row gap">${ok?`<button class="btn co ok">${ok}</button>`:''}<button class="btn cl">儲存</button></div></div>`;
 const c=()=>m.remove();q(m,'.x').onclick=q(m,'.cl').onclick=c;m.onclick=e=>{if(e.target===m)c()};
 if(ok)q(m,'.ok').onclick=async()=>{if(await onOk(m)!==false)c()};document.body.appendChild(m);return m}
 const val=(m,s)=>q(m,s).value.trim();
@@ -217,7 +217,25 @@ $('sl').querySelectorAll('.item').forEach(e=>e.onclick=()=>detail(e.dataset.i))}
 function detail(id){
 const s=S.sch.find(x=>x.id===id);if(!s)return;
 const t=clean(s.title);
-const getQuery = () => { const kw = q(m,'#map-kw')?.value?.trim(); if(kw) return kw; return (/濟州/.test(S.name)&&!t.includes('濟州')?'濟州島 ':'')+t; };
+
+/* 🌸 智慧取得地圖搜尋目標：排除 [xxx] 標籤，並自動加上專案國家/城市名稱以提高準確度 */
+const getAutoQuery = () => {
+    let pureTitle = t.replace(/^\[.*?\]\s*/, '').trim();
+    let region = '';
+    if(/濟州/.test(S.name)) region = '濟州島';
+    else if(/首爾/.test(S.name)) region = '首爾';
+    else if(/釜山/.test(S.name)) region = '釜山';
+    else if(/曼谷/.test(S.name)) region = '曼谷';
+    else if(/東京/.test(S.name)) region = '東京';
+    else if(/大阪/.test(S.name)) region = '大阪';
+    else if(/京都/.test(S.name)) region = '京都';
+    else if(/新加坡/.test(S.name)) region = '新加坡';
+    else if(/吉隆坡/.test(S.name)) region = '吉隆坡';
+    else if(/香港/.test(S.name)) region = '香港';
+    else if(/澳門/.test(S.name)) region = '澳門';
+    
+    return region && !pureTitle.includes(region) ? `${region} ${pureTitle}` : pureTitle;
+};
 
 const m=modal(esc(t),`
 <div style="margin:6px 0 10px">
@@ -228,19 +246,71 @@ const m=modal(esc(t),`
     <input id="sched-loc" placeholder="備註" value="${esc(s.location||'')}">
 </div>
 <div class="row gap" style="justify-content:flex-start">
-    ${dest(S.name)==='korea'?`<a class="btn gr" id="btn-naver" target="_blank" rel="noopener" href="#">💚 Naver</a>`:''}
-    <a class="btn aq" id="btn-google" target="_blank" rel="noopener" href="#">💙 Google</a>
+    ${dest(S.name)==='korea'?`<button class="btn gr" id="btn-naver">💚 Naver</button>`:''}
+    <button class="btn aq" id="btn-google">💙 Google</button>
     <button class="btn" id="dl">🗑 刪除</button>
 </div>`);
 
-const updateLinks = () => {
-    const kw = encodeURIComponent(getQuery());
-    // 🌸 Naver Map 導航連結 (使用官方 nmap 協定，直接導向開車導航)
-    q(m,'#btn-naver')?.setAttribute('href', `nmap://route/car?destination=${kw}&appname=com.example.myapp`);
-    // 🌸 Google Maps 導航連結 (設定為開車模式導航)
-    q(m,'#btn-google').href = `https://www.google.com/maps/dir/?api=1&destination=${kw}&travelmode=driving`;
+// 🌸 綁定導航與長按設定自訂網址功能
+const setupMapButton = (btnId, mapType) => {
+    const btn = q(m, btnId);
+    if(!btn) return;
+
+    let pressTimer;
+
+    // 點一下導航
+    const handleTap = () => {
+        let url = '';
+        const customUrl = (mapType === 'naver' ? s.customNaverUrl : s.customGoogleUrl)?.trim();
+        
+        if (customUrl) {
+            url = customUrl;
+        } else {
+            const queryStr = encodeURIComponent(s.mapKeyword?.trim() || getAutoQuery());
+            if (mapType === 'naver') {
+                url = `nmap://route/car?destination=${queryStr}&appname=com.example.myapp`;
+            } else {
+                url = `https://www.google.com/maps/dir/?api=1&destination=${queryStr}&travelmode=driving`;
+            }
+        }
+        window.open(url, '_blank');
+    };
+
+    // 長按設定網址
+    const handleLongPress = (e) => {
+        e.preventDefault();
+        const currentCustom = (mapType === 'naver' ? s.customNaverUrl : s.customGoogleUrl) || '';
+        const titleName = mapType === 'naver' ? '💚 設定 Naver 自訂導航網址' : '💙 設定 Google 自訂導航網址';
+        
+        modal(titleName, `
+            <p style="font-size:12px;opacity:0.7;margin:0 0 6px">貼上網址後點擊下方儲存，之後點擊按鈕將直接導向該網址。</p>
+            <input id="custom-url-input" placeholder="請貼上網址 (https://...)" value="${esc(currentCustom)}">
+        `, '儲存', async (subModal) => {
+            const newUrl = q(subModal, '#custom-url-input').value.trim();
+            if (mapType === 'naver') s.customNaverUrl = newUrl;
+            else s.customGoogleUrl = newUrl;
+            
+            await updateDoc(doc(db,'projects',S.id,'schedules',id), {
+                customNaverUrl: s.customNaverUrl || '',
+                customGoogleUrl: s.customGoogleUrl || ''
+            });
+            alert('自訂導航網址已儲存 ✨');
+        });
+    };
+
+    btn.onclick = handleTap;
+    btn.oncontextmenu = handleLongPress; // 電腦右鍵 / 手機長按選單
+    
+    // 手機觸控長按偵測
+    btn.ontouchstart = (e) => {
+        pressTimer = setTimeout(() => handleLongPress(e), 600);
+    };
+    btn.ontouchend = () => clearTimeout(pressTimer);
+    btn.ontouchmove = () => clearTimeout(pressTimer);
 };
-updateLinks(); q(m,'#map-kw').oninput = updateLinks;
+
+setupMapButton('#btn-naver', 'naver');
+setupMapButton('#btn-google', 'google');
 
 q(m,'#dl').onclick=async()=>{if(confirm('確定刪除這個行程？')){await deleteDoc(doc(db,'projects',S.id,'schedules',id));m.remove()}};
 
@@ -255,6 +325,7 @@ q(m,'.cl').onclick = async () => { await saveData(); m.remove(); };
 q(m,'.x').onclick = async () => { await saveData(); m.remove(); };
 }
 
+/* 🌸 修正紅色按鈕打字錯誤：+ 新增 */
 $('ad').onclick=()=>modal('✏️ 新增行程','<label>天數</label><input id="a1" value="Day 1"><label>時間</label><input id="a2" value="10:00"><label>行程名稱</label><input id="a3"><label>備註</label><textarea id="a4" rows="3" placeholder="備註"></textarea>','新增',async m=>{const title=val(m,'#a3');if(!title){alert('請輸入名稱');return false}
 await addDoc(collection(db,'projects',S.id,'schedules'),{day:val(m,'#a1')||'Day 1',time:val(m,'#a2'),title,location:val(m,'#a4'),mapKeyword:'',createdAt:Date.now()})});
 
@@ -336,7 +407,7 @@ korea:{c:'ko-KR',p:{
     emergency:[['救命！我的護照被偷了！','살려주세요! 여권을 도둑맞았어요!'],['我迷路了。','길을 잃었어요.'],['請幫我報警。','경찰에 신고해주세요.'],['請幫我叫救護車！','구급차를 불러주세요!']]
 }},
 japan:{c:'ja-JP',p:{
-    airport:[['我是來觀光的。','観光で来ました。'],['我會待五天。','5日間滞在します。'],['這是我的護照。','パスポートです。'],['我有行李要托運。','荷물을預けたいです。'],['請給我靠走道的座位。','通路側の席をお願いします。'],['我的行李找不到。','荷물が見つかりません。']],
+    airport:[['我是來觀光的。','観光で來ました。'],['我會待五天。','5日間滞在します。'],['這是我的護照。','パスポートです。'],['我有行李要托運。','荷물을預けたいです。'],['請給我靠走道的座位。','通路側の席をお願いします。'],['我的行李找不到。','荷물が見つかりません。']],
     hotel:[['我有預約，名字是…','予約している…です。'],['請問有附早餐嗎？','朝食はついていますか？'],['可以寄放行李嗎？','荷물을預かっていただけますか？'],['房間有 Wi-Fi 嗎？密碼是什麼？','部屋にWi-Fiはありますか？パスワードは何ですか？'],['幾點退房？','チェックアウトは何時ですか？']],
     restaurant:[['我們有 4 個人。','4人です。'],['有中文菜單嗎？','中国語のメニューはありますか？'],['推薦什麼菜？','おすすめは何ですか？'],['這個會辣嗎？','これは辛いですか？'],['我們要結帳。','お会計をお願いします。'],['可以刷卡嗎？','カードは使えますか？'],['我要一杯冰咖啡。','アイスコーヒーを一つください。'],['內用還是外帶？','店内でお召し上がりですか、お持ち帰りですか？']],
     shopping:[['這個多少錢？','これはいくらですか？'],['有其他顏色嗎？','他の色はありますか？'],['可以試穿嗎？','試着してもいいですか？'],['可以退稅嗎？','免税できますか？']],
