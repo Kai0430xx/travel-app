@@ -237,7 +237,7 @@ const getGoogleQuery = () => {
     return region && !pureTitle.includes(region) ? `${region} ${pureTitle}` : pureTitle;
 };
 
-/* 🌸 3. Naver Map 抓取輸入電話或當地語言名稱的格子內容 */
+/* 🌸 3. Naver Map 抓取電話或當地名稱格子內容 */
 const getNaverQuery = () => {
     const kw = q(m,'#map-kw')?.value?.trim();
     if(kw) return kw;
@@ -249,7 +249,7 @@ const getNaverQuery = () => {
     return region && !pureTitle.includes(region) ? `${region} ${pureTitle}` : pureTitle;
 };
 
-// 🌸 1. 若為韓國則顯示 Naver 與 Google，否則只顯示 Google
+// 🌸 1. 若為韓國顯示 Naver 與 Google，否則只顯示 Google
 const isKorea = dest(S.name) === 'korea';
 
 const m=modal(esc(t),`
@@ -266,7 +266,7 @@ const m=modal(esc(t),`
     <button class="btn" id="dl">🗑 刪除</button>
 </div>`);
 
-// 🌸 5. 確保自訂網址或自動生成的網址一律轉換為汽車導航
+// 🌸 1 & 5. 確保 Naver 與 Google 導航網址均能正確帶入地點並強制定向為汽車導航
 const setupMapButton = (btnId, mapType) => {
     const btn = q(m, btnId);
     if(!btn) return;
@@ -277,12 +277,26 @@ const setupMapButton = (btnId, mapType) => {
         const customUrl = (mapType === 'naver' ? s.customNaverUrl : s.customGoogleUrl)?.trim();
         
         if (customUrl) {
-            // 如果使用者貼上的是一般網址，強制或直接引導
-            url = customUrl;
+            // 🌸 5. 如果使用者貼上的是地點網址，自動轉換成導航格式
+            let targetUrl = customUrl;
+            if (mapType === 'google') {
+                if (!targetUrl.includes('/maps/dir/')) {
+                    // 如果不是導航網址，嘗試轉為導航網址
+                    const encodedDest = encodeURIComponent(getGoogleQuery());
+                    targetUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedDest}&travelmode=driving`;
+                }
+            } else if (mapType === 'naver') {
+                if (!targetUrl.includes('nmap://route/car')) {
+                    const encodedDest = encodeURIComponent(getNaverQuery());
+                    targetUrl = `nmap://route/car?destination=${encodedDest}&appname=com.example.myapp`;
+                }
+            }
+            url = targetUrl;
         } else {
             if (mapType === 'naver') {
                 const queryStr = encodeURIComponent(getNaverQuery());
-                url = `nmap://route/car?destination=${queryStr}&appname=com.example.myapp`;
+                // 🌸 1. 修正 Naver 導航：同時帶入 dname 與 destination 確保地點不遺失
+                url = `nmap://route/car?dlat=&dlng=&destination=${queryStr}&dname=${queryStr}&appname=com.example.myapp`;
             } else {
                 const queryStr = encodeURIComponent(getGoogleQuery());
                 url = `https://www.google.com/maps/dir/?api=1&destination=${queryStr}&travelmode=driving`;
@@ -418,7 +432,7 @@ korea:{c:'ko-KR',p:{
     emergency:[['救命！我的護照被偷了！','살려주세요! 여권을 도둑맞았어요!'],['我迷路了。','길을 잃었어요.'],['請幫我報警。','경찰에 신고해주세요.'],['請幫我叫救護車！','구급차를 불러주세요!']]
 }},
 japan:{c:'ja-JP',p:{
-    airport:[['我是來觀光的。','観光で来ました。'],['我會待五天。','5日間滞在します。'],['這是我的護照。','パスポートです。'],['我有行李要托運。','荷物を預けたいです。'],['請給我靠走道的座位。','通路側の席をお願いします。'],['我的行李找不到。','荷物が見つかりません。']],
+    airport:[['我是來觀光的。','観光で来ました。'],['我會待五天。','5日間滞在します。'],['這是我的護照。','パスポートです。'],['我有行李要托運。','荷物を預けたいです。'],['請給我靠走道的座位。','通路側の席をお願いします。'],['我的行李找不到。','荷물が見つかりません。']],
     hotel:[['我有預約，名字是…','予約している…です。'],['請問有附早餐嗎？','朝食はついていますか？'],['可以寄放行李嗎？','荷물을預かっていただけますか？'],['房間有 Wi-Fi 嗎？密碼是什麼？','部屋にWi-Fiはありますか？パスワードは何ですか？'],['幾點退房？','チェックアウトは何時ですか？']],
     restaurant:[['我們有 4 個人。','4人です。'],['有中文菜單嗎？','中国語のメニューはありますか？'],['推薦什麼菜？','おすすめは何ですか？'],['這個會辣嗎？','これは辛いですか？'],['我們要結帳。','お会計をお願いします。'],['可以刷卡嗎？','カードは使えますか？'],['我要一杯冰咖啡。','アイスコーヒーを一つください。'],['內用還是外帶？','店内でお召し上がりですか、お持ち帰りですか？']],
     shopping:[['這個多少錢？','これはいくらですか？'],['有其他顏色嗎？','他の色はありますか？'],['可以試穿嗎？','試着してもいいですか？'],['可以退稅嗎？','免税できますか？']],
@@ -434,7 +448,7 @@ thailand:{c:'th-TH',p:{
     shopping:[['請問這個多少錢？','อันนี้ราคาเท่าไหร่คะ/ครับ'],['可以便宜一點嗎？','ลดราคาหน่อยได้ไหมคะ/ครับ'],['有其他顏色嗎？','มีสีอื่นไหมคะ/ครับ'],['可以刷卡嗎？','รูดบัตรได้ไหมคะ/ครับ']],
     transport:[['去這裡多少錢？','ไปที่นี่ราคาเท่าไหร่คะ/ครับ'],['請跳錶（計程車）。','มิเตอร์นะคะ/ครับ'],['請在這裡停車。','จอดตรงนี้ค่ะ/ครับ'],['最近的捷運站（BTS/MRT）在哪裡？','สถานีรถไฟฟ้าที่ใกล้ที่สุดอยู่ที่ไหนคะ/ครับ']],
     smalltalk:[['你好！','สวัสดีค่ะ/ครับ'],['謝謝。','ขอบคุณค่ะ/ครับ'],['對不起 / 不好意思。','ขอโทษค่ะ/ครับ'],['很好吃！','อร่อยมากค่ะ/ครับ']],
-    health:[['我身體很不舒服。','ไม่สบายค่ะ/ครับ'],['我頭痛（或肚子痛）。','ปวดหัว / ปวดท้อง'],['附近有藥局嗎？','มีร้านขายยาแถวนี้ไหมคะ/ครับ'],['請給我止痛藥。','ขอยาแก้ปวดหน่อยค่ะ/ครับ']],
+    health:[['我身體很不舒服。','ไม่สบายค่ะ/ครับ'],['我頭痛（或肚子痛）。','ปวดหัว / ปวดท้อง'],['附近有藥局嗎？','มีร้านขายยาแถวนี้ไหมคะ/ครับ'],['請給我消化藥。','ขอยาแก้ปวดหน่อยค่ะ/ครับ']],
     emergency:[['救命！護照被偷了！','ช่วยด้วย! หนังสือเดินทางถูกขโมย'],['我迷路了。','ฉันหลงทาง'],['請幫我叫警察。','ช่วยเรียกตำรวจให้หน่อย'],['請幫我叫救護車！','ช่วยเรียกรถพยาบาลให้หน่อย']]
 }},
 general:{c:'en-US',p:{
