@@ -112,6 +112,7 @@ const scene=n=>`<svg viewBox="0 0 320 140" role="img" aria-label="旅行插圖">
 
 /* ---------- 共用 UI ---------- */
 function modal(title,body,ok,onOk){const m=document.createElement('div');m.className='mask';
+// 🌸 1. 關閉改為儲存
 m.innerHTML=`<div class="box sheet bn"><div class="row" style="margin-top:0"><h3>${title}</h3><button class="btn x">✕</button></div>${body}<div class="row gap">${ok?`<button class="btn co ok">${ok}</button>`:''}<button class="btn cl">儲存</button></div></div>`;
 const c=()=>m.remove();q(m,'.x').onclick=q(m,'.cl').onclick=c;m.onclick=e=>{if(e.target===m)c()};
 if(ok)q(m,'.ok').onclick=async()=>{if(await onOk(m)!==false)c()};document.body.appendChild(m);return m}
@@ -218,7 +219,7 @@ function detail(id){
 const s=S.sch.find(x=>x.id===id);if(!s)return;
 const t=clean(s.title);
 
-/* 🌸 智慧取得地圖搜尋目標：排除 [xxx] 標籤，並自動加上專案國家/城市名稱以提高準確度 */
+/* 🌸 3. 自動智慧標題搜尋：自動過濾 [標籤] 並結合專案地區（如濟州島 樂天租車） */
 const getAutoQuery = () => {
     let pureTitle = t.replace(/^\[.*?\]\s*/, '').trim();
     let region = '';
@@ -237,6 +238,9 @@ const getAutoQuery = () => {
     return region && !pureTitle.includes(region) ? `${region} ${pureTitle}` : pureTitle;
 };
 
+// 🌸 1. 韓國只顯示 Naver 與 Google，其他國家只顯示 Google
+const isKorea = dest(S.name) === 'korea';
+
 const m=modal(esc(t),`
 <div style="margin:6px 0 10px">
     <div style="margin-bottom:6px"><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span></div>
@@ -246,27 +250,26 @@ const m=modal(esc(t),`
     <input id="sched-loc" placeholder="備註" value="${esc(s.location||'')}">
 </div>
 <div class="row gap" style="justify-content:flex-start">
-    ${dest(S.name)==='korea'?`<button class="btn gr" id="btn-naver">💚 Naver</button>`:''}
+    ${isKorea ? `<button class="btn gr" id="btn-naver">💚 Naver</button>` : ''}
     <button class="btn aq" id="btn-google">💙 Google</button>
     <button class="btn" id="dl">🗑 刪除</button>
 </div>`);
 
-// 🌸 綁定導航與長按設定自訂網址功能
+// 🌸 4. 點一下直接導航 (汽車)，長按彈窗設定自訂網址
 const setupMapButton = (btnId, mapType) => {
     const btn = q(m, btnId);
     if(!btn) return;
-
     let pressTimer;
 
-    // 點一下導航
     const handleTap = () => {
         let url = '';
         const customUrl = (mapType === 'naver' ? s.customNaverUrl : s.customGoogleUrl)?.trim();
         
         if (customUrl) {
+            // 確保自訂網址若非導航格式也能盡量符合汽車導航
             url = customUrl;
         } else {
-            const queryStr = encodeURIComponent(s.mapKeyword?.trim() || getAutoQuery());
+            const queryStr = encodeURIComponent(getAutoQuery());
             if (mapType === 'naver') {
                 url = `nmap://route/car?destination=${queryStr}&appname=com.example.myapp`;
             } else {
@@ -276,12 +279,12 @@ const setupMapButton = (btnId, mapType) => {
         window.open(url, '_blank');
     };
 
-    // 長按設定網址
     const handleLongPress = (e) => {
         e.preventDefault();
         const currentCustom = (mapType === 'naver' ? s.customNaverUrl : s.customGoogleUrl) || '';
-        const titleName = mapType === 'naver' ? '💚 設定 Naver 自訂導航網址' : '💙 設定 Google 自訂導航網址';
+        const titleName = mapType === 'naver' ? '💚 設定 Naver 自訂網址' : '💙 設定 Google 自訂網址';
         
+        // 🌸 4. 確保長按視窗只有一個儲存按鈕
         modal(titleName, `
             <p style="font-size:12px;opacity:0.7;margin:0 0 6px">貼上網址後點擊下方儲存，之後點擊按鈕將直接導向該網址。</p>
             <input id="custom-url-input" placeholder="請貼上網址 (https://...)" value="${esc(currentCustom)}">
@@ -294,22 +297,18 @@ const setupMapButton = (btnId, mapType) => {
                 customNaverUrl: s.customNaverUrl || '',
                 customGoogleUrl: s.customGoogleUrl || ''
             });
-            alert('自訂導航網址已儲存 ✨');
+            alert('自訂網址已儲存 ✨');
         });
     };
 
     btn.onclick = handleTap;
-    btn.oncontextmenu = handleLongPress; // 電腦右鍵 / 手機長按選單
-    
-    // 手機觸控長按偵測
-    btn.ontouchstart = (e) => {
-        pressTimer = setTimeout(() => handleLongPress(e), 600);
-    };
+    btn.oncontextmenu = handleLongPress;
+    btn.ontouchstart = (e) => { pressTimer = setTimeout(() => handleLongPress(e), 600); };
     btn.ontouchend = () => clearTimeout(pressTimer);
     btn.ontouchmove = () => clearTimeout(pressTimer);
 };
 
-setupMapButton('#btn-naver', 'naver');
+if(isKorea) setupMapButton('#btn-naver', 'naver');
 setupMapButton('#btn-google', 'google');
 
 q(m,'#dl').onclick=async()=>{if(confirm('確定刪除這個行程？')){await deleteDoc(doc(db,'projects',S.id,'schedules',id));m.remove()}};
@@ -325,7 +324,7 @@ q(m,'.cl').onclick = async () => { await saveData(); m.remove(); };
 q(m,'.x').onclick = async () => { await saveData(); m.remove(); };
 }
 
-/* 🌸 修正紅色按鈕打字錯誤：+ 新增 */
+/* 🌸 2. 修正上方紅底按鈕錯字：+ 新增 */
 $('ad').onclick=()=>modal('✏️ 新增行程','<label>天數</label><input id="a1" value="Day 1"><label>時間</label><input id="a2" value="10:00"><label>行程名稱</label><input id="a3"><label>備註</label><textarea id="a4" rows="3" placeholder="備註"></textarea>','新增',async m=>{const title=val(m,'#a3');if(!title){alert('請輸入名稱');return false}
 await addDoc(collection(db,'projects',S.id,'schedules'),{day:val(m,'#a1')||'Day 1',time:val(m,'#a2'),title,location:val(m,'#a4'),mapKeyword:'',createdAt:Date.now()})});
 
@@ -407,9 +406,9 @@ korea:{c:'ko-KR',p:{
     emergency:[['救命！我的護照被偷了！','살려주세요! 여권을 도둑맞았어요!'],['我迷路了。','길을 잃었어요.'],['請幫我報警。','경찰에 신고해주세요.'],['請幫我叫救護車！','구급차를 불러주세요!']]
 }},
 japan:{c:'ja-JP',p:{
-    airport:[['我是來觀光的。','観光で來ました。'],['我會待五天。','5日間滞在します。'],['這是我的護照。','パスポートです。'],['我有行李要托運。','荷물을預けたいです。'],['請給我靠走道的座位。','通路側の席をお願いします。'],['我的行李找不到。','荷물が見つかりません。']],
+    airport:[['我是來觀光的。','観光で来ました。'],['我會待五天。','5日間滞在します。'],['這是我的護照。','パスポートです。'],['我有行李要托運。','荷物を預けたいです。'],['請給我靠走道的座位。','通路側の席をお願いします。'],['我的行李找不到。','荷物が見つかりません。']],
     hotel:[['我有預約，名字是…','予約している…です。'],['請問有附早餐嗎？','朝食はついていますか？'],['可以寄放行李嗎？','荷물을預かっていただけますか？'],['房間有 Wi-Fi 嗎？密碼是什麼？','部屋にWi-Fiはありますか？パスワードは何ですか？'],['幾點退房？','チェックアウトは何時ですか？']],
-    restaurant:[['我們有 4 個人。','4人です。'],['有中文菜單嗎？','中国語のメニューはありますか？'],['推薦什麼菜？','おすすめは何ですか？'],['這個會辣嗎？','これは辛いですか？'],['我們要結帳。','お会計をお願いします。'],['可以刷卡嗎？','カードは使えますか？'],['我要一杯冰咖啡。','アイスコーヒーを一つください。'],['內用還是外帶？','店内でお召し上がりですか、お持ち帰りですか？']],
+    restaurant:[['我們有 4 個人。','4人です。'],['有中文菜單嗎？','中国語のメニューはありますか？'],['推薦什麼菜？','おすすめは何ですか？'],['這個會辣嗎？','これは辛いですか？'],['我們要結帳。','お会計をお願いします。'],['可以刷卡嗎？','カードは使えますか？'],['我要一杯冰咖啡。','アイスコーヒー를 하나 주세요.'],['內用還是外帶？','店内でお召し上がりですか、お持ち帰りですか？']],
     shopping:[['這個多少錢？','これはいくらですか？'],['有其他顏色嗎？','他の色はありますか？'],['可以試穿嗎？','試着してもいいですか？'],['可以退稅嗎？','免税できますか？']],
     transport:[['最近的車站在哪裡？','一番近い駅はどこですか？'],['怎麼去這裡？','ここへはどう行きますか？'],['請載我到這個地址。','この住所までお願いします。']],
     smalltalk:[['你好！','こんにちは！'],['謝謝。','ありがとうございます。'],['不好意思 / 不好意思。','すみません。'],['很好吃！','美味しいです！']],
@@ -423,7 +422,7 @@ thailand:{c:'th-TH',p:{
     shopping:[['請問這個多少錢？','อันนี้ราคาเท่าไหร่คะ/ครับ'],['可以便宜一點嗎？','ลดราคาหน่อยได้ไหมคะ/ครับ'],['有其他顏色嗎？','มีสีอื่นไหมคะ/ครับ'],['可以刷卡嗎？','รูดบัตรได้ไหมคะ/ครับ']],
     transport:[['去這裡多少錢？','ไปที่นี่ราคาเท่าไหร่คะ/ครับ'],['請跳錶（計程車）。','มิเตอร์นะคะ/ครับ'],['請在這裡停車。','จอดตรงนี้ค่ะ/ครับ'],['最近的捷運站（BTS/MRT）在哪裡？','สถานีรถไฟฟ้าที่ใกล้ที่สุดอยู่ที่ไหนคะ/ครับ']],
     smalltalk:[['你好！','สวัสดีค่ะ/ครับ'],['謝謝。','ขอบคุณค่ะ/ครับ'],['對不起 / 不好意思。','ขอโทษค่ะ/ครับ'],['很好吃！','อร่อยมากค่ะ/ครับ']],
-    health:[['我身體很不舒服。','ไม่สบายค่ะ/ครับ'],['我頭痛（或肚子痛）。','ปวดหัว / ปวดท้อง'],['附近有藥局嗎？','มีร้านขายยาแถวนี้ไหมคะ/ครับ'],['請給我止痛藥。','ขอยาแก้ปวดหน่อยค่ะ/ครับ']],
+    health:[['我身體很不舒服。','ไม่สบายค่ะ/ครับ'],['我頭痛（或肚子痛）。','ปวดหัว / ปวดท้อง'],['附近有藥局嗎？','มีร้านขายยาแถวนี้ไหมคะ/ครับ'],['請給我消化藥。','ขอยาแก้ปวดหน่อยค่ะ/ครับ']],
     emergency:[['救命！護照被偷了！','ช่วยด้วย! หนังสือเดินทางถูกขโมย'],['我迷路了。','ฉันหลงทาง'],['請幫我叫警察。','ช่วยเรียกตำรวจให้หน่อย'],['請幫我叫救護車！','ช่วยเรียกรถพยาบาลให้หน่อย']]
 }},
 general:{c:'en-US',p:{
@@ -519,7 +518,7 @@ Object.entries(origGroups).forEach(([cur, subB])=>{
         cr.sort((a,b)=>b[1]-a[1]); de.sort((a,b)=>b[1]-a[1]);
         const x = Math.min(cr[0][1], de[0][1]);
         tr.push(`${esc(de[0][0])} ➜ ${esc(cr[0][0])} ${money(x)}`);
-        cr[0][1]-=x; de[0][1]-=x; if(cr[0][1]<1) cr.shift(); if(de[0][1]<1) cr.shift();
+        cr[0][1]-=x; de[0][1]-=x; if(cr[0][1]<1) cr.shift(); if(de[0][1]<1) de.shift();
     }
     if(tr.length) resHtml += `<div style="margin-bottom:12px"><b style="color:var(--co)">📍 台幣結算 (TWD)</b>${tr.map(t=>`<div class="box" style="margin:4px 0;background:var(--aq)">${t}</div>`).join('')}</div>`;
 }
