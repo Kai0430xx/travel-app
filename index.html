@@ -139,59 +139,49 @@ general:`<rect width="320" height="140" fill="#A8D3E6"/>${cloud(18,30)}${cloud(2
 const scene=n=>`<svg viewBox="0 0 320 140" role="img" aria-label="旅行插圖">${SC[dest(n)]||SC.general}</svg>`;
 
 /* ---------- 共用 UI ---------- */
-function modal(title,body,onOk){const m=document.createElement('div');m.className='mask';
-m.innerHTML=`<div class="box sheet bn"><div class="row" style="margin-top:0"><h3>${title}</h3><button class="btn x">✕</button></div>${body}<div class="row gap"><button class="btn cl">儲存</button></div></div>`;
-const c=()=>m.remove();q(m,'.x').onclick=q(m,'.cl').onclick=async()=>{if(onOk)await onOk(m);c();};m.onclick=e=>{if(e.target===m)c()};
-document.body.appendChild(m);return m}
+function modal(title, body, onOk) {
+    const m = document.createElement('div');
+    m.className = 'mask';
 
-const val=(m,s)=>q(m,s).value.trim();
-const copy=async t=>{try{await navigator.clipboard.writeText(t);alert('已複製 ✨')}catch{prompt('請手動複製',t)}};
+    m.innerHTML = `
+        <div class="box sheet bn">
+            <div class="row" style="margin-top:0">
+                <h3>${title}</h3>
+                <button class="btn x">✕</button>
+            </div>
+            ${body}
+            <div class="row gap">
+                <button class="btn cl">儲存</button>
+            </div>
+        </div>
+    `;
 
-const getCountdownInfo = datesStr => {
-    if(!datesStr) return { text: '未定日期', days: 999999 };
-    const match = datesStr.match(/(\d{4})[年/.-]?\s*(\d{1,2})[月/.-]\s*(\d{1,2})/);
-    if(!match) return { text: '', days: 999999 };
-    const [,y,m,d] = match;
-    const start = new Date(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}T00:00:00`);
-    const now = new Date(); now.setHours(0,0,0,0);
-    const diff = Math.ceil((start - now) / (1000 * 60 * 60 * 24));
-    
-    if(diff > 0) return { text: `🔥 倒數 ${diff} 天`, days: diff };
-    if(diff === 0) return { text: `🎉 今天出發！`, days: 0 };
-    return { text: `✈️ 進行中/已結束`, days: 888888 + Math.abs(diff) };
-};
+    const close = () => m.remove();
 
-const ids=()=>JSON.parse(localStorage.getItem('my_subscribed_projects')||'[]');
-const saveIds=a=>localStorage.setItem('my_subscribed_projects',JSON.stringify([...new Set(a)]));
+    // 關閉不儲存
+    q(m, '.x').onclick = close;
 
-async function renderProjects(){
-    const l=$('pl'), a=ids();
-    if(!a.length){ l.innerHTML='<p class="mute">還沒有專案，新增一個或輸入 6 位數號碼導入吧 ✨</p>'; return; }
-    
-    const snaps = await Promise.all(a.map(i=>getDoc(doc(db,'projects',i)).catch(()=>null)));
-    let list = [];
-    snaps.forEach(s=>{
-        if(s && s.exists()){
-            const p = s.data();
-            const info = getCountdownInfo(p.dates);
-            list.push({ id: s.id, ...p, days: info.days, countdownText: info.text });
+    q(m, '.cl').onclick = async () => {
+        const button = q(m, '.cl');
+        button.disabled = true;
+
+        try {
+            if (onOk && await onOk(m) === false) return;
+            close();
+        } catch (error) {
+            console.error(error);
+            alert('儲存失敗，請確認連線後再試一次');
+        } finally {
+            button.disabled = false;
         }
-    });
+    };
 
-    list.sort((x, y) => x.days - y.days);
+    m.onclick = event => {
+        if (event.target === m) close();
+    };
 
-    l.innerHTML = '';
-    list.forEach(p => {
-        const isExpired = p.days >= 888888;
-        const flag = getFlagEmoji(p.name);
-        const d=document.createElement('div');
-        d.className='box item';
-        d.style.display='flex'; d.style.justifyContent='space-between'; d.style.alignItems='center';
-        if(isExpired) { d.style.opacity = '0.5'; }
-        
-        d.innerHTML=`<div style="flex:1;min-width:0" onclick="window.enterProj('${p.id}')"><div class="row" style="margin:0"><span class="tag">${esc(p.dates||'未定日期')}</span><small style="color:var(--co);font-weight:bold">${p.countdownText}</small></div><b style="font-size:16px;margin-top:4px">${flag} ${esc(p.name)}</b></div><button class="btn" style="background:#ffdddd;padding:6px 10px;margin-left:8px" onclick="event.stopPropagation();window.delProj('${p.id}')">🗑️</button>`;
-        l.appendChild(d);
-    });
+    document.body.appendChild(m);
+    return m;
 }
 
 window.enterProj = id => enter(id);
@@ -251,7 +241,7 @@ sub('checkins',0,a=>{S.all=a;S.chk={};a.filter(c=>c.uploader===S.me).forEach(c=>
 
 $('bk').onclick=()=>{S.un.forEach(f=>f());S.un=[];S.id=null;$('v0').hidden=false;$('v1').hidden=true;$('nav').hidden=true;$('bk').hidden=true;$('sh').hidden=true;$('ref').hidden=false;$('ht').textContent='🧳 放風之旅';$('hs').textContent='選擇你的冒險旅程 ✨';renderProjects()};
 
-const TABS=[['schedule','📅','行程'],['ai','💡','提醒'],['lang','🗣','對話'],['split','💰','分帳'],['quest','🎯','闖關']];
+const TABS=[['schedule','📅','行程'],['ai','💡','提醒'],['lang','🗣','對話'],['split','💰','分帳'],['quest','🏅','收藏']];
 $('nav').innerHTML=TABS.map(t=>`<button data-t="${t[0]}"><span>${t[1]}</span>${t[2]}</button>`).join('');
 
 $('nav').querySelectorAll('button').forEach(b=>{
@@ -262,136 +252,355 @@ $('nav').querySelectorAll('button').forEach(b=>{
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.hidden=e.id!=='t-'+t);$('nav').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.t===t);if(b.dataset.t!==t)b.classList.remove('bn')})}
 
 /* ---------- 行程 ---------- */
-const tp=t=>String(t||'99:99').padStart(5,'0');
-function rSch(pop){const days=[...new Set(S.sch.map(s=>s.day||'Day 1'))].sort((a,b)=>dn(a)-dn(b));if(S.day!=='all'&&!days.includes(S.day))S.day='all';
-$('pills').innerHTML=['all',...days].map(d=>`<button class="pill ${d===S.day?'on'+(pop?' bn':''):''}" data-d="${esc(d)}">${d==='all'?'全部':esc(d)}</button>`).join('');
-$('pills').querySelectorAll('button').forEach(b=>b.onclick=()=>{S.day=b.dataset.d;rSch(1)});
-const l=S.sch.filter(s=>S.day==='all'||(s.day||'Day 1')===S.day).sort((a,b)=>dn(a.day)-dn(b.day)||tp(a.time).localeCompare(tp(b.time)));
-$('sl').innerHTML=l.length?l.map(s=>`<div class="box item${pop?' bn':''}" data-i="${s.id}"><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><b>${esc(clean(s.title))}</b></div>`).join(''):'<p class="mute">還沒有行程，按「新增」或「智慧導入」吧 ✨</p>';
-$('sl').querySelectorAll('.item').forEach(e=>e.onclick=()=>detail(e.dataset.i))}
-
-function detail(id){
-const s=S.sch.find(x=>x.id===id);if(!s)return;
-const t=clean(s.title);
-
-const getGoogleQuery = () => {
-    let pureTitle = t.replace(/^\[.*?\]\s*/, '').trim();
-    let region = '';
-    if(/濟州/.test(S.name)) region = '濟州島';
-    else if(/首爾/.test(S.name)) region = '首爾';
-    else if(/釜山/.test(S.name)) region = '釜山';
-    else if(/曼谷/.test(S.name)) region = '曼谷';
-    else if(/東京/.test(S.name)) region = '東京';
-    else if(/大阪/.test(S.name)) region = '大阪';
-    else if(/京都/.test(S.name)) region = '京都';
-    else if(/新加坡/.test(S.name)) region = '新加坡';
-    else if(/吉隆坡/.test(S.name)) region = '吉隆坡';
-    else if(/香港/.test(S.name)) region = '香港';
-    else if(/澳門/.test(S.name)) region = '澳門';
-    
-    return region && !pureTitle.includes(region) ? `${region} ${pureTitle}` : pureTitle;
+// 將時間轉為分鐘，解決 9:30 排在 10:00 後面的問題
+const tp = time => {
+    const match = String(time || '').match(/(\d{1,2})[:：](\d{2})/);
+    return match ? Number(match[1]) * 60 + Number(match[2]) : 1440;
 };
 
-const getNaverQuery = () => {
-    const kw = q(m,'#map-kw')?.value?.trim();
-    if(kw) return kw;
-    let pureTitle = t.replace(/^\[.*?\]\s*/, '').trim();
-    let region = '';
-    if(/濟州/.test(S.name)) region = '濟州島';
-    else if(/首爾/.test(S.name)) region = '首爾';
-    else if(/釜山/.test(S.name)) region = '釜山';
-    return region && !pureTitle.includes(region) ? `${region} ${pureTitle}` : pureTitle;
+const dayOrder = day => {
+    return /^\d{4}-\d{2}-\d{2}$/.test(day || '')
+        ? Date.parse(day) / 86400000
+        : dn(day);
 };
 
-const isKorea = dest(S.name) === 'korea';
+const scheduleOrder = (a, b) =>
+    dayOrder(a.day) - dayOrder(b.day) ||
+    tp(a.time) - tp(b.time) ||
+    (a.createdAt || 0) - (b.createdAt || 0);
 
-const m=modal(esc(t),`
-<div style="margin:6px 0 10px">
-    <div style="margin-bottom:6px"><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span></div>
-    <input id="map-kw" placeholder="輸入電話或當地語言名稱" value="${esc(s.mapKeyword||'')}">
-</div>
-<div style="margin:8px 0">
-    <input id="sched-loc" placeholder="備註" value="${esc(s.location||'')}">
-</div>
-<div class="row gap" style="justify-content:flex-start">
-    ${isKorea ? `<button class="btn gr" id="btn-naver">💚 Naver</button>` : ''}
-    <button class="btn aq" id="btn-google">💙 Google</button>
-    <button class="btn" id="dl">🗑 刪除</button>
-</div>`, async (modalEl) => {
-    const kw = q(modalEl,'#map-kw')?.value?.trim() || '';
-    const loc = q(modalEl,'#sched-loc')?.value?.trim() || '';
-    await updateDoc(doc(db,'projects',S.id,'schedules',id),{ mapKeyword: kw, location: loc });
-});
+// 專案名稱判斷是否為韓國
+function isKoreanTrip() {
+    return /濟州|韓國|釜山|首爾|仁川|大邱|江陵|慶州|全州|束草|水原|Jeju|Seoul|Busan|Korea/i
+        .test(S.name || '');
+}
 
-const setupMapButton = (btnId, mapType) => {
-    const btn = q(m, btnId);
-    if(!btn) return;
-    let pressTimer;
+// 地圖搜尋優先帶入專案的目的地
+function mapQuery(schedule) {
+    const region = (
+        (S.name || '').match(
+            /濟州島?|首爾|釜山|仁川|大邱|江陵|慶州|全州|束草|水原|東京|大阪|京都|沖繩|北海道|曼谷|清邁|新加坡|吉隆坡|香港|澳門|Jeju|Seoul|Busan/i
+        ) || []
+    )[0] || S.name;
 
-    const handleTap = () => {
-        let url = '';
-        const customUrl = (mapType === 'naver' ? s.customNaverUrl : s.customGoogleUrl)?.trim();
-        
-        if (customUrl) {
-            let targetUrl = customUrl;
-            if (mapType === 'google') {
-                if (!targetUrl.includes('/maps/dir/')) {
-                    const encodedDest = encodeURIComponent(getGoogleQuery());
-                    targetUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedDest}&travelmode=driving`;
+    const place =
+        schedule.place ||
+        schedule.mapKeyword ||
+        clean(schedule.title).replace(/^\[.*?\]\s*/, '');
+
+    return [region, place].filter(Boolean).join(' ');
+}
+
+// 只接受對應地圖服務的 HTTPS 網址
+function safeMapUrl(raw, type) {
+    try {
+        const url = new URL(raw);
+
+        const hosts = type === 'google'
+            ? ['google.com', 'maps.google.com', 'maps.app.goo.gl', 'goo.gl']
+            : ['map.naver.com', 'naver.me', 'm.map.naver.com'];
+
+        const allowed = hosts.some(host =>
+            url.hostname === host ||
+            url.hostname.endsWith('.' + host)
+        );
+
+        return url.protocol === 'https:' && allowed ? url : null;
+    } catch {
+        return null;
+    }
+}
+
+function mapUrl(schedule, type) {
+    const custom = safeMapUrl(
+        type === 'naver'
+            ? schedule.customNaverUrl
+            : schedule.customGoogleUrl,
+        type
+    );
+
+    const query = mapQuery(schedule);
+
+    // Naver 使用網頁搜尋，避免沒有經緯度的導航連結失效
+    if (type === 'naver') {
+        return custom?.href ||
+            'https://map.naver.com/p/search/' + encodeURIComponent(query);
+    }
+
+    // 韓國：開啟地點，不強制導航
+    if (isKoreanTrip()) {
+        return custom?.href ||
+            'https://www.google.com/maps/search/?api=1&query=' +
+            encodeURIComponent(query);
+    }
+
+    // 其他國家：不指定 origin，由 Google Maps 使用目前位置
+    let destination = query;
+    let placeId = '';
+
+    if (custom) {
+        destination =
+            custom.searchParams.get('destination') ||
+            custom.searchParams.get('query') ||
+            custom.searchParams.get('q') ||
+            query;
+
+        placeId =
+            custom.searchParams.get('destination_place_id') ||
+            custom.searchParams.get('query_place_id') ||
+            '';
+    }
+
+    const url = new URL('https://www.google.com/maps/dir/');
+
+    url.search = new URLSearchParams({
+        api: '1',
+        destination,
+        dir_action: 'navigate',
+        travelmode: 'driving',
+        ...(placeId ? { destination_place_id: placeId } : {})
+    }).toString();
+
+    return url.href;
+}
+
+function rSch(pop) {
+    const days = [
+        ...new Set(S.sch.map(schedule => schedule.day || 'Day 1'))
+    ].sort((a, b) => dayOrder(a) - dayOrder(b));
+
+    if (S.day !== 'all' && !days.includes(S.day)) {
+        S.day = 'all';
+    }
+
+    $('pills').innerHTML = ['all', ...days].map(day => `
+        <button
+            class="pill ${day === S.day ? 'on' + (pop ? ' bn' : '') : ''}"
+            data-d="${esc(day)}"
+        >
+            ${day === 'all' ? '全部' : esc(day)}
+        </button>
+    `).join('');
+
+    $('pills').querySelectorAll('button').forEach(button => {
+        button.onclick = () => {
+            S.day = button.dataset.d;
+            rSch(1);
+        };
+    });
+
+    const list = S.sch
+        .filter(schedule =>
+            S.day === 'all' ||
+            (schedule.day || 'Day 1') === S.day
+        )
+        .sort(scheduleOrder);
+
+    $('sl').innerHTML = list.length
+        ? list.map(schedule => `
+            <div class="box">
+                <span class="tag">
+                    ${esc(schedule.day || 'Day 1')} ·
+                    ${esc(schedule.time || '全天')}
+                </span>
+
+                <b style="display:block">
+                    ${esc(clean(schedule.title))}
+                </b>
+
+                ${schedule.place
+                    ? `<small>📍 ${esc(schedule.place)}</small>`
+                    : ''
                 }
-            } else if (mapType === 'naver') {
-                if (!targetUrl.includes('nmap://route/car')) {
-                    const encodedDest = encodeURIComponent(getNaverQuery());
-                    targetUrl = `nmap://route/car?destination=${encodedDest}&dname=${encodedDest}&appname=com.example.myapp`;
-                }
-            }
-            url = targetUrl;
-        } else {
-            if (mapType === 'naver') {
-                const queryStr = encodeURIComponent(getNaverQuery());
-                url = `nmap://route/car?dlat=&dlng=&destination=${queryStr}&dname=${queryStr}&appname=com.example.myapp`;
-            } else {
-                const queryStr = encodeURIComponent(getGoogleQuery());
-                url = `https://www.google.com/maps/dir/?api=1&destination=${queryStr}&travelmode=driving`;
+
+                <div class="row" style="flex-wrap:wrap">
+                    <button
+                        class="btn co"
+                        data-edit="${esc(schedule.id)}"
+                    >
+                        ✏️ 編輯
+                    </button>
+
+                    <a
+                        class="btn aq"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="${esc(mapUrl(schedule, 'google'))}"
+                    >
+                        Google Maps
+                    </a>
+
+                    ${isKoreanTrip() ? `
+                        <a
+                            class="btn gr"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href="${esc(mapUrl(schedule, 'naver'))}"
+                        >
+                            Naver Map
+                        </a>
+                    ` : ''}
+                </div>
+
+                <small>
+                    ${schedule.customGoogleUrl || schedule.customNaverUrl
+                        ? '已設定地圖連結'
+                        : '地圖以目的地與名稱搜尋 · 待確認'
+                    }
+                </small>
+            </div>
+        `).join('')
+        : '<p class="mute">還沒有行程，按「新增」或「智慧導入」吧 ✨</p>';
+
+    $('sl').querySelectorAll('[data-edit]').forEach(button => {
+        button.onclick = () => detail(button.dataset.edit);
+    });
+}
+
+function detail(id) {
+    const schedule = S.sch.find(item => item.id === id);
+    if (!schedule) return;
+
+    const minutes = tp(schedule.time);
+    const timeValue = minutes < 1440
+        ? String(Math.floor(minutes / 60)).padStart(2, '0') +
+          ':' +
+          String(minutes % 60).padStart(2, '0')
+        : '';
+
+    const m = modal('✏️ 編輯行程', `
+        <label for="edit-day">日期或天數</label>
+        <input
+            id="edit-day"
+            placeholder="Day 1 或 2027-01-01"
+            value="${esc(schedule.day || 'Day 1')}"
+        >
+
+        <label for="edit-time">時間（留空表示全天）</label>
+        <input
+            id="edit-time"
+            type="time"
+            value="${esc(timeValue)}"
+        >
+
+        <label for="edit-title">行程名稱</label>
+        <input
+            id="edit-title"
+            value="${esc(clean(schedule.title))}"
+        >
+
+        <label for="edit-place">地點／分店名稱或地址</label>
+        <input
+            id="edit-place"
+            value="${esc(schedule.place || schedule.mapKeyword || '')}"
+        >
+
+        <label for="edit-notes">備註</label>
+        <textarea id="edit-notes" rows="4">${esc(
+            schedule.notes ?? schedule.location ?? ''
+        )}</textarea>
+
+        <label for="edit-google">Google Maps 連結（選填）</label>
+        <input
+            id="edit-google"
+            type="url"
+            value="${esc(schedule.customGoogleUrl || '')}"
+        >
+
+        ${isKoreanTrip() ? `
+            <label for="edit-naver">Naver Map 連結（選填）</label>
+            <input
+                id="edit-naver"
+                type="url"
+                value="${esc(schedule.customNaverUrl || '')}"
+            >
+        ` : ''}
+
+        <p>
+            <small>
+                儲存後依日期與時間排序。
+                地圖可填入確切分店或地圖連結，尚未經 AI 驗證。
+            </small>
+        </p>
+
+        <button class="btn" id="dl">🗑 刪除行程</button>
+    `, async () => {
+        const title = val(m, '#edit-title');
+        const day = val(m, '#edit-day');
+
+        if (!title) {
+            alert('請輸入行程名稱');
+            return false;
+        }
+
+        const validFormat =
+            /^(Day\s*[1-9]\d*|\d{4}-\d{2}-\d{2})$/i.test(day);
+
+        const invalidDate = /^\d{4}/.test(day) && (
+            !Number.isFinite(Date.parse(day)) ||
+            new Date(day).toISOString().slice(0, 10) !== day
+        );
+
+        if (!validFormat || invalidDate) {
+            alert('請填寫 Day 1 之類的天數，或 YYYY-MM-DD 日期');
+            return false;
+        }
+
+        for (const type of ['google', 'naver']) {
+            const input = q(m, '#edit-' + type);
+            const raw = input?.value.trim();
+
+            if (raw && !safeMapUrl(raw, type)) {
+                alert(
+                    '請貼上有效的 HTTPS ' +
+                    (type === 'google' ? 'Google Maps' : 'Naver Map') +
+                    ' 連結'
+                );
+                return false;
             }
         }
-        window.open(url, '_blank');
-    };
 
-    const handleLongPress = (e) => {
-        e.preventDefault();
-        const currentCustom = (mapType === 'naver' ? s.customNaverUrl : s.customGoogleUrl) || '';
-        const titleName = mapType === 'naver' ? '💚 設定 Naver 自訂網址' : '💙 設定 Google 自訂網址';
-        
-        const subM = document.createElement('div'); subM.className='mask';
-        subM.innerHTML=`<div class="box sheet bn"><div class="row" style="margin-top:0"><h3>${titleName}</h3><button class="btn x">✕</button></div><p style="font-size:12px;opacity:0.7;margin:0 0 6px">貼上網址後點擊下方儲存，之後點擊按鈕將直接導向該網址。</p><input id="custom-url-input" placeholder="請貼上網址 (https://...)" value="${esc(currentCustom)}"><div class="row gap"><button class="btn cl" id="sub-save">儲存</button></div></div>`;
-        const closeSub = () => subM.remove();
-        q(subM,'.x').onclick = closeSub; subM.onclick = ev => { if(ev.target === subM) closeSub(); };
-        q(subM,'#sub-save').onclick = async () => {
-            const newUrl = q(subM, '#custom-url-input').value.trim();
-            if (mapType === 'naver') s.customNaverUrl = newUrl;
-            else s.customGoogleUrl = newUrl;
-            await updateDoc(doc(db,'projects',S.id,'schedules',id), {
-                customNaverUrl: s.customNaverUrl || '',
-                customGoogleUrl: s.customGoogleUrl || ''
-            });
-            alert('自訂網址已儲存 ✨');
-            closeSub();
+        const patch = {
+            day,
+            time: val(m, '#edit-time'),
+            title,
+            place: val(m, '#edit-place'),
+            mapKeyword: val(m, '#edit-place'),
+            notes: val(m, '#edit-notes'),
+
+            // 保留舊欄位，讓原本導入的備註相容
+            location: val(m, '#edit-notes'),
+
+            customGoogleUrl: val(m, '#edit-google'),
+            customNaverUrl: q(m, '#edit-naver')
+                ? val(m, '#edit-naver')
+                : schedule.customNaverUrl || ''
         };
-        document.body.appendChild(subM);
+
+        await updateDoc(
+            doc(db, 'projects', S.id, 'schedules', id),
+            patch
+        );
+
+        Object.assign(schedule, patch);
+        S.day = 'all';
+        rSch();
+        rQuest();
+    });
+
+    q(m, '#dl').onclick = async () => {
+        if (!confirm('確定刪除這個行程？')) return;
+
+        try {
+            await deleteDoc(
+                doc(db, 'projects', S.id, 'schedules', id)
+            );
+            m.remove();
+        } catch (error) {
+            console.error(error);
+            alert('刪除失敗，請稍後再試');
+        }
     };
-
-    btn.onclick = handleTap;
-    btn.oncontextmenu = handleLongPress;
-    btn.ontouchstart = (e) => { pressTimer = setTimeout(() => handleLongPress(e), 600); };
-    btn.ontouchend = () => clearTimeout(pressTimer);
-    btn.ontouchmove = () => clearTimeout(pressTimer);
-};
-
-if(isKorea) setupMapButton('#btn-naver', 'naver');
-setupMapButton('#btn-google', 'google');
-
-q(m,'#dl').onclick=async()=>{if(confirm('確定刪除這個行程？')){await deleteDoc(doc(db,'projects',S.id,'schedules',id));m.remove()}};
 }
 
 $('ad').onclick=()=> {
@@ -622,21 +831,103 @@ modal('📊 結算明細', resHtml || '<p class="mute">目前不需要轉帳 �
 const cls=t=>{t=t||'';if(/交通|機場|租車|還車|출발|空港/.test(t))return null;if(/餐廳|美食|咖啡|晚餐|午餐|早餐|烤肉|料理|吃|맛집|식당|카페|ร้านอาหาร/.test(t))return'food';if(/購物|免稅|超市|商場|買|마트|쇼핑|ช้อปปิ้ง/.test(t))return'shop';return'spot'};
 const BD={food:['美食家','var(--co)'],spot:['探險家','var(--aq)'],shop:['購物達人','var(--ye)']};
 
-function rQuest(){
-const allIt = S.sch.map(s=>({...s,k:cls(s.title)})).filter(s=>s.k);
-const totalChk = allIt.filter(s=>S.chk[s.id]).length;
-const totalP = allIt.length ? Math.round(totalChk/allIt.length*100) : 0;
-$('qc').textContent=`已打卡 ${totalChk} / ${allIt.length}`; $('qp').textContent=totalP+'\%';$('qb').style.width=totalP+'%';
-for(const k in BD){
-    const catItems = allIt.filter(s=>s.k===k); const catTotal = catItems.length; const catDone = catItems.filter(s=>S.chk[s.id]).length;
-    const unlocked = catTotal > 0 && catDone === catTotal;
-    const b = $('b-'+k), was = b.classList.contains('on');
-    b.classList.toggle('on', unlocked); b.style.background = unlocked ? BD[k][1] : '';
-    $('bt-'+k).textContent = catTotal > 0 ? `${catDone}/${catTotal}` : '0/0';
-    if(unlocked && !was) b.classList.add('bn');
-}
-$('ql').innerHTML=allIt.length?allIt.map(s=>`<div class="box item" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag">${esc(s.day||'Day 1')} · ${esc(s.time||'全天')}</span><b>${esc(clean(s.title))}</b></div><button class="btn ${S.chk[s.id]?'gr':''}" data-i="${s.id}">${S.chk[s.id]?'✔ 已解鎖':'📍 打卡'}</button></div>`).join(''):'<p class="mute">行程中還沒有可打卡的景點、美食或購物 ✨</p>';
-$('ql').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>checkin(b.dataset.i))
+function rQuest() {
+    const items = S.sch
+        .map(schedule => ({
+            ...schedule,
+            k: cls(schedule.title)
+        }))
+        .filter(schedule => schedule.k)
+        .sort(scheduleOrder);
+
+    // S.chk 原本就只收錄目前使用者的打卡
+    const checked = items.filter(schedule => S.chk[schedule.id]);
+    const photos = checked.filter(
+        schedule => S.chk[schedule.id]?.photoUrl
+    );
+
+    const percent = items.length
+        ? Math.round(checked.length / items.length * 100)
+        : 0;
+
+    $('qc').textContent =
+        `我的收藏 ${checked.length} / ${items.length} · 照片 ${photos.length} 張`;
+
+    $('qp').textContent = percent + '%';
+    $('qb').style.width = percent + '%';
+
+    for (const key in BD) {
+        const categoryItems = items.filter(
+            schedule => schedule.k === key
+        );
+
+        const done = categoryItems.filter(
+            schedule => S.chk[schedule.id]
+        ).length;
+
+        // 第一次完成該類型打卡，就解鎖個人徽章
+        const unlocked = done > 0;
+        const badge = $('b-' + key);
+        const wasUnlocked = badge.classList.contains('on');
+
+        badge.classList.toggle('on', unlocked);
+        badge.style.background = unlocked ? BD[key][1] : '';
+        badge.title = BD[key][0];
+
+        $('bt-' + key).textContent = categoryItems.length
+            ? `${BD[key][0]} · 已收藏 ${done} 處`
+            : `${BD[key][0]} · 尚無行程`;
+
+        if (unlocked && !wasUnlocked) {
+            badge.classList.add('bn');
+        } else if (!unlocked) {
+            badge.classList.remove('bn');
+        }
+    }
+
+    $('ql').innerHTML = items.length
+        ? items.map(schedule => {
+            const check = S.chk[schedule.id];
+
+            return `
+                <div
+                    class="box"
+                    style="display:flex;justify-content:space-between;
+                           align-items:center;gap:8px"
+                >
+                    <div style="flex:1;min-width:0">
+                        <span class="tag">
+                            ${esc(schedule.day || 'Day 1')} ·
+                            ${esc(schedule.time || '全天')}
+                        </span>
+                        <b style="display:block">
+                            ${esc(clean(schedule.title))}
+                        </b>
+                    </div>
+
+                    ${check?.photoUrl ? `
+                        <img
+                            src="${esc(check.photoUrl)}"
+                            alt="我的打卡照片"
+                            style="width:56px;height:56px;object-fit:cover;
+                                   border-radius:12px"
+                        >
+                    ` : ''}
+
+                    <button
+                        class="btn ${check ? 'gr' : ''}"
+                        data-i="${esc(schedule.id)}"
+                    >
+                        ${check ? '✔ 已收藏' : '📍 打卡'}
+                    </button>
+                </div>
+            `;
+        }).join('')
+        : '<p class="mute">行程中還沒有可收藏的景點、美食或購物 ✨</p>';
+
+    $('ql').querySelectorAll('[data-i]').forEach(button => {
+        button.onclick = () => checkin(button.dataset.i);
+    });
 }
 
 function compressAndConvert(file) {
