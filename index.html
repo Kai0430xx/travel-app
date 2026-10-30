@@ -359,7 +359,7 @@ function errorMessage(error) {
   };
 
   return messages[error.code] ||
-    "操作失敗，請確認網路與 Firebase 設定後重試。";
+    "操作失敗，錯誤代碼：" + (error.code || "unknown");
 }
 
 async function runButton(button, operation) {
