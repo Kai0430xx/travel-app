@@ -5242,6 +5242,1430 @@ $("speak").onclick = () => {
   speechSynthesis.speak(utterance);
 };
 
+/* ---------- 今日行程、個人打包與收付款 ---------- */
+
+import {
+  runTransaction
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const extra = {
+  packing: null,
+  payments: [],
+  error: "",
+  pendingDay: true,
+  mask: null,
+  controller: null
+};
+
+const PACK_CATEGORIES = [
+  "證件與金錢",
+  "衣物",
+  "盥洗保養",
+  "電子與充電",
+  "藥品",
+  "防曬雨具",
+  "其他"
+];
+
+const newItem = (category, label, source = "基本清單") => ({
+  id: crypto.randomUUID(),
+  category,
+  label,
+  done: false,
+  source
+});
+
+const itemKey = item =>
+  item.category + ":" + item.label.trim().toLowerCase();
+
+/* ---------- 自動選中今天 ---------- */
+
+function tripDate(text) {
+  const match = String(text || "").match(
+    /(\d{4})[年/.-]?\s*(\d{1,2})[月/.-]\s*(\d{1,2})/
+  );
+
+  if (!match) return null;
+
+  const value = Date.UTC(
+    Number(match[1]),
+    Number(match[2]) - 1,
+    Number(match[3])
+  );
+
+  const expected =
+    `${match[1]}-` +
+    `${match[2].padStart(2, "0")}-` +
+    `${match[3].padStart(2, "0")}`;
+
+  return new Date(value).toISOString().slice(0, 10) === expected
+    ? value
+    : null;
+}
+
+function todayDay(now = new Date()) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Taipei",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(now).map(part => [
+      part.type,
+      part.value
+    ])
+  );
+
+  const iso = `${parts.year}-${parts.month}-${parts.day}`;
+  const start = tripDate(state.project?.dates);
+
+  const number = start === null
+    ? null
+    : Math.floor((Date.parse(iso) - start) / 86400000) + 1;
+
+  const days = [
+    ...new Set(
+      state.schedules.map(schedule =>
+        schedule.day || "Day 1"
+      )
+    )
+  ];
+
+  return days.find(day =>
+    day === iso ||
+    (
+      /^Day\s*\d+$/i.test(day) &&
+      Number(day.replace(/\D/g, "")) === number
+    )
+  ) || null;
+}
+
+const oldRenderSchedules = renderSchedules;
+
+renderSchedules = function () {
+  const today = todayDay();
+
+  if (extra.pendingDay && state.schedules.length) {
+    state.day = today || "all";
+    extra.pendingDay = false;
+  }
+
+  oldRenderSchedules();
+
+  $("days").querySelectorAll("button").forEach(button => {
+    if (button.dataset.day === today) {
+      button.textContent += " · 今天";
+
+      button.style.background =
+        button.dataset.day === state.day
+          ? "#b9d7ac"
+          : "#edf4e7";
+
+      button.style.borderColor = "#536747";
+      button.style.fontWeight = "bold";
+    }
+
+    const original = button.onclick;
+
+    button.onclick = () => {
+      extra.pendingDay = false;
+      original();
+    };
+  });
+};
+
+/* ---------- 個人打包清單入口 ---------- */
+
+const packingButton = document.createElement("button");
+
+packingButton.className = "btn aq";
+packingButton.textContent = "🎒 我的打包清單";
+packingButton.style.margin = "0 0 12px";
+
+$("days").before(packingButton);
+
+packingButton.onclick = () => openPacking();
+
+function packingRef(
+  projectId = state.project.id,
+  userId = uid()
+) {
+  return doc(
+    db,
+    "users",
+    userId,
+    "packing",
+    projectId
+  );
+}
+
+function basicPacking() {
+  const groups = {
+    "證件與金錢": [
+      "護照與必要入境文件",
+      "機票、住宿與保險資料",
+      "信用卡與少量當地現金"
+    ],
+    "衣物": [
+      "每日換洗衣物與內衣襪",
+      "舒適好走的鞋",
+      "睡衣與薄外套"
+    ],
+    "盥洗保養": [
+      "牙刷牙膏與個人清潔用品",
+      "個人保養品",
+      "眼鏡與隱形眼鏡用品（依需要）"
+    ],
+    "電子與充電": [
+      "手機與充電線",
+      "充電器與適用轉接頭",
+      "行動電源（確認航空公司規定）",
+      "SIM／eSIM／漫遊設定"
+    ],
+    "藥品": [
+      "個人常備藥與處方資料",
+      "OK繃與簡易急救用品"
+    ],
+    "防曬雨具": [
+      "防曬用品與帽子",
+      "折疊傘或輕便雨衣"
+    ],
+    "其他": [
+      "隨身小包",
+      "水壺與購物袋"
+    ]
+  };
+
+  const month = new Date(
+    tripDate(state.project?.dates) || Date.now()
+  ).getUTCMonth() + 1;
+
+  if (
+    ["korea", "japan"].includes(
+      destinationType(state.project.name)
+    )
+  ) {
+    if (month <= 3 || month >= 11) {
+      groups.衣物.push(
+        "保暖外套與分層衣物（依實際氣溫調整）"
+      );
+    } else if (month >= 6 && month <= 9) {
+      groups.衣物.push("透氣快乾衣物");
+    }
+  }
+
+  return Object.entries(groups).flatMap(
+    ([category, labels]) =>
+      labels.map(label => newItem(category, label))
+  );
+}
+
+async function mutatePacking(
+  change,
+  reference = packingRef()
+) {
+  const initialItems = basicPacking();
+
+  await runTransaction(db, async transaction => {
+    const snapshot = await transaction.get(reference);
+
+    const data = snapshot.exists()
+      ? snapshot.data()
+      : {
+          items: initialItems,
+          removed: [],
+          webStatus: "尚未更新",
+          sources: []
+        };
+
+    change(data);
+
+    if (data.items.length > 300) {
+      throw new Error(
+        "每趟旅程最多保留 300 件物品。"
+      );
+    }
+
+    transaction.set(reference, {
+      ...data,
+      updatedAt: Date.now()
+    });
+  });
+}
+
+async function packingAction(button, operation) {
+  button.disabled = true;
+
+  try {
+    await operation();
+  } catch (error) {
+    drawPacking();
+
+    if (extra.mask?.isConnected) {
+      q(extra.mask, ".modal-error").textContent =
+        error.code
+          ? errorMessage(error)
+          : error.message;
+    }
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function openPacking() {
+  const mask = modal(
+    "🎒 我的打包清單",
+    '<div id="packing-body"></div>'
+  );
+
+  extra.mask = mask;
+  drawPacking();
+}
+
+function drawPacking() {
+  const mask = extra.mask;
+
+  if (!mask?.isConnected) return;
+
+  const root = q(mask, "#packing-body");
+  const data = extra.packing;
+
+  if (!data) {
+    root.textContent =
+      extra.error || "載入個人清單中…";
+    return;
+  }
+
+  const draftLabel =
+    q(root, "#packing-label")?.value || "";
+
+  const draftCategory =
+    q(root, "#packing-category")?.value ||
+    PACK_CATEGORIES[0];
+
+  const focusInput =
+    document.activeElement ===
+    q(root, "#packing-label");
+
+  const items = data.items || [];
+  const done = items.filter(item => item.done).length;
+
+  root.innerHTML = `
+    <p class="hint">
+      只有你能查看與修改。此清單依專案分開保存。
+    </p>
+
+    <div class="box" style="background:var(--aq)">
+      <b>已準備 ${done}／${items.length} 件</b>
+      <progress
+        value="${done}"
+        max="${items.length || 1}"
+        style="display:block;width:100%;margin-top:8px"
+      ></progress>
+    </div>
+
+    <p class="hint">
+      基本清單為固定參考；網頁查到的建議會另標來源。
+      刪除的建議不會在重查時自動加回。
+    </p>
+
+    <div class="row">
+      <small>
+        ${esc(data.webStatus || "網頁建議尚未更新")}
+        ${
+          data.checkedAt
+            ? " · " + esc(
+                new Date(data.checkedAt).toLocaleString(
+                  "zh-TW",
+                  { timeZone: "Asia/Taipei" }
+                )
+              )
+            : ""
+        }
+      </small>
+      <button class="btn" id="packing-query">
+        重新查詢
+      </button>
+    </div>
+
+    ${(data.sources || []).map(source => `
+      <p class="hint">
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="${esc(source.url)}"
+        >
+          ${esc(source.title)} ↗
+        </a>
+        ${
+          source.text
+            ? `<br>${esc(source.text)}`
+            : ""
+        }
+      </p>
+    `).join("")}
+
+    <form id="packing-add">
+      <label>新增物品分類</label>
+      <select id="packing-category">
+        ${PACK_CATEGORIES.map(category => `
+          <option>${category}</option>
+        `).join("")}
+      </select>
+
+      <label>物品名稱</label>
+      <input
+        id="packing-label"
+        maxlength="100"
+        required
+        placeholder="例如：保溫瓶"
+      >
+
+      <button
+        class="btn aq"
+        style="margin-top:8px"
+      >
+        ＋ 新增物品
+      </button>
+    </form>
+
+    ${PACK_CATEGORIES.map(category => `
+      <h3>${category}</h3>
+      ${
+        items.filter(item =>
+          item.category === category
+        ).map(item => `
+          <div
+            class="row"
+            style="align-items:flex-start;flex-wrap:nowrap;gap:8px"
+          >
+            <label style="
+              display:flex;
+              gap:10px;
+              flex:1;
+              min-width:0;
+              align-items:flex-start;
+            ">
+              <input
+                type="checkbox"
+                data-pack-check="${esc(item.id)}"
+                ${item.done ? "checked" : ""}
+                style="
+                  width:20px;
+                  flex-shrink:0;
+                  margin-top:4px;
+                "
+              >
+              <span style="
+                overflow-wrap:anywhere;
+                ${
+                  item.done
+                    ? "text-decoration:line-through;opacity:.6"
+                    : ""
+                }
+              ">
+                ${esc(item.label)}
+                <small style="
+                  display:block;
+                  font-size:11px;
+                ">
+                  ${esc(item.source || "自行新增")}
+                </small>
+              </span>
+            </label>
+
+            <button
+              class="btn"
+              data-pack-delete="${esc(item.id)}"
+              aria-label="刪除${esc(item.label)}"
+            >
+              ×
+            </button>
+          </div>
+        `).join("") ||
+        '<p class="hint">尚無物品</p>'
+      }
+    `).join("")}
+  `;
+
+  q(root, "#packing-label").value = draftLabel;
+  q(root, "#packing-category").value = draftCategory;
+
+  if (focusInput) {
+    q(root, "#packing-label").focus();
+  }
+
+  const reference = packingRef();
+
+  root.querySelectorAll("[data-pack-check]")
+    .forEach(button => {
+      button.onchange = () => packingAction(
+        button,
+        () => mutatePacking(data => {
+          const item = data.items.find(item =>
+            item.id === button.dataset.packCheck
+          );
+
+          if (item) item.done = button.checked;
+        }, reference)
+      );
+    });
+
+  root.querySelectorAll("[data-pack-delete]")
+    .forEach(button => {
+      button.onclick = () => packingAction(
+        button,
+        () => mutatePacking(data => {
+          const item = data.items.find(item =>
+            item.id === button.dataset.packDelete
+          );
+
+          if (!item) return;
+
+          data.removed = [
+            ...new Set([
+              ...(data.removed || []),
+              itemKey(item)
+            ])
+          ].slice(-600);
+
+          data.items = data.items.filter(
+            other => other.id !== item.id
+          );
+        }, reference)
+      );
+    });
+
+  q(root, "#packing-add").onsubmit = event => {
+    event.preventDefault();
+
+    const label =
+      q(root, "#packing-label").value.trim();
+
+    const category =
+      q(root, "#packing-category").value;
+
+    if (!label) return;
+
+    const item = newItem(
+      category,
+      label,
+      "自行新增"
+    );
+
+    packingAction(
+      q(root, "#packing-add button"),
+      async () => {
+        await mutatePacking(data => {
+          if (
+            !data.items.some(other =>
+              itemKey(other) === itemKey(item)
+            )
+          ) {
+            data.items.push(item);
+          }
+        }, reference);
+
+        if (mask.isConnected) {
+          q(mask, "#packing-label").value = "";
+        }
+      }
+    );
+  };
+
+  q(root, "#packing-query").onclick = event =>
+    packingAction(
+      event.currentTarget,
+      () => queryPacking()
+    );
+}
+
+/* ---------- 依網頁與天氣補充打包建議 ---------- */
+
+async function queryPacking() {
+  if (extra.controller) return;
+
+  const reference = packingRef();
+  const revision = projectRevision;
+
+  const destination =
+    reminderDestination(state.project.name);
+
+  if (!destination) {
+    await mutatePacking(data => {
+      data.webStatus =
+        "尚未辨識到支援的城市，先使用基本清單";
+      data.checkedAt = Date.now();
+    }, reference);
+
+    return;
+  }
+
+  const controller = new AbortController();
+  extra.controller = controller;
+
+  try {
+    const results = await Promise.allSettled([
+      fetchGuide(destination, controller.signal),
+      fetchWeather(destination, controller.signal)
+    ]);
+
+    if (
+      revision !== projectRevision ||
+      controller.signal.aborted
+    ) return;
+
+    const suggested = [];
+    const sources = [];
+
+    if (results[0].status === "fulfilled") {
+      const guide = results[0].value;
+
+      for (const section of guide.items) {
+        sources.push({
+          title: `維基導遊（CC BY-SA）· ${section.title}`,
+          url: section.url,
+          text: section.text.slice(0, 350)
+        });
+
+        const rules = [
+          [
+            /雨|降水/,
+            "防曬雨具",
+            "折疊傘或輕便雨衣"
+          ],
+          [
+            /寒冷|低溫|低温|保暖|冬季/,
+            "衣物",
+            "保暖衣物（出發前確認預報）"
+          ],
+          [
+            /日照|防曬|防晒|紫外線|紫外线/,
+            "防曬雨具",
+            "防曬用品與帽子"
+          ],
+          [
+            /蚊|登革/,
+            "藥品",
+            "適用的防蚊用品"
+          ],
+          [
+            /插座|插頭|插头|電壓|电压/,
+            "電子與充電",
+            "充電器與適用轉接頭"
+          ],
+          [
+            /步行|徒步|健行/,
+            "衣物",
+            "舒適好走的鞋"
+          ]
+        ];
+
+        for (
+          const [pattern, category, label] of rules
+        ) {
+          if (pattern.test(section.text)) {
+            suggested.push(
+              newItem(
+                category,
+                label,
+                `網頁文字提示：${section.title}；請依自身需求確認`
+              )
+            );
+          }
+        }
+      }
+    }
+
+    if (results[1].status === "fulfilled") {
+      const weather = results[1].value;
+      const start = tripDate(state.project.dates);
+      const daily = weather.daily || weather;
+
+      const dayCount = state.schedules.reduce(
+        (max, schedule) =>
+          /^Day\s*\d+$/i.test(schedule.day || "")
+            ? Math.max(max, dayOrder(schedule.day))
+            : max,
+        1
+      );
+
+      const rows = (daily.time || [])
+        .map((date, index) => ({
+          date,
+          min: daily.temperature_2m_min?.[index],
+          rain:
+            daily.precipitation_probability_max?.[index]
+        }))
+        .filter(row =>
+          start !== null &&
+          Date.parse(row.date) >= start &&
+          Date.parse(row.date) <
+            start + dayCount * 86400000
+        );
+
+      if (rows.length) {
+        sources.push({
+          title: "Open-Meteo · 旅程日期內的天氣預報",
+          url: "https://open-meteo.com/",
+          text:
+            "僅對目前可預報且與旅程重疊的日期提供準備提示。"
+        });
+
+        if (
+          rows.some(row =>
+            Number.isFinite(row.min) &&
+            row.min < 12
+          )
+        ) {
+          suggested.push(
+            newItem(
+              "衣物",
+              "保暖衣物（出發前確認預報）",
+              "旅程日期預報：低溫低於 12°C"
+            )
+          );
+        }
+
+        if (
+          rows.some(row =>
+            Number.isFinite(row.rain) &&
+            row.rain >= 60
+          )
+        ) {
+          suggested.push(
+            newItem(
+              "防曬雨具",
+              "折疊傘或輕便雨衣",
+              "旅程日期預報：降雨機率至少 60%"
+            )
+          );
+        }
+      }
+    }
+
+    await mutatePacking(data => {
+      const keys = new Set([
+        ...data.items.map(itemKey),
+        ...(data.removed || [])
+      ]);
+
+      for (const item of suggested) {
+        if (
+          !keys.has(itemKey(item)) &&
+          data.items.length < 300
+        ) {
+          data.items.push(item);
+          keys.add(itemKey(item));
+        }
+      }
+
+      data.sources = sources.length
+        ? sources
+        : data.sources || [];
+
+      data.checkedAt = Date.now();
+
+      data.webStatus = sources.length
+        ? "已查詢；網頁摘錄為補充參考，非完整打包建議"
+        : "網頁建議尚未更新，保留基本清單與上次資料，可稍後重查";
+    }, reference);
+  } finally {
+    if (extra.controller === controller) {
+      extra.controller = null;
+    }
+  }
+}
+
+/* ---------- 結算金額與已收款紀錄 ---------- */
+
+const moneyScale = currency =>
+  ["KRW", "JPY"].includes(currency) ? 1 : 100;
+
+function ledger() {
+  const groups = new Map();
+
+  const add = (currency, name, value) => {
+    if (!groups.has(currency)) {
+      groups.set(currency, new Map());
+    }
+
+    const group = groups.get(currency);
+
+    group.set(
+      name,
+      (group.get(name) || 0) + value
+    );
+  };
+
+  for (const expense of state.expenses) {
+    const currency = expense.settle === "orig"
+      ? expense.cur || "TWD"
+      : "TWD";
+
+    const scale = moneyScale(currency);
+
+    const total = Math.round(
+      Number(expense.amount) *
+      (
+        currency === (expense.cur || "TWD")
+          ? 1
+          : RATE[expense.cur || "TWD"] || 1
+      ) *
+      scale
+    );
+
+    const shares = Object.entries(
+      expense.split || {}
+    ).filter(([, value]) => Number(value) > 0);
+
+    if (!shares.length) {
+      shares.push([expense.payer, 1]);
+    }
+
+    const sum = shares.reduce(
+      (sum, [, value]) =>
+        sum + Number(value),
+      0
+    );
+
+    if (
+      !Number.isSafeInteger(total) ||
+      total < 0 ||
+      !Number.isFinite(sum)
+    ) {
+      throw new Error(
+        "帳目金額異常，請先檢查原始帳目。"
+      );
+    }
+
+    const allocated = shares.map(([name, value]) => {
+      const raw = total * Number(value) / sum;
+
+      return {
+        name,
+        raw,
+        value: Math.floor(raw)
+      };
+    });
+
+    let left = total - allocated.reduce(
+      (sum, part) => sum + part.value,
+      0
+    );
+
+    [...allocated].sort((a, b) =>
+      (b.raw - b.value) - (a.raw - a.value) ||
+      a.name.localeCompare(b.name)
+    ).forEach(part => {
+      if (left > 0) {
+        part.value++;
+        left--;
+      }
+    });
+
+    add(currency, expense.payer, total);
+
+    allocated.forEach(part =>
+      add(currency, part.name, -part.value)
+    );
+  }
+
+  for (
+    const payment of extra.payments.filter(
+      payment => payment.status === "received"
+    )
+  ) {
+    add(
+      payment.currency,
+      payment.fromName,
+      payment.units
+    );
+
+    add(
+      payment.currency,
+      payment.toName,
+      -payment.units
+    );
+  }
+
+  const transfers = [];
+
+  for (const [currency, balances] of groups) {
+    const debt = [...balances]
+      .filter(([, amount]) => amount < 0)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([name, amount]) => ({
+        name,
+        amount: -amount
+      }));
+
+    const credit = [...balances]
+      .filter(([, amount]) => amount > 0)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([name, amount]) => ({
+        name,
+        amount
+      }));
+
+    let debtor = 0;
+    let creditor = 0;
+
+    while (
+      debtor < debt.length &&
+      creditor < credit.length
+    ) {
+      const units = Math.min(
+        debt[debtor].amount,
+        credit[creditor].amount
+      );
+
+      if (units) {
+        transfers.push({
+          currency,
+          fromName: debt[debtor].name,
+          toName: credit[creditor].name,
+          units
+        });
+      }
+
+      debt[debtor].amount -= units;
+      credit[creditor].amount -= units;
+
+      if (!debt[debtor].amount) debtor++;
+      if (!credit[creditor].amount) creditor++;
+    }
+  }
+
+  return transfers;
+}
+
+function accountUid(name) {
+  if (name === myName()) return uid();
+
+  const member = state.members.find(member =>
+    member.name === name &&
+    state.project.memberUids.includes(
+      member.userUid || member.id
+    )
+  );
+
+  return member
+    ? member.userUid || member.id
+    : null;
+}
+
+const amountText = payment =>
+  `${payment.currency} ${
+    (
+      payment.units /
+      moneyScale(payment.currency)
+    ).toLocaleString(undefined, {
+      maximumFractionDigits: 2
+    })
+  }`;
+
+function ledgerSignature() {
+  return JSON.stringify([
+    state.expenses.map(expense => [
+      expense.id,
+      expense.amount,
+      expense.cur,
+      expense.settle,
+      expense.payer,
+      expense.split
+    ]).sort((a, b) =>
+      a[0].localeCompare(b[0])
+    ),
+
+    extra.payments
+      .filter(payment =>
+        payment.status === "received"
+      )
+      .map(payment => payment.id)
+      .sort()
+  ]);
+}
+
+async function basisHash(basis) {
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(basis)
+  );
+
+  return [...new Uint8Array(digest)]
+    .map(byte =>
+      byte.toString(16).padStart(2, "0")
+    )
+    .join("");
+}
+
+/* ---------- 分帳結算卡 ---------- */
+
+function openSettlement() {
+  const mask = modal(
+    "📊 分帳結算卡",
+    '<div id="settlement-body"></div>'
+  );
+
+  mask.dataset.settlement = "true";
+  drawSettlement(mask);
+}
+
+function drawSettlement(mask) {
+  if (!mask?.isConnected) return;
+
+  const root = q(mask, "#settlement-body");
+
+  if (extra.error) {
+    root.textContent = extra.error;
+    return;
+  }
+
+  if (!extra.paymentsReady) {
+    root.textContent = "載入收付款紀錄中…";
+    return;
+  }
+
+  let transfers;
+
+  try {
+    transfers = ledger();
+  } catch (error) {
+    root.textContent = error.message;
+    return;
+  }
+
+  const pending = extra.payments.filter(
+    payment => payment.status === "paid"
+  );
+
+  const blocked = new Set(
+    pending.map(payment => payment.currency)
+  );
+
+  const available = transfers.filter(
+    transfer => !blocked.has(transfer.currency)
+  );
+
+  root.innerHTML = `
+    <p class="hint">
+      付款人標記已付款，收款人確認實際收到後才結清。
+      金額沿用帳目匯率；確認紀錄永久保留。
+    </p>
+
+    ${
+      pending.length
+        ? `
+          <h3>等待確認收款</h3>
+          <p class="hint">
+            同幣別有待確認款項時，先完成確認，
+            或由付款人撤回，再安排其他付款。
+            帳目若有更動，請先核對實際轉帳金額。
+          </p>
+        `
+        : ""
+    }
+
+    ${pending.map(payment => `
+      <div class="box" style="background:var(--ye)">
+        <b>
+          ${esc(payment.fromName)}
+          →
+          ${esc(payment.toName)}
+        </b>
+
+        <h3>${esc(amountText(payment))}</h3>
+
+        <p>已標記付款，等待收款人確認</p>
+
+        ${
+          payment.toUid === uid()
+            ? `
+              <button
+                class="btn aq"
+                data-receive="${esc(payment.id)}"
+              >
+                確認已收款
+              </button>
+            `
+            : ""
+        }
+
+        ${
+          payment.fromUid === uid()
+            ? `
+              <button
+                class="btn"
+                data-cancel-pay="${esc(payment.id)}"
+              >
+                撤回付款標記
+              </button>
+            `
+            : ""
+        }
+      </div>
+    `).join("")}
+
+    <h3>尚待結算</h3>
+
+    ${
+      available.map((transfer, index) => `
+        <div class="box" style="background:var(--aq)">
+          <b>
+            ${esc(transfer.fromName)}
+            →
+            ${esc(transfer.toName)}
+          </b>
+
+          <h3>${esc(amountText(transfer))}</h3>
+
+          ${
+            accountUid(transfer.fromName) === uid() &&
+            accountUid(transfer.toName)
+              ? `
+                <button
+                  class="btn"
+                  data-pay="${index}"
+                >
+                  我已付款
+                </button>
+              `
+              : `
+                <small>
+                  ${
+                    !accountUid(transfer.fromName) ||
+                    !accountUid(transfer.toName)
+                      ? "歷史暱稱尚未對應帳號，請另行核對；不會自動認領。"
+                      : "由付款人登入後標記付款"
+                  }
+                </small>
+              `
+          }
+        </div>
+      `).join("") ||
+      '<p class="hint">目前沒有可安排的新轉帳。</p>'
+    }
+
+    ${
+      extra.payments.some(payment =>
+        payment.status === "received"
+      )
+        ? `
+          <details>
+            <summary>已結清紀錄</summary>
+
+            ${
+              extra.payments.filter(payment =>
+                payment.status === "received"
+              ).map(payment => `
+                <div class="box">
+                  <b>
+                    ${esc(payment.fromName)}
+                    →
+                    ${esc(payment.toName)}
+                  </b>
+
+                  <p>
+                    ${esc(amountText(payment))}
+                    · 雙方已確認
+                  </p>
+                </div>
+              `).join("")
+            }
+          </details>
+        `
+        : ""
+    }
+  `;
+
+  const projectId = state.project.id;
+  const revision = projectRevision;
+
+  const action = (button, operation) => {
+    button.disabled = true;
+
+    Promise.resolve()
+      .then(operation)
+      .catch(error => {
+        if (mask.isConnected) {
+          q(mask, ".modal-error").textContent =
+            error.code
+              ? errorMessage(error)
+              : error.message;
+        }
+      })
+      .finally(() => {
+        button.disabled = false;
+      });
+  };
+
+  root.querySelectorAll("[data-pay]")
+    .forEach(button => {
+      button.onclick = () => action(
+        button,
+        async () => {
+          const transfer =
+            available[Number(button.dataset.pay)];
+
+          const signature = ledgerSignature();
+          const basis = await basisHash(signature);
+
+          if (
+            signature !== ledgerSignature() ||
+            extra.payments.some(payment =>
+              payment.status === "paid" &&
+              payment.currency === transfer.currency
+            ) ||
+            !ledger().some(current =>
+              current.currency === transfer.currency &&
+              current.fromName === transfer.fromName &&
+              current.toName === transfer.toName &&
+              current.units === transfer.units
+            )
+          ) {
+            throw new Error(
+              "帳目或付款狀態已變更，請重新開啟結算卡。"
+            );
+          }
+
+          if (revision !== projectRevision) return;
+
+          const fromUid =
+            accountUid(transfer.fromName);
+
+          const toUid =
+            accountUid(transfer.toName);
+
+          if (fromUid !== uid() || !toUid) {
+            throw new Error(
+              "請重新開啟結算卡確認成員。"
+            );
+          }
+
+          const paymentId =
+            basis + "_" +
+            fromUid + "_" +
+            toUid + "_" +
+            transfer.currency;
+
+          await runTransaction(db, async transaction => {
+            const reference = doc(
+              db,
+              "projects",
+              projectId,
+              "payments",
+              paymentId
+            );
+
+            const snapshot =
+              await transaction.get(reference);
+
+            if (snapshot.exists()) {
+              throw new Error(
+                "這筆付款已登記，請等待同步。"
+              );
+            }
+
+            transaction.set(reference, {
+              ...transfer,
+              fromUid,
+              toUid,
+              basis,
+              status: "paid",
+              createdAt: Date.now(),
+              receivedAt: 0
+            });
+          });
+        }
+      );
+    });
+
+  root.querySelectorAll("[data-receive]")
+    .forEach(button => {
+      button.onclick = () => action(
+        button,
+        async () => {
+          if (
+            !confirm(
+              "請確認已實際收到這筆款項。" +
+              "確認後會計入結算，且不能撤回。"
+            )
+          ) return;
+
+          const reference = doc(
+            db,
+            "projects",
+            projectId,
+            "payments",
+            button.dataset.receive
+          );
+
+          await runTransaction(db, async transaction => {
+            const snapshot =
+              await transaction.get(reference);
+
+            if (
+              !snapshot.exists() ||
+              snapshot.data().status !== "paid" ||
+              snapshot.data().toUid !== uid()
+            ) {
+              throw new Error(
+                "付款狀態已變更，請重開結算卡。"
+              );
+            }
+
+            transaction.update(reference, {
+              status: "received",
+              receivedAt: Date.now()
+            });
+          });
+        }
+      );
+    });
+
+  root.querySelectorAll("[data-cancel-pay]")
+    .forEach(button => {
+      button.onclick = () => action(
+        button,
+        async () => {
+          const reference = doc(
+            db,
+            "projects",
+            projectId,
+            "payments",
+            button.dataset.cancelPay
+          );
+
+          await runTransaction(db, async transaction => {
+            const snapshot =
+              await transaction.get(reference);
+
+            if (
+              !snapshot.exists() ||
+              snapshot.data().status !== "paid" ||
+              snapshot.data().fromUid !== uid()
+            ) {
+              throw new Error(
+                "這筆付款已確認或狀態改變。"
+              );
+            }
+
+            transaction.delete(reference);
+          });
+        }
+      );
+    });
+}
+
+$("settle").onclick = openSettlement;
+
+/* ---------- 訂閱與離開專案時清理 ---------- */
+
+const oldStartProject = startProject;
+
+startProject = function () {
+  extra.pendingDay = true;
+  extra.packing = null;
+  extra.payments = [];
+  extra.paymentsReady = false;
+  extra.error = "";
+
+  oldStartProject();
+
+  const projectId = state.project.id;
+  const reference = packingRef();
+  const revision = projectRevision;
+
+  const failed = error => {
+    if (revision !== projectRevision) return;
+
+    extra.error =
+      errorMessage(error) +
+      " 請確認新增功能的 Firestore 規則已發布。";
+
+    drawPacking();
+
+    document.querySelectorAll(
+      "[data-settlement]"
+    ).forEach(drawSettlement);
+  };
+
+  state.unsubscribers.push(
+    onSnapshot(
+      reference,
+      snapshot => {
+        if (revision !== projectRevision) return;
+
+        if (snapshot.exists()) {
+          extra.packing = snapshot.data();
+          drawPacking();
+        } else {
+          mutatePacking(() => {}, reference)
+            .then(() => {
+              if (revision === projectRevision) {
+                return queryPacking();
+              }
+            })
+            .catch(failed);
+        }
+      },
+      failed
+    )
+  );
+
+  state.unsubscribers.push(
+    onSnapshot(
+      collection(
+        db,
+        "projects",
+        projectId,
+        "payments"
+      ),
+      snapshot => {
+        if (revision !== projectRevision) return;
+
+        extra.payments = snapshot.docs.map(item => ({
+          ...item.data(),
+          id: item.id
+        }));
+
+        extra.paymentsReady = true;
+
+        document.querySelectorAll(
+          "[data-settlement]"
+        ).forEach(drawSettlement);
+      },
+      failed
+    )
+  );
+};
+
+const oldStopProject = stopProject;
+
+stopProject = function () {
+  extra.controller?.abort();
+  extra.controller = null;
+
+  extra.mask?.remove();
+  extra.mask = null;
+
+  extra.packing = null;
+  extra.payments = [];
+
+  oldStopProject();
+};
+
+const oldRenderExpenses = renderExpenses;
+
+renderExpenses = function () {
+  oldRenderExpenses();
+
+  document.querySelectorAll(
+    "[data-settlement]"
+  ).forEach(drawSettlement);
+};
+
 /* ---------- 啟動 ---------- */
 $("refresh").onclick = () => location.reload();
 
