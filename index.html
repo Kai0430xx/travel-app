@@ -14,218 +14,812 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#3E3A39;--paper:#FFFCF6;--co:#F2A497;--ye:#F6D27A;--aq:#A8D3E6;--gr:#B9DAA5}
+:root{
+  --ink:#3E3A39;
+  --paper:#FFFCF6;
+  --co:#F2A497;
+  --ye:#F6D27A;
+  --aq:#A8D3E6;
+  --gr:#B9DAA5;
+  --soft-line:#d9cdbd;
+  --muted:#82776b
+}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0 auto;max-width:560px;min-height:100vh;background:var(--paper);color:var(--ink);font:15px/1.6 "Huninn","Noto Sans TC",system-ui,sans-serif;padding:0 14px calc(85px + env(safe-area-inset-bottom));touch-action:manipulation}
-h2,h3,p{overflow-wrap:anywhere}
+body{
+  margin:0 auto;
+  max-width:560px;
+  min-height:100vh;
+  background:var(--paper);
+  color:var(--ink);
+  font:15px/1.6 "Huninn","Noto Sans TC",system-ui,sans-serif;
+  padding:0 14px calc(85px + env(safe-area-inset-bottom));
+  touch-action:manipulation
+}
+h2,h3,h4,p{overflow-wrap:anywhere}
 h2,h3{margin:0}
 small{opacity:.75}
-button,input,select,textarea{font:inherit}
-button,a,input,select,textarea{touch-action:manipulation}
+button,input,textarea,select{font:inherit}
 button{color:inherit}
+button,a,input,textarea,select{touch-action:manipulation}
 button:disabled{opacity:.55;cursor:wait}
-button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #297c92;outline-offset:3px}
-.box{border:3px solid var(--ink);border-radius:24px;background:var(--paper);box-shadow:3px 3px 0 var(--ink);padding:14px;margin:12px 0}
-.btn{font:inherit;font-size:13px;color:var(--ink);background:var(--ye);border:3px solid var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;box-shadow:2px 2px 0 var(--ink);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:44px}
-.btn:active{transform:translate(2px,2px);box-shadow:none}
+button:focus-visible,a:focus-visible,input:focus-visible,
+textarea:focus-visible,select:focus-visible{
+  outline:3px solid #297c92;
+  outline-offset:3px
+}
+.box{
+  border:3px solid var(--ink);
+  border-radius:24px;
+  background:var(--paper);
+  box-shadow:3px 3px 0 var(--ink);
+  padding:14px;
+  margin:12px 0
+}
+.btn{
+  font:inherit;
+  font-size:13px;
+  color:var(--ink);
+  background:var(--ye);
+  border:3px solid var(--ink);
+  border-radius:999px;
+  padding:6px 14px;
+  cursor:pointer;
+  box-shadow:2px 2px 0 var(--ink);
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  min-height:44px
+}
+.btn:active{
+  transform:translate(2px,2px);
+  box-shadow:none
+}
 .co{background:var(--co)}
 .aq{background:var(--aq)}
 .gr{background:var(--gr)}
 .wide{width:100%}
-header{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:3px solid var(--ink);margin:0 -14px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
+header{
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:var(--paper);
+  border-bottom:3px solid var(--ink);
+  margin:0 -14px;
+  padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  justify-content:space-between;
+  flex-wrap:wrap
+}
 header>div{flex:1;min-width:150px}
-header b,header small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-header>span{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+header b,header small{
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis
+}
+header>span{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  justify-content:flex-end
+}
 header .btn{font-size:12px;padding:4px 9px}
-.row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:12px 0;flex-wrap:wrap}
+.icon-button{
+  width:40px;
+  min-height:40px;
+  padding:8px!important;
+  background:var(--paper);
+  border-width:2px
+}
+.icon-button svg{width:20px;height:20px;display:block}
+.icon-button:hover svg{transform:rotate(25deg)}
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin:12px 0;
+  flex-wrap:wrap
+}
 .row>span{display:flex;flex-wrap:wrap;gap:8px}
 .gap{justify-content:flex-end}
-.hint{font-size:13px;opacity:.75;line-height:1.7}
+.hint{font-size:13px;opacity:.75;line-height:1.8}
 .mute{text-align:center;opacity:.65;padding:18px 0}
 .error{color:#a02b36;white-space:pre-line}
-.notice{margin-top:12px;padding:10px 14px;border:2px dashed var(--ink);border-radius:16px;background:var(--ye);font-size:13px}
-.art{border:3px solid var(--ink);border-radius:24px;overflow:hidden;margin:12px 0;box-shadow:3px 3px 0 var(--ink);line-height:0}
+.notice{
+  margin-top:12px;
+  padding:10px 14px;
+  border:2px dashed var(--ink);
+  border-radius:16px;
+  background:var(--ye);
+  font-size:13px
+}
+.art{
+  border:3px solid var(--ink);
+  border-radius:24px;
+  overflow:hidden;
+  margin:12px 0;
+  box-shadow:3px 3px 0 var(--ink);
+  line-height:0
+}
 .art svg{width:100%;height:auto}
 .auth-card{margin-top:22px}
 .auth-card h2{text-align:center}
 .auth-card .art{margin-top:0}
-.text-button{display:block;margin:12px auto;background:none;border:0;font:inherit;color:var(--ink);text-decoration:underline;min-height:44px;cursor:pointer}
+.text-button{
+  display:block;
+  margin:12px auto;
+  background:none;
+  border:0;
+  font:inherit;
+  color:var(--ink);
+  text-decoration:underline;
+  min-height:44px;
+  cursor:pointer
+}
 label{display:block;font-size:13px}
-input,textarea,select{font:inherit;font-size:16px!important;width:100%;border:3px solid var(--ink);border-radius:16px;background:#fff;padding:8px 12px;margin:4px 0 8px;color:var(--ink)}
+input,textarea,select{
+  font:inherit;
+  font-size:16px!important;
+  width:100%;
+  border:3px solid var(--ink);
+  border-radius:16px;
+  background:#fff;
+  padding:8px 12px;
+  margin:4px 0 8px;
+  color:var(--ink)
+}
 ::placeholder{color:#b0a8a0;opacity:1}
-.pills{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px}
-.pill{font:inherit;flex:none;border:3px solid var(--ink);border-radius:999px;background:var(--paper);padding:4px 14px;cursor:pointer;color:var(--ink);min-height:44px}
-.pill.on{background:var(--aq)}
-.tag{display:inline-block;background:var(--ye);border:2px solid var(--ink);border-radius:999px;padding:0 10px;font-size:12px;margin-bottom:4px}
-.trip-card>small{display:block}
-.trip-card h3{margin-top:6px}
+.tag{
+  display:inline-block;
+  background:var(--ye);
+  border:2px solid var(--ink);
+  border-radius:999px;
+  padding:0 10px;
+  font-size:12px;
+  margin-bottom:4px
+}
+.trip-card{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 94px;
+  gap:16px;
+  align-items:center;
+  padding:18px
+}
+.trip-copy{min-width:0}
+.trip-copy h3{
+  font-size:17px;
+  line-height:1.65;
+  margin:8px 0 12px
+}
+.trip-role{font-size:11px;color:var(--muted)}
+.countdown-ticket{
+  align-self:stretch;
+  border-left:2px dashed var(--soft-line);
+  padding-left:14px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:relative
+}
+.countdown-ticket:before,.countdown-ticket:after{
+  content:"";
+  position:absolute;
+  width:10px;
+  height:10px;
+  background:var(--paper);
+  border:2px solid var(--soft-line);
+  border-radius:50%;
+  left:-6px
+}
+.countdown-ticket:before{top:-4px}
+.countdown-ticket:after{bottom:-4px}
+.countdown-ticket strong{
+  font-size:38px;
+  line-height:1.15;
+  font-weight:normal;
+  transform:rotate(-4deg)
+}
+.countdown-label{
+  font:10px system-ui,sans-serif;
+  letter-spacing:2px
+}
+.countdown-ticket small{font-size:12px}
+.countdown-ticket.departure{
+  background:var(--ye);
+  border-radius:12px;
+  border-left:0;
+  padding:10px
+}
+.countdown-ticket.departure strong{font-size:24px}
 .empty{text-align:center}
-.item{cursor:pointer;display:block}
-.item b{display:block}
-nav{position:fixed;left:0;right:0;bottom:0;width:100%;max-width:560px;margin:0 auto;background:var(--paper);border-top:3px solid var(--ink);display:flex;justify-content:center;padding:6px 4px calc(4px + env(safe-area-inset-bottom));z-index:9999}
-nav button{flex:1;min-width:0;font:inherit;font-size:12px;border:3px solid transparent;border-radius:20px;background:none;color:var(--ink);padding:6px 2px;cursor:pointer;min-height:54px}
+.pills{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:4px 2px 12px
+}
+.pill{
+  font:inherit;
+  flex:none;
+  border:3px solid var(--ink);
+  border-radius:999px;
+  background:var(--paper);
+  padding:4px 14px;
+  cursor:pointer;
+  color:var(--ink);
+  min-height:44px
+}
+.pill.on{background:var(--aq)}
+.schedule-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px
+}
+.schedule-link{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:19px 17px;
+  background:var(--paper);
+  border:2px solid var(--ink);
+  border-radius:19px;
+  box-shadow:2px 3px 0 var(--ink);
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+  line-height:1.6;
+  min-height:68px
+}
+.schedule-link>b{font-weight:normal;overflow-wrap:anywhere}
+.schedule-link>span{font-size:23px;opacity:.4;flex-shrink:0}
+.schedule-link:hover{background:#fff6e6}
+.schedule-link:active{
+  transform:translate(1px,2px);
+  box-shadow:1px 1px 0 var(--ink)
+}
+.eyebrow{
+  font:10px system-ui,sans-serif;
+  letter-spacing:2px
+}
+.detail-heading h2{font-size:21px;margin:8px 0}
+.detail-note{border-top:1px dashed var(--soft-line);padding:12px 0}
+.detail-note small{color:var(--muted)}
+.detail-note p{margin:5px 0;overflow-wrap:anywhere}
+.map-actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+nav{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  width:100%;
+  max-width:560px;
+  margin:0 auto;
+  background:var(--paper);
+  border-top:3px solid var(--ink);
+  display:flex;
+  justify-content:center;
+  padding:6px 4px calc(4px + env(safe-area-inset-bottom));
+  z-index:9999
+}
+nav button{
+  flex:1;
+  min-width:0;
+  font:inherit;
+  font-size:12px;
+  border:3px solid transparent;
+  border-radius:20px;
+  background:none;
+  padding:6px 2px;
+  cursor:pointer;
+  min-height:54px
+}
 nav button span{display:block;font-size:18px}
 nav button.on{background:var(--ye);border-color:var(--ink)}
-.mask{position:fixed;inset:0;background:rgba(62,58,57,.45);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px}
-.sheet{width:100%;max-width:460px;max-height:88vh;overflow:auto;margin:0;overscroll-behavior:contain}
-.member-option{display:flex;gap:12px;align-items:center;border-bottom:2px dashed #ded4c7;padding:12px 0}
+.mask{
+  position:fixed;
+  inset:0;
+  background:rgba(62,58,57,.45);
+  z-index:99999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px
+}
+.sheet{
+  width:100%;
+  max-width:460px;
+  max-height:88vh;
+  overflow:auto;
+  margin:0;
+  overscroll-behavior:contain
+}
+.member-option{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  border-bottom:2px dashed var(--soft-line);
+  padding:12px 0
+}
 .member-option input{width:22px;height:22px;margin:0;flex:none}
 .member-option small{display:block}
+.account-people{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+.person-chip{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#fff;
+  border:2px solid var(--ink);
+  border-radius:40px;
+  padding:6px 12px 6px 6px
+}
+.person-chip small{
+  font-size:10px;
+  background:var(--ye);
+  padding:0 5px;
+  border-radius:8px
+}
+.person-avatar{
+  background:var(--aq);
+  width:30px;
+  height:30px;
+  border:1px solid var(--ink);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center
+}
 .chk{display:inline-flex;gap:4px;align-items:center;margin:0 10px 6px 0}
 .chk input{width:auto;margin:0}
-.bar{height:16px;border:3px solid var(--ink);border-radius:99px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--gr);transition:width .5s}
-.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
-.bd{width:60px;height:60px;margin:0 auto;border:3px dashed var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;filter:grayscale(1);opacity:.5}
-.bd.on{border-style:solid;filter:none;opacity:1}
+.passport-cover{
+  margin:16px 0 24px;
+  padding:22px 20px;
+  background:#dce5d4;
+  border:2px solid var(--ink);
+  border-radius:12px 26px 26px 12px;
+  box-shadow:5px 5px 0 #c2cbb9,7px 7px 0 var(--ink);
+  position:relative;
+  overflow:hidden
+}
+.passport-cover:before{
+  content:"";
+  position:absolute;
+  left:7px;
+  top:10px;
+  bottom:10px;
+  border-left:1px dashed #9da895
+}
+.passport-top{display:flex;justify-content:space-between;align-items:center}
+.passport-seal{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:38px;
+  height:38px;
+  border:2px double #829276;
+  border-radius:50%;
+  color:#52644b;
+  transform:rotate(15deg)
+}
+.passport-owner{font-size:12px;margin:16px 0 5px;color:#58634f}
+.passport-cover h2{font-size:21px;line-height:1.6}
+.passport-metrics{display:flex;gap:40px;margin:22px 0}
+.passport-metrics>div{display:flex;flex-direction:column}
+.passport-metrics strong{
+  font:36px/1.15 system-ui,sans-serif;
+  letter-spacing:-1px
+}
+.passport-metrics strong small{font-size:15px;letter-spacing:0}
+.passport-metrics>div>span{font-size:11px;margin-top:5px;color:#58634f}
+.passport-progress{
+  height:5px;
+  background:#bdcbb2;
+  border-radius:5px;
+  overflow:hidden
+}
+.passport-progress i{height:100%;display:block;background:#52644b}
+.passport-footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:12px;
+  font-size:11px;
+  gap:8px
+}
+.album-link{
+  background:none;
+  border:0;
+  padding:8px 0;
+  font:inherit;
+  text-decoration:underline;
+  cursor:pointer;
+  min-height:44px
+}
+.collection-heading{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  margin:24px 0 12px
+}
+.collection-heading h3{font-size:16px}
+.collection-heading small{font-size:10px;color:var(--muted)}
+.stamp-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px
+}
+.travel-stamp{
+  aspect-ratio:1/1.15;
+  padding:10px 4px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  border:2px dashed #cfc5b6;
+  border-radius:18px;
+  color:#aa9f90;
+  background:#f8f3e9
+}
+.stamp-symbol{
+  font-size:25px;
+  margin-bottom:6px;
+  filter:grayscale(1);
+  opacity:.4
+}
+.travel-stamp b{font-size:12px;font-weight:normal}
+.travel-stamp small{font-size:9px;margin-top:3px;line-height:1.6}
+.travel-stamp.on{
+  border:2px solid #a8746e;
+  background:#f7e6dd;
+  color:#8d4f47;
+  transform:rotate(-3deg);
+  box-shadow:inset 0 0 0 3px var(--paper),inset 0 0 0 4px #c79a90
+}
+.travel-stamp.on:nth-child(even){
+  transform:rotate(3deg);
+  background:#e4edf0;
+  color:#496773;
+  border-color:#7897a1;
+  box-shadow:inset 0 0 0 3px var(--paper),inset 0 0 0 4px #9fb4bc
+}
+.travel-stamp.on .stamp-symbol{filter:none;opacity:1}
+.memory-strip{display:flex;gap:12px;overflow:auto;padding:6px 3px 12px}
+.memory-print{
+  flex:0 0 115px;
+  background:#fff;
+  border:1px solid #cbbfae;
+  padding:7px 7px 12px;
+  box-shadow:2px 3px 0 #e5dacc;
+  font:inherit;
+  cursor:pointer;
+  transform:rotate(-2deg)
+}
+.memory-print:nth-child(even){transform:rotate(2deg)}
+.memory-print img{width:99px;height:95px;object-fit:cover}
+.memory-print small{
+  font-size:10px;
+  display:block;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  overflow:hidden;
+  margin-top:6px
+}
+.collection-tabs{
+  display:flex;
+  gap:16px;
+  border-bottom:1px solid var(--soft-line);
+  margin-bottom:18px
+}
+.collection-tabs button{
+  font:inherit;
+  font-size:12px;
+  display:flex;
+  gap:5px;
+  border:0;
+  border-bottom:2px solid transparent;
+  background:none;
+  padding:10px 0;
+  color:var(--muted);
+  min-height:44px;
+  cursor:pointer
+}
+.collection-tabs button.active{color:var(--ink);border-color:var(--ink)}
+.collection-tabs button span{
+  font-size:10px;
+  background:#eee4d3;
+  min-width:18px;
+  border-radius:8px
+}
+.collection-day h4{
+  font-size:11px;
+  letter-spacing:1px;
+  margin:18px 0 8px;
+  color:var(--muted)
+}
+.collection-stop{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  background:none;
+  border:0;
+  text-align:left;
+  font:inherit;
+  padding:16px 0;
+  cursor:pointer;
+  border-bottom:1px dashed var(--soft-line)
+}
+.stop-marker{
+  width:36px;
+  height:36px;
+  border:1px dashed #b7a994;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f4ebdc;
+  flex:none;
+  color:#8c7d68
+}
+.collected .stop-marker{
+  background:#dbe8d1;
+  color:#52644b;
+  border:1px solid #8b9a7e
+}
+.stop-caption{flex:1;min-width:0;display:flex;flex-direction:column}
+.stop-caption small{font-size:10px;color:var(--muted)}
+.stop-caption b{
+  font-size:14px;
+  font-weight:normal;
+  line-height:1.6;
+  overflow-wrap:anywhere;
+  margin:3px 0
+}
+.stop-caption>span{font-size:10px;color:#a18c73}
+.collected .stop-caption>span{color:#65795b}
+.stop-arrow{font-size:20px;color:#aa9f90}
+.stop-photo{
+  width:48px;
+  height:48px;
+  object-fit:cover;
+  border:3px solid #fff;
+  box-shadow:1px 1px 3px #d0c4b3;
+  transform:rotate(5deg);
+  flex:none
+}
+.collection-empty{text-align:center;padding:30px 15px;color:var(--muted)}
+.collection-empty>span{font-size:40px;display:block}
+.collection-empty>b{display:block;font-size:14px}
+.collection-empty p{font-size:12px}
 .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .album-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.photo-card{background:#fff;border:2px solid var(--ink);border-radius:16px;padding:6px;font:inherit;text-align:left;cursor:pointer;min-width:0;box-shadow:2px 2px 0 var(--ink)}
+.photo-card{
+  background:#fff;
+  border:2px solid var(--ink);
+  border-radius:16px;
+  padding:6px;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+  min-width:0;
+  box-shadow:2px 2px 0 var(--ink)
+}
 .photo-card img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}
-.photo-card b,.photo-card small{display:block;font-size:12px;overflow-wrap:anywhere}
+.photo-card b,.photo-card small{
+  display:block;
+  font-size:12px;
+  overflow-wrap:anywhere
+}
 .photo-zoom{width:100%;max-height:65vh;object-fit:contain;border-radius:16px}
 .uid{overflow-wrap:anywhere;font-size:12px}
 .lang{display:grid;grid-template-columns:104px 1fr;gap:10px}
-.lang .btn{display:block;width:100%;text-align:left;margin-bottom:8px;font-size:12px}
+.lang .btn{
+  display:block;
+  width:100%;
+  text-align:left;
+  margin-bottom:8px;
+  font-size:12px
+}
 .lang .btn.on{background:var(--co)}
+.reminder-label{font-size:11px;color:var(--muted);margin:20px 0 8px}
+.reminder-section{
+  padding:18px;
+  border:2px solid var(--ink);
+  border-radius:20px;
+  background:#fffaf2;
+  margin:12px 0;
+  box-shadow:2px 3px 0 var(--ink)
+}
+.reminder-section h3{font-size:17px}
+.source-line{
+  font-size:10px;
+  color:var(--muted);
+  line-height:1.8;
+  margin:12px 0 0
+}
+.source-line a,.reference-links a{color:inherit;text-underline-offset:3px}
+.reference-links{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;margin-top:12px}
+.weather-strip{display:flex;overflow:auto;gap:8px;padding:8px 0}
+.weather-day{
+  flex:0 0 80px;
+  text-align:center;
+  background:#f3ebdd;
+  border-radius:14px;
+  padding:10px 4px;
+  font-size:11px
+}
+.weather-day>b{display:block;font-size:20px;padding:5px 0}
+.weather-day strong{font-size:12px}
+.weather-day small{display:block;font-size:10px;margin-top:5px}
+.weather-advice{font-size:12px;line-height:1.9;padding-left:18px}
+.guide-excerpt{border-top:1px dashed var(--soft-line);padding:12px 0}
+.guide-excerpt h4{margin:0;font-size:13px}
+.guide-excerpt p{font-size:12px;white-space:pre-line;line-height:1.9;margin:6px 0}
+.reminder-state{font-size:12px;color:var(--muted);line-height:1.9}
+.reminder-refresh{
+  font-size:11px;
+  background:none;
+  border:0;
+  text-decoration:underline;
+  cursor:pointer;
+  min-height:44px
+}
 @keyframes fl{50%{transform:translateY(-5px)}}
 @keyframes dr{from{transform:translateX(-9px)}to{transform:translateX(9px)}}
-@keyframes bn{0%{transform:scale(.82)}55%{transform:scale(1.1)}100%{transform:scale(1)}}
 .fl{animation:fl 3s ease-in-out infinite}
 .dr{animation:dr 6s ease-in-out infinite alternate}
-.bn{animation:bn .5s cubic-bezier(.3,1.6,.5,1)}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media(max-width:350px){
+  .trip-card{grid-template-columns:minmax(0,1fr) 76px;gap:10px}
+  .countdown-ticket strong{font-size:30px}
+  .passport-cover{padding:18px 16px}
+  .stamp-grid{gap:6px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
 </style>
 </head>
+
 <body>
 <header>
-<button id="back" class="btn aq" hidden>← 旅程</button>
-<div>
-<b id="header-title">🧳 放風之旅</b>
-<small id="header-subtitle">登入，開始下一段冒險 ✨</small>
-</div>
-<span>
-<button id="refresh" class="btn" aria-label="重新整理">🔄</button>
-<button id="manage" class="btn" hidden>👑 成員管理</button>
-<button id="account" class="btn" hidden>👤 帳號</button>
-<button id="logout" class="btn" hidden>登出</button>
-<button id="share" class="btn gr" hidden>✨ 分享</button>
-</span>
+  <button id="back" class="btn aq" hidden>← 旅程</button>
+  <div>
+    <b id="header-title">🧳 放風之旅</b>
+    <small id="header-subtitle">登入，開始下一段冒險 ✨</small>
+  </div>
+  <span>
+    <button id="refresh" class="btn icon-button"
+      aria-label="重新整理" title="重新整理">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="1.8" stroke-linecap="round"
+        stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 7v5h-5M4 17v-5h5"/>
+        <path d="M6.1 7a7 7 0 0 1 11.5-1L20 9M4 15l2.4 3A7 7 0 0 0 17.9 17"/>
+      </svg>
+    </button>
+    <button id="manage" class="btn" hidden>👑 成員管理</button>
+    <button id="account" class="btn" hidden>👤 帳號</button>
+    <button id="logout" class="btn" hidden>登出</button>
+    <button id="share" class="btn gr" hidden>✨ 分享</button>
+  </span>
 </header>
 
 <div id="status" class="notice" role="status" aria-live="polite" hidden></div>
 
 <main>
-<section id="auth-view" class="box auth-card">
-<div class="art" id="auth-art"></div>
-<h2 id="auth-title">歡迎回來 ✈</h2>
-<p class="hint">登入你的帳號，和旅伴一起收藏旅途。</p>
+  <section id="auth-view" class="box auth-card">
+    <div class="art" id="auth-art"></div>
+    <h2 id="auth-title">歡迎回來 ✈</h2>
+    <p class="hint">登入你的帳號，和旅伴一起收藏旅途。</p>
 
-<form id="auth-form">
-<label for="auth-username">帳號</label>
-<input id="auth-username" autocomplete="username" autocapitalize="none"
-spellcheck="false" maxlength="24" placeholder="例如 Kai"
-required pattern="[A-Za-z][A-Za-z0-9_]{2,23}">
-<small class="hint">3–24 個英文字母、數字或底線，不分大小寫。</small>
+    <form id="auth-form">
+      <label for="auth-username">帳號</label>
+      <input id="auth-username" autocomplete="username"
+        autocapitalize="none" spellcheck="false" maxlength="24"
+        placeholder="例如 Kai" required
+        pattern="[A-Za-z][A-Za-z0-9_]{2,23}">
+      <small class="hint">3–24 個英文字母、數字或底線，不分大小寫。</small>
 
-<div id="nickname-row" hidden>
-<label for="auth-nickname">顯示暱稱</label>
-<input id="auth-nickname" maxlength="30" placeholder="旅伴如何稱呼你">
-</div>
+      <div id="nickname-row" hidden>
+        <label for="auth-nickname">顯示暱稱</label>
+        <input id="auth-nickname" maxlength="30"
+          placeholder="旅伴如何稱呼你">
+      </div>
 
-<label for="auth-password">密碼</label>
-<input id="auth-password" type="password" autocomplete="current-password" required>
+      <label for="auth-password">密碼</label>
+      <input id="auth-password" type="password"
+        autocomplete="current-password" required>
 
-<div id="confirm-row" hidden>
-<label for="auth-confirm">再次輸入密碼</label>
-<input id="auth-confirm" type="password" autocomplete="new-password">
-</div>
+      <div id="confirm-row" hidden>
+        <label for="auth-confirm">再次輸入密碼</label>
+        <input id="auth-confirm" type="password"
+          inputmode="numeric" autocomplete="new-password">
+      </div>
 
-<p id="auth-error" class="error" role="alert"></p>
-<button id="auth-submit" class="btn co wide" type="submit" disabled>登入</button>
-</form>
+      <p id="auth-error" class="error" role="alert"></p>
+      <button id="auth-submit" class="btn co wide"
+        type="submit" disabled>登入</button>
+    </form>
 
-<button id="auth-switch" class="text-button" disabled>還沒有帳號？註冊</button>
-<p class="hint">不收集 Email；忘記密碼請聯絡管理員人工重設。</p>
-<small id="boot-status">正在準備旅行工具…</small>
-</section>
+    <button id="auth-switch" class="text-button" disabled>
+      還沒有帳號？註冊
+    </button>
+    <p class="hint">不收集 Email；忘記密碼請聯絡管理員人工重設。</p>
+    <small id="boot-status">正在準備旅行工具…</small>
+  </section>
 
-<section id="home-view" hidden>
-<div class="art" id="home-art"></div>
-<div class="row">
-<h2>我的旅程 ✈</h2>
-<span>
-<button id="open-code" class="btn">📥 代碼開啟</button>
-<button id="new-project" class="btn co">＋ 新增</button>
-</span>
-</div>
-<div id="projects"></div>
-</section>
+  <section id="home-view" hidden>
+    <div class="art" id="home-art"></div>
+    <div class="row">
+      <h2>我的旅程 ✈</h2>
+      <span>
+        <button id="open-code" class="btn">📥 代碼開啟</button>
+        <button id="new-project" class="btn co">＋ 新增</button>
+      </span>
+    </div>
+    <div id="projects"></div>
+  </section>
 
-<section id="project-view" hidden>
-<section id="tab-schedule" class="tab">
-<div class="row">
-<h3>📅 行程時間軸</h3>
-<span>
-<button id="import-schedule" class="btn">📥 文字導入</button>
-<button id="add-schedule" class="btn co">＋ 新增</button>
-</span>
-</div>
-<div id="days" class="pills"></div>
-<div id="schedules"></div>
-</section>
+  <section id="project-view" hidden>
+    <section id="tab-schedule" class="tab">
+      <div class="row">
+        <h3>📅 行程時間軸</h3>
+        <span>
+          <button id="import-schedule" class="btn">📥 文字導入</button>
+          <button id="add-schedule" class="btn co">＋ 新增</button>
+        </span>
+      </div>
+      <div id="days" class="pills"></div>
+      <div id="schedules" class="schedule-list"></div>
+    </section>
 
-<section id="tab-reminders" class="tab" hidden></section>
+    <section id="tab-reminders" class="tab" hidden></section>
 
-<section id="tab-language" class="tab" hidden>
-<div class="box" style="text-align:center;background:var(--ye)">
-<small id="phrase-chinese">請選擇下方情境與句子</small>
-<h2 id="phrase-foreign" style="margin:4px 0 10px">想說什麼呢？</h2>
-<button id="speak" class="btn co">🔊 朗讀</button>
-</div>
-<div class="lang">
-<div id="language-categories"></div>
-<div id="language-phrases"></div>
-</div>
-</section>
+    <section id="tab-language" class="tab" hidden>
+      <div class="box" style="text-align:center;background:var(--ye)">
+        <small id="phrase-chinese">請選擇下方情境與句子</small>
+        <h2 id="phrase-foreign" style="margin:4px 0 10px">
+          想說什麼呢？
+        </h2>
+        <button id="speak" class="btn co">🔊 朗讀</button>
+      </div>
+      <div class="lang">
+        <div id="language-categories"></div>
+        <div id="language-phrases"></div>
+      </div>
+    </section>
 
-<section id="tab-expenses" class="tab" hidden>
-<div class="box" style="background:var(--co)">
-<div class="row" style="margin:0">
-<small>旅程總花費（折合台幣）</small>
-<button id="expense-members" class="btn">👥 分帳名單</button>
-</div>
-<h2 id="expense-total">NT$ 0</h2>
-<small id="expense-summary"></small>
-</div>
-<div class="row">
-<h3>💰 帳目</h3>
-<span>
-<button id="settle" class="btn aq">📊 結算</button>
-<button id="add-expense" class="btn co">＋ 記一筆</button>
-</span>
-</div>
-<div id="expenses"></div>
-</section>
+    <section id="tab-expenses" class="tab" hidden>
+      <div class="box" style="background:var(--co)">
+        <div class="row" style="margin:0">
+          <small>旅程總花費（折合台幣）</small>
+          <button id="expense-members" class="btn">👥 分帳名單</button>
+        </div>
+        <h2 id="expense-total">NT$ 0</h2>
+        <small id="expense-summary"></small>
+      </div>
+      <div class="row">
+        <h3>💰 帳目</h3>
+        <span>
+          <button id="settle" class="btn aq">📊 結算</button>
+          <button id="add-expense" class="btn co">＋ 記一筆</button>
+        </span>
+      </div>
+      <div id="expenses"></div>
+    </section>
 
-<section id="tab-collection" class="tab" hidden>
-<div class="box" style="background:var(--gr)">
-<div class="row" style="margin:0 0 6px">
-<b id="collection-count">我的收藏</b>
-<b id="collection-percent">0%</b>
-</div>
-<div class="bar"><i id="collection-progress" style="width:0"></i></div>
-<button id="album" class="btn aq" style="margin-top:12px">📸 大家的回憶相冊</button>
-<div class="badges" style="margin-top:12px">
-<div><div class="bd" id="badge-food">🍽️</div><small id="badge-text-food"></small></div>
-<div><div class="bd" id="badge-spot">🗺️</div><small id="badge-text-spot"></small></div>
-<div><div class="bd" id="badge-shop">🛍️</div><small id="badge-text-shop"></small></div>
-</div>
-</div>
-<div id="collection-items"></div>
-</section>
-</section>
+    <section id="tab-collection" class="tab" hidden></section>
+  </section>
 </main>
 
 <nav id="navigation" hidden></nav>
@@ -262,7 +856,7 @@ import {
   updatePassword
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-/* Firebase 設定保留原專案 */
+/* ---------- Firebase ---------- */
 const app = initializeApp({
   apiKey: "AIzaSyBcKmZhJaZn5emOlHRV95-uC9q01wFxt4M",
   authDomain: "my-travel-app-6e00c.firebaseapp.com",
@@ -274,6 +868,7 @@ const app = initializeApp({
 
 const db = getFirestore(app);
 const auth = getAuth(app);
+const ACCOUNT_DOMAIN = "accounts.travel-app.invalid";
 
 const $ = id => document.getElementById(id);
 const q = (element, selector) => element.querySelector(selector);
@@ -291,37 +886,41 @@ const esc = value => String(value ?? "").replace(
 );
 
 const RATE = {
-  TWD: 1,
-  KRW: .024,
-  JPY: .21,
-  THB: .92,
-  SGD: 24,
-  MYR: 7.2,
-  HKD: 4.1,
-  MOP: 4.1,
-  USD: 32
+  TWD:1,
+  KRW:.024,
+  JPY:.21,
+  THB:.92,
+  SGD:24,
+  MYR:7.2,
+  HKD:4.1,
+  MOP:4.1,
+  USD:32
 };
 
-const ACCOUNT_DOMAIN = "accounts.travel-app.invalid";
-
 const state = {
-  user: null,
-  profile: null,
-  project: null,
-  schedules: [],
-  members: [],
-  expenses: [],
-  checkins: [],
-  personalCheckins: {},
-  day: "all",
-  phrase: null,
-  unsubscribers: []
+  user:null,
+  profile:null,
+  project:null,
+  schedules:[],
+  members:[],
+  expenses:[],
+  checkins:[],
+  personalCheckins:{},
+  day:"all",
+  phrase:null,
+  unsubscribers:[]
 };
 
 let authMode = "login";
 let authRevision = 0;
 let projectRevision = 0;
-let pendingProject = new URLSearchParams(location.search).get("project");
+let collectionFilter = "all";
+let reminderController = null;
+
+const reminderCache = new Map();
+
+let pendingProject =
+  new URLSearchParams(location.search).get("project");
 
 const uid = () => state.user?.uid || "";
 
@@ -345,17 +944,23 @@ function notify(message) {
 
 function errorMessage(error) {
   const messages = {
-    "auth/invalid-credential": "帳號或密碼不正確。",
-    "auth/user-not-found": "帳號或密碼不正確。",
-    "auth/wrong-password": "帳號或密碼不正確。",
-    "auth/email-already-in-use": "這個帳號已被註冊。",
-    "auth/weak-password": "密碼強度不足，請依密碼政策設定。",
-    "auth/password-does-not-meet-requirements": "密碼不符合 Firebase 密碼政策。",
-    "auth/too-many-requests": "嘗試次數過多，請稍後再試。",
-    "auth/network-request-failed": "網路連線失敗，請稍後重試。",
-    "auth/operation-not-allowed": "尚未啟用 Firebase 帳號密碼登入。",
-    "auth/unauthorized-domain": "網站網域尚未加入 Firebase 授權網域。",
-    "permission-denied": "沒有權限，或 Firebase 權限規則尚未設定。"
+    "auth/invalid-credential":"帳號或密碼不正確。",
+    "auth/user-not-found":"帳號或密碼不正確。",
+    "auth/wrong-password":"帳號或密碼不正確。",
+    "auth/email-already-in-use":"這個帳號已被註冊。",
+    "auth/weak-password":"密碼不符合目前 Firebase 密碼政策。",
+    "auth/password-does-not-meet-requirements":
+      "請聯絡管理員確認是否允許至少 6 位純數字密碼。",
+    "auth/too-many-requests":"嘗試次數過多，請稍後再試。",
+    "auth/network-request-failed":"網路連線失敗，請稍後重試。",
+    "auth/configuration-not-found":
+      "Firebase Authentication 尚未初始化，請完成登入設定。",
+    "auth/operation-not-allowed":
+      "尚未啟用 Firebase 電子郵件／密碼登入。",
+    "auth/unauthorized-domain":
+      "網站網域尚未加入 Firebase Authentication 授權網域。",
+    "permission-denied":
+      "沒有權限，或 Firebase 權限規則尚未設定。"
   };
 
   return messages[error.code] ||
@@ -363,7 +968,7 @@ function errorMessage(error) {
 }
 
 async function runButton(button, operation) {
-  if (button.disabled) return;
+  if (button.disabled) return false;
 
   const original = button.textContent;
   button.disabled = true;
@@ -395,7 +1000,8 @@ function modal(title, body, onSave = null) {
   mask.className = "mask";
 
   mask.innerHTML = `
-    <div class="box sheet bn" role="dialog" aria-modal="true" tabindex="-1">
+    <div class="box sheet" role="dialog"
+      aria-modal="true" tabindex="-1">
       <div class="row" style="margin-top:0">
         <h3>${title}</h3>
         <button class="btn close" aria-label="關閉">✕</button>
@@ -403,7 +1009,9 @@ function modal(title, body, onSave = null) {
       ${body}
       <p class="error modal-error" role="alert"></p>
       <div class="row gap">
-        <button class="btn save">${onSave ? "儲存" : "完成"}</button>
+        <button class="btn save">
+          ${onSave ? "儲存" : "完成"}
+        </button>
       </div>
     </div>
   `;
@@ -411,11 +1019,11 @@ function modal(title, body, onSave = null) {
   const previousFocus = document.activeElement;
   let saving = false;
 
-  const close = () => {
+  function close() {
     if (saving) return;
     mask.remove();
     previousFocus?.focus();
-  };
+  }
 
   q(mask, ".close").onclick = close;
 
@@ -435,7 +1043,9 @@ function modal(title, body, onSave = null) {
       if (onSave && await onSave(mask) === false) return;
 
       mask.remove();
+
       if (onSave) notify("已儲存 ✨");
+
       previousFocus?.focus();
     } catch (error) {
       q(mask, ".modal-error").textContent = errorMessage(error);
@@ -458,9 +1068,11 @@ function modal(title, body, onSave = null) {
     }
 
     if (event.key === "Tab") {
-      const controls = [...mask.querySelectorAll(
-        "button,input,select,textarea,a[href]"
-      )].filter(element =>
+      const controls = [
+        ...mask.querySelectorAll(
+          "button,input,select,textarea,a[href]"
+        )
+      ].filter(element =>
         !element.disabled && element.getClientRects().length
       );
 
@@ -470,7 +1082,10 @@ function modal(title, body, onSave = null) {
       if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last?.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
+      } else if (
+        !event.shiftKey &&
+        document.activeElement === last
+      ) {
         event.preventDefault();
         first?.focus();
       }
@@ -485,27 +1100,33 @@ function modal(title, body, onSave = null) {
 
 /* ---------- 手繪插圖 ---------- */
 const STROKE =
-  'stroke="#3E3A39" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"';
+  'stroke="#3E3A39" stroke-width="3" ' +
+  'stroke-linejoin="round" stroke-linecap="round"';
 
 function scene(name = "") {
-  const korea = /濟州|韓國|首爾|釜山|Jeju|Seoul|Busan|Korea/i.test(name);
+  const korea =
+    /濟州|韓國|首爾|釜山|Jeju|Seoul|Busan|Korea/i.test(name);
 
   return `
-    <svg viewBox="0 0 320 140" role="img" aria-label="手繪旅行插圖">
+    <svg viewBox="0 0 320 140"
+      role="img" aria-label="手繪旅行插圖">
       <rect width="320" height="140" fill="#A8D3E6"/>
       <g class="dr">
         <path d="M18 42q-2-14 14-12q8-12 22 0q14-2 12 12z"
           fill="#FFFCF6" ${STROKE}/>
       </g>
       <g class="fl">
-        <circle cx="268" cy="31" r="17" fill="#F6D27A" ${STROKE}/>
+        <circle cx="268" cy="31" r="17"
+          fill="#F6D27A" ${STROKE}/>
       </g>
       <path d="M-4 140V108Q80 72 160 106T324 100V140z"
         fill="#B9DAA5" ${STROKE}/>
       ${korea ? `
         <g class="fl">
-          <circle cx="66" cy="107" r="18" fill="#F6D27A" ${STROKE}/>
-          <path d="M66 89q4-9 13-8" fill="none" ${STROKE}/>
+          <circle cx="66" cy="107" r="18"
+            fill="#F6D27A" ${STROKE}/>
+          <path d="M66 89q4-9 13-8"
+            fill="none" ${STROKE}/>
         </g>
       ` : `
         <g class="dr">
@@ -516,9 +1137,10 @@ function scene(name = "") {
         </g>
       `}
       <g class="fl">
-        <rect x="232" y="92" width="44" height="34" rx="8"
-          fill="#F2A497" ${STROKE}/>
-        <path d="M244 92v-9h20v9" fill="none" ${STROKE}/>
+        <rect x="232" y="92" width="44" height="34"
+          rx="8" fill="#F2A497" ${STROKE}/>
+        <path d="M244 92v-9h20v9"
+          fill="none" ${STROKE}/>
       </g>
     </svg>
   `;
@@ -526,17 +1148,17 @@ function scene(name = "") {
 
 /* ---------- 目的地 ---------- */
 function destinationType(name = "") {
-  if (/濟州|韓國|釜山|首爾|仁川|大邱|江陵|慶州|全州|束草|水原|Jeju|Seoul|Busan|Korea/i.test(name)) {
-    return "korea";
-  }
+  if (
+    /濟州|韓國|釜山|首爾|仁川|大邱|江陵|慶州|全州|束草|水原|Jeju|Seoul|Busan|Korea/i.test(name)
+  ) return "korea";
 
-  if (/日本|東京|大阪|京都|沖繩|北海道|Japan|Tokyo|Osaka/i.test(name)) {
-    return "japan";
-  }
+  if (
+    /日本|東京|大阪|京都|沖繩|北海道|Japan|Tokyo|Osaka/i.test(name)
+  ) return "japan";
 
-  if (/曼谷|泰國|清邁|普吉島|芭達雅|Thailand|Bangkok/i.test(name)) {
-    return "thailand";
-  }
+  if (
+    /曼谷|泰國|清邁|普吉島|芭達雅|Thailand|Bangkok/i.test(name)
+  ) return "thailand";
 
   if (/新加坡|Singapore/i.test(name)) return "singapore";
   if (/馬來西亞|吉隆坡|檳城|沙巴|Malaysia/i.test(name)) return "malaysia";
@@ -548,14 +1170,14 @@ function destinationType(name = "") {
 
 function flag(name) {
   return {
-    korea: "🇰🇷",
-    japan: "🇯🇵",
-    thailand: "🇹🇭",
-    singapore: "🇸🇬",
-    malaysia: "🇲🇾",
-    hongkong: "🇭🇰",
-    macau: "🇲🇴",
-    general: "🧳"
+    korea:"🇰🇷",
+    japan:"🇯🇵",
+    thailand:"🇹🇭",
+    singapore:"🇸🇬",
+    malaysia:"🇲🇾",
+    hongkong:"🇭🇰",
+    macau:"🇲🇴",
+    general:"🧳"
   }[destinationType(name)];
 }
 
@@ -564,7 +1186,13 @@ function countdown(dateText = "") {
     /(\d{4})[年/.-]?\s*(\d{1,2})[月/.-]\s*(\d{1,2})/
   );
 
-  if (!match) return { text: "日期待定", order: 999999 };
+  if (!match) {
+    return {
+      text:"日期待定",
+      order:999999,
+      days:null
+    };
+  }
 
   const start = new Date(
     Number(match[1]),
@@ -577,22 +1205,23 @@ function countdown(dateText = "") {
 
   const days = Math.ceil((start - today) / 86400000);
 
-  if (days > 0) return { text: `🔥 倒數 ${days} 天`, order: days };
-  if (days === 0) return { text: "🎉 今天出發！", order: 0 };
-
   return {
-    text: "✈️ 進行中／已結束",
-    order: 888888 + Math.abs(days)
+    text:
+      days > 0 ? `倒數 ${days} 天` :
+      days === 0 ? "今天出發" : "已出發",
+    days,
+    order:days >= 0 ? days : 888888 + Math.abs(days)
   };
 }
 
-/* ---------- 帳號登入 ---------- */
+/* ---------- 帳號 ---------- */
 function accountEmail(username) {
   return username.trim().toLowerCase() + "@" + ACCOUNT_DOMAIN;
 }
 
 $("auth-switch").onclick = () => {
   authMode = authMode === "login" ? "register" : "login";
+
   const registering = authMode === "register";
 
   $("auth-title").textContent = registering
@@ -607,9 +1236,16 @@ $("auth-switch").onclick = () => {
 
   $("nickname-row").hidden = !registering;
   $("confirm-row").hidden = !registering;
+
   $("auth-password").autocomplete = registering
     ? "new-password"
     : "current-password";
+
+  $("auth-password").inputMode = registering ? "numeric" : "text";
+
+  $("auth-password").placeholder = registering
+    ? "至少 6 位數字"
+    : "輸入密碼";
 
   $("auth-password").value = "";
   $("auth-confirm").value = "";
@@ -619,7 +1255,9 @@ $("auth-switch").onclick = () => {
 $("auth-form").onsubmit = async event => {
   event.preventDefault();
 
-  const username = $("auth-username").value.trim().toLowerCase();
+  const username =
+    $("auth-username").value.trim().toLowerCase();
+
   const password = $("auth-password").value;
   const nickname = $("auth-nickname").value.trim();
 
@@ -637,8 +1275,8 @@ $("auth-form").onsubmit = async event => {
       return;
     }
 
-    if (password.length < 8) {
-      $("auth-error").textContent = "密碼至少需要 8 碼。";
+    if (!/^\d{6,128}$/.test(password)) {
+      $("auth-error").textContent = "密碼請使用至少 6 位數字。";
       return;
     }
 
@@ -694,7 +1332,7 @@ $("account").onclick = () => {
     <p>帳號：<b>${esc(state.profile.username)}</b></p>
     <p>暱稱：${esc(state.profile.displayName)}</p>
     <p class="hint">
-      登入不需要 Email。忘記密碼請聯絡管理員人工重設。
+      不收集 Email，忘記密碼請聯絡管理員人工重設。
     </p>
     <details>
       <summary>提供管理員的使用者 ID</summary>
@@ -708,26 +1346,37 @@ $("account").onclick = () => {
 
     const change = modal("🔑 變更密碼", `
       <label>目前密碼</label>
-      <input id="old-password" type="password" autocomplete="current-password">
+      <input id="old-password" type="password"
+        autocomplete="current-password">
       <label>新密碼</label>
-      <input id="new-password" type="password" autocomplete="new-password">
+      <input id="new-password" type="password"
+        inputmode="numeric" maxlength="128"
+        autocomplete="new-password"
+        placeholder="至少 6 位數字">
       <label>再次輸入新密碼</label>
-      <input id="new-confirm" type="password" autocomplete="new-password">
+      <input id="new-confirm" type="password"
+        inputmode="numeric" maxlength="128"
+        autocomplete="new-password">
     `, async () => {
       const oldPassword = q(change, "#old-password").value;
       const newPassword = q(change, "#new-password").value;
 
-      if (
-        newPassword.length < 8 ||
-        newPassword !== q(change, "#new-confirm").value
-      ) {
-        alert("新密碼至少 8 碼，且兩次輸入必須相同。");
+      if (!/^\d{6,128}$/.test(newPassword)) {
+        alert("新密碼請使用至少 6 位數字。");
+        return false;
+      }
+
+      if (newPassword !== q(change, "#new-confirm").value) {
+        alert("兩次輸入的新密碼不同。");
         return false;
       }
 
       await reauthenticateWithCredential(
         state.user,
-        EmailAuthProvider.credential(state.user.email, oldPassword)
+        EmailAuthProvider.credential(
+          state.user.email,
+          oldPassword
+        )
       );
 
       await updatePassword(state.user, newPassword);
@@ -746,18 +1395,20 @@ async function ensureProfile(user) {
       username,
       displayName:
         sessionStorage.getItem("travel.pendingNickname") || username,
-      createdAt: Date.now()
+      createdAt:Date.now()
     });
 
     snapshot = await getDoc(reference);
   }
 
   sessionStorage.removeItem("travel.pendingNickname");
+
   return snapshot.data();
 }
 
 function stopProject() {
   projectRevision++;
+  reminderController?.abort();
 
   state.unsubscribers.forEach(unsubscribe => unsubscribe());
   state.unsubscribers = [];
@@ -770,15 +1421,12 @@ function stopProject() {
   state.personalCheckins = {};
   state.day = "all";
   state.phrase = null;
+  collectionFilter = "all";
 
   document.querySelectorAll(".mask").forEach(mask => mask.remove());
 
-  [
-    "schedules",
-    "days",
-    "expenses",
-    "collection-items"
-  ].forEach(id => $(id).replaceChildren());
+  ["schedules", "days", "expenses", "tab-collection"]
+    .forEach(id => $(id).replaceChildren());
 
   $("project-view").hidden = true;
   $("navigation").hidden = true;
@@ -806,7 +1454,8 @@ async function handleAuth(user) {
 
   if (!user) {
     $("auth-view").hidden = false;
-    $("header-subtitle").textContent = "登入，開始下一段冒險 ✨";
+    $("header-subtitle").textContent =
+      "登入，開始下一段冒險 ✨";
     return;
   }
 
@@ -814,12 +1463,15 @@ async function handleAuth(user) {
 
   try {
     const profile = await ensureProfile(user);
+
     if (revision !== authRevision) return;
 
     state.profile = profile;
+
     $("account").hidden = false;
     $("home-view").hidden = false;
-    $("header-subtitle").textContent = `你好，${profile.displayName} ✨`;
+    $("header-subtitle").textContent =
+      `你好，${profile.displayName} ✨`;
 
     await renderProjects();
 
@@ -828,16 +1480,60 @@ async function handleAuth(user) {
       pendingProject = null;
 
       history.replaceState({}, "", location.pathname);
+
       await openProject(target);
     }
   } catch (error) {
     if (revision !== authRevision) return;
 
-    notify(errorMessage(error) + " 可登出後重新登入重試。");
+    notify(
+      errorMessage(error) +
+      " 可登出後重新登入重試。"
+    );
   }
 }
 
-/* ---------- 旅程首頁 ---------- */
+/* ---------- 首頁 ---------- */
+function projectCard(project, currentUid) {
+  const info = countdown(project.dates);
+  const upcoming = info.days !== null && info.days > 0;
+  const today = info.days === 0;
+
+  return `
+    <article class="box trip-card">
+      <div class="trip-copy">
+        <span class="tag">${esc(project.dates || "日期待定")}</span>
+        <div class="trip-role">
+          ${project.ownerUid === currentUid
+            ? "我的旅程 · 負責人"
+            : "一起出發 · 旅程成員"}
+        </div>
+        <h3>${flag(project.name)} ${esc(project.name)}</h3>
+        <button class="btn aq"
+          data-project="${esc(project.id)}">
+          打開旅程 →
+        </button>
+      </div>
+
+      <aside class="countdown-ticket ${today ? "departure" : ""}">
+        <span class="countdown-label">
+          ${upcoming ? "COUNTDOWN" : today ? "LET’S GO" : "TRAVEL"}
+        </span>
+        <strong>
+          ${
+            upcoming ? info.days :
+            today ? "今天" :
+            info.days === null ? "待定" : "已出發"
+          }
+        </strong>
+        <small>
+          ${upcoming ? "天後出發" : today ? "出發日" : "下一段回憶"}
+        </small>
+      </aside>
+    </article>
+  `;
+}
+
 async function renderProjects() {
   if (!state.user || !state.profile) return;
 
@@ -865,7 +1561,7 @@ async function renderProjects() {
       ...new Map(
         [...owned.docs, ...joined.docs].map(snapshot => [
           snapshot.id,
-          { ...snapshot.data(), id: snapshot.id }
+          {...snapshot.data(), id:snapshot.id}
         ])
       ).values()
     ];
@@ -875,33 +1571,23 @@ async function renderProjects() {
     );
 
     $("projects").innerHTML = projects.length
-      ? projects.map(project => `
-          <article class="box trip-card">
-            <span class="tag">${esc(project.dates || "日期待定")}</span>
-            <small>
-              ${project.ownerUid === currentUid
-                ? "👑 我是負責人"
-                : "🌷 旅程成員"}
-            </small>
-            <h3>${flag(project.name)} ${esc(project.name)}</h3>
-            <p class="hint">${esc(countdown(project.dates).text)}</p>
-            <button class="btn aq" data-project="${esc(project.id)}">
-              打開旅程 →
-            </button>
-          </article>
-        `).join("")
+      ? projects.map(project =>
+          projectCard(project, currentUid)
+        ).join("")
       : `
-          <div class="box empty">
-            <h3>下一段旅程，從這裡開始 🌱</h3>
-            <p>建立旅程，或請負責人將你的帳號加入成員。</p>
-            <small>舊旅程完成帳號歸屬設定後才會出現。</small>
-          </div>
-        `;
+        <div class="box empty">
+          <h3>下一段旅程，從這裡開始 🌱</h3>
+          <p>建立旅程，或請負責人將你的帳號加入成員。</p>
+        </div>
+      `;
 
-    $("projects").querySelectorAll("[data-project]").forEach(button => {
-      button.onclick = () =>
-        runButton(button, () => openProject(button.dataset.project));
-    });
+    $("projects").querySelectorAll("[data-project]")
+      .forEach(button => {
+        button.onclick = () => runButton(
+          button,
+          () => openProject(button.dataset.project)
+        );
+      });
   } catch (error) {
     if (revision !== authRevision) return;
 
@@ -920,12 +1606,17 @@ async function renderProjects() {
 $("new-project").onclick = () => {
   const mask = modal("🌸 新增旅程", `
     <label>旅程名稱（包含目的地）</label>
-    <input id="project-name" maxlength="100" placeholder="例如：濟州島五日遊">
+    <input id="project-name" maxlength="100"
+      placeholder="例如：濟州島五日遊">
     <label>日期</label>
-    <input id="project-dates" maxlength="100" placeholder="2027年 1/1 - 1/5">
-    <p class="hint">你會成為負責人，建立後可以勾選旅伴。</p>
+    <input id="project-dates" maxlength="100"
+      placeholder="2027年 1/1 - 1/5">
+    <p class="hint">
+      你會成為負責人，建立後可以勾選旅伴。
+    </p>
   `, async () => {
     const name = val(mask, "#project-name");
+
     if (!name) {
       alert("請輸入旅程名稱。");
       return false;
@@ -936,18 +1627,19 @@ $("new-project").onclick = () => {
 
     batch.set(reference, {
       name,
-      dates: val(mask, "#project-dates"),
-      pin: String(Math.floor(100000 + Math.random() * 900000)),
-      ownerUid: uid(),
-      memberUids: [uid()],
-      createdAt: Date.now()
+      dates:val(mask, "#project-dates"),
+      pin:String(Math.floor(100000 + Math.random() * 900000)),
+      ownerUid:uid(),
+      memberUids:[uid()],
+      createdAt:Date.now()
     });
 
     batch.update(doc(db, "users", uid()), {
-      managedProjectId: reference.id
+      managedProjectId:reference.id
     });
 
     await batch.commit();
+
     await renderProjects();
     await openProject(reference.id);
   });
@@ -957,10 +1649,12 @@ $("new-project").onclick = () => {
 
 $("open-code").onclick = () => {
   const mask = modal("📥 用代碼開啟旅程", `
-    <p class="hint">負責人必須先將你的帳號加入成員。</p>
+    <p class="hint">
+      負責人必須先將你的帳號加入成員。
+    </p>
     <label>六位數旅程代碼</label>
-    <input id="project-code" inputmode="numeric" maxlength="6"
-      placeholder="例如：883921">
+    <input id="project-code" inputmode="numeric"
+      maxlength="6" placeholder="例如：883921">
   `, async () => {
     const code = val(mask, "#project-code");
 
@@ -1007,15 +1701,20 @@ $("share").onclick = () => {
     </div>
   `);
 
-  q(mask, "#copy-code").onclick = () => copyText(state.project.pin);
-  q(mask, "#copy-link").onclick = () => copyText(link);
+  q(mask, "#copy-code").onclick = () =>
+    copyText(state.project.pin);
+
+  q(mask, "#copy-link").onclick = () =>
+    copyText(link);
 };
 
 async function openProject(projectId) {
   if (!state.user || !state.profile) return;
 
   const revision = authRevision;
-  const snapshot = await getDoc(doc(db, "projects", projectId));
+  const snapshot = await getDoc(
+    doc(db, "projects", projectId)
+  );
 
   if (revision !== authRevision) return;
 
@@ -1035,7 +1734,8 @@ async function openProject(projectId) {
   }
 
   stopProject();
-  state.project = { ...project, id: projectId };
+
+  state.project = {...project, id:projectId};
 
   startProject();
 }
@@ -1044,6 +1744,7 @@ function goHome() {
   stopProject();
 
   $("home-view").hidden = !state.user;
+
   $("header-subtitle").textContent = state.profile
     ? `你好，${state.profile.displayName} ✨`
     : "請登入";
@@ -1052,17 +1753,6 @@ function goHome() {
 }
 
 $("back").onclick = goHome;
-
-function accountingNames() {
-  return [...new Set([
-    myName(),
-    ...state.members.map(member => member.name || member.id),
-    ...state.expenses.flatMap(expense => [
-      expense.payer,
-      ...Object.keys(expense.split || {})
-    ])
-  ])].filter(Boolean);
-}
 
 function startProject() {
   const projectId = state.project.id;
@@ -1078,7 +1768,8 @@ function startProject() {
   $("header-title").textContent =
     flag(state.project.name) + " " + state.project.name;
 
-  $("header-subtitle").textContent = "旅伴：" + myName();
+  $("header-subtitle").textContent =
+    "旅伴：" + myName();
 
   renderSchedules();
   renderCollection();
@@ -1086,11 +1777,16 @@ function startProject() {
   renderReminders();
   renderLanguage();
 
-  const failed = error => {
+  function failed(error) {
     if (revision !== projectRevision) return;
+
     goHome();
-    notify("連線或權限已變更，請重新開啟旅程。" + errorMessage(error));
-  };
+
+    notify(
+      "連線或權限已變更，請重新開啟旅程。" +
+      errorMessage(error)
+    );
+  }
 
   state.unsubscribers.push(onSnapshot(
     doc(db, "projects", projectId),
@@ -1111,13 +1807,28 @@ function startProject() {
         return;
       }
 
-      state.project = { ...project, id: projectId };
+      const destinationChanged =
+        state.project.name !== project.name ||
+        state.project.dates !== project.dates;
+
+      state.project = {...project, id:projectId};
+
       $("manage").hidden = !isOwner();
+
+      renderExpenses();
+
+      if (destinationChanged) {
+        $("header-title").textContent =
+          flag(project.name) + " " + project.name;
+
+        renderReminders();
+        renderLanguage();
+      }
     },
     failed
   ));
 
-  const subscribe = (name, callback) => {
+  function subscribe(name, callback) {
     state.unsubscribers.push(onSnapshot(
       collection(db, "projects", projectId, name),
       snapshot => {
@@ -1125,12 +1836,12 @@ function startProject() {
 
         callback(snapshot.docs.map(item => ({
           ...item.data(),
-          id: item.id
+          id:item.id
         })));
       },
       failed
     ));
-  };
+  }
 
   subscribe("schedules", items => {
     state.schedules = items;
@@ -1147,6 +1858,7 @@ function startProject() {
     state.expenses = items.sort((a, b) =>
       (a.createdAt || 0) - (b.createdAt || 0)
     );
+
     renderExpenses();
   });
 
@@ -1154,17 +1866,19 @@ function startProject() {
     state.checkins = items;
     state.personalCheckins = {};
 
-    items.filter(item => item.uploaderUid === uid()).forEach(item => {
-      state.personalCheckins[item.scheduleId] = item;
-    });
+    items.filter(item => item.uploaderUid === uid())
+      .forEach(item => {
+        state.personalCheckins[item.scheduleId] = item;
+      });
 
     renderCollection();
   });
 
-  setDoc(doc(db, "projects", projectId, "members", uid()), {
-    name: myName(),
-    userUid: uid()
-  }, { merge: true }).catch(failed);
+  setDoc(
+    doc(db, "projects", projectId, "members", uid()),
+    {name:myName(), userUid:uid()},
+    {merge:true}
+  ).catch(failed);
 
   selectTab("schedule");
 }
@@ -1175,20 +1889,25 @@ $("manage").onclick = async () => {
 
   const projectId = state.project.id;
   const revision = projectRevision;
+
   let directory = [];
 
   const mask = modal("👑 專案成員管理", `
     <p class="hint">
-      勾選可進入旅程的帳號。取消成員後，歷史帳目與共用照片仍會保留。
+      勾選可進入旅程的帳號。
+      取消成員後，歷史帳目與共用照片仍會保留。
     </p>
     <label>搜尋帳號或暱稱</label>
     <input id="member-search" placeholder="搜尋已註冊使用者">
     <div id="member-directory">載入中…</div>
   `, async () => {
-    if (revision !== projectRevision || !isOwner()) return false;
+    if (revision !== projectRevision || !isOwner()) {
+      return false;
+    }
 
     const selected = [
-      ...q(mask, "#member-directory").querySelectorAll("input:checked")
+      ...q(mask, "#member-directory")
+        .querySelectorAll("input:checked")
     ].map(input => input.value);
 
     if (!selected.includes(uid())) selected.push(uid());
@@ -1201,7 +1920,7 @@ $("manage").onclick = async () => {
     const batch = writeBatch(db);
 
     batch.update(doc(db, "projects", projectId), {
-      memberUids: selected
+      memberUids:selected
     });
 
     directory.filter(account => selected.includes(account.id))
@@ -1209,10 +1928,10 @@ $("manage").onclick = async () => {
         batch.set(
           doc(db, "projects", projectId, "members", account.id),
           {
-            name: `${account.displayName} (@${account.username})`,
-            userUid: account.id
+            name:`${account.displayName} (@${account.username})`,
+            userUid:account.id
           },
-          { merge: true }
+          {merge:true}
         );
       });
 
@@ -1224,60 +1943,80 @@ $("manage").onclick = async () => {
   try {
     const snapshot = await getDocs(collection(db, "users"));
 
-    if (revision !== projectRevision || !mask.isConnected) return;
+    if (
+      revision !== projectRevision ||
+      !mask.isConnected
+    ) return;
 
     directory = snapshot.docs.map(item => ({
       ...item.data(),
-      id: item.id
-    })).sort((a, b) => a.username.localeCompare(b.username));
+      id:item.id
+    })).sort((a, b) =>
+      a.username.localeCompare(b.username)
+    );
 
-    q(mask, "#member-directory").innerHTML = directory.map(account => `
-      <label class="member-option"
-        data-search="${esc(
-          (account.username + " " + account.displayName).toLowerCase()
-        )}">
-        <input type="checkbox"
-          value="${esc(account.id)}"
-          ${
-            state.project.memberUids.includes(account.id) ||
-            account.id === state.project.ownerUid
-              ? "checked"
-              : ""
-          }
-          ${account.id === state.project.ownerUid ? "disabled" : ""}>
-        <span>
-          <b>${esc(account.displayName)}</b>
-          <small>
-            @${esc(account.username)}
-            ${account.id === state.project.ownerUid ? " · 負責人" : ""}
-          </small>
-        </span>
-      </label>
-    `).join("");
+    q(mask, "#member-directory").innerHTML =
+      directory.map(account => `
+        <label class="member-option"
+          data-search="${esc(
+            (
+              account.username + " " +
+              account.displayName
+            ).toLowerCase()
+          )}">
+          <input type="checkbox"
+            value="${esc(account.id)}"
+            ${
+              state.project.memberUids.includes(account.id) ||
+              account.id === state.project.ownerUid
+                ? "checked"
+                : ""
+            }
+            ${
+              account.id === state.project.ownerUid
+                ? "disabled"
+                : ""
+            }>
+          <span>
+            <b>${esc(account.displayName)}</b>
+            <small>
+              @${esc(account.username)}
+              ${
+                account.id === state.project.ownerUid
+                  ? " · 負責人"
+                  : ""
+              }
+            </small>
+          </span>
+        </label>
+      `).join("");
 
     q(mask, "#member-search").oninput = event => {
-      const keyword = event.target.value.toLowerCase().trim();
+      const keyword =
+        event.target.value.toLowerCase().trim();
 
       q(mask, "#member-directory")
         .querySelectorAll(".member-option")
         .forEach(row => {
-          row.hidden = !row.dataset.search.includes(keyword);
+          row.hidden =
+            !row.dataset.search.includes(keyword);
         });
     };
 
     q(mask, ".save").disabled = false;
   } catch (error) {
-    q(mask, "#member-directory").textContent = errorMessage(error);
+    q(mask, "#member-directory").textContent =
+      errorMessage(error);
   }
 };
 
 /* ---------- 分頁 ---------- */
 const TABS = [
-  ["schedule", "📅", "行程"],
-  ["reminders", "💡", "提醒"],
-  ["language", "🗣", "對話"],
-  ["expenses", "💰", "分帳"],
-  ["collection", "🏅", "收藏"]
+  ["schedule","📅","行程"],
+  ["reminders","💡","提醒"],
+  ["language","🗣","對話"],
+  ["expenses","💰","分帳"],
+  ["collection","🏅","收藏"]
 ];
 
 $("navigation").innerHTML = TABS.map(tab => `
@@ -1286,29 +2025,43 @@ $("navigation").innerHTML = TABS.map(tab => `
   </button>
 `).join("");
 
-$("navigation").querySelectorAll("button").forEach(button => {
-  button.onclick = () => {
-    selectTab(button.dataset.tab);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-});
+$("navigation").querySelectorAll("button")
+  .forEach(button => {
+    button.onclick = () => {
+      selectTab(button.dataset.tab);
+
+      window.scrollTo({
+        top:0,
+        behavior:"smooth"
+      });
+    };
+  });
 
 function selectTab(name) {
   document.querySelectorAll(".tab").forEach(section => {
     section.hidden = section.id !== "tab-" + name;
   });
 
-  $("navigation").querySelectorAll("button").forEach(button => {
-    const active = button.dataset.tab === name;
-    button.classList.toggle("on", active);
-    button.setAttribute("aria-current", active ? "page" : "false");
-  });
+  $("navigation").querySelectorAll("button")
+    .forEach(button => {
+      const active = button.dataset.tab === name;
+
+      button.classList.toggle("on", active);
+      button.setAttribute(
+        "aria-current",
+        active ? "page" : "false"
+      );
+    });
 }
 
 /* ---------- 行程排序 ---------- */
 function timeOrder(time) {
-  const match = String(time || "").match(/(\d{1,2})[:：](\d{2})/);
-  return match ? Number(match[1]) * 60 + Number(match[2]) : 1440;
+  const match =
+    String(time || "").match(/(\d{1,2})[:：](\d{2})/);
+
+  return match
+    ? Number(match[1]) * 60 + Number(match[2])
+    : 1440;
 }
 
 function dayOrder(day) {
@@ -1316,7 +2069,9 @@ function dayOrder(day) {
     return Date.parse(day) / 86400000;
   }
 
-  return Number(String(day || "").replace(/\D/g, "")) || 1;
+  return Number(
+    String(day || "").replace(/\D/g, "")
+  ) || 1;
 }
 
 function scheduleOrder(a, b) {
@@ -1346,7 +2101,8 @@ function mapQuery(schedule) {
     ) || []
   )[0] || projectName;
 
-  const place = schedule.place ||
+  const place =
+    schedule.place ||
     schedule.mapKeyword ||
     cleanTitle(schedule.title).replace(/^\[.*?\]\s*/, "");
 
@@ -1358,34 +2114,53 @@ function safeMapUrl(raw, type) {
     const url = new URL(raw);
 
     const hosts = type === "google"
-      ? ["google.com", "maps.google.com", "maps.app.goo.gl", "goo.gl"]
-      : ["map.naver.com", "naver.me", "m.map.naver.com"];
+      ? [
+          "google.com",
+          "maps.google.com",
+          "maps.app.goo.gl",
+          "goo.gl"
+        ]
+      : [
+          "map.naver.com",
+          "naver.me",
+          "m.map.naver.com"
+        ];
 
     const validHost = hosts.some(host =>
-      url.hostname === host || url.hostname.endsWith("." + host)
+      url.hostname === host ||
+      url.hostname.endsWith("." + host)
     );
 
-    return url.protocol === "https:" && validHost ? url : null;
+    return url.protocol === "https:" && validHost
+      ? url
+      : null;
   } catch {
     return null;
   }
 }
 
 function googleDestination(url) {
-  const parameter = url.searchParams.get("destination") ||
+  const parameter =
+    url.searchParams.get("destination") ||
     url.searchParams.get("query") ||
     url.searchParams.get("q");
 
   if (parameter) return parameter;
 
-  const coordinates = url.href.match(/!3d(-?[\d.]+)!4d(-?[\d.]+)/);
-  if (coordinates) return coordinates[1] + "," + coordinates[2];
+  const coordinates =
+    url.href.match(/!3d(-?[\d.]+)!4d(-?[\d.]+)/);
+
+  if (coordinates) {
+    return coordinates[1] + "," + coordinates[2];
+  }
 
   const place = url.pathname.match(/\/place\/([^/]+)/);
 
   if (place) {
     try {
-      return decodeURIComponent(place[1].replace(/\+/g, " "));
+      return decodeURIComponent(
+        place[1].replace(/\+/g, " ")
+      );
     } catch {
       return "";
     }
@@ -1406,7 +2181,8 @@ function mapUrl(schedule, type) {
 
   if (type === "naver") {
     return custom?.href ||
-      "https://map.naver.com/p/search/" + encodeURIComponent(queryText);
+      "https://map.naver.com/p/search/" +
+      encodeURIComponent(queryText);
   }
 
   const destination =
@@ -1417,40 +2193,47 @@ function mapUrl(schedule, type) {
     custom.searchParams.get("query_place_id")
   );
 
-  const korea = destinationType(state.project?.name) === "korea";
+  const korea =
+    destinationType(state.project?.name) === "korea";
 
   if (korea) {
-    if (custom && !custom.pathname.includes("/dir/")) {
-      return custom.href;
-    }
+    if (
+      custom &&
+      !custom.pathname.includes("/dir/")
+    ) return custom.href;
 
     return "https://www.google.com/maps/search/?" +
       new URLSearchParams({
-        api: "1",
-        query: destination,
-        ...(placeId ? { query_place_id: placeId } : {})
+        api:"1",
+        query:destination,
+        ...(placeId ? {query_place_id:placeId} : {})
       });
   }
 
   return "https://www.google.com/maps/dir/?" +
     new URLSearchParams({
-      api: "1",
+      api:"1",
       destination,
-      dir_action: "navigate",
-      travelmode: "driving",
-      ...(placeId ? { destination_place_id: placeId } : {})
+      dir_action:"navigate",
+      travelmode:"driving",
+      ...(placeId ? {destination_place_id:placeId} : {})
     });
 }
 
-/* ---------- 行程顯示與編輯 ---------- */
+/* ---------- 行程列表 ---------- */
 function renderSchedules() {
   const days = [
-    ...new Set(state.schedules.map(schedule => schedule.day || "Day 1"))
+    ...new Set(
+      state.schedules.map(schedule =>
+        schedule.day || "Day 1"
+      )
+    )
   ].sort((a, b) => dayOrder(a) - dayOrder(b));
 
-  if (state.day !== "all" && !days.includes(state.day)) {
-    state.day = "all";
-  }
+  if (
+    state.day !== "all" &&
+    !days.includes(state.day)
+  ) state.day = "all";
 
   $("days").innerHTML = ["all", ...days].map(day => `
     <button class="pill ${day === state.day ? "on" : ""}"
@@ -1459,91 +2242,167 @@ function renderSchedules() {
     </button>
   `).join("");
 
-  $("days").querySelectorAll("button").forEach(button => {
-    button.onclick = () => {
-      state.day = button.dataset.day;
-      renderSchedules();
-    };
-  });
+  $("days").querySelectorAll("button")
+    .forEach(button => {
+      button.onclick = () => {
+        state.day = button.dataset.day;
+        renderSchedules();
+      };
+    });
 
   const list = state.schedules.filter(schedule =>
     state.day === "all" ||
     (schedule.day || "Day 1") === state.day
   ).sort(scheduleOrder);
 
-  const korea = destinationType(state.project?.name) === "korea";
-
   $("schedules").innerHTML = list.length
     ? list.map(schedule => `
-        <article class="box">
-          <span class="tag">
-            ${esc(schedule.day || "Day 1")} ·
-            ${esc(schedule.time || "全天")}
-          </span>
-          <b style="display:block">${esc(cleanTitle(schedule.title))}</b>
-          ${schedule.place
-            ? `<small>📍 ${esc(schedule.place)}</small>`
-            : ""}
-          <div class="row" style="justify-content:flex-start">
-            <button class="btn co" data-edit="${esc(schedule.id)}">
-              ✏️ 編輯
-            </button>
-            <a class="btn aq" href="${esc(mapUrl(schedule, "google"))}"
-              target="_blank" rel="noopener noreferrer">Google Maps</a>
-            ${korea ? `
-              <a class="btn gr" href="${esc(mapUrl(schedule, "naver"))}"
-                target="_blank" rel="noopener noreferrer">Naver Map</a>
-            ` : ""}
-          </div>
-          <small>
-            ${schedule.customGoogleUrl || schedule.customNaverUrl
-              ? "已設定地圖連結"
-              : "依目的地與名稱搜尋 · 待確認"}
-          </small>
-        </article>
+        <button class="schedule-link"
+          data-detail="${esc(schedule.id)}"
+          aria-label="${esc(
+            cleanTitle(schedule.title) + "，查看行程詳情"
+          )}">
+          <b>${esc(cleanTitle(schedule.title))}</b>
+          <span aria-hidden="true">›</span>
+        </button>
       `).join("")
-    : '<p class="mute">還沒有行程，新增或貼上文字導入吧 ✨</p>';
+    : `
+      <p class="mute">
+        還沒有行程，新增或貼上文字導入吧 ✨
+      </p>
+    `;
 
-  $("schedules").querySelectorAll("[data-edit]").forEach(button => {
-    button.onclick = () => editSchedule(button.dataset.edit);
-  });
+  $("schedules").querySelectorAll("[data-detail]")
+    .forEach(button => {
+      button.onclick = () =>
+        showSchedule(button.dataset.detail);
+    });
+}
+
+function showSchedule(scheduleId) {
+  const schedule = state.schedules.find(item =>
+    item.id === scheduleId
+  );
+
+  if (!schedule) return;
+
+  const notes = schedule.notes ?? schedule.location ?? "";
+  const korea =
+    destinationType(state.project.name) === "korea";
+
+  const mask = modal("行程小卡", `
+    <div class="detail-heading">
+      <span class="eyebrow">TRAVEL NOTES</span>
+      <h2>${esc(cleanTitle(schedule.title))}</h2>
+      <p class="hint">
+        ${esc(schedule.day || "Day 1")} ·
+        ${esc(schedule.time || "全天")}
+      </p>
+    </div>
+
+    ${schedule.place || schedule.mapKeyword ? `
+      <div class="detail-note">
+        <small>地點</small>
+        <p>${esc(schedule.place || schedule.mapKeyword)}</p>
+      </div>
+    ` : ""}
+
+    ${notes ? `
+      <div class="detail-note">
+        <small>旅行筆記</small>
+        <p style="white-space:pre-wrap">${esc(notes)}</p>
+      </div>
+    ` : `
+      <p class="hint">
+        還沒有備註，點編輯記下預約或交通資訊。
+      </p>
+    `}
+
+    <div class="map-actions">
+      <a class="btn aq"
+        target="_blank" rel="noopener noreferrer"
+        href="${esc(mapUrl(schedule, "google"))}">
+        Google Maps ↗
+      </a>
+
+      ${korea ? `
+        <a class="btn gr"
+          target="_blank" rel="noopener noreferrer"
+          href="${esc(mapUrl(schedule, "naver"))}">
+          Naver Map ↗
+        </a>
+      ` : ""}
+    </div>
+
+    <p class="hint">
+      ${schedule.customGoogleUrl || schedule.customNaverUrl
+        ? "已設定自訂地圖連結"
+        : "依目的地與地點名稱搜尋，請確認分店是否正確。"}
+    </p>
+
+    <button class="btn co wide" id="edit-this-schedule">
+      ✎ 編輯這個行程
+    </button>
+  `);
+
+  q(mask, "#edit-this-schedule").onclick = () => {
+    mask.remove();
+    editSchedule(scheduleId);
+  };
 }
 
 function scheduleForm(schedule = {}) {
   const minutes = timeOrder(schedule.time);
+
   const time = minutes < 1440
-    ? String(Math.floor(minutes / 60)).padStart(2, "0") + ":" +
+    ? String(Math.floor(minutes / 60)).padStart(2, "0") +
+      ":" +
       String(minutes % 60).padStart(2, "0")
     : "";
 
-  const korea = destinationType(state.project?.name) === "korea";
+  const korea =
+    destinationType(state.project?.name) === "korea";
 
   return `
     <label>日期或天數</label>
     <input id="schedule-day"
-      value="${esc(schedule.day || (state.day === "all" ? "Day 1" : state.day))}"
+      value="${esc(
+        schedule.day ||
+        (state.day === "all" ? "Day 1" : state.day)
+      )}"
       placeholder="Day 1 或 2027-01-01">
+
     <label>時間（留空表示全天）</label>
     <input id="schedule-time" type="time" value="${esc(time)}">
+
     <label>行程名稱</label>
-    <input id="schedule-title" value="${esc(cleanTitle(schedule.title))}">
+    <input id="schedule-title"
+      value="${esc(cleanTitle(schedule.title))}">
+
     <label>地點／分店名稱或地址</label>
     <input id="schedule-place"
-      value="${esc(schedule.place || schedule.mapKeyword || "")}">
+      value="${esc(
+        schedule.place || schedule.mapKeyword || ""
+      )}">
+
     <label>備註</label>
     <textarea id="schedule-notes" rows="4">${esc(
       schedule.notes ?? schedule.location ?? ""
     )}</textarea>
+
     <label>Google Maps 連結（選填）</label>
     <input id="schedule-google" type="url"
       value="${esc(schedule.customGoogleUrl || "")}">
+
     ${korea ? `
       <label>Naver Map 連結（選填）</label>
       <input id="schedule-naver" type="url"
         value="${esc(schedule.customNaverUrl || "")}">
     ` : ""}
+
     <p class="hint">
-      地圖尚未經 AI 驗證。請確認確切分店，可自行補上地址或地圖連結。
+      地圖尚未經 AI 驗證，可自行補上確切分店、
+      地址或地圖連結。
     </p>
   `;
 }
@@ -1587,7 +2446,8 @@ function readScheduleForm(mask, previous = {}) {
     !googleDestination(googleLink)
   ) {
     alert(
-      "這個短網址無法直接轉成導航。請貼完整 Google Maps 地點／導航網址，" +
+      "這個短網址無法直接轉成導航。" +
+      "請貼完整 Google Maps 地點／導航網址，" +
       "或清空網址並填入確切地址。"
     );
     return null;
@@ -1595,19 +2455,22 @@ function readScheduleForm(mask, previous = {}) {
 
   return {
     day,
-    time: val(mask, "#schedule-time"),
+    time:val(mask, "#schedule-time"),
     title,
-    place: val(mask, "#schedule-place"),
-    mapKeyword: val(mask, "#schedule-place"),
-    notes: val(mask, "#schedule-notes"),
-    location: val(mask, "#schedule-notes"),
-    customGoogleUrl: google,
-    customNaverUrl: naver
+    place:val(mask, "#schedule-place"),
+    mapKeyword:val(mask, "#schedule-place"),
+    notes:val(mask, "#schedule-notes"),
+    location:val(mask, "#schedule-notes"),
+    customGoogleUrl:google,
+    customNaverUrl:naver
   };
 }
 
 function editSchedule(scheduleId) {
-  const schedule = state.schedules.find(item => item.id === scheduleId);
+  const schedule = state.schedules.find(item =>
+    item.id === scheduleId
+  );
+
   if (!schedule) return;
 
   const projectId = state.project.id;
@@ -1618,6 +2481,7 @@ function editSchedule(scheduleId) {
       '<button id="delete-schedule" class="btn">🗑 刪除行程</button>',
     async () => {
       const patch = readScheduleForm(mask, schedule);
+
       if (!patch) return false;
 
       await updateDoc(
@@ -1641,6 +2505,7 @@ function editSchedule(scheduleId) {
       await deleteDoc(
         doc(db, "projects", projectId, "schedules", scheduleId)
       );
+
       mask.remove();
     });
   };
@@ -1649,24 +2514,27 @@ function editSchedule(scheduleId) {
 $("add-schedule").onclick = () => {
   const projectId = state.project.id;
 
-  const mask = modal("🌸 新增行程", scheduleForm({
-    time: "10:00"
-  }), async () => {
-    const data = readScheduleForm(mask);
-    if (!data) return false;
+  const mask = modal(
+    "🌸 新增行程",
+    scheduleForm({time:"10:00"}),
+    async () => {
+      const data = readScheduleForm(mask);
 
-    await addDoc(collection(db, "projects", projectId, "schedules"), {
-      ...data,
-      createdAt: Date.now()
-    });
+      if (!data) return false;
 
-    if (state.day !== "all") state.day = data.day;
-  });
+      await addDoc(
+        collection(db, "projects", projectId, "schedules"),
+        {...data, createdAt:Date.now()}
+      );
+
+      if (state.day !== "all") state.day = data.day;
+    }
+  );
 
   q(mask, ".save").textContent = "新增行程";
 };
 
-/* ---------- 文字導入與預覽 ---------- */
+/* ---------- 文字導入 ---------- */
 function parseItinerary(text) {
   let day = "Day 1";
   let current = null;
@@ -1674,26 +2542,33 @@ function parseItinerary(text) {
   const items = [];
   const warnings = [];
 
-  for (const raw of text.split("\n").map(line => line.trim()).filter(Boolean)) {
+  const lines = text.split("\n")
+    .map(line => line.trim())
+    .filter(Boolean);
+
+  for (const raw of lines) {
     const dayMatch = raw.match(
       /^(?:Day\s*(\d+)|第([一二三四五六七八九十\d]+)天)\s*(?:[：:、.\-].*)?$/i
     );
 
-    const dateMatch = raw.match(/^(\d{4}-\d{2}-\d{2})$/);
+    const dateMatch = raw.match(
+      /^(\d{4}-\d{2}-\d{2})$/
+    );
 
     if (dayMatch || dateMatch) {
       if (current) items.push(current);
+
       current = null;
 
       if (dateMatch) {
         day = dateMatch[1];
       } else {
-        const number = dayMatch[1] ||
-          (
-            /^\d+$/.test(dayMatch[2])
-              ? dayMatch[2]
-              : "一二三四五六七八九十".indexOf(dayMatch[2]) + 1
-          );
+        const number = dayMatch[1] || (
+          /^\d+$/.test(dayMatch[2])
+            ? dayMatch[2]
+            : "一二三四五六七八九十"
+                .indexOf(dayMatch[2]) + 1
+        );
 
         day = "Day " + number;
       }
@@ -1702,6 +2577,7 @@ function parseItinerary(text) {
     }
 
     const normalized = raw.replace(/：/g, ":");
+
     const timeMatch = normalized.match(
       /^[•\-\s]*(\d{1,2}):(\d{2})\s*(.*)$/
     );
@@ -1715,12 +2591,15 @@ function parseItinerary(text) {
 
       current = {
         day,
-        time: timeMatch[1].padStart(2, "0") + ":" + timeMatch[2],
-        title: timeMatch[3].trim(),
-        location: ""
+        time:
+          timeMatch[1].padStart(2, "0") +
+          ":" + timeMatch[2],
+        title:timeMatch[3].trim(),
+        location:""
       };
     } else if (current) {
-      current.location += (current.location ? "\n" : "") + raw;
+      current.location +=
+        (current.location ? "\n" : "") + raw;
     } else {
       warnings.push(raw);
     }
@@ -1728,16 +2607,19 @@ function parseItinerary(text) {
 
   if (current) items.push(current);
 
-  return { items, warnings };
+  return {items, warnings};
 }
 
 $("import-schedule").onclick = () => {
   const projectId = state.project.id;
+
   let parsedItems = [];
   let saved = false;
 
   const mask = modal("📥 導入行程", `
-    <p class="hint">貼上文字後先預覽，可修正後再匯入。</p>
+    <p class="hint">
+      貼上文字後先預覽，可修正後再匯入。
+    </p>
     <label>行程文字</label>
     <textarea id="import-text" rows="7"
       placeholder="Day 1&#10;09:30 抵達機場&#10;12:00 午餐&#10;備註：預約資訊"></textarea>
@@ -1753,20 +2635,25 @@ $("import-schedule").onclick = () => {
     const now = Date.now();
 
     const items = [
-      ...q(mask, "#import-preview").querySelectorAll("[data-preview]")
+      ...q(mask, "#import-preview")
+        .querySelectorAll("[data-preview]")
     ].map((row, index) => ({
-      day: val(row, ".import-day"),
-      time: val(row, ".import-time"),
-      title: val(row, ".import-title"),
-      place: val(row, ".import-place"),
-      location: val(row, ".import-notes"),
-      notes: val(row, ".import-notes"),
-      mapKeyword: "",
-      createdAt: now + index
+      day:val(row, ".import-day"),
+      time:val(row, ".import-time"),
+      title:val(row, ".import-title"),
+      place:val(row, ".import-place"),
+      location:val(row, ".import-notes"),
+      notes:val(row, ".import-notes"),
+      mapKeyword:"",
+      createdAt:now + index
     }));
 
-    if (items.some(item => !item.title || !validDay(item.day))) {
-      alert("請確認每筆行程都有名稱及有效的日期或天數。");
+    if (
+      items.some(item =>
+        !item.title || !validDay(item.day)
+      )
+    ) {
+      alert("請確認每筆行程都有名稱及有效日期。");
       return false;
     }
 
@@ -1779,7 +2666,12 @@ $("import-schedule").onclick = () => {
 
     items.forEach(item => {
       batch.set(
-        doc(collection(db, "projects", projectId, "schedules")),
+        doc(collection(
+          db,
+          "projects",
+          projectId,
+          "schedules"
+        )),
         item
       );
     });
@@ -1793,54 +2685,73 @@ $("import-schedule").onclick = () => {
 
   q(mask, "#import-text").oninput = () => {
     parsedItems = [];
+
     q(mask, ".save").disabled = true;
     q(mask, "#import-preview").replaceChildren();
+
     q(mask, "#import-warning").textContent =
       "文字已變更，請重新產生預覽。";
   };
 
   q(mask, "#parse-import").onclick = () => {
-    const parsed = parseItinerary(val(mask, "#import-text"));
+    const parsed = parseItinerary(
+      val(mask, "#import-text")
+    );
+
     parsedItems = parsed.items;
 
-    q(mask, "#import-warning").textContent = parsedItems.length
-      ? `辨識到 ${parsedItems.length} 筆。` +
-        (
-          parsed.warnings.length
-            ? "未納入文字：" + parsed.warnings.join("、")
-            : ""
-        )
-      : "未辨識到行程，請使用「09:30 行程名稱」格式。";
+    q(mask, "#import-warning").textContent =
+      parsedItems.length
+        ? `辨識到 ${parsedItems.length} 筆。` +
+          (
+            parsed.warnings.length
+              ? "未納入文字：" + parsed.warnings.join("、")
+              : ""
+          )
+        : "未辨識到行程，請使用「09:30 行程名稱」格式。";
 
-    q(mask, "#import-preview").innerHTML = parsedItems.map((item, index) => `
-      <div class="box" data-preview="${index}">
-        <b>行程 ${index + 1}</b>
-        <label>日期或天數</label>
-        <input class="import-day" value="${esc(item.day)}">
-        <label>時間</label>
-        <input class="import-time" type="time" value="${esc(item.time)}">
-        <label>名稱</label>
-        <input class="import-title" value="${esc(item.title)}">
-        <label>地點／分店或地址</label>
-        <input class="import-place">
-        <label>備註</label>
-        <textarea class="import-notes">${esc(item.location)}</textarea>
-      </div>
-    `).join("");
+    q(mask, "#import-preview").innerHTML =
+      parsedItems.map((item, index) => `
+        <div class="box" data-preview="${index}">
+          <b>行程 ${index + 1}</b>
+
+          <label>日期或天數</label>
+          <input class="import-day"
+            value="${esc(item.day)}">
+
+          <label>時間</label>
+          <input class="import-time" type="time"
+            value="${esc(item.time)}">
+
+          <label>名稱</label>
+          <input class="import-title"
+            value="${esc(item.title)}">
+
+          <label>地點／分店或地址</label>
+          <input class="import-place">
+
+          <label>備註</label>
+          <textarea class="import-notes">${esc(
+            item.location
+          )}</textarea>
+        </div>
+      `).join("");
 
     q(mask, ".save").disabled = !parsedItems.length;
   };
 };
 
-/* ---------- 個人收藏 ---------- */
-const BADGES = {
-  food: ["美食家", "var(--co)"],
-  spot: ["探險家", "var(--aq)"],
-  shop: ["購物達人", "var(--ye)"]
+/* ---------- 個人旅行護照 ---------- */
+const COLLECTION_CATEGORIES = {
+  food:["美食家","🍴"],
+  spot:["探險家","⌁"],
+  shop:["購物達人","♧"]
 };
 
 function category(title = "") {
-  if (/交通|機場|租車|還車|출발|空港/.test(title)) return null;
+  if (
+    /交通|機場|租車|還車|출발|空港/.test(title)
+  ) return null;
 
   if (
     /餐廳|美食|咖啡|晚餐|午餐|早餐|烤肉|料理|吃|맛집|식당|카페|ร้านอาหาร/.test(title)
@@ -1856,73 +2767,263 @@ function category(title = "") {
 function renderCollection() {
   const items = state.schedules.map(schedule => ({
     ...schedule,
-    category: category(schedule.title)
-  })).filter(schedule => schedule.category).sort(scheduleOrder);
+    category:category(schedule.title)
+  })).filter(schedule =>
+    schedule.category
+  ).sort(scheduleOrder);
 
   const completed = items.filter(item =>
     state.personalCheckins[item.id]
   );
 
-  const photoCount = completed.filter(item =>
+  const photos = completed.filter(item =>
     state.personalCheckins[item.id]?.photoUrl
-  ).length;
+  );
 
   const percent = items.length
     ? Math.round(completed.length / items.length * 100)
     : 0;
 
-  $("collection-count").textContent =
-    `我的收藏 ${completed.length} / ${items.length} · 照片 ${photoCount} 張`;
+  const counts = Object.fromEntries(
+    Object.keys(COLLECTION_CATEGORIES).map(key => [
+      key,
+      completed.filter(item => item.category === key).length
+    ])
+  );
 
-  $("collection-percent").textContent = percent + "%";
-  $("collection-progress").style.width = percent + "%";
+  const stamps = [
+    [
+      "first","👣","旅途第一步","留下第一個打卡",
+      completed.length > 0
+    ],
+    [
+      "food","🍴","在地食記","收藏一處美食",
+      counts.food > 0
+    ],
+    [
+      "spot","🧭","風景採集","收藏一處景點",
+      counts.spot > 0
+    ],
+    [
+      "shop","🛍","旅行尋寶","收藏一處購物",
+      counts.shop > 0
+    ],
+    [
+      "photo","📷","光影記錄","留下第一張照片",
+      photos.length > 0
+    ],
+    [
+      "complete","✦","滿頁回憶","收藏全部行程",
+      items.length > 0 && completed.length === items.length
+    ]
+  ];
 
-  for (const key in BADGES) {
-    const categoryItems = items.filter(item => item.category === key);
-    const count = categoryItems.filter(item =>
-      state.personalCheckins[item.id]
-    ).length;
+  const filtered = items.filter(item => {
+    if (collectionFilter === "all") return true;
 
-    const badge = $("badge-" + key);
-    const unlocked = count > 0;
+    const checked = !!state.personalCheckins[item.id];
 
-    badge.classList.toggle("on", unlocked);
-    badge.style.background = unlocked ? BADGES[key][1] : "";
-    badge.title = BADGES[key][0];
+    return collectionFilter === "done"
+      ? checked
+      : !checked;
+  });
 
-    $("badge-text-" + key).textContent = categoryItems.length
-      ? `${BADGES[key][0]} · 已收藏 ${count} 處`
-      : `${BADGES[key][0]} · 尚無行程`;
-  }
+  const byDay = new Map();
 
-  $("collection-items").innerHTML = items.length
-    ? items.map(item => {
-        const checkin = state.personalCheckins[item.id];
+  filtered.forEach(item => {
+    const day = item.day || "Day 1";
 
-        return `
-          <div class="box" style="display:flex;align-items:center;gap:8px">
-            <div style="flex:1;min-width:0">
-              <span class="tag">
-                ${esc(item.day || "Day 1")} · ${esc(item.time || "全天")}
-              </span>
-              <b style="display:block">${esc(cleanTitle(item.title))}</b>
-            </div>
-            ${checkin?.photoUrl ? `
-              <img src="${esc(checkin.photoUrl)}" alt="我的打卡照片"
-                style="width:56px;height:56px;object-fit:cover;border-radius:12px">
-            ` : ""}
-            <button class="btn ${checkin ? "gr" : ""}"
-              data-checkin="${esc(item.id)}">
-              ${checkin ? "✔ 已收藏" : "📍 打卡"}
-            </button>
+    if (!byDay.has(day)) byDay.set(day, []);
+
+    byDay.get(day).push(item);
+  });
+
+  $("tab-collection").innerHTML = `
+    <section class="passport-cover">
+      <div class="passport-top">
+        <span class="eyebrow">MY TRAVEL PASSPORT</span>
+        <span class="passport-seal">旅</span>
+      </div>
+
+      <p class="passport-owner">
+        ${esc(state.profile?.displayName || "旅人")} 的旅行護照
+      </p>
+
+      <h2>${esc(state.project?.name || "下一段旅程")}</h2>
+
+      <div class="passport-metrics">
+        <div>
+          <strong>
+            ${completed.length}<small> / ${items.length}</small>
+          </strong>
+          <span>收藏的足跡</span>
+        </div>
+        <div>
+          <strong>${photos.length}</strong>
+          <span>留下的照片</span>
+        </div>
+      </div>
+
+      <div class="passport-progress">
+        <i style="width:${percent}%"></i>
+      </div>
+
+      <div class="passport-footer">
+        <span>旅途已收藏 ${percent}%</span>
+        <button id="album" class="album-link">
+          大家的相冊 ↗
+        </button>
+      </div>
+    </section>
+
+    <div class="collection-heading">
+      <h3>旅途印章</h3>
+      <small>打卡後自動蓋章</small>
+    </div>
+
+    <div class="stamp-grid">
+      ${stamps.map(([key, icon, title, hint, unlocked]) => `
+        <div class="travel-stamp ${unlocked ? "on" : "locked"}"
+          aria-label="${esc(
+            title + "：" + (unlocked ? "已解鎖" : hint)
+          )}">
+          <span class="stamp-symbol">${icon}</span>
+          <b>${title}</b>
+          <small>${unlocked ? "已收入護照" : hint}</small>
+        </div>
+      `).join("")}
+    </div>
+
+    ${photos.length ? `
+      <div class="collection-heading">
+        <h3>我的光影碎片</h3>
+        <small>${photos.length} 張回憶</small>
+      </div>
+
+      <div class="memory-strip">
+        ${photos.slice(-4).reverse().map(item => `
+          <button class="memory-print"
+            data-memory="${esc(item.id)}">
+            <img
+              alt="${esc(cleanTitle(item.title))}"
+              src="${esc(
+                state.personalCheckins[item.id].photoUrl
+              )}">
+            <small>${esc(cleanTitle(item.title))}</small>
+          </button>
+        `).join("")}
+      </div>
+    ` : ""}
+
+    <div class="collection-heading">
+      <h3>收藏沿途風景</h3>
+    </div>
+
+    <div class="collection-tabs">
+      ${[
+        ["all","全部",items.length],
+        ["todo","待收藏",items.length - completed.length],
+        ["done","已收藏",completed.length]
+      ].map(([key, title, count]) => `
+        <button
+          data-collection-filter="${key}"
+          aria-pressed="${collectionFilter === key}"
+          class="${collectionFilter === key ? "active" : ""}">
+          ${title}<span>${count}</span>
+        </button>
+      `).join("")}
+    </div>
+
+    <div id="collection-items">
+      ${filtered.length
+        ? [...byDay].map(([day, rows]) => `
+            <section class="collection-day">
+              <h4>${esc(day)}</h4>
+              ${rows.map(item => {
+                const check = state.personalCheckins[item.id];
+
+                return `
+                  <button
+                    class="collection-stop ${check ? "collected" : ""}"
+                    data-checkin="${esc(item.id)}">
+                    <span class="stop-marker">
+                      ${check
+                        ? "✓"
+                        : COLLECTION_CATEGORIES[item.category][1]}
+                    </span>
+
+                    <span class="stop-caption">
+                      <small>
+                        ${esc(item.time || "全天")} ·
+                        ${COLLECTION_CATEGORIES[item.category][0]}
+                      </small>
+
+                      <b>${esc(cleanTitle(item.title))}</b>
+
+                      <span>
+                        ${check
+                          ? check.photoUrl
+                            ? "照片已收進護照"
+                            : "已留下我的足跡"
+                          : "點一下，收藏這一站"}
+                      </span>
+                    </span>
+
+                    ${check?.photoUrl ? `
+                      <img class="stop-photo"
+                        alt="我的打卡照片"
+                        src="${esc(check.photoUrl)}">
+                    ` : `
+                      <span class="stop-arrow">↗</span>
+                    `}
+                  </button>
+                `;
+              }).join("")}
+            </section>
+          `).join("")
+        : `
+          <div class="collection-empty">
+            <span>✧</span>
+            <b>
+              ${items.length
+                ? "這一頁還是空白的"
+                : "行程還沒展開"}
+            </b>
+            <p>
+              ${items.length
+                ? "換個分類，或去收藏第一個足跡。"
+                : "新增景點、美食或購物行程，開始你的旅行護照。"}
+            </p>
           </div>
-        `;
-      }).join("")
-    : '<p class="mute">還沒有可收藏的景點、美食或購物行程 🌱</p>';
+        `}
+    </div>
+  `;
 
-  $("collection-items").querySelectorAll("[data-checkin]")
+  $("album").onclick = openAlbum;
+
+  $("tab-collection")
+    .querySelectorAll("[data-collection-filter]")
     .forEach(button => {
-      button.onclick = () => openCheckin(button.dataset.checkin);
+      button.onclick = () => {
+        collectionFilter =
+          button.dataset.collectionFilter;
+
+        renderCollection();
+      };
+    });
+
+  $("tab-collection")
+    .querySelectorAll("[data-checkin]")
+    .forEach(button => {
+      button.onclick = () =>
+        openCheckin(button.dataset.checkin);
+    });
+
+  $("tab-collection")
+    .querySelectorAll("[data-memory]")
+    .forEach(button => {
+      button.onclick = () =>
+        openCheckin(button.dataset.memory);
     });
 }
 
@@ -1968,7 +3069,10 @@ function compressImage(file) {
 }
 
 function openCheckin(scheduleId) {
-  const schedule = state.schedules.find(item => item.id === scheduleId);
+  const schedule = state.schedules.find(item =>
+    item.id === scheduleId
+  );
+
   if (!schedule) return;
 
   const current = state.personalCheckins[scheduleId];
@@ -1983,17 +3087,24 @@ function openCheckin(scheduleId) {
 
   const mask = modal(esc(cleanTitle(schedule.title)), `
     ${current?.photoUrl ? `
-      <img class="photo-zoom" src="${esc(current.photoUrl)}"
+      <img class="photo-zoom"
+        src="${esc(current.photoUrl)}"
         alt="我的打卡照片">
     ` : ""}
+
     <label>選擇照片</label>
     <input id="photo-file" type="file" accept="image/*">
+
     <button id="upload-photo" class="btn co wide">
       📷 ${current ? "換一張照片" : "上傳照片並打卡"}
     </button>
+
     <div style="height:10px"></div>
+
     ${current ? `
-      <button id="cancel-checkin" class="btn wide">↩ 取消打卡</button>
+      <button id="cancel-checkin" class="btn wide">
+        ↩ 取消打卡
+      </button>
     ` : `
       <button id="checkin-only" class="btn gr wide">
         ✔ 不放照片，直接打卡
@@ -2013,16 +3124,18 @@ function openCheckin(scheduleId) {
       const photoUrl = await compressImage(file);
 
       if (!photoUrl || photoUrl.length > 700000) {
-        alert("圖片壓縮失敗或檔案過大，請換一張較小的照片。");
+        alert(
+          "圖片壓縮失敗或檔案過大，請換一張較小的照片。"
+        );
         return false;
       }
 
       await setDoc(reference, {
         scheduleId,
-        uploader: myName(),
-        uploaderUid: uid(),
+        uploader:myName(),
+        uploaderUid:uid(),
         photoUrl,
-        at: Date.now()
+        at:Date.now()
       });
 
       mask.remove();
@@ -2032,44 +3145,53 @@ function openCheckin(scheduleId) {
   const checkinButton = q(mask, "#checkin-only");
 
   if (checkinButton) {
-    checkinButton.onclick = () => runButton(checkinButton, async () => {
-      await setDoc(reference, {
-        scheduleId,
-        uploader: myName(),
-        uploaderUid: uid(),
-        photoUrl: "",
-        at: Date.now()
-      });
+    checkinButton.onclick = () =>
+      runButton(checkinButton, async () => {
+        await setDoc(reference, {
+          scheduleId,
+          uploader:myName(),
+          uploaderUid:uid(),
+          photoUrl:"",
+          at:Date.now()
+        });
 
-      mask.remove();
-      notify("已加入我的收藏 ✨");
-    });
+        mask.remove();
+        notify("已加入我的收藏 ✨");
+      });
   }
 
   const cancelButton = q(mask, "#cancel-checkin");
 
   if (cancelButton) {
-    cancelButton.onclick = () => runButton(cancelButton, async () => {
-      await deleteDoc(reference);
-      mask.remove();
-      notify("已取消打卡。");
-    });
+    cancelButton.onclick = () =>
+      runButton(cancelButton, async () => {
+        await deleteDoc(reference);
+        mask.remove();
+        notify("已取消打卡。");
+      });
   }
 }
 
 /* ---------- 共用相冊 ---------- */
-$("album").onclick = () => {
+function openAlbum() {
   const photos = state.checkins.filter(item =>
     item.photoUrl && !item.migratedTo
-  ).sort((a, b) => (b.at || 0) - (a.at || 0));
+  ).sort((a, b) =>
+    (b.at || 0) - (a.at || 0)
+  );
 
-  const people = [...new Set(
-    photos.map(item => item.uploader || "未知旅伴")
-  )];
+  const people = [
+    ...new Set(
+      photos.map(item =>
+        item.uploader || "未知旅伴"
+      )
+    )
+  ];
 
   const photoDay = photo =>
-    state.schedules.find(item => item.id === photo.scheduleId)?.day ||
-    "未分類";
+    state.schedules.find(item =>
+      item.id === photo.scheduleId
+    )?.day || "未分類";
 
   const days = [...new Set(photos.map(photoDay))];
 
@@ -2079,19 +3201,25 @@ $("album").onclick = () => {
         <select id="album-person">
           <option value="">全部旅伴</option>
           ${people.map(person => `
-            <option value="${esc(person)}">${esc(person)}</option>
+            <option value="${esc(person)}">
+              ${esc(person)}
+            </option>
           `).join("")}
         </select>
       </label>
+
       <label>行程日期
         <select id="album-day">
           <option value="">全部日期</option>
           ${days.map(day => `
-            <option value="${esc(day)}">${esc(day)}</option>
+            <option value="${esc(day)}">
+              ${esc(day)}
+            </option>
           `).join("")}
         </select>
       </label>
     </div>
+
     <div id="album-grid" class="album-grid"></div>
   `);
 
@@ -2100,7 +3228,10 @@ $("album").onclick = () => {
     const day = val(mask, "#album-day");
 
     const filtered = photos.filter(photo =>
-      (!person || (photo.uploader || "未知旅伴") === person) &&
+      (
+        !person ||
+        (photo.uploader || "未知旅伴") === person
+      ) &&
       (!day || photoDay(photo) === day)
     );
 
@@ -2111,17 +3242,31 @@ $("album").onclick = () => {
           );
 
           return `
-            <button class="photo-card" data-photo="${esc(photo.id)}">
-              <img src="${esc(photo.photoUrl)}" loading="lazy"
-                alt="${esc(schedule?.title || "旅程回憶")}">
-              <b>${esc(cleanTitle(schedule?.title || "旅程回憶"))}</b>
-              <small>📷 ${esc(photo.uploader || "未知旅伴")}</small>
+            <button class="photo-card"
+              data-photo="${esc(photo.id)}">
+              <img
+                src="${esc(photo.photoUrl)}"
+                loading="lazy"
+                alt="${esc(
+                  schedule?.title || "旅程回憶"
+                )}">
+              <b>${esc(cleanTitle(
+                schedule?.title || "旅程回憶"
+              ))}</b>
+              <small>
+                📷 ${esc(photo.uploader || "未知旅伴")}
+              </small>
             </button>
           `;
         }).join("")
-      : '<p class="mute">還沒有照片，打卡留下第一張回憶吧 🌷</p>';
+      : `
+        <p class="mute">
+          還沒有照片，打卡留下第一張回憶吧 🌷
+        </p>
+      `;
 
-    q(mask, "#album-grid").querySelectorAll("[data-photo]")
+    q(mask, "#album-grid")
+      .querySelectorAll("[data-photo]")
       .forEach(button => {
         button.onclick = () => {
           const photo = photos.find(item =>
@@ -2129,9 +3274,12 @@ $("album").onclick = () => {
           );
 
           modal("🌷 旅行回憶", `
-            <img class="photo-zoom" src="${esc(photo.photoUrl)}"
+            <img class="photo-zoom"
+              src="${esc(photo.photoUrl)}"
               alt="旅行照片">
-            <p>📷 ${esc(photo.uploader || "未知旅伴")}</p>
+            <p>
+              📷 ${esc(photo.uploader || "未知旅伴")}
+            </p>
           `);
         };
       });
@@ -2139,26 +3287,105 @@ $("album").onclick = () => {
 
   q(mask, "#album-person").onchange = render;
   q(mask, "#album-day").onchange = render;
+
   render();
+}
+
+/* ---------- 分帳名單 ---------- */
+function accountingNames() {
+  const allowed = new Set(
+    state.project?.memberUids || []
+  );
+
+  const accounts = new Map();
+
+  for (const record of state.members) {
+    const accountId = record.userUid || record.id;
+
+    if (allowed.has(accountId) && record.name) {
+      accounts.set(accountId, record.name);
+    }
+  }
+
+  if (allowed.has(uid())) {
+    accounts.set(uid(), myName());
+  }
+
+  return [...accounts.values()];
+}
+
+function memberLabel(name) {
+  const simple = value =>
+    value.replace(/\s*\(@[a-z0-9_]+\)$/i, "");
+
+  const label = simple(name);
+  const duplicates = accountingNames().filter(other =>
+    simple(other) === label
+  ).length;
+
+  return duplicates > 1 ? name : label;
+}
+
+$("expense-members").onclick = () => {
+  const names = accountingNames();
+
+  const mask = modal("一起分帳的旅伴", `
+    <p class="hint">
+      名單自動跟隨這趟旅程的授權成員。
+    </p>
+
+    <div class="account-people">
+      ${names.map(name => `
+        <span class="person-chip">
+          <span class="person-avatar">
+            ${esc(memberLabel(name).slice(0, 1))}
+          </span>
+          <b>${esc(memberLabel(name))}</b>
+          ${name === myName() ? "<small>我</small>" : ""}
+        </span>
+      `).join("")}
+    </div>
+
+    <p class="hint">
+      舊暱稱不再列入新帳目的選單，
+      歷史帳目與結算仍保留原紀錄。
+    </p>
+
+    ${isOwner() ? `
+      <button class="btn aq wide" id="manage-from-split">
+        管理旅程成員 →
+      </button>
+    ` : ""}
+  `);
+
+  if (isOwner()) {
+    q(mask, "#manage-from-split").onclick = () => {
+      mask.remove();
+      $("manage").click();
+    };
+  }
 };
 
-/* ---------- 分帳 ---------- */
+/* ---------- 記帳 ---------- */
 function renderExpenses() {
   const currencies = {};
   let total = 0;
 
   state.expenses.forEach(expense => {
     currencies[expense.cur] =
-      (currencies[expense.cur] || 0) + expense.amount;
+      (currencies[expense.cur] || 0) +
+      expense.amount;
 
-    total += expense.amount * (RATE[expense.cur] || 1);
+    total +=
+      expense.amount * (RATE[expense.cur] || 1);
   });
 
   $("expense-total").textContent = money(total);
 
   $("expense-summary").textContent =
     Object.entries(currencies).map(([currency, amount]) =>
-      currency + " " + Math.round(amount).toLocaleString()
+      currency + " " +
+      Math.round(amount).toLocaleString()
     ).join(" · ") +
     "｜固定參考匯率估算，非即時報價";
 
@@ -2170,83 +3397,55 @@ function renderExpenses() {
               <b>${esc(expense.title)}</b><br>
               <small>
                 ${esc(expense.payer)} 先付 ·
-                ${esc(expense.cur)} ${expense.amount.toLocaleString()}
+                ${esc(expense.cur)}
+                ${Number(expense.amount).toLocaleString()}
               </small>
             </div>
-            <b>約 ${money(expense.amount * (RATE[expense.cur] || 1))}</b>
+
+            <b>
+              約 ${money(
+                expense.amount * (RATE[expense.cur] || 1)
+              )}
+            </b>
           </div>
+
           <div class="row" style="margin-bottom:0">
             <small>
-              ${expense.settle === "orig" ? "原幣結算" : "折合台幣結算"}
+              ${expense.settle === "orig"
+                ? "原幣結算"
+                : "折合台幣結算"}
             </small>
-            <button class="btn" data-delete-expense="${esc(expense.id)}">
+            <button class="btn"
+              data-delete-expense="${esc(expense.id)}">
               刪除
             </button>
           </div>
         </div>
       `).join("")
-    : '<p class="mute">還沒有帳目，記下第一筆花費吧 ✨</p>';
+    : `
+      <p class="mute">
+        還沒有帳目，記下第一筆花費吧 ✨
+      </p>
+    `;
 
-  $("expenses").querySelectorAll("[data-delete-expense]")
+  $("expenses")
+    .querySelectorAll("[data-delete-expense]")
     .forEach(button => {
       button.onclick = () => {
         if (!confirm("確定刪除這筆共用帳目？")) return;
 
-        runButton(button, () => deleteDoc(doc(
-          db,
-          "projects",
-          state.project.id,
-          "expenses",
-          button.dataset.deleteExpense
-        )));
+        runButton(button, () => deleteDoc(
+          doc(
+            db,
+            "projects",
+            state.project.id,
+            "expenses",
+            button.dataset.deleteExpense
+          )
+        ));
       };
     });
 }
-
-$("expense-members").onclick = () => {
-  const names = accountingNames();
-
-  const mask = modal("👥 分帳名單", `
-    <p class="hint">
-      分帳名單不會授予旅程存取權。歷史帳目的姓名會保留。
-    </p>
-    <div id="accounting-members">
-      ${names.map(name => `
-        <span class="tag" style="margin:4px">${esc(name)}</span>
-      `).join("")}
-    </div>
-    ${isOwner() ? `
-      <label>新增歷史或額外分帳名稱</label>
-      <input id="accounting-name" maxlength="100">
-      <button id="add-accounting-name" class="btn gr">
-        ＋ 加入分帳名單
-      </button>
-    ` : ""}
-  `);
-
-  const button = q(mask, "#add-accounting-name");
-
-  if (button) {
-    button.onclick = () => runButton(button, async () => {
-      const name = val(mask, "#accounting-name");
-      if (!name) return false;
-
-      await addDoc(
-        collection(db, "projects", state.project.id, "members"),
-        { name }
-      );
-
-      q(mask, "#accounting-name").value = "";
-
-      const tag = document.createElement("span");
-      tag.className = "tag";
-      tag.style.margin = "4px";
-      tag.textContent = name;
-
-      q(mask, "#accounting-members").appendChild(tag);
-    });
-  }
-};
 
 $("add-expense").onclick = () => {
   const names = accountingNames();
@@ -2257,41 +3456,47 @@ $("add-expense").onclick = () => {
   }
 
   const defaultCurrency = {
-    korea: "KRW",
-    japan: "JPY",
-    thailand: "THB",
-    singapore: "SGD",
-    malaysia: "MYR",
-    hongkong: "HKD",
-    macau: "MOP"
+    korea:"KRW",
+    japan:"JPY",
+    thailand:"THB",
+    singapore:"SGD",
+    malaysia:"MYR",
+    hongkong:"HKD",
+    macau:"MOP"
   }[destinationType(state.project.name)] || "TWD";
 
   let mode = "equal";
+
   const projectId = state.project.id;
 
   const mask = modal("💸 記一筆", `
     <label>項目</label>
     <input id="expense-title">
+
     <label>金額</label>
-    <input id="expense-amount" type="number" min="0" step="any"
-      inputmode="decimal">
+    <input id="expense-amount" type="number"
+      min="0" step="any" inputmode="decimal">
+
     <label>幣別</label>
     <select id="expense-currency">
       ${Object.keys(RATE).map(currency => `
-        <option ${currency === defaultCurrency ? "selected" : ""}>
+        <option value="${currency}"
+          ${currency === defaultCurrency ? "selected" : ""}>
           ${currency}
         </option>
       `).join("")}
     </select>
+
     <label>誰先付</label>
     <select id="expense-payer">
       ${names.map(name => `
         <option value="${esc(name)}"
           ${name === myName() ? "selected" : ""}>
-          ${esc(name)}
+          ${esc(memberLabel(name))}
         </option>
       `).join("")}
     </select>
+
     <div class="row">
       <label>分攤模式</label>
       <span>
@@ -2299,7 +3504,9 @@ $("add-expense").onclick = () => {
         <button id="mode-custom" class="btn">自訂金額</button>
       </span>
     </div>
+
     <div id="expense-split"></div>
+
     <label>結算幣別</label>
     <select id="expense-settlement">
       <option value="orig">依原幣別</option>
@@ -2307,9 +3514,15 @@ $("add-expense").onclick = () => {
     </select>
   `, async () => {
     const title = val(mask, "#expense-title");
-    const amount = Number(val(mask, "#expense-amount"));
+    const amount = Number(
+      val(mask, "#expense-amount")
+    );
 
-    if (!title || !Number.isFinite(amount) || amount <= 0) {
+    if (
+      !title ||
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ) {
       alert("請填寫項目與正確金額。");
       return false;
     }
@@ -2318,7 +3531,8 @@ $("add-expense").onclick = () => {
 
     if (mode === "equal") {
       const selected = [
-        ...q(mask, "#expense-split").querySelectorAll("input:checked")
+        ...q(mask, "#expense-split")
+          .querySelectorAll("input:checked")
       ].map(input => input.value);
 
       if (!selected.length) {
@@ -2333,55 +3547,91 @@ $("add-expense").onclick = () => {
       let sum = 0;
       let invalid = false;
 
-      q(mask, "#expense-split").querySelectorAll("[data-index]")
+      q(mask, "#expense-split")
+        .querySelectorAll("[data-index]")
         .forEach(input => {
           const value = Number(input.value || 0);
 
-          if (!Number.isFinite(value) || value < 0) {
+          if (
+            !Number.isFinite(value) ||
+            value < 0
+          ) {
             invalid = true;
             return;
           }
 
-          if (value > 0) split[names[Number(input.dataset.index)]] = value;
+          if (value > 0) {
+            split[
+              names[Number(input.dataset.index)]
+            ] = value;
+          }
+
           sum += value;
         });
 
-      if (invalid || Math.abs(sum - amount) > .01) {
-        alert("自訂金額總和必須等於總金額，且不能為負數。");
+      if (
+        invalid ||
+        Math.abs(sum - amount) > .01
+      ) {
+        alert(
+          "自訂金額總和必須等於總金額，且不能為負數。"
+        );
         return false;
       }
     }
 
-    await addDoc(collection(db, "projects", projectId, "expenses"), {
-      title,
-      amount,
-      cur: val(mask, "#expense-currency"),
-      payer: val(mask, "#expense-payer"),
-      split,
-      settle: val(mask, "#expense-settlement"),
-      createdAt: Date.now()
-    });
+    await addDoc(
+      collection(
+        db,
+        "projects",
+        projectId,
+        "expenses"
+      ),
+      {
+        title,
+        amount,
+        cur:val(mask, "#expense-currency"),
+        payer:val(mask, "#expense-payer"),
+        split,
+        settle:val(mask, "#expense-settlement"),
+        createdAt:Date.now()
+      }
+    );
   });
 
   function drawSplit() {
-    q(mask, "#expense-split").innerHTML = mode === "equal"
-      ? names.map(name => `
-          <label class="chk">
-            <input type="checkbox" value="${esc(name)}" checked>
-            ${esc(name)}
-          </label>
-        `).join("")
-      : names.map((name, index) => `
-          <div class="row">
-            <span style="flex:1">${esc(name)}</span>
-            <input type="number" min="0" step="any" data-index="${index}"
-              inputmode="decimal" placeholder="金額"
-              style="width:120px;margin:0">
-          </div>
-        `).join("");
+    q(mask, "#expense-split").innerHTML =
+      mode === "equal"
+        ? names.map(name => `
+            <label class="chk">
+              <input type="checkbox"
+                value="${esc(name)}" checked>
+              ${esc(memberLabel(name))}
+            </label>
+          `).join("")
+        : names.map((name, index) => `
+            <div class="row">
+              <span style="flex:1">
+                ${esc(memberLabel(name))}
+              </span>
+              <input type="number"
+                min="0" step="any"
+                data-index="${index}"
+                inputmode="decimal"
+                placeholder="金額"
+                style="width:120px;margin:0">
+            </div>
+          `).join("");
 
-    q(mask, "#mode-equal").classList.toggle("aq", mode === "equal");
-    q(mask, "#mode-custom").classList.toggle("aq", mode === "custom");
+    q(mask, "#mode-equal").classList.toggle(
+      "aq",
+      mode === "equal"
+    );
+
+    q(mask, "#mode-custom").classList.toggle(
+      "aq",
+      mode === "custom"
+    );
   }
 
   q(mask, "#mode-equal").onclick = () => {
@@ -2397,6 +3647,7 @@ $("add-expense").onclick = () => {
   drawSplit();
 };
 
+/* ---------- 結算 ---------- */
 function calculateTransfers(balance) {
   const creditors = [];
   const debtors = [];
@@ -2412,11 +3663,14 @@ function calculateTransfers(balance) {
     creditors.sort((a, b) => b[1] - a[1]);
     debtors.sort((a, b) => b[1] - a[1]);
 
-    const amount = Math.min(creditors[0][1], debtors[0][1]);
+    const amount = Math.min(
+      creditors[0][1],
+      debtors[0][1]
+    );
 
     transfers.push({
-      from: debtors[0][0],
-      to: creditors[0][0],
+      from:debtors[0][0],
+      to:creditors[0][0],
       amount
     });
 
@@ -2437,9 +3691,13 @@ $("settle").onclick = () => {
     const currency = expense.cur || "TWD";
 
     const settlementCurrency =
-      expense.settle === "orig" ? currency : "TWD";
+      expense.settle === "orig"
+        ? currency
+        : "TWD";
 
-    if (!groups[settlementCurrency]) groups[settlementCurrency] = {};
+    if (!groups[settlementCurrency]) {
+      groups[settlementCurrency] = {};
+    }
 
     const balance = groups[settlementCurrency];
 
@@ -2447,18 +3705,27 @@ $("settle").onclick = () => {
       ? expense.amount
       : expense.amount * (RATE[currency] || 1);
 
-    balance[expense.payer] = (balance[expense.payer] || 0) + total;
+    balance[expense.payer] =
+      (balance[expense.payer] || 0) + total;
 
-    const shares = expense.split && Object.keys(expense.split).length
-      ? expense.split
-      : { [expense.payer]: expense.amount };
+    const shares =
+      expense.split &&
+      Object.keys(expense.split).length
+        ? expense.split
+        : {[expense.payer]:expense.amount};
 
     const shareTotal = Object.values(shares)
-      .reduce((sum, value) => sum + Number(value), 0);
+      .reduce((sum, value) =>
+        sum + Number(value), 0
+      );
 
     for (const [name, value] of Object.entries(shares)) {
-      const share = shareTotal ? total * Number(value) / shareTotal : 0;
-      balance[name] = (balance[name] || 0) - share;
+      const share = shareTotal
+        ? total * Number(value) / shareTotal
+        : 0;
+
+      balance[name] =
+        (balance[name] || 0) - share;
     }
   });
 
@@ -2474,10 +3741,13 @@ $("settle").onclick = () => {
       ${transfers.map(transfer => `
         <div class="box" style="background:var(--aq)">
           ${esc(transfer.from)} ➜ ${esc(transfer.to)}
-          <b>${esc(currency)} ${transfer.amount.toLocaleString(
-            undefined,
-            { maximumFractionDigits: 2 }
-          )}</b>
+          <b>
+            ${esc(currency)}
+            ${transfer.amount.toLocaleString(
+              undefined,
+              {maximumFractionDigits:2}
+            )}
+          </b>
         </div>
       `).join("")}
     `;
@@ -2489,312 +3759,966 @@ $("settle").onclick = () => {
   );
 };
 
-/* ---------- 旅遊提醒 ---------- */
-function renderReminders() {
+/* ---------- 目的地網頁與天氣 ---------- */
+const DESTINATION_GUIDES = [
+  [
+    /濟州|jeju/i,
+    "濟州島",33.4996,126.5312,
+    "https://www.visitjeju.net/tw"
+  ],
+  [
+    /首爾|seoul/i,
+    "首爾",37.5665,126.9780,
+    "https://big5chinese.visitkorea.or.kr/"
+  ],
+  [
+    /釜山|busan/i,
+    "釜山",35.1796,129.0756,
+    "https://www.visitbusan.net/"
+  ],
+  [
+    /仁川|incheon/i,
+    "仁川",37.4563,126.7052,
+    "https://big5chinese.visitkorea.or.kr/"
+  ],
+  [
+    /東京|tokyo/i,
+    "東京",35.6762,139.6503,
+    "https://www.gotokyo.org/tc/"
+  ],
+  [
+    /大阪|osaka/i,
+    "大阪",34.6937,135.5023,
+    "https://osaka-info.jp/tw/"
+  ],
+  [
+    /京都|kyoto/i,
+    "京都",35.0116,135.7681,
+    "https://kyoto.travel/tw/"
+  ],
+  [
+    /沖繩|okinawa/i,
+    "沖繩",26.2124,127.6809,
+    "https://visitokinawajapan.com/zh-hant/"
+  ],
+  [
+    /北海道|札幌|sapporo|hokkaido/i,
+    "札幌",43.0618,141.3545,
+    "https://www.visit-hokkaido.jp/tw/"
+  ],
+  [
+    /曼谷|bangkok/i,
+    "曼谷",13.7563,100.5018,
+    "https://www.tourismthailand.org/"
+  ],
+  [
+    /清邁|chiang mai/i,
+    "清邁",18.7883,98.9853,
+    "https://www.tourismthailand.org/"
+  ],
+  [
+    /普吉|phuket/i,
+    "普吉島",7.8804,98.3923,
+    "https://www.tourismthailand.org/"
+  ],
+  [
+    /新加坡|singapore/i,
+    "新加坡",1.3521,103.8198,
+    "https://www.visitsingapore.com/zh_cn/"
+  ],
+  [
+    /吉隆坡|kuala lumpur/i,
+    "吉隆坡",3.1390,101.6869,
+    "https://www.malaysia.travel/"
+  ],
+  [
+    /檳城|penang/i,
+    "檳城",5.4141,100.3288,
+    "https://www.malaysia.travel/"
+  ],
+  [
+    /香港|hong kong/i,
+    "香港",22.3193,114.1694,
+    "https://www.discoverhongkong.com/tc/"
+  ],
+  [
+    /澳門|macau/i,
+    "澳門",22.1987,113.5439,
+    "https://www.macaotourism.gov.mo/zh-hant/"
+  ]
+];
+
+function reminderDestination(name) {
+  const match = DESTINATION_GUIDES.find(row =>
+    row[0].test(name || "")
+  );
+
+  return match ? {
+    name:match[1],
+    latitude:match[2],
+    longitude:match[3],
+    official:match[4]
+  } : null;
+}
+
+async function publicJSON(url, signal) {
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+
+  if (signal?.aborted) {
+    throw new DOMException("Aborted", "AbortError");
+  }
+
+  signal?.addEventListener(
+    "abort",
+    abort,
+    {once:true}
+  );
+
+  const timer = setTimeout(abort, 12000);
+
+  try {
+    const response = await fetch(url, {
+      signal:controller.signal,
+      credentials:"omit",
+      referrerPolicy:"no-referrer"
+    });
+
+    if (!response.ok) {
+      throw new Error("Source unavailable");
+    }
+
+    return await response.json();
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener("abort", abort);
+  }
+}
+
+function wikiURL(destination, section = "") {
+  return "https://zh.wikivoyage.org/wiki/" +
+    encodeURIComponent(destination) +
+    (
+      section
+        ? "#" + encodeURIComponent(section)
+        : ""
+    );
+}
+
+async function fetchGuide(destination, signal) {
+  const api = "https://zh.wikivoyage.org/w/api.php";
+
+  const url = new URL(api);
+
+  url.search = new URLSearchParams({
+    action:"parse",
+    page:destination.name,
+    prop:"sections",
+    format:"json",
+    origin:"*",
+    redirects:"1"
+  });
+
+  const result = await publicJSON(url, signal);
+
+  if (!result.parse?.sections) {
+    throw new Error("Guide unavailable");
+  }
+
+  const sections = result.parse.sections.filter(section =>
+    /安全|健康|氣候|气候|交通|抵達|抵达|通訊|通讯|尊重|注意/
+      .test(section.line)
+  ).slice(0, 4);
+
+  if (!sections.length) {
+    throw new Error("No matching travel sections");
+  }
+
+  const excerpts = await Promise.all(
+    sections.map(async section => {
+      const part = new URL(api);
+
+      part.search = new URLSearchParams({
+        action:"parse",
+        page:destination.name,
+        section:section.index,
+        prop:"text",
+        format:"json",
+        origin:"*",
+        redirects:"1"
+      });
+
+      try {
+        const data = await publicJSON(part, signal);
+        const html = data.parse?.text?.["*"];
+
+        if (!html) return null;
+
+        const template =
+          document.createElement("template");
+
+        template.innerHTML = html;
+
+        template.content.querySelectorAll(
+          "script,style,sup,table,.mw-editsection,.hatnote,.toc"
+        ).forEach(node => node.remove());
+
+        const text = [
+          ...template.content.querySelectorAll("p,li")
+        ].map(node =>
+          node.textContent.replace(/\s+/g, " ").trim()
+        ).filter(line =>
+          line.length > 12
+        ).slice(0, 2).join("\n");
+
+        if (!text) return null;
+
+        const heading =
+          document.createElement("template");
+
+        heading.innerHTML = section.line;
+
+        return {
+          title:heading.content.textContent,
+          text:
+            text.slice(0, 700) +
+            (text.length > 700 ? "…" : ""),
+          url:wikiURL(
+            destination.name,
+            section.anchor
+          )
+        };
+      } catch (error) {
+        if (signal.aborted) throw error;
+        return null;
+      }
+    })
+  );
+
+  const items = excerpts.filter(Boolean);
+
+  if (!items.length) {
+    throw new Error("Guide unavailable");
+  }
+
+  return {
+    items,
+    at:Date.now()
+  };
+}
+
+async function fetchWeather(destination, signal) {
+  const url = new URL(
+    "https://api.open-meteo.com/v1/forecast"
+  );
+
+  url.search = new URLSearchParams({
+    latitude:destination.latitude,
+    longitude:destination.longitude,
+    daily:[
+      "weather_code",
+      "temperature_2m_max",
+      "temperature_2m_min",
+      "precipitation_probability_max",
+      "wind_speed_10m_max"
+    ].join(","),
+    timezone:"auto",
+    forecast_days:"7",
+    wind_speed_unit:"kmh"
+  });
+
+  const data = await publicJSON(url, signal);
+  const daily = data.daily;
+
+  if (
+    !daily ||
+    !Array.isArray(daily.time) ||
+    !daily.time.length
+  ) {
+    throw new Error("Weather unavailable");
+  }
+
+  for (const field of [
+    "weather_code",
+    "temperature_2m_max",
+    "temperature_2m_min",
+    "precipitation_probability_max",
+    "wind_speed_10m_max"
+  ]) {
+    if (
+      !Array.isArray(daily[field]) ||
+      daily[field].length !== daily.time.length
+    ) {
+      throw new Error("Incomplete weather response");
+    }
+  }
+
+  return {
+    daily,
+    at:Date.now()
+  };
+}
+
+function weatherSymbol(code) {
+  if (code === 0) return "☀";
+  if (code <= 3) return "⛅";
+  if (code === 45 || code === 48) return "≋";
+  if (code >= 95) return "⛈";
+
+  if ([71,73,75,77,85,86].includes(code)) {
+    return "❄";
+  }
+
+  return "☂";
+}
+
+function weatherScope(dates, times) {
+  const match = String(dates || "").match(
+    /(\d{4})[年/.-]?\s*(\d{1,2})[月/.-]\s*(\d{1,2})/
+  );
+
+  if (!match) {
+    return "以下為目的地近期預報，請確認是否涵蓋你的出發日期。";
+  }
+
+  const start =
+    match[1] + "-" +
+    match[2].padStart(2, "0") + "-" +
+    match[3].padStart(2, "0");
+
+  return times.includes(start)
+    ? "預報涵蓋出發日；行程後段仍可能超出預報範圍。"
+    : "旅程日期不在目前預報範圍內，以下僅供近期天氣參考，並非旅程當天預報。";
+}
+
+function weatherAdvice(daily) {
+  const numbers = field =>
+    daily[field].filter(value =>
+      typeof value === "number" &&
+      Number.isFinite(value)
+    );
+
+  const notes = [];
+
+  if (
+    numbers("temperature_2m_min")
+      .some(value => value < 12)
+  ) {
+    notes.push("近期低溫偏涼，準備保暖層與薄外套。");
+  }
+
+  if (
+    numbers("temperature_2m_max")
+      .some(value => value >= 30)
+  ) {
+    notes.push("近期白天可能炎熱，安排補水、遮陽與休息。");
+  }
+
+  if (
+    numbers("precipitation_probability_max")
+      .some(value => value >= 60)
+  ) {
+    notes.push(
+      "近期部分時段降雨機率較高，準備雨具並保留室內備案。"
+    );
+  }
+
+  if (
+    numbers("wind_speed_10m_max")
+      .some(value => value >= 35)
+  ) {
+    notes.push(
+      "近期可能有較強風，海邊、山區與船班出發前請再次確認狀況。"
+    );
+  }
+
+  if (
+    daily.weather_code.some(code =>
+      [71,73,75,77,85,86].includes(code)
+    )
+  ) {
+    notes.push(
+      "近期預報包含降雪，自駕前請查道路狀況並確認車輛配備。"
+    );
+  }
+
+  return notes.length
+    ? notes
+    : [
+        "近期預報沒有觸發額外穿搭提示，出發前仍請重新確認天氣。"
+      ];
+}
+
+function sourceTime(at) {
+  return new Date(at).toLocaleString(
+    "zh-TW",
+    {hour12:false}
+  );
+}
+
+function weatherHTML(data, destination, dates, stale = false) {
+  const daily = data.daily;
+
+  const temperature = value =>
+    typeof value === "number" && Number.isFinite(value)
+      ? Math.round(value) + "°"
+      : "—";
+
+  return `
+    <p class="hint">
+      ${esc(weatherScope(dates, daily.time))}
+    </p>
+
+    ${stale ? `
+      <p class="reminder-state">
+        更新失敗，以下保留上次成功查詢的資料。
+      </p>
+    ` : ""}
+
+    <div class="weather-strip">
+      ${daily.time.map((date, index) => `
+        <div class="weather-day">
+          <span>
+            ${esc(date.slice(5).replace("-", "/"))}
+          </span>
+          <b>${weatherSymbol(daily.weather_code[index])}</b>
+          <strong>
+            ${temperature(daily.temperature_2m_min[index])}
+            –
+            ${temperature(daily.temperature_2m_max[index])}
+          </strong>
+          <small>
+            降雨
+            ${esc(
+              daily.precipitation_probability_max[index] ?? "—"
+            )}%
+          </small>
+        </div>
+      `).join("")}
+    </div>
+
+    <ul class="weather-advice">
+      ${weatherAdvice(daily).map(note => `
+        <li>${esc(note)}</li>
+      `).join("")}
+    </ul>
+
+    <p class="source-line">
+      來源：
+      <a href="https://open-meteo.com/"
+        target="_blank" rel="noopener noreferrer">
+        Open-Meteo
+      </a>
+      · 查詢 ${esc(sourceTime(data.at))}
+      <br>
+      位置：${esc(destination.name)}市區代表點；
+      山區、海岸與離島可能不同。
+      <br>
+      以上為預報推導的準備建議，不是官方即時警報。
+    </p>
+  `;
+}
+
+function guideHTML(data, destination, stale = false) {
+  return `
+    ${stale ? `
+      <p class="reminder-state">
+        更新失敗，以下保留上次成功查詢的摘錄。
+      </p>
+    ` : ""}
+
+    ${data.items.map(item => `
+      <article class="guide-excerpt">
+        <h4>${esc(item.title)}</h4>
+        <p>${esc(item.text)}</p>
+        <a class="hint"
+          target="_blank" rel="noopener noreferrer"
+          href="${esc(item.url)}">
+          閱讀原頁 ↗
+        </a>
+      </article>
+    `).join("")}
+
+    <p class="source-line">
+      來源：
+      <a target="_blank" rel="noopener noreferrer"
+        href="${esc(wikiURL(destination.name))}">
+        維基導遊 · ${esc(destination.name)}
+      </a>
+      （CC BY-SA，授權詳見原頁）
+      <br>
+      查詢 ${esc(sourceTime(data.at))}。
+      社群旅遊資訊未必即時，交通、簽證與警報
+      請以主管機關公告為準。
+    </p>
+  `;
+}
+
+/* ---------- 固定參考資訊 ---------- */
+function basicReminders() {
   const type = destinationType(state.project?.name);
 
   const information = {
-    korea: [
-      ["🇰🇷 韓國天氣與穿搭", "早晚溫差與風勢可能較大，準備防風外套與好走的鞋。"],
-      ["🚗 地圖與交通", "韓國建議搭配 Naver Map。Google Maps 按鈕會開啟地點，不強制導航。"],
-      ["💳 支付", "信用卡普及，傳統市場及部分小店仍建議準備韓元現金。"],
-      ["🔌 插頭", "一般為 220V、圓形雙孔，請確認電器規格並準備轉接頭。"],
-      ["🚨 緊急聯絡", "警察 112｜消防與救護 119｜旅遊諮詢 1330"]
+    korea:[
+      ["🇰🇷 穿搭準備","依季節準備外套與好走的鞋，海岸與高處行程請另外確認風勢。"],
+      ["🚗 地圖與交通","建議搭配 Naver Map。自駕請確認駕照文件、保險、速限與停車規定。"],
+      ["💳 支付","信用卡較普及，傳統市場與小店可能需要韓元現金。"],
+      ["🔌 插頭","一般為 220V、圓形雙孔，請確認電器規格並準備轉接頭。"],
+      ["🚨 緊急聯絡","警察 112｜消防與救護 119｜旅遊諮詢 1330"]
     ],
-    japan: [
-      ["🇯🇵 日本交通", "可善用地鐵與鐵路，依目的地準備交通卡。"],
-      ["💳 支付", "部分小店與販賣機仍需現金。"],
-      ["🔌 插頭", "一般為 100V、雙孔扁平插頭。"],
-      ["🚨 緊急聯絡", "警察 110｜消防與救護 119"]
+    japan:[
+      ["🇯🇵 交通","善用地鐵與鐵路，依目的地確認交通卡與末班車時間。"],
+      ["💳 支付","部分小店、餐券機與販賣機仍可能需要現金。"],
+      ["🔌 插頭","一般為 100V、雙孔扁平插頭，確認電器電壓。"],
+      ["🚨 緊急聯絡","警察 110｜消防與救護 119"]
     ],
-    thailand: [
-      ["🇹🇭 泰國穿搭", "天氣炎熱，寺廟可能要求遮住肩膀與膝蓋。"],
-      ["🚗 交通", "可使用 Grab、Bolt 或當地大眾運輸；搭車前確認路線與費用。"],
-      ["💳 支付", "夜市與小吃店通常建議準備泰銖現金。"],
-      ["🔌 插頭", "一般為 220V，請確認住宿插座與電器規格。"],
-      ["🚨 緊急聯絡", "觀光警察 1155｜警察 191｜救護 1669"]
+    thailand:[
+      ["🇹🇭 穿搭","天氣可能炎熱，寺廟可能要求遮住肩膀與膝蓋。"],
+      ["🚗 交通","可使用 Grab、Bolt 或當地大眾運輸，搭車前確認路線與費用。"],
+      ["💳 支付","夜市與小吃店通常建議準備泰銖現金。"],
+      ["🔌 插頭","一般為 220V，請確認住宿插座與電器規格。"],
+      ["🚨 緊急聯絡","觀光警察 1155｜警察 191｜救護 1669"]
     ],
-    singapore: [
-      ["🇸🇬 新加坡交通", "可使用 MRT 與公車，確認交通卡或感應信用卡支援情況。"],
-      ["🔌 插頭", "一般為 230V、英規三孔方形插頭。"],
-      ["🚨 緊急聯絡", "警察 999｜消防與救護 995"]
+    singapore:[
+      ["🇸🇬 交通","可使用 MRT 與公車，確認交通卡或感應信用卡支援情況。"],
+      ["🔌 插頭","一般為 230V、英規三孔方形插頭。"],
+      ["🚨 緊急聯絡","警察 999｜消防與救護 995"]
     ],
-    malaysia: [
-      ["🇲🇾 馬來西亞交通", "可使用 Grab，部分區域適合搭配鐵路與公車。"],
-      ["💳 支付", "夜市與小店建議準備令吉現金。"],
-      ["🔌 插頭", "一般為 240V、英規三孔方形插頭。"],
-      ["🚨 緊急聯絡", "緊急求助 999"]
+    malaysia:[
+      ["🇲🇾 交通","可使用 Grab，部分區域適合搭配鐵路與公車。"],
+      ["💳 支付","夜市與小店建議準備令吉現金。"],
+      ["🔌 插頭","一般為 240V、英規三孔方形插頭。"],
+      ["🚨 緊急聯絡","緊急求助 999"]
     ],
-    hongkong: [
-      ["🇭🇰 香港交通", "八達通可用於多種交通與商店付款。"],
-      ["🔌 插頭", "一般為 220V、英規三孔方形插頭。"],
-      ["🚨 緊急聯絡", "緊急求助 999"]
+    hongkong:[
+      ["🇭🇰 交通","八達通可用於多種交通與商店付款。"],
+      ["🔌 插頭","一般為 220V、英規三孔方形插頭。"],
+      ["🚨 緊急聯絡","緊急求助 999"]
     ],
-    macau: [
-      ["🇲🇴 澳門交通", "可確認飯店接駁、公車與步行路線。"],
-      ["💳 支付", "出發前確認店家接受的幣別與支付方式。"],
-      ["🔌 插頭", "一般為 220V、英規三孔方形插頭。"],
-      ["🚨 緊急聯絡", "緊急求助 999"]
+    macau:[
+      ["🇲🇴 交通","可確認飯店接駁、公車與步行路線。"],
+      ["💳 支付","出發前確認店家接受的幣別與支付方式。"],
+      ["🔌 插頭","一般為 220V、英規三孔方形插頭。"],
+      ["🚨 緊急聯絡","緊急求助 999"]
     ],
-    general: [
-      ["🌍 出發前確認", "確認護照、簽證、保險、網路、交通與住宿資訊。"],
-      ["🔌 電器", "確認目的地電壓與插頭規格。"],
-      ["🧭 地圖", "地圖導航使用裝置目前位置，可能需要授予定位權限。"]
+    general:[
+      ["🌍 出發前確認","確認護照、簽證、保險、網路、交通與住宿資訊。"],
+      ["🔌 電器","確認目的地電壓與插頭規格。"],
+      ["🧭 地圖","導航可能需要授予裝置定位權限。"]
     ]
   };
 
-  $("tab-reminders").innerHTML = information[type].map(([title, text]) => `
+  return information[type].map(([title, text]) => `
     <article class="box">
       <h3>${esc(title)}</h3>
       <p>${esc(text)}</p>
     </article>
-  `).join("") + `
-    <p class="hint">以上為一般參考資訊，出發前請確認當地最新公告。</p>
+  `).join("");
+}
+
+function renderReminders(force = false) {
+  reminderController?.abort();
+  reminderController = new AbortController();
+
+  const signal = reminderController.signal;
+  const revision = projectRevision;
+
+  const destination = reminderDestination(
+    state.project?.name
+  );
+
+  const dates = state.project?.dates || "";
+
+  $("tab-reminders").innerHTML = `
+    <div class="detail-heading">
+      <span class="eyebrow">BEFORE YOU GO</span>
+      <h2>
+        ${esc(destination?.name || state.project?.name || "")}
+        ・出發前的小筆記
+      </h2>
+      <p class="hint">
+        天氣與旅遊網頁分別查詢，
+        並保留來源與查詢時間。
+      </p>
+    </div>
+
+    <section class="reminder-section">
+      <div class="row" style="margin-top:0">
+        <h3>近期天氣與準備</h3>
+        <button class="reminder-refresh" id="reminders-refresh">
+          重新查詢 ↻
+        </button>
+      </div>
+      <div id="weather-result" class="reminder-state">
+        ${destination
+          ? "正在查詢近期預報…"
+          : "目前無法從專案名稱確認城市，因此未查詢天氣。"}
+      </div>
+    </section>
+
+    <section class="reminder-section">
+      <h3>目的地網頁摘錄</h3>
+
+      <div id="guide-result" class="reminder-state">
+        ${destination
+          ? "正在讀取交通、安全與當地注意事項…"
+          : "目前無法確認對應頁面，請在專案名稱保留明確城市名稱。"}
+      </div>
+
+      ${destination ? `
+        <div class="reference-links">
+          <a target="_blank" rel="noopener noreferrer"
+            href="${esc(destination.official)}">
+            官方旅遊資訊 ↗
+          </a>
+          <a target="_blank" rel="noopener noreferrer"
+            href="${esc(wikiURL(destination.name))}">
+            維基導遊原頁 ↗
+          </a>
+        </div>
+      ` : ""}
+    </section>
+
+    <details>
+      <summary class="reminder-label">
+        基本旅行資訊（固定參考）
+      </summary>
+      ${basicReminders()}
+    </details>
   `;
+
+  $("reminders-refresh").onclick = () =>
+    renderReminders(true);
+
+  if (!destination) return;
+
+  const cache =
+    reminderCache.get(destination.name) || {};
+
+  let remaining = 2;
+
+  $("reminders-refresh").disabled = true;
+
+  function complete() {
+    remaining--;
+
+    if (
+      remaining === 0 &&
+      revision === projectRevision &&
+      !signal.aborted
+    ) {
+      $("reminders-refresh").disabled = false;
+    }
+  }
+
+  for (const kind of ["weather", "guide"]) {
+    const target = kind === "weather"
+      ? "weather-result"
+      : "guide-result";
+
+    function render(data, stale = false) {
+      if (
+        revision !== projectRevision ||
+        signal.aborted
+      ) return;
+
+      $(target).innerHTML = kind === "weather"
+        ? weatherHTML(data, destination, dates, stale)
+        : guideHTML(data, destination, stale);
+    }
+
+    if (
+      !force &&
+      cache[kind] &&
+      Date.now() - cache[kind].at < 30 * 60 * 1000
+    ) {
+      render(cache[kind]);
+      complete();
+      continue;
+    }
+
+    const operation = kind === "weather"
+      ? fetchWeather(destination, signal)
+      : fetchGuide(destination, signal);
+
+    operation.then(data => {
+      if (
+        signal.aborted ||
+        revision !== projectRevision
+      ) return;
+
+      cache[kind] = data;
+      reminderCache.set(destination.name, cache);
+
+      render(data);
+    }).catch(() => {
+      if (
+        signal.aborted ||
+        revision !== projectRevision
+      ) return;
+
+      if (cache[kind]) {
+        render(cache[kind], true);
+      } else {
+        $(target).textContent = kind === "weather"
+          ? "目前無法讀取天氣來源，請稍後重新查詢。"
+          : "目前無法讀取目的地網頁，請使用下方來源連結查看，或稍後重新查詢。";
+      }
+    }).finally(complete);
+  }
 }
 
 /* ---------- 旅行對話 ---------- */
 const LANGUAGE_CATEGORIES = [
-  ["airport", "✈️ 機場海關"],
-  ["hotel", "🏨 飯店住宿"],
-  ["restaurant", "🍽️ 餐廳美食"],
-  ["shopping", "🛍️ 購物商場"],
-  ["transport", "🚗 問路交通"],
-  ["smalltalk", "💬 日常寒暄"],
-  ["health", "💊 身體不適"],
-  ["emergency", "🚨 緊急求助"]
+  ["airport","✈️ 機場海關"],
+  ["hotel","🏨 飯店住宿"],
+  ["restaurant","🍽️ 餐廳美食"],
+  ["shopping","🛍️ 購物商場"],
+  ["transport","🚗 問路交通"],
+  ["smalltalk","💬 日常寒暄"],
+  ["health","💊 身體不適"],
+  ["emergency","🚨 緊急求助"]
 ];
 
 const LANGUAGES = {
-  korea: {
-    code: "ko-KR",
-    phrases: {
-      airport: [
-        ["我是來觀光的。", "관광하러 왔습니다."],
-        ["我會待七天。", "7일 동안 머물 예정입니다."],
-        ["這是我的護照。", "제 여권입니다."],
-        ["我有行李要托運。", "짐을 부치겠습니다."],
-        ["請給我靠窗的座位。", "창가 쪽 자리로 주세요."],
-        ["我的行李不見了。", "제 짐이 없어졌어요."]
+  korea:{
+    code:"ko-KR",
+    phrases:{
+      airport:[
+        ["我是來觀光的。","관광하러 왔습니다."],
+        ["我會待七天。","7일 동안 머물 예정입니다."],
+        ["這是我的護照。","제 여권입니다."],
+        ["我有行李要托運。","짐을 부치겠습니다."],
+        ["請給我靠窗的座位。","창가 쪽 자리로 주세요."],
+        ["我的行李不見了。","제 짐이 없어졌어요."]
       ],
-      hotel: [
-        ["我有訂房，名字是……", "예약했습니다. 이름은 …입니다."],
-        ["有含早餐嗎？", "조식이 포함되어 있나요?"],
-        ["可以寄放行李嗎？", "짐을 맡겨도 될까요?"],
-        ["Wi-Fi 密碼是什麼？", "와이파이 비밀번호가 뭐예요?"],
-        ["幾點退房？", "체크아웃 시간이 몇 시예요?"]
+      hotel:[
+        ["我有訂房，名字是……","예약했습니다. 이름은 …입니다."],
+        ["有含早餐嗎？","조식이 포함되어 있나요?"],
+        ["可以寄放行李嗎？","짐을 맡겨도 될까요?"],
+        ["Wi-Fi 密碼是什麼？","와이파이 비밀번호가 뭐예요?"],
+        ["幾點退房？","체크아웃 시간이 몇 시예요?"]
       ],
-      restaurant: [
-        ["我們有四個人。", "네 명입니다."],
-        ["有中文菜單嗎？", "중국어 메뉴판 있어요?"],
-        ["請推薦招牌菜。", "대표 메뉴 추천해 주세요."],
-        ["可以做不辣的嗎？", "안 맵게 해 주실 수 있나요?"],
-        ["我們要結帳。", "계산해 주세요."],
-        ["可以刷卡嗎？", "카드 되나요?"],
-        ["我要一杯冰美式咖啡。", "아이스 아메리카노 한 잔 주세요."]
+      restaurant:[
+        ["我們有四個人。","네 명입니다."],
+        ["有中文菜單嗎？","중국어 메뉴판 있어요?"],
+        ["請推薦招牌菜。","대표 메뉴 추천해 주세요."],
+        ["可以做不辣的嗎？","안 맵게 해 주실 수 있나요?"],
+        ["我們要結帳。","계산해 주세요."],
+        ["可以刷卡嗎？","카드 되나요?"],
+        ["我要一杯冰美式咖啡。","아이스 아메리카노 한 잔 주세요."]
       ],
-      shopping: [
-        ["這個多少錢？", "이거 얼마예요?"],
-        ["有其他顏色嗎？", "다른 색상 있어요?"],
-        ["可以試穿嗎？", "입어 봐도 되나요?"],
-        ["可以退稅嗎？", "택스 리펀드 되나요?"]
+      shopping:[
+        ["這個多少錢？","이거 얼마예요?"],
+        ["有其他顏色嗎？","다른 색상 있어요?"],
+        ["可以試穿嗎？","입어 봐도 되나요?"],
+        ["可以退稅嗎？","택스 리펀드 되나요?"]
       ],
-      transport: [
-        ["最近的地鐵站在哪裡？", "가장 가까운 지하철역이 어디예요?"],
-        ["怎麼去這個地方？", "여기에 어떻게 가요?"],
-        ["請載我到這個地址。", "이 주소로 가 주세요."]
+      transport:[
+        ["最近的地鐵站在哪裡？","가장 가까운 지하철역이 어디예요?"],
+        ["怎麼去這個地方？","여기에 어떻게 가요?"],
+        ["請載我到這個地址。","이 주소로 가 주세요."]
       ],
-      smalltalk: [
-        ["你好！", "안녕하세요!"],
-        ["謝謝。", "감사합니다."],
-        ["不好意思。", "실례합니다."],
-        ["對不起。", "죄송합니다."],
-        ["很好吃！", "맛있어요!"]
+      smalltalk:[
+        ["你好！","안녕하세요!"],
+        ["謝謝。","감사합니다."],
+        ["不好意思。","실례합니다."],
+        ["對不起。","죄송합니다."],
+        ["很好吃！","맛있어요!"]
       ],
-      health: [
-        ["我身體不舒服。", "몸이 안 좋아요."],
-        ["我頭痛。", "머리가 아파요."],
-        ["我肚子痛。", "배가 아파요."],
-        ["附近有藥局嗎？", "근처에 약국이 있어요?"]
+      health:[
+        ["我身體不舒服。","몸이 안 좋아요."],
+        ["我頭痛。","머리가 아파요."],
+        ["我肚子痛。","배가 아파요."],
+        ["附近有藥局嗎？","근처에 약국이 있어요?"]
       ],
-      emergency: [
-        ["請幫幫我！", "도와주세요!"],
-        ["我的護照被偷了。", "여권을 도둑맞았어요."],
-        ["我迷路了。", "길을 잃었어요."],
-        ["請幫我報警。", "경찰에 신고해 주세요."],
-        ["請叫救護車。", "구급차를 불러 주세요."]
+      emergency:[
+        ["請幫幫我！","도와주세요!"],
+        ["我的護照被偷了。","여권을 도둑맞았어요."],
+        ["我迷路了。","길을 잃었어요."],
+        ["請幫我報警。","경찰에 신고해 주세요."],
+        ["請叫救護車。","구급차를 불러 주세요."]
       ]
     }
   },
-  japan: {
-    code: "ja-JP",
-    phrases: {
-      airport: [
-        ["我是來觀光的。", "観光で来ました。"],
-        ["我會待五天。", "5日間滞在します。"],
-        ["這是我的護照。", "パスポートです。"],
-        ["我有行李要托運。", "荷物を預けたいです。"],
-        ["我的行李找不到。", "荷物が見つかりません。"]
+
+  japan:{
+    code:"ja-JP",
+    phrases:{
+      airport:[
+        ["我是來觀光的。","観光で来ました。"],
+        ["我會待五天。","5日間滞在します。"],
+        ["這是我的護照。","パスポートです。"],
+        ["我有行李要托運。","荷物を預けたいです。"],
+        ["我的行李找不到。","荷物が見つかりません。"]
       ],
-      hotel: [
-        ["我有預約。", "予約しています。"],
-        ["有含早餐嗎？", "朝食はついていますか？"],
-        ["可以寄放行李嗎？", "荷物を預かっていただけますか？"],
-        ["Wi-Fi 密碼是什麼？", "Wi-Fiのパスワードは何ですか？"],
-        ["幾點退房？", "チェックアウトは何時ですか？"]
+      hotel:[
+        ["我有預約。","予約しています。"],
+        ["有含早餐嗎？","朝食はついていますか？"],
+        ["可以寄放行李嗎？","荷物を預かっていただけますか？"],
+        ["Wi-Fi 密碼是什麼？","Wi-Fiのパスワードは何ですか？"],
+        ["幾點退房？","チェックアウトは何時ですか？"]
       ],
-      restaurant: [
-        ["我們有四個人。", "4人です。"],
-        ["有中文菜單嗎？", "中国語のメニューはありますか？"],
-        ["推薦什麼菜？", "おすすめは何ですか？"],
-        ["這個會辣嗎？", "これは辛いですか？"],
-        ["我們要結帳。", "お会計をお願いします。"],
-        ["可以刷卡嗎？", "カードは使えますか？"],
-        ["我要一杯冰咖啡。", "アイスコーヒーを一つお願いします。"]
+      restaurant:[
+        ["我們有四個人。","4人です。"],
+        ["有中文菜單嗎？","中国語のメニューはありますか？"],
+        ["推薦什麼菜？","おすすめは何ですか？"],
+        ["這個會辣嗎？","これは辛いですか？"],
+        ["我們要結帳。","お会計をお願いします。"],
+        ["可以刷卡嗎？","カードは使えますか？"],
+        ["我要一杯冰咖啡。","アイスコーヒーを一つお願いします。"]
       ],
-      shopping: [
-        ["這個多少錢？", "これはいくらですか？"],
-        ["有其他顏色嗎？", "他の色はありますか？"],
-        ["可以試穿嗎？", "試着してもいいですか？"],
-        ["可以退稅嗎？", "免税できますか？"]
+      shopping:[
+        ["這個多少錢？","これはいくらですか？"],
+        ["有其他顏色嗎？","他の色はありますか？"],
+        ["可以試穿嗎？","試着してもいいですか？"],
+        ["可以退稅嗎？","免税できますか？"]
       ],
-      transport: [
-        ["最近的車站在哪裡？", "一番近い駅はどこですか？"],
-        ["怎麼去這裡？", "ここへはどう行きますか？"],
-        ["請載我到這個地址。", "この住所までお願いします。"]
+      transport:[
+        ["最近的車站在哪裡？","一番近い駅はどこですか？"],
+        ["怎麼去這裡？","ここへはどう行きますか？"],
+        ["請載我到這個地址。","この住所までお願いします。"]
       ],
-      smalltalk: [
-        ["你好！", "こんにちは！"],
-        ["謝謝。", "ありがとうございます。"],
-        ["不好意思。", "すみません。"],
-        ["很好吃！", "美味しいです！"]
+      smalltalk:[
+        ["你好！","こんにちは！"],
+        ["謝謝。","ありがとうございます。"],
+        ["不好意思。","すみません。"],
+        ["很好吃！","美味しいです！"]
       ],
-      health: [
-        ["我身體不舒服。", "気分が悪いです。"],
-        ["我頭痛。", "頭が痛いです。"],
-        ["附近有藥局嗎？", "近くに薬局はありますか？"]
+      health:[
+        ["我身體不舒服。","気分が悪いです。"],
+        ["我頭痛。","頭が痛いです。"],
+        ["附近有藥局嗎？","近くに薬局はありますか？"]
       ],
-      emergency: [
-        ["救命！", "助けてください！"],
-        ["護照被偷了。", "パスポートが盗まれました。"],
-        ["我迷路了。", "道に迷いました。"],
-        ["請幫我叫警察。", "警察を呼んでください。"]
+      emergency:[
+        ["救命！","助けてください！"],
+        ["護照被偷了。","パスポートが盗まれました。"],
+        ["我迷路了。","道に迷いました。"],
+        ["請幫我叫警察。","警察を呼んでください。"]
       ]
     }
   },
-  thailand: {
-    code: "th-TH",
-    phrases: {
-      airport: [
-        ["我是來觀光的。", "ฉันมาท่องเที่ยว"],
-        ["我會待五天。", "ฉันจะอยู่ห้าวัน"],
-        ["這是我的護照。", "นี่คือหนังสือเดินทางของฉัน"]
+
+  thailand:{
+    code:"th-TH",
+    phrases:{
+      airport:[
+        ["我是來觀光的。","ฉันมาท่องเที่ยว"],
+        ["我會待五天。","ฉันจะอยู่ห้าวัน"],
+        ["這是我的護照。","นี่คือหนังสือเดินทางของฉัน"]
       ],
-      hotel: [
-        ["我有訂房。", "ฉันจองห้องไว้"],
-        ["有含早餐嗎？", "รวมอาหารเช้าด้วยไหม"],
-        ["可以寄放行李嗎？", "ฝากกระเป๋าไว้ก่อนได้ไหม"],
-        ["幾點退房？", "เช็คเอาท์กี่โมง"]
+      hotel:[
+        ["我有訂房。","ฉันจองห้องไว้"],
+        ["有含早餐嗎？","รวมอาหารเช้าด้วยไหม"],
+        ["可以寄放行李嗎？","ฝากกระเป๋าไว้ก่อนได้ไหม"],
+        ["幾點退房？","เช็คเอาท์กี่โมง"]
       ],
-      restaurant: [
-        ["我們有四個人。", "มาสี่คน"],
-        ["有英文菜單嗎？", "มีเมนูภาษาอังกฤษไหม"],
-        ["不要太辣。", "ไม่เผ็ดมาก"],
-        ["我要結帳。", "เก็บเงินด้วย"],
-        ["可以刷卡嗎？", "จ่ายด้วยบัตรเครดิตได้ไหม"]
+      restaurant:[
+        ["我們有四個人。","มาสี่คน"],
+        ["有英文菜單嗎？","มีเมนูภาษาอังกฤษไหม"],
+        ["不要太辣。","ไม่เผ็ดมาก"],
+        ["我要結帳。","เก็บเงินด้วย"],
+        ["可以刷卡嗎？","จ่ายด้วยบัตรเครดิตได้ไหม"]
       ],
-      shopping: [
-        ["這個多少錢？", "อันนี้ราคาเท่าไหร่"],
-        ["可以便宜一點嗎？", "ลดราคาหน่อยได้ไหม"],
-        ["有其他顏色嗎？", "มีสีอื่นไหม"]
+      shopping:[
+        ["這個多少錢？","อันนี้ราคาเท่าไหร่"],
+        ["可以便宜一點嗎？","ลดราคาหน่อยได้ไหม"],
+        ["有其他顏色嗎？","มีสีอื่นไหม"]
       ],
-      transport: [
-        ["去這裡多少錢？", "ไปที่นี่ราคาเท่าไหร่"],
-        ["請跳錶。", "กรุณาใช้มิเตอร์"],
-        ["請在這裡停車。", "จอดตรงนี้"]
+      transport:[
+        ["去這裡多少錢？","ไปที่นี่ราคาเท่าไหร่"],
+        ["請跳錶。","กรุณาใช้มิเตอร์"],
+        ["請在這裡停車。","จอดตรงนี้"]
       ],
-      smalltalk: [
-        ["你好。", "สวัสดี"],
-        ["謝謝。", "ขอบคุณ"],
-        ["對不起。", "ขอโทษ"],
-        ["很好吃。", "อร่อยมาก"]
+      smalltalk:[
+        ["你好。","สวัสดี"],
+        ["謝謝。","ขอบคุณ"],
+        ["對不起。","ขอโทษ"],
+        ["很好吃。","อร่อยมาก"]
       ],
-      health: [
-        ["我身體不舒服。", "ฉันไม่สบาย"],
-        ["我頭痛。", "ฉันปวดหัว"],
-        ["附近有藥局嗎？", "มีร้านขายยาแถวนี้ไหม"]
+      health:[
+        ["我身體不舒服。","ฉันไม่สบาย"],
+        ["我頭痛。","ฉันปวดหัว"],
+        ["附近有藥局嗎？","มีร้านขายยาแถวนี้ไหม"]
       ],
-      emergency: [
-        ["救命！", "ช่วยด้วย!"],
-        ["我迷路了。", "ฉันหลงทาง"],
-        ["請幫我叫警察。", "ช่วยเรียกตำรวจให้หน่อย"],
-        ["請幫我叫救護車。", "ช่วยเรียกรถพยาบาลให้หน่อย"]
+      emergency:[
+        ["救命！","ช่วยด้วย!"],
+        ["我迷路了。","ฉันหลงทาง"],
+        ["請幫我叫警察。","ช่วยเรียกตำรวจให้หน่อย"],
+        ["請幫我叫救護車。","ช่วยเรียกรถพยาบาลให้หน่อย"]
       ]
     }
   },
-  general: {
-    code: "en-US",
-    phrases: {
-      airport: [
-        ["我是來觀光的。", "I'm here for sightseeing."],
-        ["我會待五天。", "I'll be staying for five days."],
-        ["這是我的護照。", "Here is my passport."]
+
+  general:{
+    code:"en-US",
+    phrases:{
+      airport:[
+        ["我是來觀光的。","I'm here for sightseeing."],
+        ["我會待五天。","I'll be staying for five days."],
+        ["這是我的護照。","Here is my passport."]
       ],
-      hotel: [
-        ["我有訂房。", "I have a reservation."],
-        ["有含早餐嗎？", "Is breakfast included?"],
-        ["可以寄放行李嗎？", "Could I store my luggage here?"],
-        ["Wi-Fi 密碼是什麼？", "What is the Wi-Fi password?"]
+      hotel:[
+        ["我有訂房。","I have a reservation."],
+        ["有含早餐嗎？","Is breakfast included?"],
+        ["可以寄放行李嗎？","Could I store my luggage here?"],
+        ["Wi-Fi 密碼是什麼？","What is the Wi-Fi password?"]
       ],
-      restaurant: [
-        ["我們有四個人。", "A table for four, please."],
-        ["有英文菜單嗎？", "Do you have an English menu?"],
-        ["我們要結帳。", "Could we have the bill, please?"],
-        ["可以刷卡嗎？", "Do you take cards?"]
+      restaurant:[
+        ["我們有四個人。","A table for four, please."],
+        ["有英文菜單嗎？","Do you have an English menu?"],
+        ["我們要結帳。","Could we have the bill, please?"],
+        ["可以刷卡嗎？","Do you take cards?"]
       ],
-      shopping: [
-        ["這個多少錢？", "How much is this?"],
-        ["有其他顏色嗎？", "Do you have other colors?"],
-        ["可以退稅嗎？", "Can I get a tax refund?"]
+      shopping:[
+        ["這個多少錢？","How much is this?"],
+        ["有其他顏色嗎？","Do you have other colors?"],
+        ["可以退稅嗎？","Can I get a tax refund?"]
       ],
-      transport: [
-        ["最近的車站在哪裡？", "Where is the nearest station?"],
-        ["請載我到這個地址。", "Please take me to this address."]
+      transport:[
+        ["最近的車站在哪裡？","Where is the nearest station?"],
+        ["請載我到這個地址。","Please take me to this address."]
       ],
-      smalltalk: [
-        ["你好。", "Hello!"],
-        ["非常感謝。", "Thank you very much."],
-        ["不好意思。", "Excuse me."],
-        ["很好吃。", "This is delicious!"]
+      smalltalk:[
+        ["你好。","Hello!"],
+        ["非常感謝。","Thank you very much."],
+        ["不好意思。","Excuse me."],
+        ["很好吃。","This is delicious!"]
       ],
-      health: [
-        ["我身體不舒服。", "I feel sick."],
-        ["附近有藥局嗎？", "Is there a pharmacy nearby?"]
+      health:[
+        ["我身體不舒服。","I feel sick."],
+        ["附近有藥局嗎？","Is there a pharmacy nearby?"]
       ],
-      emergency: [
-        ["救命！", "Help!"],
-        ["我的護照被偷了。", "My passport has been stolen."],
-        ["請幫我報警。", "Please call the police."],
-        ["請叫救護車。", "Please call an ambulance."]
+      emergency:[
+        ["救命！","Help!"],
+        ["我的護照被偷了。","My passport has been stolen."],
+        ["請幫我報警。","Please call the police."],
+        ["請叫救護車。","Please call an ambulance."]
       ]
     }
   }
 };
 
 function currentLanguage() {
-  return LANGUAGES[destinationType(state.project?.name)] ||
-    LANGUAGES.general;
+  return LANGUAGES[
+    destinationType(state.project?.name)
+  ] || LANGUAGES.general;
 }
 
 function renderLanguage() {
   state.phrase = null;
-  $("phrase-chinese").textContent = "請選擇下方情境與句子";
-  $("phrase-foreign").textContent = "想說什麼呢？";
+
+  $("phrase-chinese").textContent =
+    "請選擇下方情境與句子";
+
+  $("phrase-foreign").textContent =
+    "想說什麼呢？";
 
   const language = currentLanguage();
 
   function show(categoryName) {
-    $("language-categories").querySelectorAll("button")
+    $("language-categories")
+      .querySelectorAll("button")
       .forEach(button => {
         button.classList.toggle(
           "on",
@@ -2802,20 +4726,28 @@ function renderLanguage() {
         );
       });
 
-    const phrases = language.phrases[categoryName] || [];
+    const phrases =
+      language.phrases[categoryName] || [];
 
-    $("language-phrases").innerHTML = phrases.map((phrase, index) => `
-      <button class="box item" data-phrase="${index}"
-        style="width:100%;font:inherit;color:inherit;text-align:left;margin:0 0 10px">
-        <b>${esc(phrase[0])}</b>
-        <small style="color:var(--co)">${esc(phrase[1])}</small>
-      </button>
-    `).join("");
+    $("language-phrases").innerHTML =
+      phrases.map((phrase, index) => `
+        <button class="box"
+          data-phrase="${index}"
+          style="width:100%;font:inherit;color:inherit;text-align:left;margin:0 0 10px;cursor:pointer">
+          <b style="display:block">${esc(phrase[0])}</b>
+          <small style="color:var(--co)">
+            ${esc(phrase[1])}
+          </small>
+        </button>
+      `).join("");
 
-    $("language-phrases").querySelectorAll("[data-phrase]")
+    $("language-phrases")
+      .querySelectorAll("[data-phrase]")
       .forEach(button => {
         button.onclick = () => {
-          const phrase = phrases[Number(button.dataset.phrase)];
+          const phrase =
+            phrases[Number(button.dataset.phrase)];
+
           state.phrase = phrase;
 
           $("phrase-chinese").textContent = phrase[0];
@@ -2826,12 +4758,16 @@ function renderLanguage() {
 
   $("language-categories").innerHTML =
     LANGUAGE_CATEGORIES.map(([key, label]) => `
-      <button class="btn" data-category="${key}">${label}</button>
+      <button class="btn" data-category="${key}">
+        ${label}
+      </button>
     `).join("");
 
-  $("language-categories").querySelectorAll("button")
+  $("language-categories")
+    .querySelectorAll("button")
     .forEach(button => {
-      button.onclick = () => show(button.dataset.category);
+      button.onclick = () =>
+        show(button.dataset.category);
     });
 
   show("airport");
@@ -2847,7 +4783,9 @@ $("speak").onclick = () => {
 
   speechSynthesis.cancel();
 
-  const utterance = new SpeechSynthesisUtterance(state.phrase[1]);
+  const utterance =
+    new SpeechSynthesisUtterance(state.phrase[1]);
+
   utterance.lang = currentLanguage().code;
 
   speechSynthesis.speak(utterance);
@@ -2855,6 +4793,7 @@ $("speak").onclick = () => {
 
 /* ---------- 啟動 ---------- */
 $("refresh").onclick = () => location.reload();
+
 $("home-art").innerHTML = scene();
 $("auth-art").innerHTML = scene();
 
