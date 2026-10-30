@@ -3167,7 +3167,6 @@ function openCheckin(scheduleId) {
       runButton(cancelButton, async () => {
         await deleteDoc(reference);
         mask.remove();
-        notify("已取消打卡。");
       });
   }
 }
