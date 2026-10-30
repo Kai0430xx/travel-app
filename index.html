@@ -2236,11 +2236,15 @@ function renderSchedules() {
   if (
     state.day !== "all" &&
     !days.includes(state.day)
-  ) state.day = "all";
+  ) {
+    state.day = "all";
+  }
 
   $("days").innerHTML = ["all", ...days].map(day => `
-    <button class="pill ${day === state.day ? "on" : ""}"
-      data-day="${esc(day)}">
+    <button
+      class="pill ${day === state.day ? "on" : ""}"
+      data-day="${esc(day)}"
+    >
       ${day === "all" ? "全部" : esc(day)}
     </button>
   `).join("");
@@ -2259,16 +2263,58 @@ function renderSchedules() {
   ).sort(scheduleOrder);
 
   $("schedules").innerHTML = list.length
-    ? list.map(schedule => `
-        <button class="schedule-link"
-          data-detail="${esc(schedule.id)}"
-          aria-label="${esc(
-            cleanTitle(schedule.title) + "，查看行程詳情"
-          )}">
-          <b>${esc(cleanTitle(schedule.title))}</b>
-          <span aria-hidden="true">›</span>
-        </button>
-      `).join("")
+    ? list.map(schedule => {
+        const time = String(schedule.time || "").trim();
+        const day = schedule.day || "Day 1";
+        const timeLabel = time || "時間待安排";
+        const label = state.day === "all"
+          ? `${day} · ${timeLabel}`
+          : timeLabel;
+        const title = cleanTitle(schedule.title);
+
+        return `
+          <button
+            class="schedule-link"
+            data-detail="${esc(schedule.id)}"
+            aria-label="${esc(
+              `${day}，${timeLabel}，${title}，查看行程詳情`
+            )}"
+          >
+            <b style="
+              display:flex;
+              flex-direction:column;
+              align-items:flex-start;
+              gap:8px;
+              min-width:0;
+              font-weight:normal;
+            ">
+              <small style="
+                display:inline-block;
+                padding:2px 10px;
+                border:1px solid var(--ink, #403c39);
+                border-radius:999px;
+                background:var(--yellow, #f4d681);
+                color:var(--ink, #403c39);
+                font-size:12px;
+                line-height:1.5;
+                font-weight:normal;
+              ">
+                ${esc(label)}
+              </small>
+
+              <span style="
+                font-size:14px;
+                line-height:1.6;
+                overflow-wrap:anywhere;
+              ">
+                ${esc(title)}
+              </span>
+            </b>
+
+            <span aria-hidden="true">›</span>
+          </button>
+        `;
+      }).join("")
     : `
       <p class="mute">
         還沒有行程，新增或貼上文字導入吧 ✨
