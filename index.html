@@ -4256,64 +4256,435 @@ function guideHTML(data, destination, stale = false) {
 
 /* ---------- 固定參考資訊 ---------- */
 function basicReminders() {
-  const type = destinationType(state.project?.name);
+  const projectName = state.project?.name || "";
+  const dates = state.project?.dates || "";
+  const type = destinationType(projectName);
+  const isJeju = /濟州|jeju/i.test(projectName);
 
-  const information = {
-    korea:[
-      ["🇰🇷 穿搭準備","依季節準備外套與好走的鞋，海岸與高處行程請另外確認風勢。"],
-      ["🚗 地圖與交通","建議搭配 Naver Map。自駕請確認駕照文件、保險、速限與停車規定。"],
-      ["💳 支付","信用卡較普及，傳統市場與小店可能需要韓元現金。"],
-      ["🔌 插頭","一般為 220V、圓形雙孔，請確認電器規格並準備轉接頭。"],
-      ["🚨 緊急聯絡","警察 112｜消防與救護 119｜旅遊諮詢 1330"]
-    ],
-    japan:[
-      ["🇯🇵 交通","善用地鐵與鐵路，依目的地確認交通卡與末班車時間。"],
-      ["💳 支付","部分小店、餐券機與販賣機仍可能需要現金。"],
-      ["🔌 插頭","一般為 100V、雙孔扁平插頭，確認電器電壓。"],
-      ["🚨 緊急聯絡","警察 110｜消防與救護 119"]
-    ],
-    thailand:[
-      ["🇹🇭 穿搭","天氣可能炎熱，寺廟可能要求遮住肩膀與膝蓋。"],
-      ["🚗 交通","可使用 Grab、Bolt 或當地大眾運輸，搭車前確認路線與費用。"],
-      ["💳 支付","夜市與小吃店通常建議準備泰銖現金。"],
-      ["🔌 插頭","一般為 220V，請確認住宿插座與電器規格。"],
-      ["🚨 緊急聯絡","觀光警察 1155｜警察 191｜救護 1669"]
-    ],
-    singapore:[
-      ["🇸🇬 交通","可使用 MRT 與公車，確認交通卡或感應信用卡支援情況。"],
-      ["🔌 插頭","一般為 230V、英規三孔方形插頭。"],
-      ["🚨 緊急聯絡","警察 999｜消防與救護 995"]
-    ],
-    malaysia:[
-      ["🇲🇾 交通","可使用 Grab，部分區域適合搭配鐵路與公車。"],
-      ["💳 支付","夜市與小店建議準備令吉現金。"],
-      ["🔌 插頭","一般為 240V、英規三孔方形插頭。"],
-      ["🚨 緊急聯絡","緊急求助 999"]
-    ],
-    hongkong:[
-      ["🇭🇰 交通","八達通可用於多種交通與商店付款。"],
-      ["🔌 插頭","一般為 220V、英規三孔方形插頭。"],
-      ["🚨 緊急聯絡","緊急求助 999"]
-    ],
-    macau:[
-      ["🇲🇴 交通","可確認飯店接駁、公車與步行路線。"],
-      ["💳 支付","出發前確認店家接受的幣別與支付方式。"],
-      ["🔌 插頭","一般為 220V、英規三孔方形插頭。"],
-      ["🚨 緊急聯絡","緊急求助 999"]
-    ],
-    general:[
-      ["🌍 出發前確認","確認護照、簽證、保險、網路、交通與住宿資訊。"],
-      ["🔌 電器","確認目的地電壓與插頭規格。"],
-      ["🧭 地圖","導航可能需要授予裝置定位權限。"]
-    ]
-  };
+  const selfDrive =
+    /自駕|租車|還車/.test(projectName) ||
+    state.schedules.some(item =>
+      /租車|還車|自駕/.test(item.title || "")
+    );
 
-  return information[type].map(([title, text]) => `
-    <article class="box">
-      <h3>${esc(title)}</h3>
-      <p>${esc(text)}</p>
-    </article>
-  `).join("");
+  const country = {
+    korea: {
+      currency: "韓元（KRW）",
+      code: "KRW",
+
+      power:
+        "一般為 220V、60Hz，常見 C／F 型圓形雙孔插座。",
+
+      adapter:
+        "準備適合韓國插座的圓形雙孔轉接頭。",
+
+      transport:
+        "地圖可搭配 Naver Map；搭乘大眾運輸前，先確認交通卡購買及儲值方式。",
+
+      emergency:
+        "警察 112｜消防、救護 119｜旅遊諮詢 1330。",
+
+      entry:
+        "依自己的國籍與出發日期確認免簽、簽證、K-ETA 及入境申報要求；不要只依過往旅遊經驗判斷。",
+
+      entryURL: "https://www.k-eta.go.kr/",
+      entryLabel: "韓國 K-ETA 官方網站",
+
+      etiquette:
+        "餐廳可能有每人低消、最後點餐或休息時段；市場、小店及熱門餐廳的支付與預約方式需分別確認。"
+    },
+
+    japan: {
+      currency: "日圓（JPY）",
+      code: "JPY",
+
+      power:
+        "一般為 100V、A 型雙孔扁平插座；頻率依地區可能為 50Hz 或 60Hz。",
+
+      adapter:
+        "雙孔扁平插頭通常可直接插入；三腳插頭及其他規格需確認轉接方式。",
+
+      transport:
+        "確認交通卡支援地區、車票種類、轉乘方式與末班車；熱門列車、巴士可能需要事先預約。",
+
+      emergency:
+        "警察 110｜消防、救護 119。",
+
+      entry:
+        "依國籍確認簽證或免簽條件；如使用 Visit Japan Web，請確認資料、護照與實際航班一致。",
+
+      entryURL: "https://www.vjw.digital.go.jp/",
+      entryLabel: "Visit Japan Web 官方網站",
+
+      etiquette:
+        "部分餐廳使用餐券機或只收現金；搭車、排隊與溫泉設施請遵守現場規定。"
+    },
+
+    thailand: {
+      currency: "泰銖（THB）",
+      code: "THB",
+
+      power:
+        "一般為 220V、50Hz；插座規格依住宿與場所可能不同。",
+
+      adapter:
+        "建議準備合規的萬用轉接頭，不要只根據插頭外觀判斷電壓。",
+
+      transport:
+        "可比較 Grab、Bolt 與當地大眾運輸；尖峰時段預留塞車時間，搭車前確認車牌、目的地與費用。",
+
+      emergency:
+        "警察 191｜醫療救護 1669｜觀光警察 1155。",
+
+      entry:
+        "確認出發日期適用的簽證或免簽條件及入境申報要求；以泰國官方最新公告為準。",
+
+      entryURL: "https://www.thaievisa.go.th/",
+      entryLabel: "泰國簽證官方網站",
+
+      etiquette:
+        "進入寺廟可能需要遮住肩膀與膝蓋、脫鞋；避免接觸野生動物，活動項目先確認保險保障範圍。"
+    },
+
+    singapore: {
+      currency: "新加坡元（SGD）",
+      code: "SGD",
+
+      power:
+        "一般為 230V、50Hz，常見 G 型英規三孔方形插座。",
+
+      adapter:
+        "準備英規三孔轉接頭。",
+
+      transport:
+        "可使用 MRT 與公車；確認交通卡或感應信用卡支援情況、交易費用及進出站使用方式。",
+
+      emergency:
+        "警察 999｜消防、救護 995。",
+
+      entry:
+        "確認簽證資格及 SG Arrival Card 等申報要求，並注意海關限制物品。",
+
+      entryURL:
+        "https://www.ica.gov.sg/enter-transit-depart",
+
+      entryLabel: "新加坡 ICA 入境資訊",
+
+      etiquette:
+        "公共交通、飲食場所與公共空間有各自規範，請遵守現場禁食、禁菸及清潔指示。"
+    },
+
+    malaysia: {
+      currency: "馬來西亞令吉（MYR）",
+      code: "MYR",
+
+      power:
+        "一般為 230–240V、50Hz，常見 G 型英規三孔方形插座。",
+
+      adapter:
+        "準備英規三孔轉接頭。",
+
+      transport:
+        "可搭配 Grab、鐵路與公車；跨城或離島交通請確認末班、船班及營運日。",
+
+      emergency:
+        "緊急求助 999。",
+
+      entry:
+        "確認簽證、免簽及 Malaysia Digital Arrival Card 等申報規定是否適用。",
+
+      entryURL: "https://www.imi.gov.my/",
+      entryLabel: "馬來西亞移民局",
+
+      etiquette:
+        "宗教場所可能要求服裝遮蔽、脫鞋；飲食禁忌、營業時間與節日期間安排需另外確認。"
+    },
+
+    hongkong: {
+      currency: "港幣（HKD）",
+      code: "HKD",
+
+      power:
+        "一般為 220V、50Hz，常見 G 型英規三孔方形插座。",
+
+      adapter:
+        "準備英規三孔轉接頭。",
+
+      transport:
+        "可使用港鐵、公車、渡輪等；確認八達通購買、儲值與退款條件。",
+
+      emergency:
+        "緊急求助 999。",
+
+      entry:
+        "依自己的旅行證件確認簽證、預辦登記或其他入境許可要求。",
+
+      entryURL:
+        "https://www.immd.gov.hk/hkt/services/visas/visit-transit.html",
+
+      entryLabel: "香港入境事務處",
+
+      etiquette:
+        "部分小店或茶餐廳可能只接受特定付款方式；留意繁忙時段、併桌與餐廳用餐規則。"
+    },
+
+    macau: {
+      currency: "澳門元（MOP）",
+      code: "MOP",
+
+      power:
+        "一般為 220V、50Hz，常見 G 型英規三孔方形插座。",
+
+      adapter:
+        "準備英規三孔轉接頭。",
+
+      transport:
+        "可先確認飯店接駁、公車及步行路線；接駁站點、班距與服務時間依業者公告。",
+
+      emergency:
+        "緊急求助 999。",
+
+      entry:
+        "依自己的旅行證件確認入境資格及可停留期限；跨境移動另外確認通關時間。",
+
+      entryURL: "https://www.gov.mo/zh-hant/",
+      entryLabel: "澳門政府資訊",
+
+      etiquette:
+        "澳門元與港幣的接受方式、找零及匯率由店家而異，付款前先確認。"
+    },
+
+    general: {
+      currency: "請依目的地確認當地幣別",
+      code: "",
+
+      power:
+        "目前無法確認目的地的電壓、頻率與插座型式，請在出發前查證。",
+
+      adapter:
+        "依目的地準備合規轉接頭，並確認電器適用電壓。",
+
+      transport:
+        "確認當地交通卡、叫車方式、末班車及住宿周邊交通。",
+
+      emergency:
+        "先儲存當地警察、消防、救護及駐外館處的聯絡方式。",
+
+      entry:
+        "依國籍、護照與旅行日期查詢簽證、免簽及入境申報要求。",
+
+      entryURL: "https://www.boca.gov.tw/",
+      entryLabel: "外交部領事事務局",
+
+      etiquette:
+        "確認當地宗教、拍攝、用餐、服裝及公共空間規範。"
+    }
+  }[type];
+
+  const monthMatch = dates.match(
+    /\d{4}[年/.-]?\s*(\d{1,2})/
+  );
+
+  const month = monthMatch
+    ? Number(monthMatch[1])
+    : null;
+
+  let seasonal =
+    "採可增減的分層穿搭，依旅行日期的實際預報調整厚薄。";
+
+  if (type === "korea" || type === "japan") {
+    if ([12, 1, 2].includes(month)) {
+      seasonal =
+        "冬季可準備保暖內層、毛衣或刷毛中層、外套、圍巾及手套；厚度依目的地與實際預報調整。";
+    } else if ([3, 4, 5].includes(month)) {
+      seasonal =
+        "春季準備長袖、薄外套與可疊穿的中層，早晚與日間需求可能不同。";
+    } else if ([6, 7, 8].includes(month)) {
+      seasonal =
+        "夏季準備透氣衣物、遮陽帽與防曬用品，另備薄外套因應冷氣與雨天。";
+    } else if ([9, 10, 11].includes(month)) {
+      seasonal =
+        "秋季準備長袖、可疊穿的保暖中層與防風外套，避免只帶白天適合的薄衣。";
+    }
+  } else if (
+    ["thailand", "singapore", "malaysia"].includes(type)
+  ) {
+    seasonal =
+      "準備透氣快乾衣物、遮陽用品與雨具，另備薄外套因應室內冷氣；宗教場所服裝另行準備。";
+  }
+
+  const referenceRate =
+    country.code && RATE[country.code]
+      ? `此網站分帳參考：1 ${country.code} 約 NT$ ${RATE[country.code]}；這是固定估算，非即時銀行匯率。`
+      : "換匯前確認銀行牌告、手續費與實際可取得的金額。";
+
+  function card(title, items, links = "") {
+    return `
+      <section class="reminder-section">
+        <h3>${esc(title)}</h3>
+
+        <ul style="
+          padding-left:20px;
+          margin:12px 0 0;
+          font-size:14px;
+          line-height:1.95;
+        ">
+          ${items.map(text => `
+            <li style="margin:7px 0">
+              ${esc(text)}
+            </li>
+          `).join("")}
+        </ul>
+
+        ${links ? `
+          <div class="reference-links">
+            ${links}
+          </div>
+        ` : ""}
+      </section>
+    `;
+  }
+
+  return [
+    card("02 衣物與穿著", [
+      seasonal,
+
+      isJeju
+        ? "濟州島海岸、山區與市區的風勢及體感可能不同，防風層、好走的鞋與備用襪子很實用。"
+        : "準備適合步行的鞋；戶外、雨天與正式場所可分別規劃。",
+
+      "雨具可選輕便雨衣或耐風雨傘；帽子、墨鏡、防曬用品依活動需求攜帶。",
+
+      "以上為季節與行程準備參考，仍需以出發前的實際天氣預報調整。"
+    ]),
+
+    card("03 貨幣、刷卡與換匯", [
+      `當地幣別：${country.currency}。`,
+
+      "準備至少一種主要付款方式及備用方式；小店、市場、交通卡儲值或特殊場所可能需要現金。",
+
+      "出發前確認信用卡海外交易功能、額度、手續費及銀行驗證方式，並留意交易通知。",
+
+      "刷卡遇到幣別選擇時，先比較當地幣別與商家換匯的費率，避免未確認就接受動態貨幣轉換。",
+
+      "提款前確認 ATM 支援的卡片、銀行與當地業者費用；大額現金分開保管。",
+
+      referenceRate
+    ], `
+      <a href="https://rate.bot.com.tw/xrt?Lang=zh-TW"
+        target="_blank" rel="noopener noreferrer">
+        臺灣銀行匯率參考 ↗
+      </a>
+    `),
+
+    card("04 充電、插頭與電壓", [
+      country.power,
+
+      country.adapter,
+
+      "查看每個充電器的 INPUT 標示。標示 100–240V、50/60Hz 的設備通常可配合合適轉接頭使用；仍以設備說明為準。",
+
+      "轉接頭不會改變電壓。吹風機、電棒、電熱用品及其他非全電壓設備，必須另外確認電壓與功率。",
+
+      "帶齊 USB-C、Lightning 或其他設備需要的線材；不要假設住宿一定提供 USB 孔或免費轉接頭。",
+
+      "行動電源及備用鋰電池的容量、攜帶數量、存放及使用限制，出發前依航空公司最新規定確認，通常不可放入托運行李。"
+    ], `
+      <a href="https://www.iec.ch/world-plugs"
+        target="_blank" rel="noopener noreferrer">
+        IEC 各地插頭資訊 ↗
+      </a>
+    `),
+
+    card("05 網路、手機與聯絡", [
+      "出發前選好漫遊、SIM 或 eSIM 方案，確認流量、天數、熱點分享、覆蓋地區與啟用時間。",
+
+      "購買 eSIM 前確認手機型號、電信鎖與安裝條件；有些方案需先在可連網環境完成設定。",
+
+      "確認方案是否只有數據、是否可接收簡訊或通話；銀行驗證與臨時聯絡可能仍需要原門號。",
+
+      "先儲存住宿地址、電話、預約代碼、交通截圖與旅伴聯絡方式，斷網時也能查看。",
+
+      type === "korea"
+        ? "韓國住宿與地點建議同時保存韓文名稱或地址，方便向司機、店家或路人確認。"
+        : "住宿與重要地點可同時保存當地語言名稱或地址。"
+    ]),
+
+    card("06 交通與自駕", [
+      country.transport,
+
+      selfDrive
+        ? "你的旅程包含自駕或租車：確認租車公司接受的駕照文件、駕駛資格、保險、自負額與額外駕駛登記。"
+        : "查好機場往返住宿的路線、票價、末班與備案，晚班機尤其要確認。",
+
+      selfDrive
+        ? "取車時拍攝車身、輪胎、油量或電量；確認油種、加油方式、停車付費與事故聯絡流程。"
+        : "熱門交通工具或長途班次可能需要預約，移動日預留轉乘緩衝。",
+
+      selfDrive
+        ? "還車前確認油量／電量要求、營業時間、機場接駁及行李搬運時間。"
+        : "出門前確認末班車、回程站點及叫車可用性。",
+
+      isJeju
+        ? "濟州島景點間距離可能較長，海岸、山區及船班安排應預留天氣與交通變動空間。"
+        : "導航時間僅供參考，尖峰、山區、雨雪或活動期間可能需要更多時間。"
+    ]),
+
+    card("07 護照、入境與航班", [
+      country.entry,
+
+      "確認護照效期、證件姓名、機票與住宿資料一致；護照效期要求依目的地及旅行條件查證。",
+
+      "將機票、住宿、租車、保險與重要預約存成可離線查看的副本；證件影本與正本分開保管。",
+
+      "確認航空公司的報到、登機截止、行李件數、尺寸與重量，轉機及不同航段規則可能不同。",
+
+      "食物、藥品、液體、電池與其他管制物品，出發前查詢航空公司與目的地海關規定。"
+    ], `
+      <a href="${country.entryURL}"
+        target="_blank" rel="noopener noreferrer">
+        ${country.entryLabel} ↗
+      </a>
+      <a href="https://www.boca.gov.tw/"
+        target="_blank" rel="noopener noreferrer">
+        領事事務局 ↗
+      </a>
+    `),
+
+    card("08 行李與每日隨身包", [
+      "隨身包可放證件、付款工具、手機、充電線、必要藥品、雨具及當日需要的預約資訊。",
+
+      "托運行李與隨身行李依航空公司規範分配；重要證件、貴重物及臨時必需品放在可取用的位置。",
+
+      "依活動準備備用衣物、襪子、防水袋或購物袋，並保留回程行李空間。",
+
+      "每天出門前確認手機電量、當日營業時間、預約時段、回程交通及旅伴集合點。"
+    ]),
+
+    card("09 餐飲、購物與當地習慣", [
+      country.etiquette,
+
+      "熱門餐廳與景點先確認營業日、休息時段、最後入場或點餐、預約與取消規則。",
+
+      "如有食物過敏或飲食限制，準備當地語言說明，並向店家確認食材及交叉接觸風險。",
+
+      "購物退稅、收據、保固及退換貨條件依店家與當地規則確認，不要預設所有商品都可退稅。",
+
+      "拍攝人物、宗教場所、店內或私人空間前，先確認是否允許。"
+    ]),
+
+    card("10 健康、保險與緊急聯絡", [
+      country.emergency,
+
+      "依自己的需求準備常用藥、處方及必要醫療資訊；特殊藥品需確認目的地攜帶與申報規定。",
+
+      "確認旅遊保險的生效期間、海外醫療、緊急協助、自駕或活動保障，以及理賠所需文件。",
+
+      "儲存住宿、租車公司、保險救援、駐外館處與家人聯絡方式；旅伴約好走散時的集合方式。",
+
+      "天候警報、道路封閉、船班停航與重大事件，以當地主管機關及營運單位最新公告為準。"
+    ])
+  ].join("");
 }
 
 function renderReminders(force = false) {
@@ -4332,23 +4703,31 @@ function renderReminders(force = false) {
   $("tab-reminders").innerHTML = `
     <div class="detail-heading">
       <span class="eyebrow">BEFORE YOU GO</span>
+
       <h2>
-        ${esc(destination?.name || state.project?.name || "")}
-        ・出發前的小筆記
+        ${esc(
+          destination?.name ||
+          state.project?.name ||
+          ""
+        )}・出發準備清單
       </h2>
+
       <p class="hint">
-        天氣與旅遊網頁分別查詢，
-        並保留來源與查詢時間。
+        天氣自動查詢；穿著、金錢、充電與行前事項
+        依目的地整理。
       </p>
     </div>
 
     <section class="reminder-section">
       <div class="row" style="margin-top:0">
-        <h3>近期天氣與準備</h3>
-        <button class="reminder-refresh" id="reminders-refresh">
+        <h3>01 天氣與近期預報</h3>
+
+        <button class="reminder-refresh"
+          id="reminders-refresh">
           重新查詢 ↻
         </button>
       </div>
+
       <div id="weather-result" class="reminder-state">
         ${destination
           ? "正在查詢近期預報…"
@@ -4356,35 +4735,44 @@ function renderReminders(force = false) {
       </div>
     </section>
 
-    <section class="reminder-section">
-      <h3>目的地網頁摘錄</h3>
+    ${basicReminders()}
 
-      <div id="guide-result" class="reminder-state">
-        ${destination
-          ? "正在讀取交通、安全與當地注意事項…"
-          : "目前無法確認對應頁面，請在專案名稱保留明確城市名稱。"}
-      </div>
+    <section class="reminder-section">
+      <h3>查證與延伸閱讀</h3>
+
+      <p class="hint">
+        上方行前準備為固定參考，
+        並非即時入境政策或官方警報。
+      </p>
 
       ${destination ? `
         <div class="reference-links">
-          <a target="_blank" rel="noopener noreferrer"
-            href="${esc(destination.official)}">
+          <a href="${esc(destination.official)}"
+            target="_blank"
+            rel="noopener noreferrer">
             官方旅遊資訊 ↗
           </a>
-          <a target="_blank" rel="noopener noreferrer"
-            href="${esc(wikiURL(destination.name))}">
+
+          <a href="${esc(wikiURL(destination.name))}"
+            target="_blank"
+            rel="noopener noreferrer">
             維基導遊原頁 ↗
           </a>
         </div>
       ` : ""}
-    </section>
 
-    <details>
-      <summary class="reminder-label">
-        基本旅行資訊（固定參考）
-      </summary>
-      ${basicReminders()}
-    </details>
+      <details style="margin-top:14px">
+        <summary class="hint">
+          補充旅遊網頁摘錄
+        </summary>
+
+        <div id="guide-result" class="reminder-state">
+          ${destination
+            ? "正在讀取補充網頁資訊…"
+            : "目前無法確認對應頁面。"}
+        </div>
+      </details>
+    </section>
   `;
 
   $("reminders-refresh").onclick = () =>
@@ -4423,14 +4811,24 @@ function renderReminders(force = false) {
       ) return;
 
       $(target).innerHTML = kind === "weather"
-        ? weatherHTML(data, destination, dates, stale)
-        : guideHTML(data, destination, stale);
+        ? weatherHTML(
+            data,
+            destination,
+            dates,
+            stale
+          )
+        : guideHTML(
+            data,
+            destination,
+            stale
+          );
     }
 
     if (
       !force &&
       cache[kind] &&
-      Date.now() - cache[kind].at < 30 * 60 * 1000
+      Date.now() - cache[kind].at <
+        30 * 60 * 1000
     ) {
       render(cache[kind]);
       complete();
@@ -4448,7 +4846,11 @@ function renderReminders(force = false) {
       ) return;
 
       cache[kind] = data;
-      reminderCache.set(destination.name, cache);
+
+      reminderCache.set(
+        destination.name,
+        cache
+      );
 
       render(data);
     }).catch(() => {
@@ -4460,9 +4862,10 @@ function renderReminders(force = false) {
       if (cache[kind]) {
         render(cache[kind], true);
       } else {
-        $(target).textContent = kind === "weather"
-          ? "目前無法讀取天氣來源，請稍後重新查詢。"
-          : "目前無法讀取目的地網頁，請使用下方來源連結查看，或稍後重新查詢。";
+        $(target).textContent =
+          kind === "weather"
+            ? "目前無法讀取天氣來源，請稍後重新查詢。其他行前準備仍可查看。"
+            : "補充網頁目前無法讀取，可使用上方官方連結查證；不影響主要準備清單。";
       }
     }).finally(complete);
   }
