@@ -690,6 +690,54 @@ nav button.on{background:var(--ye);border-color:var(--ink)}
 #status {
   display: none !important;
 }
+/* 新增按鈕與下方分類拉開距離 */
+#packing-body #packing-add {
+  margin-bottom: 26px;
+}
+
+#packing-body #packing-add > button {
+  margin-top: 12px !important;
+}
+
+/* 隱藏每件物品下方的來源小字 */
+#packing-body [data-pack-check] + span > small {
+  display: none;
+}
+
+/* 刪除按鈕改成小巧的 ×，移除大圓框 */
+#packing-body button[data-pack-delete] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  min-height: 26px;
+  flex-shrink: 0;
+
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  box-shadow: none;
+
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1;
+  opacity: 0.55;
+}
+
+#packing-body button[data-pack-delete]:hover {
+  background: #f8e4df;
+  opacity: 1;
+}
+
+#packing-body button[data-pack-delete]:active {
+  transform: none;
+  box-shadow: none;
+}
 </style>
 </head>
 
