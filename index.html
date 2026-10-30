@@ -1992,7 +1992,21 @@ $("manage").onclick = async () => {
   q(mask, ".save").disabled = true;
 
   try {
-    const snapshot = await getDocs(collection(db, "users"));
+    // 先設定目前帳號管理的專案。
+// Firebase 規則會驗證你確實是該專案的負責人。
+await updateDoc(doc(db, "users", uid()), {
+  managedProjectId: projectId
+});
+
+// 等待期間若已離開專案，就停止讀取。
+if (
+  revision !== projectRevision ||
+  !mask.isConnected ||
+  !isOwner()
+) return;
+
+// 通過負責人驗證後，讀取已註冊帳號。
+const snapshot = await getDocs(collection(db, "users"));
 
     if (
       revision !== projectRevision ||
