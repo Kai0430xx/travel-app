@@ -6722,6 +6722,1065 @@ renderExpenses = function () {
   ).forEach(drawSettlement);
 };
 
+/* ---------- 簡易行程地圖 ---------- */
+
+// 填入剛才部署的 Worker 網址，結尾必須加 /resolve。
+const TRAVEL_MAP_API =
+  "https://travel-map-resolver.kai0430xx.workers.dev/resolve";
+
+const travelMapCache = new Map();
+let travelMapAssets = null;
+let travelMapCurrent = null;
+
+const TRAVEL_MAP_COLORS = [
+  "#cb6459",
+  "#397eaa",
+  "#6a8b46",
+  "#9a62a8",
+  "#bd872e",
+  "#358c86",
+  "#b85d87",
+  "#6571b4"
+];
+
+function travelMapRegion(project) {
+  const destination =
+    reminderDestination(project.name);
+
+  if (!destination) return null;
+
+  const {
+    latitude: lat,
+    longitude: lng
+  } = destination;
+
+  if (/濟州|jeju/i.test(project.name)) {
+    return {
+      name: "濟州島",
+      center: [33.38, 126.55],
+      bounds: [
+        [33.05, 126.08],
+        [33.65, 127.02]
+      ]
+    };
+  }
+
+  if (/北海道|hokkaido/i.test(project.name)) {
+    return {
+      name: "北海道",
+      center: [43.4, 142.6],
+      bounds: [
+        [41.3, 139.3],
+        [45.7, 146.0]
+      ]
+    };
+  }
+
+  const dy = 80 / 111;
+  const dx =
+    80 / (111 * Math.cos(lat * Math.PI / 180));
+
+  return {
+    name: destination.name + "及周邊",
+    center: [lat, lng],
+    bounds: [
+      [lat - dy, lng - dx],
+      [lat + dy, lng + dx]
+    ]
+  };
+}
+
+function travelMapContains(region, point) {
+  const [
+    [south, west],
+    [north, east]
+  ] = region.bounds;
+
+  return (
+    point.lat >= south &&
+    point.lat <= north &&
+    point.lng >= west &&
+    point.lng <= east
+  );
+}
+
+/* 載入地圖元件 */
+
+function travelMapAssetsReady() {
+  if (travelMapAssets) return travelMapAssets;
+
+  travelMapAssets = Promise.all([
+    new Promise((resolve, reject) => {
+      if (window.L) return resolve();
+
+      const script = document.createElement("script");
+
+      script.src =
+        "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+
+      const timer = setTimeout(() => {
+        script.remove();
+
+        reject(new Error(
+          "地圖元件載入逾時，請稍後再試。"
+        ));
+      }, 15000);
+
+      script.onload = () => {
+        clearTimeout(timer);
+        resolve();
+      };
+
+      script.onerror = () => {
+        clearTimeout(timer);
+        script.remove();
+
+        reject(new Error(
+          "無法載入地圖元件，請檢查網路。"
+        ));
+      };
+
+      document.head.append(script);
+    }),
+
+    new Promise((resolve, reject) => {
+      if (
+        document.getElementById(
+          "travel-map-leaflet-css"
+        )
+      ) return resolve();
+
+      const link = document.createElement("link");
+
+      link.id = "travel-map-leaflet-css";
+      link.rel = "stylesheet";
+      link.href =
+        "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+
+      const timer = setTimeout(() => {
+        link.remove();
+
+        reject(new Error(
+          "地圖樣式載入逾時。"
+        ));
+      }, 15000);
+
+      link.onload = () => {
+        clearTimeout(timer);
+        resolve();
+      };
+
+      link.onerror = () => {
+        clearTimeout(timer);
+        link.remove();
+
+        reject(new Error(
+          "無法載入地圖樣式。"
+        ));
+      };
+
+      document.head.append(link);
+    })
+  ]).catch(error => {
+    travelMapAssets = null;
+    throw error;
+  });
+
+  return travelMapAssets;
+}
+
+/* 地圖外觀 */
+
+const travelMapStyle =
+  document.createElement("style");
+
+travelMapStyle.textContent = `
+.travel-map-sheet {
+  width: min(920px, 96vw) !important;
+  max-width: 920px !important;
+}
+
+.travel-map-canvas {
+  height: min(54vh, 470px);
+  min-height: 280px;
+  border: 2px solid var(--ink);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #e8eee4;
+  isolation: isolate;
+}
+
+.travel-map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 12px;
+  font-size: 12px;
+  margin: 10px 0;
+}
+
+.travel-map-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.travel-map-canvas .leaflet-container {
+  font: inherit;
+}
+
+.travel-map-icon {
+  background: none;
+  border: none;
+}
+
+.travel-map-pin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 5px #0008;
+  display: grid;
+  place-items: center;
+}
+
+.travel-map-pin > b {
+  transform: rotate(45deg);
+  color: white;
+  font: 700 12px/1 sans-serif;
+  text-shadow: 0 1px 2px #0008;
+}
+
+.travel-map-popup {
+  font: 14px/1.7 sans-serif;
+  overflow-wrap: anywhere;
+  max-width: 240px;
+}
+
+.travel-map-popup a {
+  display: inline-block;
+  margin: 5px 8px 0 0;
+  color: #28608b;
+  text-decoration: underline;
+}
+
+.travel-map-popup article + article {
+  border-top: 1px dashed #bbb;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.travel-map-status {
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+
+.travel-map-pending {
+  font-size: 12px;
+  line-height: 1.8;
+  margin-top: 12px;
+}
+
+.travel-map-canvas .leaflet-control-attribution {
+  font-size: 10px;
+}
+`;
+
+document.head.append(travelMapStyle);
+
+/* 在打包按鈕旁新增地圖按鈕 */
+
+const travelMapButton =
+  document.createElement("button");
+
+travelMapButton.className = "btn gr";
+travelMapButton.textContent = "🗺️ 地圖";
+travelMapButton.style.margin = "0 0 12px 8px";
+
+const travelMapPacking = [
+  ...$("days").parentElement.querySelectorAll("button")
+].find(button =>
+  button.textContent.includes("打包清單")
+);
+
+if (travelMapPacking) {
+  travelMapPacking.after(travelMapButton);
+} else {
+  $("days").before(travelMapButton);
+}
+
+travelMapButton.onclick = () => openTravelMap();
+
+/* 解析錯誤文字 */
+
+const TRAVEL_MAP_ERRORS = {
+  NO_SAVED_GOOGLE_URL:
+    "尚未儲存 Google Maps 網址",
+  NO_EXACT_COORDINATES:
+    "網址未提供可確認的地點座標",
+  AMBIGUOUS_LOCATION:
+    "網址內有多個位置，暫不標圖",
+  MAP_SOURCE_UNAVAILABLE:
+    "Google 暫時無法回應解析",
+  UNSUPPORTED_MAP_HOST:
+    "暫不支援此網址或跳轉頁面",
+  INVALID_MAP_URL:
+    "地圖網址格式不符",
+  PROJECT_ACCESS_DENIED:
+    "登入或專案存取權限已變更",
+  DOCUMENT_NOT_FOUND:
+    "行程不存在或已被移除",
+  SIGN_IN_REQUIRED:
+    "請重新登入",
+  RESOLVE_TIMEOUT:
+    "解析逾時，可重新查詢",
+  RESPONSE_TOO_LARGE:
+    "地圖頁面過大，暫時無法解析",
+  SERVER_NOT_CONFIGURED:
+    "解析服務尚未設定完成"
+};
+
+/* 向後端取得位置 */
+
+async function travelMapResolve(context, item) {
+  const original =
+    String(item.customGoogleUrl || "").trim();
+
+  if (!original) {
+    throw new Error(
+      TRAVEL_MAP_ERRORS.NO_SAVED_GOOGLE_URL
+    );
+  }
+
+  const key = JSON.stringify([
+    context.user.uid,
+    context.project.id,
+    item.id,
+    original
+  ]);
+
+  const cached = travelMapCache.get(key);
+
+  if (cached && cached.until > Date.now()) {
+    return cached.point;
+  }
+
+  let api;
+
+  try {
+    api = new URL(TRAVEL_MAP_API);
+  } catch {
+    throw new Error(
+      "尚未填入地圖解析服務網址。"
+    );
+  }
+
+  if (api.protocol !== "https:") {
+    throw new Error(
+      "解析服務必須使用 HTTPS。"
+    );
+  }
+
+  const token = await context.user.getIdToken();
+
+  if (context.closed) {
+    throw new DOMException(
+      "Aborted",
+      "AbortError"
+    );
+  }
+
+  const controller = new AbortController();
+
+  context.requests.add(controller);
+
+  const abort = () => controller.abort();
+
+  context.controller.signal.addEventListener(
+    "abort",
+    abort,
+    { once: true }
+  );
+
+  const timer = setTimeout(abort, 22000);
+
+  try {
+    const response = await fetch(api.href, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token
+      },
+      body: JSON.stringify({
+        projectId: context.project.id,
+        scheduleId: item.id
+      }),
+      signal: controller.signal,
+      credentials: "omit",
+      referrerPolicy: "no-referrer"
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        TRAVEL_MAP_ERRORS[result.error] ||
+        "暫時無法解析此地點，請稍後重試。"
+      );
+    }
+
+    if (
+      result.scheduleId !== item.id ||
+      !Number.isFinite(result.lat) ||
+      !Number.isFinite(result.lng) ||
+      Math.abs(result.lat) > 90 ||
+      Math.abs(result.lng) > 180
+    ) {
+      throw new Error(
+        "解析服務未回傳有效座標。"
+      );
+    }
+
+    const coordinates = {
+      lat: result.lat,
+      lng: result.lng
+    };
+
+    travelMapCache.set(key, {
+      point: coordinates,
+      until: Date.now() + 86400000
+    });
+
+    return coordinates;
+  } catch (error) {
+    if (
+      error.name === "AbortError" &&
+      !context.closed
+    ) {
+      throw new Error(
+        "解析逾時，可重新查詢。"
+      );
+    }
+
+    throw error;
+  } finally {
+    clearTimeout(timer);
+
+    context.requests.delete(controller);
+
+    context.controller.signal.removeEventListener(
+      "abort",
+      abort
+    );
+  }
+}
+
+function travelMapSelected(context) {
+  return context.items.filter(item =>
+    context.day === "all" ||
+    (item.day || "Day 1") === context.day
+  );
+}
+
+/* 圖釘資訊卡 */
+
+function travelMapPopup(context, items) {
+  return '<div class="travel-map-popup">' +
+    items.map(item => {
+      const day = item.day || "Day 1";
+      const color = context.color(day);
+
+      const google =
+        safeMapUrl(
+          item.customGoogleUrl,
+          "google"
+        )?.href ||
+        mapUrl(item, "google");
+
+      const naver =
+        destinationType(context.project.name) === "korea"
+          ? mapUrl(item, "naver")
+          : null;
+
+      return `
+        <article>
+          <small>
+            <i
+              class="travel-map-dot"
+              style="background:${color}"
+            ></i>
+            ${esc(day)}
+            ·
+            ${esc(item.time || "時間待安排")}
+          </small>
+
+          <br>
+
+          <b>${esc(cleanTitle(item.title))}</b>
+
+          <br>
+
+          <a
+            href="${esc(google)}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Google Maps ↗
+          </a>
+
+          ${
+            naver
+              ? `
+                <a
+                  href="${esc(naver)}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Naver Map ↗
+                </a>
+              `
+              : ""
+          }
+        </article>
+      `;
+    }).join("") +
+    "</div>";
+}
+
+/* 更新圖釘與定位狀態 */
+
+function travelMapDraw(context) {
+  if (context.closed || !context.map) return;
+
+  context.layer.clearLayers();
+
+  const items = travelMapSelected(context);
+  const groups = new Map();
+
+  let shown = 0;
+  let outside = 0;
+  let failed = 0;
+
+  for (const item of items) {
+    const result = context.results.get(item.id);
+
+    if (!result) continue;
+
+    if (result.error) {
+      failed++;
+      continue;
+    }
+
+    if (!travelMapContains(context.region, result)) {
+      outside++;
+      continue;
+    }
+
+    shown++;
+
+    const key =
+      `${result.lat.toFixed(6)},` +
+      `${result.lng.toFixed(6)}`;
+
+    if (!groups.has(key)) {
+      groups.set(key, {
+        point: result,
+        items: []
+      });
+    }
+
+    groups.get(key).items.push(item);
+  }
+
+  for (
+    const {
+      point: coordinates,
+      items: group
+    } of groups.values()
+  ) {
+    const colors = [
+      ...new Set(
+        group.map(item =>
+          context.color(item.day || "Day 1")
+        )
+      )
+    ];
+
+    const background = colors.length > 1
+      ? "conic-gradient(" +
+        colors.map((color, index) =>
+          `${color} ` +
+          `${index * 100 / colors.length}% ` +
+          `${(index + 1) * 100 / colors.length}%`
+        ).join(",") +
+        ")"
+      : colors[0];
+
+    const label = group.length > 1
+      ? "+"
+      : String(
+          context.items.filter(item =>
+            (item.day || "Day 1") ===
+            (group[0].day || "Day 1")
+          ).findIndex(item =>
+            item.id === group[0].id
+          ) + 1
+        );
+
+    const icon = L.divIcon({
+      className: "travel-map-icon",
+
+      html: `
+        <div
+          class="travel-map-pin"
+          style="background:${background}"
+        >
+          <b>${label}</b>
+        </div>
+      `,
+
+      iconSize: [30, 38],
+      iconAnchor: [15, 36],
+      popupAnchor: [0, -34]
+    });
+
+    L.marker(
+      [coordinates.lat, coordinates.lng],
+      {
+        icon,
+        title: group.map(item =>
+          cleanTitle(item.title)
+        ).join("／")
+      }
+    )
+      .bindPopup(
+        travelMapPopup(context, group),
+        { maxWidth: 270 }
+      )
+      .addTo(context.layer);
+  }
+
+  const pending =
+    items.length - shown - outside - failed;
+
+  q(
+    context.mask,
+    "[data-map-status]"
+  ).textContent =
+    `已標示 ${shown} 筆` +
+    ` · 目的地範圍外 ${outside} 筆` +
+    ` · 待解析 ${pending} 筆` +
+    ` · 暫未定位 ${failed} 筆`;
+
+  const failures = items.filter(item =>
+    context.results.get(item.id)?.error
+  );
+
+  q(
+    context.mask,
+    "[data-map-failures]"
+  ).innerHTML = failures.length
+    ? `
+      <details class="travel-map-pending">
+        <summary>
+          查看未能定位的行程（${failures.length}）
+        </summary>
+
+        ${failures.map(item => `
+          <p>
+            <b>${esc(cleanTitle(item.title))}</b>
+            <br>
+
+            ${
+              esc(
+                context.results.get(item.id).error
+              )
+            }
+
+            <br>
+
+            <a
+              href="${
+                esc(
+                  safeMapUrl(
+                    item.customGoogleUrl,
+                    "google"
+                  )?.href ||
+                  mapUrl(item, "google")
+                )
+              }"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              開啟原地圖 ↗
+            </a>
+          </p>
+        `).join("")}
+      </details>
+    `
+    : "";
+}
+
+/* 分批解析，避免同時發出大量查詢 */
+
+async function travelMapLoad(context) {
+  if (context.loading || context.closed) return;
+
+  context.loading = true;
+
+  const retry = q(
+    context.mask,
+    "[data-map-retry]"
+  );
+
+  retry.disabled = true;
+
+  const batchDay = context.day;
+
+  const queue = travelMapSelected(context)
+    .filter(item =>
+      !context.results.has(item.id)
+    );
+
+  let index = 0;
+
+  const work = async () => {
+    while (
+      index < queue.length &&
+      !context.closed &&
+      context.day === batchDay
+    ) {
+      const item = queue[index++];
+
+      try {
+        const coordinates =
+          await travelMapResolve(context, item);
+
+        if (!context.closed) {
+          context.results.set(
+            item.id,
+            coordinates
+          );
+        }
+      } catch (error) {
+        if (
+          !context.closed &&
+          context.day === batchDay
+        ) {
+          context.results.set(item.id, {
+            error: error.message
+          });
+        }
+      }
+
+      travelMapDraw(context);
+    }
+  };
+
+  await Promise.all([
+    work(),
+    work()
+  ]);
+
+  context.loading = false;
+
+  if (context.closed) return;
+
+  retry.disabled = false;
+
+  if (!context.touched) {
+    const points = travelMapSelected(context)
+      .map(item =>
+        context.results.get(item.id)
+      )
+      .filter(value =>
+        value &&
+        !value.error &&
+        travelMapContains(context.region, value)
+      );
+
+    if (points.length) {
+      context.map.fitBounds(
+        points.map(value => [
+          value.lat,
+          value.lng
+        ]),
+        {
+          paddingTopLeft: [40, 45],
+          paddingBottomRight: [65, 95],
+          maxZoom: 12
+        }
+      );
+    }
+  }
+
+  if (
+    travelMapSelected(context).some(item =>
+      !context.results.has(item.id)
+    )
+  ) {
+    travelMapLoad(context);
+  }
+}
+
+/* 開啟地圖 */
+
+async function openTravelMap() {
+  if (!state.project || !state.user) return;
+
+  travelMapCurrent?.mask.remove();
+
+  const project = { ...state.project };
+  const region = travelMapRegion(project);
+
+  const items = state.schedules
+    .map(item => ({ ...item }))
+    .sort(scheduleOrder);
+
+  const mask = modal(
+    "🗺️ " + esc(region?.name || project.name),
+    `
+      <p class="hint">
+        依原本的地圖網址定位；不同天不同顏色。
+        同地點多筆行程會合併圖釘，
+        點開可查看全部。
+      </p>
+
+      <div class="pills" data-map-days></div>
+
+      <div
+        class="travel-map-legend"
+        data-map-legend
+      ></div>
+
+      <div
+        class="travel-map-canvas"
+        data-map-canvas
+        role="region"
+        aria-label="行程地圖"
+      ></div>
+
+      <p
+        class="travel-map-status"
+        data-map-status
+      >
+        地圖載入中…
+      </p>
+
+      <button
+        class="btn aq"
+        data-map-retry
+      >
+        重試未定位的行程
+      </button>
+
+      <div data-map-failures></div>
+    `
+  );
+
+  q(mask, ".sheet").classList.add(
+    "travel-map-sheet"
+  );
+
+  const days = [
+    ...new Set(
+      items.map(item =>
+        item.day || "Day 1"
+      )
+    )
+  ].sort((a, b) =>
+    dayOrder(a) - dayOrder(b)
+  );
+
+  const context = {
+    mask,
+    project,
+    region,
+    items,
+    user: state.user,
+
+    day:
+      state.day === "all" ||
+      days.includes(state.day)
+        ? state.day
+        : "all",
+
+    results: new Map(),
+    controller: new AbortController(),
+    requests: new Set(),
+
+    map: null,
+    layer: null,
+    loading: false,
+    closed: false,
+    touched: false,
+
+    color: day =>
+      TRAVEL_MAP_COLORS[
+        Math.max(0, days.indexOf(day)) %
+        TRAVEL_MAP_COLORS.length
+      ]
+  };
+
+  travelMapCurrent = context;
+
+  const observer = new MutationObserver(() => {
+    if (mask.isConnected) return;
+
+    context.closed = true;
+    context.controller.abort();
+
+    for (const request of context.requests) {
+      request.abort();
+    }
+
+    context.map?.remove();
+    observer.disconnect();
+
+    if (travelMapCurrent === context) {
+      travelMapCurrent = null;
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true
+  });
+
+  const renderDays = () => {
+    q(mask, "[data-map-days]").innerHTML =
+      ["all", ...days].map(day => `
+        <button
+          class="pill ${
+            context.day === day ? "on" : ""
+          }"
+          data-map-day="${esc(day)}"
+        >
+          ${day === "all" ? "全部" : esc(day)}
+        </button>
+      `).join("");
+
+    q(mask, "[data-map-legend]").innerHTML =
+      days.map(day => `
+        <span>
+          <i
+            class="travel-map-dot"
+            style="background:${context.color(day)}"
+          ></i>
+          ${esc(day)}
+        </span>
+      `).join("");
+
+    mask.querySelectorAll("[data-map-day]")
+      .forEach(button => {
+        button.onclick = () => {
+          context.day = button.dataset.mapDay;
+
+          for (const request of context.requests) {
+            request.abort();
+          }
+
+          context.touched = false;
+
+          renderDays();
+          travelMapDraw(context);
+          travelMapLoad(context);
+        };
+      });
+  };
+
+  renderDays();
+
+  q(mask, "[data-map-retry]").onclick = () => {
+    for (
+      const [id, result] of context.results
+    ) {
+      if (result.error) {
+        context.results.delete(id);
+      }
+    }
+
+    travelMapLoad(context);
+  };
+
+  try {
+    if (!region) {
+      throw new Error(
+        "目前無法從專案名稱辨識地圖範圍。" +
+        "請在專案名稱保留城市名，" +
+        "例如濟州島、首爾或東京。"
+      );
+    }
+
+    await travelMapAssetsReady();
+
+    if (context.closed) return;
+
+    context.map = L.map(
+      q(mask, "[data-map-canvas]"),
+      {
+        scrollWheelZoom: false,
+        zoomControl: false
+      }
+    );
+
+    L.control.zoom({
+      position: "bottomright"
+    }).addTo(context.map);
+
+    context.map.fitBounds(
+      region.bounds,
+      { padding: [8, 8] }
+    );
+
+    context.layer =
+      L.layerGroup().addTo(context.map);
+
+    const tiles = L.tileLayer(
+      "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        maxZoom: 19,
+        attribution:
+          '&copy; <a ' +
+          'href="https://www.openstreetmap.org/copyright" ' +
+          'target="_blank" rel="noopener noreferrer">' +
+          "OpenStreetMap</a> contributors"
+      }
+    ).addTo(context.map);
+
+    tiles.on("tileerror", () => {
+      if (!context.closed) {
+        q(mask, ".modal-error").textContent =
+          "部分底圖未載入，請檢查網路後重新開啟地圖。";
+      }
+    });
+
+    context.map.on("dragstart", () => {
+      context.touched = true;
+    });
+
+    context.map.invalidateSize();
+
+    travelMapDraw(context);
+    await travelMapLoad(context);
+  } catch (error) {
+    if (!context.closed) {
+      q(
+        mask,
+        "[data-map-status]"
+      ).textContent = error.message;
+
+      q(
+        mask,
+        "[data-map-retry]"
+      ).disabled = true;
+    }
+  }
+}
+  
 /* ---------- 啟動 ---------- */
 $("refresh").onclick = () => location.reload();
 
