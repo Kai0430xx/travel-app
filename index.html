@@ -9102,6 +9102,723 @@ if (itinerarySketchButton) {
 
   button.onclick = openItinerarySketch;
 }
+
+/* ---------- 正確地形與座標的粉彩地圖 ---------- */
+
+let geographicLandPromise = null;
+let geographicTopoPromise = null;
+let geographicMapNumber = 0;
+
+/* 保持目的地全景，避免單一圖釘讓地圖自動放大 */
+
+const geographicOriginalLoad = travelMapLoad;
+
+travelMapLoad = async function (context) {
+  if (context.geoPrefix) {
+    context.touched = true;
+  }
+
+  return geographicOriginalLoad(context);
+};
+
+/* 載入真實地形資料的轉換元件 */
+
+function geographicLoadTopo() {
+  if (window.topojson?.feature) {
+    return Promise.resolve();
+  }
+
+  if (geographicTopoPromise) {
+    return geographicTopoPromise;
+  }
+
+  geographicTopoPromise = new Promise(
+    (resolve, reject) => {
+      const script = document.createElement("script");
+
+      script.src =
+        "https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js";
+
+      const timer = setTimeout(() => {
+        script.remove();
+
+        reject(new Error(
+          "地形元件載入逾時。"
+        ));
+      }, 15000);
+
+      script.onload = () => {
+        clearTimeout(timer);
+        resolve();
+      };
+
+      script.onerror = () => {
+        clearTimeout(timer);
+        script.remove();
+
+        reject(new Error(
+          "地形元件載入失敗。"
+        ));
+      };
+
+      document.head.append(script);
+    }
+  ).catch(error => {
+    geographicTopoPromise = null;
+    throw error;
+  });
+
+  return geographicTopoPromise;
+}
+
+/* Natural Earth 真實海岸線 */
+
+function geographicLand() {
+  if (geographicLandPromise) {
+    return geographicLandPromise;
+  }
+
+  geographicLandPromise = Promise.all([
+    geographicLoadTopo(),
+
+    (async () => {
+      const controller = new AbortController();
+
+      const timer = setTimeout(
+        () => controller.abort(),
+        25000
+      );
+
+      try {
+        const response = await fetch(
+          "https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/land-10m.json",
+          {
+            signal: controller.signal,
+            credentials: "omit"
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "真實海岸線資料載入失敗。"
+          );
+        }
+
+        return await response.json();
+      } finally {
+        clearTimeout(timer);
+      }
+    })()
+  ]).then(([, data]) => {
+    const collection = topojson.feature(
+      data,
+      data.objects.land
+    );
+
+    const polygons = collection.features.flatMap(
+      feature =>
+        feature.geometry.type === "MultiPolygon"
+          ? feature.geometry.coordinates
+          : [feature.geometry.coordinates]
+    );
+
+    return polygons.map(coordinates => {
+      let west = Infinity;
+      let east = -Infinity;
+      let south = Infinity;
+      let north = -Infinity;
+
+      for (const [lng, lat] of coordinates[0]) {
+        west = Math.min(west, lng);
+        east = Math.max(east, lng);
+        south = Math.min(south, lat);
+        north = Math.max(north, lat);
+      }
+
+      return {
+        bbox: [west, south, east, north],
+        coordinates
+      };
+    });
+  }).catch(error => {
+    geographicLandPromise = null;
+    throw error;
+  });
+
+  return geographicLandPromise;
+}
+
+/* 粉彩外觀與圖釘 */
+
+const geographicStyle =
+  document.createElement("style");
+
+geographicStyle.textContent = `
+.travel-map-canvas.geographic-pastel{
+  background:#b7d7da!important;
+  height:clamp(280px,46vw,480px)!important;
+}
+.geographic-pastel .leaflet-container{
+  background:#b7d7da;
+}
+.geographic-pastel .geographic-pastel-tile{
+  filter:sepia(.35) saturate(.5) brightness(1.05);
+}
+.geographic-map-marker{
+  background:transparent;
+  border:none;
+}
+.geographic-map-art{
+  position:relative;
+  width:48px;
+  height:53px;
+}
+.geographic-map-art svg{
+  position:absolute;
+  top:0;
+  left:0;
+  width:48px;
+  height:43px;
+  overflow:visible;
+  filter:drop-shadow(0 2px 1px #6b543425);
+}
+.geographic-map-badge{
+  position:absolute;
+  right:-2px;
+  top:0;
+  border-radius:50%;
+  background:var(--geo-color);
+  border:2px solid #fff9e8;
+  width:21px;
+  height:21px;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  font:700 10px/1 sans-serif;
+}
+.geographic-map-anchor{
+  position:absolute;
+  bottom:0;
+  left:19px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--geo-color);
+  border:2px solid white;
+  box-shadow:0 1px 2px #0004;
+}
+.geographic-map-fallback{
+  position:absolute;
+  left:10px;
+  top:0;
+  width:30px;
+  height:36px;
+  border-radius:50% 50% 50% 0;
+  transform:rotate(-45deg);
+  background:var(--geo-color);
+  border:2px solid white;
+}
+`;
+
+document.head.append(geographicStyle);
+
+/* 沿用真實位置，只替換圖釘外觀 */
+
+const geographicOriginalDraw = travelMapDraw;
+
+travelMapDraw = function (context) {
+  geographicOriginalDraw(context);
+
+  if (
+    !context.map ||
+    !context.geoPrefix ||
+    context.closed
+  ) return;
+
+  const groups = new Map();
+
+  for (const item of travelMapSelected(context)) {
+    const coordinates =
+      context.results.get(item.id);
+
+    if (
+      !coordinates ||
+      coordinates.error ||
+      !travelMapContains(
+        context.region,
+        coordinates
+      )
+    ) continue;
+
+    const key =
+      `${coordinates.lat.toFixed(6)},` +
+      `${coordinates.lng.toFixed(6)}`;
+
+    if (!groups.has(key)) {
+      groups.set(key, []);
+    }
+
+    groups.get(key).push(item);
+  }
+
+  context.layer.eachLayer(marker => {
+    const coordinates = marker.getLatLng();
+
+    const items = groups.get(
+      `${coordinates.lat.toFixed(6)},` +
+      `${coordinates.lng.toFixed(6)}`
+    );
+
+    if (!items?.length) return;
+
+    const day = items[0].day || "Day 1";
+
+    const colors = [
+      ...new Set(
+        items.map(item =>
+          context.color(item.day || "Day 1")
+        )
+      )
+    ];
+
+    const color = colors.length > 1
+      ? "conic-gradient(" +
+        colors.map((value, index) =>
+          `${value} ` +
+          `${index * 100 / colors.length}% ` +
+          `${(index + 1) * 100 / colors.length}%`
+        ).join(",") +
+        ")"
+      : colors[0];
+
+    const number = items.length > 1
+      ? "+"
+      : String(
+          context.items.filter(item =>
+            (item.day || "Day 1") === day
+          ).findIndex(item =>
+            item.id === items[0].id
+          ) + 1
+        );
+
+    const picture =
+      typeof itinerarySketchIcon === "function"
+        ? `
+          <svg
+            viewBox="0 0 80 70"
+            aria-hidden="true"
+          >
+            <use
+              href="#${context.geoPrefix}-${
+                itinerarySketchIcon(items[0].title)
+              }"
+            />
+          </svg>
+        `
+        : `
+          <span class="geographic-map-fallback"></span>
+        `;
+
+    marker.setIcon(
+      L.divIcon({
+        className: "geographic-map-marker",
+
+        html: `
+          <div
+            class="geographic-map-art"
+            style="--geo-color:${color}"
+          >
+            ${picture}
+
+            <span class="geographic-map-badge">
+              ${number}
+            </span>
+
+            <span class="geographic-map-anchor"></span>
+          </div>
+        `,
+
+        iconSize: [48, 53],
+        iconAnchor: [24, 48],
+        popupAnchor: [0, -48]
+      })
+    );
+  });
+};
+
+/* 開啟正確地理位置的地圖 */
+
+openTravelMap = async function () {
+  if (!state.project || !state.user) return;
+
+  if (
+    typeof itinerarySketchCurrent !== "undefined"
+  ) {
+    itinerarySketchCurrent?.mask.remove();
+  }
+
+  travelMapCurrent?.mask.remove();
+
+  const project = { ...state.project };
+
+  const region = travelMapRegion(project);
+
+  const items = state.schedules
+    .map(item => ({ ...item }))
+    .sort(scheduleOrder);
+
+  const mask = modal(
+    "🗺️ " + esc(region?.name || project.name),
+    `
+      <p class="hint">
+        真實地形的簡化底圖，圖釘按地點座標定位。
+        點選圖釘查看行程與導航。
+      </p>
+
+      <div class="pills" data-map-days></div>
+
+      <div
+        class="travel-map-legend"
+        data-map-legend
+      ></div>
+
+      <div
+        class="travel-map-canvas geographic-pastel"
+        data-map-canvas
+        role="region"
+        aria-label="真實位置的行程地圖"
+      ></div>
+
+      <p
+        class="travel-map-status"
+        data-map-status
+      >
+        載入真實地形…
+      </p>
+
+      <button class="btn aq" data-map-retry>
+        重試未定位的行程
+      </button>
+
+      <button class="btn" data-geo-home>
+        回到目的地
+      </button>
+
+      <div data-map-failures></div>
+    `
+  );
+
+  q(mask, ".sheet").classList.add(
+    "travel-map-sheet"
+  );
+
+  const days = [
+    ...new Set(
+      items.map(item =>
+        item.day || "Day 1"
+      )
+    )
+  ].sort((a, b) =>
+    dayOrder(a) - dayOrder(b)
+  );
+
+  const context = {
+    mask,
+    project,
+    region,
+    items,
+    user: state.user,
+
+    day:
+      state.day === "all" ||
+      days.includes(state.day)
+        ? state.day
+        : "all",
+
+    results: new Map(),
+    controller: new AbortController(),
+    requests: new Set(),
+
+    map: null,
+    layer: null,
+    loading: false,
+    closed: false,
+    touched: false,
+
+    geoPrefix:
+      "geographic-art-" +
+      (++geographicMapNumber),
+
+    color: day =>
+      TRAVEL_MAP_COLORS[
+        Math.max(0, days.indexOf(day)) %
+        TRAVEL_MAP_COLORS.length
+      ]
+  };
+
+  travelMapCurrent = context;
+
+  /* 沿用小插畫，但不沿用任意排版位置 */
+
+  if (
+    typeof itinerarySketchSymbols === "function"
+  ) {
+    const definitions = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg"
+    );
+
+    definitions.setAttribute("width", "0");
+    definitions.setAttribute("height", "0");
+    definitions.setAttribute("aria-hidden", "true");
+    definitions.style.position = "absolute";
+
+    definitions.innerHTML =
+      itinerarySketchSymbols(context.geoPrefix);
+
+    q(mask, ".sheet").append(definitions);
+  }
+
+  const observer = new MutationObserver(() => {
+    if (mask.isConnected) return;
+
+    context.closed = true;
+    context.controller.abort();
+
+    for (const request of context.requests) {
+      request.abort();
+    }
+
+    context.map?.remove();
+    observer.disconnect();
+
+    if (travelMapCurrent === context) {
+      travelMapCurrent = null;
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true
+  });
+
+  const renderDays = () => {
+    q(mask, "[data-map-days]").innerHTML =
+      ["all", ...days].map(day => `
+        <button
+          class="pill ${
+            context.day === day ? "on" : ""
+          }"
+          data-map-day="${esc(day)}"
+        >
+          ${day === "all" ? "全部" : esc(day)}
+        </button>
+      `).join("");
+
+    q(mask, "[data-map-legend]").innerHTML =
+      days.map(day => `
+        <span>
+          <i
+            class="travel-map-dot"
+            style="background:${context.color(day)}"
+          ></i>
+          ${esc(day)}
+        </span>
+      `).join("");
+
+    mask.querySelectorAll("[data-map-day]")
+      .forEach(button => {
+        button.onclick = () => {
+          context.day = button.dataset.mapDay;
+
+          for (const request of context.requests) {
+            request.abort();
+          }
+
+          context.touched = false;
+
+          renderDays();
+          travelMapDraw(context);
+          travelMapLoad(context);
+        };
+      });
+  };
+
+  renderDays();
+
+  q(mask, "[data-map-retry]").onclick = () => {
+    for (
+      const [id, result] of context.results
+    ) {
+      if (result.error) {
+        context.results.delete(id);
+      }
+    }
+
+    travelMapLoad(context);
+  };
+
+  q(mask, "[data-geo-home]").onclick = () => {
+    if (context.map && region) {
+      context.map.fitBounds(
+        region.bounds,
+        { padding: [8, 8] }
+      );
+    }
+  };
+
+  try {
+    if (!region) {
+      throw new Error(
+        "無法從專案名稱辨識目的地範圍，" +
+        "暫不繪製不正確的底圖。"
+      );
+    }
+
+    const island =
+      /濟州|沖繩|北海道|jeju|okinawa|hokkaido/i
+        .test(project.name);
+
+    const [, land] = await Promise.all([
+      travelMapAssetsReady(),
+
+      island
+        ? geographicLand()
+        : Promise.resolve(null)
+    ]);
+
+    if (context.closed) return;
+
+    context.map = L.map(
+      q(mask, "[data-map-canvas]"),
+      {
+        scrollWheelZoom: false,
+        zoomControl: false,
+        zoomSnap: .25
+      }
+    );
+
+    L.control.zoom({
+      position: "bottomright"
+    }).addTo(context.map);
+
+    context.map.fitBounds(
+      region.bounds,
+      { padding: [8, 8] }
+    );
+
+    if (land) {
+      const [
+        [south, west],
+        [north, east]
+      ] = region.bounds;
+
+      const features = land.filter(
+        ({ bbox: [w, s, e, n] }) =>
+          e >= west &&
+          w <= east &&
+          n >= south &&
+          s <= north
+      ).map(({ coordinates }) => ({
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "Polygon",
+          coordinates
+        }
+      }));
+
+      if (!features.length) {
+        throw new Error(
+          "此範圍缺少地形資料，" +
+          "暫不使用替代輪廓。"
+        );
+      }
+
+      L.geoJSON(
+        {
+          type: "FeatureCollection",
+          features
+        },
+        {
+          interactive: false,
+
+          style: {
+            fillColor: "#eeedce",
+            fillOpacity: 1,
+            color: "#c8ceaa",
+            weight: 2,
+            lineJoin: "round",
+            lineCap: "round"
+          }
+        }
+      ).addTo(context.map);
+
+      context.map.attributionControl.addAttribution(
+        '<a href="https://www.naturalearthdata.com/" ' +
+        'target="_blank" rel="noopener noreferrer">' +
+        "Natural Earth</a> · 簡化海岸線"
+      );
+    } else {
+      const tiles = L.tileLayer(
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          className: "geographic-pastel-tile",
+          maxZoom: 19,
+
+          attribution:
+            '&copy; <a ' +
+            'href="https://www.openstreetmap.org/copyright" ' +
+            'target="_blank" rel="noopener noreferrer">' +
+            "OpenStreetMap</a> contributors"
+        }
+      ).addTo(context.map);
+
+      tiles.on("tileerror", () => {
+        if (!context.closed) {
+          q(mask, ".modal-error").textContent =
+            "部分底圖載入失敗，請檢查網路。";
+        }
+      });
+    }
+
+    context.layer =
+      L.layerGroup().addTo(context.map);
+
+    context.map.on("dragstart", () => {
+      context.touched = true;
+    });
+
+    context.map.invalidateSize();
+
+    travelMapDraw(context);
+    await travelMapLoad(context);
+  } catch (error) {
+    if (!context.closed) {
+      q(
+        mask,
+        "[data-map-status]"
+      ).textContent = error.message;
+
+      q(
+        mask,
+        "[data-map-retry]"
+      ).disabled = true;
+    }
+  }
+};
+
+/* 地圖按鈕改回真實座標版本 */
+
+const geographicMapButton = [
+  ...$("days").parentElement.querySelectorAll("button")
+].find(button =>
+  /地圖$/.test(button.textContent.trim())
+);
+
+if (geographicMapButton) {
+  geographicMapButton.onclick = () =>
+    openTravelMap();
+}
   
 /* ---------- 啟動 ---------- */
 $("refresh").onclick = () => location.reload();
