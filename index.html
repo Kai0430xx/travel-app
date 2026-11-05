@@ -7780,6 +7780,1328 @@ async function openTravelMap() {
     }
   }
 }
+
+/* ---------- 手繪行程示意圖 ---------- */
+
+let itinerarySketchCurrent = null;
+let itinerarySketchSequence = 0;
+
+const ITINERARY_SKETCH_COLORS = [
+  "#c56555",
+  "#377e9e",
+  "#78904b",
+  "#9a6aa1",
+  "#c18b36",
+  "#408f83",
+  "#b96585",
+  "#6b79ad"
+];
+
+const itinerarySketchCSS = document.createElement("style");
+
+itinerarySketchCSS.textContent = `
+.sketch-sheet{
+  width:min(1080px,96vw)!important;
+  max-width:1080px!important;
+}
+.sketch-intro{
+  font-size:12px;
+  line-height:1.8;
+  color:#75634f;
+  margin:0 0 12px;
+}
+.sketch-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:10px 0;
+}
+.sketch-days{
+  display:flex;
+  flex-wrap:nowrap;
+  gap:7px;
+  max-width:100%;
+  overflow:auto;
+  padding-bottom:3px;
+}
+.sketch-days button{
+  flex-shrink:0;
+}
+.sketch-day{
+  border:1.5px solid #665744;
+  border-radius:999px;
+  padding:6px 12px;
+  background:#fffcf4;
+  font:inherit;
+  font-size:12px;
+  cursor:pointer;
+}
+.sketch-legend{
+  display:flex;
+  gap:8px 14px;
+  flex-wrap:wrap;
+  font-size:11px;
+  color:#685842;
+  margin:8px 0 12px;
+}
+.sketch-legend i{
+  display:inline-block;
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  margin-right:4px;
+}
+.sketch-zoom{
+  display:flex;
+  gap:6px;
+  align-items:center;
+  font-size:11px;
+}
+.sketch-zoom button{
+  border:1px solid #86775c;
+  background:#fffcf1;
+  border-radius:9px;
+  padding:5px 10px;
+  font:inherit;
+  cursor:pointer;
+  min-height:32px;
+}
+.sketch-frame{
+  position:relative;
+  border:2px solid #665744;
+  border-radius:24px 17px 22px 15px;
+  overflow:hidden;
+  background:#b8d9db;
+  box-shadow:3px 4px 0 #66574425;
+}
+.sketch-viewport{
+  overflow:auto;
+  max-height:65vh;
+  min-height:320px;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  cursor:grab;
+}
+.sketch-stage{
+  position:relative;
+  margin:0 auto;
+  min-height:320px;
+}
+.sketch-art{
+  display:block;
+  width:100%;
+  height:auto;
+  pointer-events:none;
+}
+.sketch-pin{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  width:var(--sketch-label-width,150px);
+  max-width:44%;
+  padding:0;
+  border:0;
+  background:none;
+  box-shadow:none;
+  color:#694622;
+  font:inherit;
+  text-align:center;
+  cursor:pointer;
+  line-height:1.5;
+  touch-action:manipulation;
+}
+.sketch-pin:hover,
+.sketch-pin:focus-visible{
+  filter:drop-shadow(0 3px 2px #6b533b35);
+  outline:2px dashed #9a7953;
+  outline-offset:5px;
+  border-radius:12px;
+}
+.sketch-pin[aria-expanded=true]{
+  outline:2px dashed var(--sketch-color);
+  outline-offset:5px;
+  border-radius:12px;
+}
+.sketch-pin-picture{
+  display:block;
+  width:56px;
+  height:52px;
+  margin:auto;
+  position:relative;
+}
+.sketch-pin-picture svg{
+  width:56px;
+  height:52px;
+  overflow:visible;
+}
+.sketch-pin-number{
+  position:absolute;
+  right:-4px;
+  top:0;
+  background:var(--sketch-color);
+  color:#fff;
+  border:2px solid #fff9e6;
+  width:24px;
+  height:28px;
+  border-radius:50% 50% 45% 45%;
+  display:grid;
+  place-items:center;
+  font:700 11px/1 sans-serif;
+  box-shadow:0 2px 0 #0002;
+}
+.sketch-pin b{
+  display:block;
+  font-size:14px;
+  font-weight:600;
+  padding:3px 6px;
+  background:#fffbeded;
+  border-radius:11px 6px 10px 5px;
+  overflow-wrap:anywhere;
+}
+.sketch-pin small{
+  display:inline-block;
+  font-size:10px;
+  background:#fffbeddd;
+  border-radius:6px;
+  padding:1px 5px;
+  margin-top:2px;
+  color:#746348;
+}
+.sketch-detail{
+  position:absolute;
+  left:12px;
+  bottom:12px;
+  z-index:3;
+  width:min(310px,calc(100% - 24px));
+  max-height:65%;
+  overflow:auto;
+  background:#fffbed;
+  border:2px solid #796445;
+  border-radius:18px 13px 20px 12px;
+  box-shadow:3px 4px 0 #79644545;
+  padding:15px;
+}
+.sketch-detail h4{
+  margin:8px 25px 10px 0;
+  font-size:16px;
+  line-height:1.6;
+}
+.sketch-detail a{
+  display:inline-block;
+  border:1px solid #796445;
+  border-radius:999px;
+  background:#b4d8df;
+  color:#443b30;
+  padding:6px 12px;
+  margin:4px 6px 0 0;
+  font-size:12px;
+  text-decoration:none;
+}
+.sketch-detail .sketch-detail-close{
+  position:absolute;
+  top:6px;
+  right:7px;
+  padding:2px 7px;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  font-size:20px;
+  color:#796445;
+  cursor:pointer;
+}
+.sketch-caption{
+  font-size:11px;
+  color:#75634f;
+  line-height:1.8;
+  margin:10px 0 0;
+}
+@media(max-width:500px){
+  .sketch-sheet{
+    padding:14px!important;
+  }
+  .sketch-pin-picture,
+  .sketch-pin-picture svg{
+    width:42px;
+    height:39px;
+  }
+  .sketch-pin b{
+    font-size:12px;
+  }
+  .sketch-pin-number{
+    width:20px;
+    height:24px;
+    right:0;
+    font-size:10px;
+  }
+  .sketch-viewport{
+    max-height:60vh;
+  }
+  .sketch-frame{
+    border-radius:20px 13px 18px 15px;
+  }
+}
+`;
+
+document.head.append(itinerarySketchCSS);
+
+/* 同一專案保留一致的插畫樣式 */
+
+function itinerarySketchRandom(text) {
+  let seed = 2166136261;
+
+  for (const character of text) {
+    seed ^= character.codePointAt(0);
+    seed = Math.imul(seed, 16777619);
+  }
+
+  return () => {
+    seed += 0x6D2B79F5;
+
+    let number = seed;
+
+    number = Math.imul(
+      number ^ (number >>> 15),
+      number | 1
+    );
+
+    number ^= number + Math.imul(
+      number ^ (number >>> 7),
+      number | 61
+    );
+
+    return (
+      (number ^ (number >>> 14)) >>> 0
+    ) / 4294967296;
+  };
+}
+
+/* 明確的台灣出發機場另列 */
+
+function itinerarySketchOutside(project, item) {
+  if (
+    /台灣|臺灣|台北|臺北|桃園|高雄|台中|臺中|taiwan|taipei/i
+      .test(project.name)
+  ) {
+    return false;
+  }
+
+  return /桃園(?:國際)?機場|松山機場|小港機場|高雄(?:國際)?機場|台中(?:國際)?機場|臺中(?:國際)?機場/
+    .test(item.title || "");
+}
+
+/* 依行程名稱選擇小插畫 */
+
+function itinerarySketchIcon(title) {
+  if (/機場|飛機|航班|airport|flight/i.test(title)) {
+    return "plane";
+  }
+
+  if (/咖啡|coffee|cafe|café/i.test(title)) {
+    return "cup";
+  }
+
+  if (/貝果|bagel/i.test(title)) {
+    return "bagel";
+  }
+
+  if (/鮑魚|海鮮|魚|seafood/i.test(title)) {
+    return "seafood";
+  }
+
+  if (/餐|美食|市場|food/i.test(title)) {
+    return "food";
+  }
+
+  if (/住宿|飯店|酒店|旅館|check.?in|hotel/i.test(title)) {
+    return "hotel";
+  }
+
+  if (/租車|交通|接送|車站|car|train/i.test(title)) {
+    return "car";
+  }
+
+  if (/購物|商店|免稅|百貨|shop/i.test(title)) {
+    return "bag";
+  }
+
+  if (/山|峰|mountain/i.test(title)) {
+    return "mountain";
+  }
+
+  return "tree";
+}
+
+/* 插畫元件 */
+
+function itinerarySketchSymbols(prefix) {
+  return `
+    <defs>
+      <symbol id="${prefix}-cup" viewBox="0 0 80 70">
+        <ellipse cx="36" cy="58" rx="29" ry="5" fill="#7baca7" opacity=".4"/>
+        <path d="M13 25H58L54 49Q36 64 19 49Z" fill="#fff9ec" stroke="#846d4e" stroke-width="2"/>
+        <path d="M58 28C82 22 78 49 55 44" fill="none" stroke="#fff9ec" stroke-width="8"/>
+        <ellipse cx="35" cy="25" rx="22" ry="6" fill="#795136"/>
+        <path d="M27 15Q19 7 28 2M44 15Q36 7 44 2" stroke="#fff9ec" fill="none" stroke-width="3" stroke-linecap="round"/>
+      </symbol>
+
+      <symbol id="${prefix}-food" viewBox="0 0 80 70">
+        <ellipse cx="40" cy="58" rx="32" ry="6" fill="#fff8e7"/>
+        <path d="M12 33Q14 10 40 10Q64 10 68 33Z" fill="#d49b50"/>
+        <path d="M12 35L20 42L29 38L39 44L50 38L62 42L68 35" fill="none" stroke="#799d53" stroke-width="8"/>
+        <path d="M12 45Q40 58 68 45L65 54Q39 66 15 54Z" fill="#d99f51"/>
+        <path d="M24 24L28 22M39 18L43 20M53 25L57 24" stroke="#fff1cb" stroke-width="3" stroke-linecap="round"/>
+      </symbol>
+
+      <symbol id="${prefix}-bagel" viewBox="0 0 80 70">
+        <ellipse cx="40" cy="59" rx="31" ry="5" fill="#f8f3db"/>
+        <path d="M10 32Q39 44 69 31L66 49Q40 62 13 48Z" fill="#cd9656"/>
+        <path d="M12 36Q40 48 67 35L66 42Q40 54 13 42Z" fill="#fff7df"/>
+        <path d="M17 41L24 45M34 46L40 47M51 44L57 42" stroke="#789751" stroke-width="4" stroke-linecap="round"/>
+        <ellipse cx="40" cy="28" rx="30" ry="18" fill="#d7a160" stroke="#b7844c" stroke-width="2"/>
+        <ellipse cx="40" cy="28" rx="8" ry="5" fill="#a37544"/>
+        <path d="M20 21L25 18M32 15L36 14M50 18L55 20M23 32L27 34M51 34L56 31" stroke="#f6ddb0" stroke-width="3" stroke-linecap="round"/>
+      </symbol>
+
+      <symbol id="${prefix}-seafood" viewBox="0 0 80 70">
+        <ellipse cx="40" cy="57" rx="32" ry="8" fill="#fff7df"/>
+        <path d="M40 54Q6 48 10 24Q19 11 27 18Q35 1 44 15Q58 4 63 21Q78 23 68 42Q60 53 40 54Z" fill="#dda477" stroke="#b8835d" stroke-width="2"/>
+        <path d="M40 50L21 24M40 50L34 20M42 50L48 20M43 50L61 28" stroke="#f7d4a6" stroke-width="3" stroke-linecap="round"/>
+        <path d="M29 56Q40 62 51 56" stroke="#8ca57d" stroke-width="3" fill="none"/>
+      </symbol>
+
+      <symbol id="${prefix}-plane" viewBox="0 0 80 70">
+        <path d="M6 38L29 29L24 9L32 7L46 26L66 19Q77 17 77 24Q77 29 65 33L48 39L44 60L37 63L34 44L13 49Z" fill="#76a8d6" stroke="#426d9a" stroke-width="2"/>
+        <path d="M54 26L64 23" stroke="#d4e8f8" stroke-width="5" stroke-linecap="round"/>
+      </symbol>
+
+      <symbol id="${prefix}-car" viewBox="0 0 80 70">
+        <path d="M10 35L18 19Q40 7 59 21L69 36L75 40L73 56H7V42Z" fill="#789eb9" stroke="#536b7c" stroke-width="2"/>
+        <path d="M23 22Q31 16 38 19V33H17ZM44 19Q53 19 58 25L63 33H44Z" fill="#d6e8e4"/>
+        <circle cx="22" cy="55" r="10" fill="#535551"/>
+        <circle cx="60" cy="55" r="10" fill="#535551"/>
+        <circle cx="22" cy="55" r="4" fill="#d3dbd3"/>
+        <circle cx="60" cy="55" r="4" fill="#d3dbd3"/>
+      </symbol>
+
+      <symbol id="${prefix}-hotel" viewBox="0 0 80 70">
+        <path d="M12 25L40 5L69 25" fill="#c47561" stroke="#93664c" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M17 25H64V64H17Z" fill="#f3d79f" stroke="#93664c" stroke-width="2"/>
+        <path d="M34 45H48V64H34Z" fill="#aa8062"/>
+        <path d="M24 32H31V39H24ZM49 32H56V39H49Z" fill="#8bb7ba"/>
+        <path d="M11 65H71" stroke="#79976b" stroke-width="4" stroke-linecap="round"/>
+      </symbol>
+
+      <symbol id="${prefix}-bag" viewBox="0 0 80 70">
+        <path d="M16 25L63 22L69 61L12 64Z" fill="#dcac70" stroke="#936c43" stroke-width="2"/>
+        <path d="M28 29V18Q38 0 51 16V28" fill="none" stroke="#936c43" stroke-width="4" stroke-linecap="round"/>
+        <path d="M34 45Q40 52 48 44" fill="none" stroke="#fff2d4" stroke-width="3"/>
+      </symbol>
+
+      <symbol id="${prefix}-mountain" viewBox="0 0 80 70">
+        <path d="M3 60L25 15Q28 10 32 16L40 29L50 8Q54 3 59 12L79 61Z" fill="#74904f" stroke="#526943" stroke-width="2"/>
+        <path d="M20 25L26 16L33 25L29 23L26 27Z" fill="#e9e6c8"/>
+        <path d="M43 22L52 10L59 23L54 20L50 24Z" fill="#e9e6c8"/>
+      </symbol>
+
+      <symbol id="${prefix}-tree" viewBox="0 0 80 70">
+        <ellipse cx="41" cy="63" rx="26" ry="4" fill="#8eac80" opacity=".4"/>
+        <path d="M38 63L40 23" stroke="#8c7550" stroke-width="6" stroke-linecap="round"/>
+        <path d="M39 40L26 28M40 45L55 30" stroke="#8c7550" stroke-width="4"/>
+        <path d="M19 37Q4 27 18 17Q16 1 33 10Q46 -2 51 10Q71 7 67 24Q80 39 60 43L44 48L28 44Z" fill="#8daa61"/>
+        <path d="M28 22L39 29L50 19" fill="none" stroke="#6f8d51" stroke-width="2"/>
+      </symbol>
+    </defs>
+  `;
+}
+
+/* 自動產生島嶼／城市示意底圖 */
+
+function itinerarySketchArt(
+  context,
+  width,
+  height,
+  positions
+) {
+  const project = state.project;
+
+  const random =
+    itinerarySketchRandom(project.name);
+
+  const island =
+    /島|濟州|沖繩|北海道|台灣|臺灣|夏威夷|jeju|okinawa|island|bali|iceland|hawaii/i
+      .test(project.name);
+
+  const cy = (height + 100) / 2;
+  const rx = 440;
+  const ry = Math.max(190, (height - 220) / 2);
+  const points = [];
+
+  for (let index = 0; index < 32; index++) {
+    const angle = index / 32 * Math.PI * 2;
+    const rough = .94 + random() * .10;
+
+    points.push([
+      500 + Math.cos(angle) * rx * rough,
+      cy + Math.sin(angle) * ry * rough
+    ]);
+  }
+
+  const first = [
+    (points[31][0] + points[0][0]) / 2,
+    (points[31][1] + points[0][1]) / 2
+  ];
+
+  let shore = `M${first[0]} ${first[1]}`;
+
+  for (let index = 0; index < points.length; index++) {
+    const current = points[index];
+    const next = points[(index + 1) % points.length];
+
+    shore +=
+      `Q${current[0]} ${current[1]} ` +
+      `${(current[0] + next[0]) / 2} ` +
+      `${(current[1] + next[1]) / 2}`;
+  }
+
+  shore += "Z";
+
+  const waves = Array.from(
+    {
+      length: Math.max(
+        5,
+        Math.floor(height / 120)
+      )
+    },
+    (_, index) => {
+      const x = index % 2 ? 910 : 20;
+      const y = 180 + index * 105;
+
+      return `
+        <path
+          d="M${x} ${y}q12 12 25 0q12 12 25 0"
+          fill="none"
+          stroke="#7faeb4"
+          stroke-width="5"
+          opacity=".5"
+          stroke-linecap="round"
+        />
+      `;
+    }
+  ).join("");
+
+  let routes = "";
+
+  for (const day of context.days) {
+    const stops = positions.filter(position =>
+      (position.item.day || "Day 1") === day
+    );
+
+    if (stops.length < 2) continue;
+
+    let path = `M${stops[0].x} ${stops[0].y}`;
+
+    for (let index = 1; index < stops.length; index++) {
+      const previous = stops[index - 1];
+      const current = stops[index];
+      const middle = (previous.y + current.y) / 2;
+
+      path +=
+        `C${previous.x} ${middle},` +
+        `${current.x} ${middle},` +
+        `${current.x} ${current.y}`;
+    }
+
+    routes += `
+      <path
+        d="${path}"
+        fill="none"
+        stroke="${context.color(day)}"
+        stroke-width="3"
+        stroke-dasharray="6 10"
+        opacity=".48"
+        stroke-linecap="round"
+      />
+    `;
+  }
+
+  return `
+    <svg
+      class="sketch-art"
+      viewBox="0 0 ${width} ${height}"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      ${itinerarySketchSymbols(context.prefix)}
+
+      <rect
+        width="1000"
+        height="${height}"
+        fill="${island ? "#b8d9db" : "#e5e4cd"}"
+      />
+
+      ${island ? waves : ""}
+
+      <path
+        d="${shore}"
+        fill="#ecedd0"
+        stroke="#dce0bc"
+        stroke-width="4"
+      />
+
+      <path
+        d="M170 ${cy - 70}
+           Q390 ${cy - 120} 500 ${cy + 40}
+           T830 ${cy + 85}"
+        fill="none"
+        stroke="#d7ddb4"
+        stroke-width="13"
+        opacity=".65"
+      />
+
+      ${
+        !island
+          ? `
+            <path
+              d="M510 150
+                 Q420 ${cy - 60} 545 ${cy + 70}
+                 T510 ${height - 70}"
+              fill="none"
+              stroke="#a9cfd3"
+              stroke-width="14"
+              opacity=".7"
+            />
+          `
+          : ""
+      }
+
+      <g fill="#91ac73" opacity=".28">
+        <ellipse
+          cx="455"
+          cy="${cy}"
+          rx="110"
+          ry="40"
+        />
+        <ellipse
+          cx="630"
+          cy="${cy + 140}"
+          rx="90"
+          ry="34"
+        />
+      </g>
+
+      ${routes}
+
+      <text
+        x="65"
+        y="70"
+        font-size="31"
+        fill="#456c72"
+        letter-spacing="5"
+        font-family="sans-serif"
+      >
+        TRAVEL SKETCH
+      </text>
+
+      <text
+        x="65"
+        y="112"
+        font-size="23"
+        fill="#64858a"
+      >
+        ${esc(project.name)}
+      </text>
+
+      <g
+        transform="translate(900 ${height - 65})"
+        stroke="#64858a"
+        fill="none"
+        stroke-width="3"
+      >
+        <path d="M0-24V24M-18 0H18M0-24L-5-11M0-24L5-11"/>
+        <text
+          x="-5"
+          y="-32"
+          fill="#64858a"
+          stroke="none"
+          font-size="16"
+          font-family="sans-serif"
+        >N</text>
+      </g>
+    </svg>
+  `;
+}
+
+/* 點選行程資訊 */
+
+function itinerarySketchDetail(context, id) {
+  const item = state.schedules.find(
+    item => item.id === id
+  );
+
+  const panel = q(
+    context.mask,
+    "[data-sketch-detail]"
+  );
+
+  if (!item) {
+    panel.hidden = true;
+    context.selected = null;
+    return;
+  }
+
+  context.selected = id;
+  panel.hidden = false;
+
+  const day = item.day || "Day 1";
+
+  const google =
+    safeMapUrl(item.customGoogleUrl, "google")?.href ||
+    mapUrl(item, "google");
+
+  const naver =
+    destinationType(state.project.name) === "korea"
+      ? mapUrl(item, "naver")
+      : null;
+
+  panel.innerHTML = `
+    <button
+      class="sketch-detail-close"
+      aria-label="關閉行程資訊"
+    >×</button>
+
+    <small style="color:${context.color(day)}">
+      ${esc(day)}
+      ·
+      ${esc(item.time || "時間待安排")}
+    </small>
+
+    <h4>${esc(cleanTitle(item.title))}</h4>
+
+    <a
+      href="${esc(google)}"
+      target="_blank"
+      rel="noopener noreferrer"
+    >Google Maps ↗</a>
+
+    ${
+      naver
+        ? `
+          <a
+            href="${esc(naver)}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Naver Map ↗</a>
+        `
+        : ""
+    }
+  `;
+
+  q(panel, "button").onclick = () => {
+    context.selected = null;
+    panel.hidden = true;
+
+    context.mask.querySelectorAll(
+      "[data-sketch-pin]"
+    ).forEach(button => {
+      button.setAttribute(
+        "aria-expanded",
+        "false"
+      );
+    });
+  };
+
+  context.mask.querySelectorAll(
+    "[data-sketch-pin]"
+  ).forEach(button => {
+    button.setAttribute(
+      "aria-expanded",
+      String(button.dataset.sketchPin === id)
+    );
+  });
+}
+
+/* 依目前行程重新排版 */
+
+function itinerarySketchDraw(context) {
+  if (!context.mask.isConnected) return;
+
+  if (
+    state.project?.id !== context.projectId ||
+    uid() !== context.userId
+  ) {
+    context.mask.remove();
+    return;
+  }
+
+  const all = state.schedules
+    .map(item => ({ ...item }))
+    .sort(scheduleOrder);
+
+  context.days = [
+    ...new Set(
+      all.map(item => item.day || "Day 1")
+    )
+  ].sort((a, b) =>
+    dayOrder(a) - dayOrder(b)
+  );
+
+  if (
+    context.day !== "all" &&
+    !context.days.includes(context.day)
+  ) {
+    context.day = "all";
+  }
+
+  context.color = day =>
+    ITINERARY_SKETCH_COLORS[
+      Math.max(
+        0,
+        context.days.indexOf(day)
+      ) % ITINERARY_SKETCH_COLORS.length
+    ];
+
+  const selected = all.filter(item =>
+    context.day === "all" ||
+    (item.day || "Day 1") === context.day
+  );
+
+  const outside = selected.filter(item =>
+    itinerarySketchOutside(state.project, item)
+  );
+
+  const items = selected.filter(item =>
+    !itinerarySketchOutside(state.project, item)
+  );
+
+  const viewport = q(
+    context.mask,
+    "[data-sketch-viewport]"
+  );
+
+  const displayWidth =
+    viewport.clientWidth || 320;
+
+  const columns =
+    displayWidth < 500 ? 2 :
+    displayWidth < 760 ? 3 : 4;
+
+  const rows = Math.ceil(
+    items.length / columns
+  );
+
+  const step = columns === 2 ? 240 : 150;
+
+  const height = Math.max(
+    columns === 2 ? 900 : 650,
+    270 + rows * step
+  );
+
+  const random =
+    itinerarySketchRandom(state.project.name);
+
+  const positions = items.map((item, index) => {
+    const row = Math.floor(index / columns);
+
+    const column = row % 2
+      ? columns - 1 - index % columns
+      : index % columns;
+
+    const span = columns === 2 ? 500 : 680;
+
+    return {
+      item,
+      x:
+        500 - span / 2 +
+        column * (
+          span / Math.max(1, columns - 1)
+        ) +
+        (random() - .5) * 14,
+      y:
+        230 +
+        row * step +
+        (random() - .5) * 16
+    };
+  });
+
+  q(
+    context.mask,
+    "[data-sketch-title]"
+  ).textContent = "🗺️ " + state.project.name;
+
+  q(
+    context.mask,
+    "[data-sketch-days]"
+  ).innerHTML = [
+    "all",
+    ...context.days
+  ].map(day => `
+    <button
+      class="sketch-day"
+      data-sketch-day="${esc(day)}"
+      aria-pressed="${day === context.day}"
+      style="${
+        day === context.day
+          ? "background:" +
+            (
+              day === "all"
+                ? "#f2d488"
+                : context.color(day)
+            ) +
+            ";color:" +
+            (
+              day === "all"
+                ? "#59462e"
+                : "#fff"
+            )
+          : ""
+      }"
+    >
+      ${day === "all" ? "全部" : esc(day)}
+    </button>
+  `).join("");
+
+  q(
+    context.mask,
+    "[data-sketch-legend]"
+  ).innerHTML = context.days.map(day => `
+    <span>
+      <i style="background:${context.color(day)}"></i>
+      ${esc(day)}
+    </span>
+  `).join("");
+
+  const stage = q(
+    context.mask,
+    "[data-sketch-stage]"
+  );
+
+  stage.style.setProperty(
+    "--sketch-label-width",
+    Math.max(
+      100,
+      Math.min(
+        170,
+        displayWidth / columns - 22
+      )
+    ) + "px"
+  );
+
+  stage.innerHTML =
+    itinerarySketchArt(
+      context,
+      1000,
+      height,
+      positions
+    ) +
+    positions.map(({ item, x, y }) => {
+      const day = item.day || "Day 1";
+
+      const index = all.filter(other =>
+        (other.day || "Day 1") === day
+      ).findIndex(other =>
+        other.id === item.id
+      ) + 1;
+
+      return `
+        <button
+          class="sketch-pin"
+          data-sketch-pin="${esc(item.id)}"
+          style="
+            left:${x / 10}%;
+            top:${y / height * 100}%;
+            --sketch-color:${context.color(day)};
+          "
+          aria-expanded="${context.selected === item.id}"
+          aria-label="${
+            esc(
+              day + " " +
+              (item.time || "") + " " +
+              cleanTitle(item.title)
+            )
+          }"
+        >
+          <span class="sketch-pin-picture">
+            <svg
+              viewBox="0 0 80 70"
+              aria-hidden="true"
+            >
+              <use
+                href="#${context.prefix}-${
+                  itinerarySketchIcon(item.title)
+                }"
+              />
+            </svg>
+
+            <span class="sketch-pin-number">
+              ${index}
+            </span>
+          </span>
+
+          <b>${esc(cleanTitle(item.title))}</b>
+
+          <small>
+            ${
+              context.day === "all"
+                ? esc(day) + " · "
+                : ""
+            }
+            ${esc(item.time || "時間待安排")}
+          </small>
+        </button>
+      `;
+    }).join("");
+
+  q(
+    context.mask,
+    "[data-sketch-caption]"
+  ).textContent =
+    `${items.length} 筆行程 · ` +
+    "圖釘位置與虛線僅作行程示意，" +
+    "不代表真實方位、距離或道路。";
+
+  q(
+    context.mask,
+    "[data-sketch-outside]"
+  ).innerHTML = outside.length
+    ? `
+      <details class="sketch-caption">
+        <summary>
+          出發地行程另列（${outside.length}）
+        </summary>
+
+        ${outside.map(item => `
+          <p>${esc(cleanTitle(item.title))}</p>
+        `).join("")}
+      </details>
+    `
+    : "";
+
+  if (!items.length) {
+    q(
+      context.mask,
+      "[data-sketch-caption]"
+    ).textContent =
+      "目前沒有可顯示的目的地行程，" +
+      "新增行程後會自動更新示意圖。";
+  }
+
+  context.mask.querySelectorAll(
+    "[data-sketch-day]"
+  ).forEach(button => {
+    button.onclick = () => {
+      context.day = button.dataset.sketchDay;
+      context.selected = null;
+
+      q(
+        context.mask,
+        "[data-sketch-detail]"
+      ).hidden = true;
+
+      context.zoom = 1;
+      stage.style.width = "100%";
+
+      q(
+        context.mask,
+        "[data-sketch-percent]"
+      ).textContent = "100%";
+
+      itinerarySketchDraw(context);
+      viewport.scrollTo(0, 0);
+    };
+  });
+
+  stage.querySelectorAll(
+    "[data-sketch-pin]"
+  ).forEach(button => {
+    button.onclick = () =>
+      itinerarySketchDetail(
+        context,
+        button.dataset.sketchPin
+      );
+  });
+
+  if (context.selected) {
+    if (
+      items.some(item =>
+        item.id === context.selected
+      )
+    ) {
+      itinerarySketchDetail(
+        context,
+        context.selected
+      );
+    } else {
+      context.selected = null;
+
+      q(
+        context.mask,
+        "[data-sketch-detail]"
+      ).hidden = true;
+    }
+  }
+}
+
+/* 開啟插畫示意圖 */
+
+function openItinerarySketch() {
+  if (!state.project || !state.user) return;
+
+  itinerarySketchCurrent?.mask.remove();
+
+  const mask = modal(
+    "行程手繪圖",
+    `
+      <p class="sketch-intro">
+        為這趟旅程自動排版的插畫示意圖。
+        點選行程可開啟原本的導航網址。
+      </p>
+
+      <div class="sketch-toolbar">
+        <div
+          class="sketch-days"
+          data-sketch-days
+        ></div>
+
+        <div class="sketch-zoom">
+          <button
+            data-sketch-minus
+            aria-label="縮小示意圖"
+          >−</button>
+
+          <span data-sketch-percent>100%</span>
+
+          <button
+            data-sketch-plus
+            aria-label="放大示意圖"
+          >＋</button>
+
+          <button data-sketch-reset>重設</button>
+        </div>
+      </div>
+
+      <div
+        class="sketch-legend"
+        data-sketch-legend
+      ></div>
+
+      <div class="sketch-frame">
+        <div
+          class="sketch-viewport"
+          data-sketch-viewport
+          role="region"
+          aria-label="可放大與滑動的行程示意圖"
+        >
+          <div
+            class="sketch-stage"
+            data-sketch-stage
+          ></div>
+        </div>
+
+        <aside
+          class="sketch-detail"
+          data-sketch-detail
+          aria-label="行程資訊"
+          hidden
+        ></aside>
+      </div>
+
+      <p
+        class="sketch-caption"
+        data-sketch-caption
+      ></p>
+
+      <div data-sketch-outside></div>
+    `
+  );
+
+  q(mask, ".sheet").classList.add(
+    "sketch-sheet"
+  );
+
+  q(mask, "h3").dataset.sketchTitle = "";
+
+  const context = {
+    mask,
+    projectId: state.project.id,
+    userId: uid(),
+    day: state.day || "all",
+    selected: null,
+    zoom: 1,
+    prefix:
+      "itinerary-sketch-" +
+      (++itinerarySketchSequence),
+    days: [],
+    color: () => ITINERARY_SKETCH_COLORS[0]
+  };
+
+  itinerarySketchCurrent = context;
+
+  const viewport = q(
+    mask,
+    "[data-sketch-viewport]"
+  );
+
+  const stage = q(
+    mask,
+    "[data-sketch-stage]"
+  );
+
+  const zoomTo = value => {
+    const oldWidth = stage.offsetWidth;
+
+    const center = (
+      viewport.scrollLeft +
+      viewport.clientWidth / 2
+    ) / Math.max(1, oldWidth);
+
+    context.zoom = Math.max(
+      1,
+      Math.min(2.5, value)
+    );
+
+    stage.style.width =
+      context.zoom * 100 + "%";
+
+    q(
+      mask,
+      "[data-sketch-percent]"
+    ).textContent =
+      Math.round(context.zoom * 100) + "%";
+
+    viewport.scrollLeft =
+      center * stage.offsetWidth -
+      viewport.clientWidth / 2;
+  };
+
+  q(mask, "[data-sketch-plus]").onclick = () =>
+    zoomTo(context.zoom + .25);
+
+  q(mask, "[data-sketch-minus]").onclick = () =>
+    zoomTo(context.zoom - .25);
+
+  q(mask, "[data-sketch-reset]").onclick = () => {
+    zoomTo(1);
+    viewport.scrollTo(0, 0);
+  };
+
+  let drag = null;
+
+  viewport.onpointerdown = event => {
+    if (
+      event.pointerType !== "mouse" ||
+      event.button !== 0 ||
+      event.target.closest("button")
+    ) return;
+
+    drag = {
+      x: event.clientX,
+      y: event.clientY,
+      left: viewport.scrollLeft,
+      top: viewport.scrollTop
+    };
+
+    viewport.setPointerCapture(event.pointerId);
+  };
+
+  viewport.onpointermove = event => {
+    if (!drag) return;
+
+    viewport.scrollLeft =
+      drag.left -
+      (event.clientX - drag.x);
+
+    viewport.scrollTop =
+      drag.top -
+      (event.clientY - drag.y);
+  };
+
+  viewport.onpointerup =
+    viewport.onpointercancel =
+      () => drag = null;
+
+  const signature = () => JSON.stringify([
+    state.project?.id,
+    state.project?.name,
+    uid(),
+    state.schedules
+  ]);
+
+  let last = signature();
+
+  itinerarySketchDraw(context);
+
+  const timer = setInterval(() => {
+    const next = signature();
+
+    if (next !== last) {
+      last = next;
+      itinerarySketchDraw(context);
+    }
+  }, 1000);
+
+  let width = viewport.clientWidth;
+
+  const resize = new ResizeObserver(() => {
+    if (viewport.clientWidth !== width) {
+      width = viewport.clientWidth;
+      itinerarySketchDraw(context);
+    }
+  });
+
+  resize.observe(viewport);
+
+  const observer = new MutationObserver(() => {
+    if (mask.isConnected) return;
+
+    clearInterval(timer);
+    resize.disconnect();
+    observer.disconnect();
+
+    if (itinerarySketchCurrent === context) {
+      itinerarySketchCurrent = null;
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true
+  });
+}
+
+/* 沿用現有地圖按鈕 */
+
+const itinerarySketchButton = [
+  ...$("days").parentElement.querySelectorAll("button")
+].find(button =>
+  /^(?:🗺️\s*)?地圖$/u.test(
+    button.textContent.trim()
+  )
+);
+
+if (itinerarySketchButton) {
+  itinerarySketchButton.onclick =
+    openItinerarySketch;
+} else {
+  const button = document.createElement("button");
+
+  button.className = "btn gr";
+  button.textContent = "🗺️ 地圖";
+  button.style.margin = "0 0 12px 8px";
+
+  const packing = [
+    ...$("days").parentElement.querySelectorAll("button")
+  ].find(button =>
+    button.textContent.includes("打包清單")
+  );
+
+  if (packing) {
+    packing.after(button);
+  } else {
+    $("days").before(button);
+  }
+
+  button.onclick = openItinerarySketch;
+}
   
 /* ---------- 啟動 ---------- */
 $("refresh").onclick = () => location.reload();
