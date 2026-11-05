@@ -9819,6 +9819,830 @@ if (geographicMapButton) {
   geographicMapButton.onclick = () =>
     openTravelMap();
 }
+
+/* ---------- 地圖快取、清楚數字與背景地標 ---------- */
+
+const mapPlaceMemory = new Map();
+const mapPlaceFailures = new Map();
+
+const MAP_PLACE_TTL = 30 * 86400000;
+
+const mapPlaceKey = (context, item) =>
+  JSON.stringify([
+    context.user.uid,
+    context.project.id,
+    item.id,
+    String(item.customGoogleUrl || "").trim()
+  ]);
+
+function mapPlaceValid(record, url) {
+  return (
+    record &&
+    record.version === 1 &&
+    record.sourceUrl === url &&
+    Number.isFinite(record.lat) &&
+    Number.isFinite(record.lng) &&
+    Math.abs(record.lat) <= 90 &&
+    Math.abs(record.lng) <= 180 &&
+    Number.isFinite(record.resolvedAt) &&
+    record.resolvedAt <= Date.now() &&
+    Date.now() - record.resolvedAt < MAP_PLACE_TTL
+  );
+}
+
+function mapPlaceReadLocal(key) {
+  try {
+    return JSON.parse(
+      localStorage.getItem("travel-place:" + key) ||
+      "null"
+    );
+  } catch {
+    return null;
+  }
+}
+
+function mapPlaceStoreLocal(key, record) {
+  try {
+    localStorage.setItem(
+      "travel-place:" + key,
+      JSON.stringify(record)
+    );
+  } catch {
+    // 裝置儲存空間不足時，仍能看地圖。
+  }
+}
+
+/* 將成功定位結果存回行程，供成員共用 */
+
+async function mapPlaceShare(context, item, record) {
+  if (
+    typeof runTransaction !== "function" ||
+    uid() !== context.user.uid ||
+    state.project?.id !== context.project.id
+  ) return;
+
+  try {
+    const reference = doc(
+      db,
+      "projects",
+      context.project.id,
+      "schedules",
+      item.id
+    );
+
+    return await runTransaction(
+      db,
+      async transaction => {
+        const snapshot =
+          await transaction.get(reference);
+
+        if (
+          !snapshot.exists() ||
+          uid() !== context.user.uid ||
+          state.project?.id !== context.project.id
+        ) {
+          return false;
+        }
+
+        const current = snapshot.data();
+
+        if (
+          String(current.customGoogleUrl || "").trim()
+          !== record.sourceUrl
+        ) {
+          return false;
+        }
+
+        if (
+          mapPlaceValid(
+            current.resolvedGooglePlace,
+            record.sourceUrl
+          )
+        ) {
+          return true;
+        }
+
+        transaction.update(reference, {
+          resolvedGooglePlace: record
+        });
+
+        return true;
+      }
+    );
+  } catch {
+    // 共用快取寫入失敗時，仍保留裝置快取。
+  }
+}
+
+/* 優先讀取已保存的位置 */
+
+const mapPlaceOriginalResolve = travelMapResolve;
+
+travelMapResolve = async function (context, item) {
+  const sourceUrl =
+    String(item.customGoogleUrl || "").trim();
+
+  const key = mapPlaceKey(context, item);
+
+  if (sourceUrl) {
+    const live =
+      state.project?.id === context.project.id
+        ? state.schedules.find(
+            schedule => schedule.id === item.id
+          )
+        : null;
+
+    const candidates = [
+      live?.resolvedGooglePlace,
+      item.resolvedGooglePlace,
+      mapPlaceMemory.get(key),
+      mapPlaceReadLocal(key)
+    ];
+
+    const cached = candidates.find(record =>
+      mapPlaceValid(record, sourceUrl)
+    );
+
+    if (cached) {
+      mapPlaceMemory.set(key, cached);
+      mapPlaceStoreLocal(key, cached);
+
+      if (
+        !mapPlaceValid(
+          live?.resolvedGooglePlace,
+          sourceUrl
+        )
+      ) {
+        await mapPlaceShare(
+          context,
+          item,
+          cached
+        );
+      }
+
+      return {
+        lat: cached.lat,
+        lng: cached.lng
+      };
+    }
+  }
+
+  const failed = mapPlaceFailures.get(key);
+
+  if (
+    failed &&
+    failed.until > Date.now()
+  ) {
+    throw new Error(failed.message);
+  }
+
+  try {
+    const coordinates =
+      await mapPlaceOriginalResolve(context, item);
+
+    const record = {
+      version: 1,
+      sourceUrl,
+      lat: coordinates.lat,
+      lng: coordinates.lng,
+      resolvedAt: Date.now()
+    };
+
+    const accepted = await mapPlaceShare(
+      context,
+      item,
+      record
+    );
+
+    if (accepted === false) {
+      throw new Error(
+        "行程網址或存取狀態已變更，請重新開啟地圖。"
+      );
+    }
+
+    mapPlaceMemory.set(key, record);
+    mapPlaceStoreLocal(key, record);
+    mapPlaceFailures.delete(key);
+
+    return coordinates;
+  } catch (error) {
+    if (!context.closed) {
+      mapPlaceFailures.set(key, {
+        message: error.message,
+        until: Date.now() + 300000
+      });
+    }
+
+    throw error;
+  }
+};
+
+/* 數字放在插畫上方，背景地標放在下方 */
+
+const mapReadabilityStyle =
+  document.createElement("style");
+
+mapReadabilityStyle.textContent = `
+.geographic-map-art{
+  overflow:visible;
+}
+.geographic-map-art svg{
+  z-index:0;
+}
+.geographic-map-badge{
+  z-index:5;
+  right:-8px;
+  top:-10px;
+  width:27px;
+  height:27px;
+  font-size:12px;
+  border:3px solid #fffdf3;
+  box-shadow:0 2px 4px #0005;
+}
+.geographic-map-anchor{
+  z-index:4;
+}
+.map-landmark{
+  background:none;
+  border:none;
+  pointer-events:none;
+}
+.map-landmark-picture{
+  display:block;
+  width:100%;
+  height:70%;
+  opacity:.85;
+  filter:drop-shadow(0 2px 1px #66764325);
+}
+.map-landmark-label{
+  display:block;
+  text-align:center;
+  font-size:11px;
+  line-height:1.3;
+  color:#6c7754;
+  text-shadow:
+    0 1px #ffffe8,
+    1px 0 #ffffe8,
+    -1px 0 #ffffe8;
+  white-space:nowrap;
+  font-weight:600;
+}
+.map-nearby-marker{
+  background:none;
+  border:0;
+}
+.map-nearby-count{
+  width:45px;
+  height:45px;
+  border:3px solid #fffbed;
+  border-radius:50%;
+  background:#617c75;
+  color:white;
+  box-shadow:0 2px 5px #0004;
+  display:grid;
+  place-items:center;
+  font:700 12px/1 sans-serif;
+  outline:2px solid #617c7580;
+}
+.map-cache-note{
+  font-size:11px;
+  color:#77705e;
+  line-height:1.7;
+  margin:8px 0;
+}
+`;
+
+document.head.append(mapReadabilityStyle);
+
+/* 背景地標：參考位置，不會加入行程名單 */
+
+const MAP_BACKGROUND_LANDMARKS = [
+  {
+    name: "漢拏山",
+    lat: 33.3617,
+    lng: 126.5292,
+    kind: "mountain"
+  },
+  {
+    name: "神話世界",
+    lat: 33.3064,
+    lng: 126.3168,
+    kind: "park"
+  },
+  {
+    name: "天地淵瀑布",
+    lat: 33.2469,
+    lng: 126.5544,
+    kind: "water"
+  },
+  {
+    name: "北漢山",
+    lat: 37.6587,
+    lng: 126.9770,
+    kind: "mountain"
+  },
+  {
+    name: "樂天世界",
+    lat: 37.5111,
+    lng: 127.0980,
+    kind: "park"
+  },
+  {
+    name: "上野公園",
+    lat: 35.7156,
+    lng: 139.7730,
+    kind: "tree"
+  },
+  {
+    name: "東京迪士尼",
+    lat: 35.6329,
+    lng: 139.8804,
+    kind: "park"
+  },
+  {
+    name: "日本環球影城",
+    lat: 34.6654,
+    lng: 135.4323,
+    kind: "park"
+  },
+  {
+    name: "濱海灣花園",
+    lat: 1.2816,
+    lng: 103.8636,
+    kind: "tree"
+  }
+];
+
+/* 背景插畫 */
+
+function mapLandmarkArt(kind) {
+  if (kind === "mountain") {
+    return `
+      <svg
+        class="map-landmark-picture"
+        viewBox="0 0 100 75"
+        aria-hidden="true"
+      >
+        <path
+          d="M3 66L31 19Q36 11 43 24L51 36L65 10Q71 4 77 16L98 65Q61 79 3 66Z"
+          fill="#78935a"
+          stroke="#607b4d"
+          stroke-width="2"
+        />
+        <path
+          d="M25 30L34 18L44 32L36 28L32 33Z"
+          fill="#e4e5c6"
+        />
+        <path
+          d="M60 25L69 11L80 27L72 22L67 28Z"
+          fill="#e4e5c6"
+        />
+      </svg>
+    `;
+  }
+
+  if (kind === "water") {
+    return `
+      <svg
+        class="map-landmark-picture"
+        viewBox="0 0 100 75"
+        aria-hidden="true"
+      >
+        <ellipse
+          cx="49" cy="63"
+          rx="36" ry="9"
+          fill="#86b6b8"
+        />
+        <path
+          d="M16 62L23 16L77 14L86 62Z"
+          fill="#8d9c72"
+        />
+        <path
+          d="M35 16L65 15L69 64Q51 72 31 64Z"
+          fill="#d4e8dd"
+        />
+        <path
+          d="M45 20L43 55M57 21L59 57"
+          stroke="#a9d1cd"
+          stroke-width="5"
+          stroke-linecap="round"
+        />
+        <path
+          d="M21 69Q34 76 47 69Q60 76 76 68"
+          fill="none"
+          stroke="#71a6ac"
+          stroke-width="3"
+        />
+      </svg>
+    `;
+  }
+
+  if (kind === "park") {
+    return `
+      <svg
+        class="map-landmark-picture"
+        viewBox="0 0 100 75"
+        aria-hidden="true"
+      >
+        <circle
+          cx="50" cy="30" r="23"
+          fill="#f5e5bc"
+          stroke="#b79770"
+          stroke-width="3"
+        />
+        <path
+          d="M50 7V53M27 30H73M34 13L66 47M34 47L66 13M50 30L35 69M50 30L65 69M29 69H71"
+          stroke="#af8c65"
+          stroke-width="2"
+          fill="none"
+        />
+        <g fill="#c28b76">
+          <circle cx="50" cy="7" r="5"/>
+          <circle cx="73" cy="30" r="5"/>
+          <circle cx="27" cy="30" r="5"/>
+          <circle cx="34" cy="13" r="5"/>
+          <circle cx="66" cy="13" r="5"/>
+        </g>
+      </svg>
+    `;
+  }
+
+  return `
+    <svg
+      class="map-landmark-picture"
+      viewBox="0 0 100 75"
+      aria-hidden="true"
+    >
+      <path
+        d="M30 68V30M64 68V23"
+        stroke="#9e8964"
+        stroke-width="5"
+      />
+      <path
+        d="M10 41Q1 19 25 16Q39 3 45 23Q58 47 30 51Z"
+        fill="#9caf73"
+      />
+      <path
+        d="M46 33Q37 10 59 8Q77 -2 82 19Q98 39 67 44Z"
+        fill="#7f9d64"
+      />
+    </svg>
+  `;
+}
+
+/* 依目前地圖範圍，加入背景地標 */
+
+function mapInstallLandmarks(context) {
+  if (context.landmarkLayer) return;
+
+  const pane = context.map.createPane(
+    "backgroundLandmarks"
+  );
+
+  pane.style.zIndex = "420";
+  pane.style.pointerEvents = "none";
+
+  context.landmarkLayer =
+    L.layerGroup().addTo(context.map);
+
+  const width = innerWidth < 500 ? 66 : 90;
+
+  for (const place of MAP_BACKGROUND_LANDMARKS) {
+    if (
+      !travelMapContains(context.region, place)
+    ) continue;
+
+    const icon = L.divIcon({
+      className: "map-landmark",
+
+      html:
+        mapLandmarkArt(place.kind) +
+        `
+          <span class="map-landmark-label">
+            ${esc(place.name)}
+          </span>
+        `,
+
+      iconSize: [
+        width,
+        width * .84
+      ],
+
+      iconAnchor: [
+        width / 2,
+        width * .45
+      ]
+    });
+
+    L.marker(
+      [place.lat, place.lng],
+      {
+        icon,
+        pane: "backgroundLandmarks",
+        interactive: false,
+        keyboard: false
+      }
+    ).addTo(context.landmarkLayer);
+  }
+}
+
+/* 合併圖釘的資訊框，保留每站編號 */
+
+function mapNearbyPopup(context, items) {
+  return '<div class="travel-map-popup">' +
+    items.map(item => {
+      const day = item.day || "Day 1";
+
+      const number = context.items
+        .filter(schedule =>
+          (schedule.day || "Day 1") === day
+        )
+        .findIndex(schedule =>
+          schedule.id === item.id
+        ) + 1;
+
+      const google =
+        safeMapUrl(
+          item.customGoogleUrl,
+          "google"
+        )?.href ||
+        mapUrl(item, "google");
+
+      const naver =
+        destinationType(context.project.name) === "korea"
+          ? mapUrl(item, "naver")
+          : null;
+
+      return `
+        <article>
+          <small style="color:${context.color(day)}">
+            ${esc(day)}
+            · 第 ${number} 站 ·
+            ${esc(item.time || "時間待安排")}
+          </small>
+
+          <br>
+
+          <b>${esc(cleanTitle(item.title))}</b>
+
+          <br>
+
+          <a
+            href="${esc(google)}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Google Maps ↗</a>
+
+          ${
+            naver
+              ? `
+                <a
+                  href="${esc(naver)}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >Naver Map ↗</a>
+              `
+              : ""
+          }
+        </article>
+      `;
+    }).join("") +
+    "</div>";
+}
+
+/* 相鄰圖釘太近時合併，避免數字互相遮住 */
+
+function mapArrangeNearby(context) {
+  if (
+    context.closed ||
+    !context.map ||
+    !context.layer
+  ) return;
+
+  if (!context.nearbyLayer) {
+    context.nearbyLayer =
+      L.layerGroup().addTo(context.map);
+  }
+
+  context.nearbyLayer.clearLayers();
+
+  const markers = context.layer.getLayers();
+
+  const parent = markers.map(
+    (_, index) => index
+  );
+
+  const root = index => {
+    while (parent[index] !== index) {
+      parent[index] = parent[parent[index]];
+      index = parent[index];
+    }
+
+    return index;
+  };
+
+  const pixels = markers.map(marker =>
+    context.map.latLngToLayerPoint(
+      marker.getLatLng()
+    )
+  );
+
+  for (const marker of markers) {
+    const element = marker.getElement();
+
+    if (element) {
+      element.style.display = "";
+    }
+  }
+
+  for (
+    let first = 0;
+    first < markers.length;
+    first++
+  ) {
+    for (
+      let second = first + 1;
+      second < markers.length;
+      second++
+    ) {
+      if (
+        pixels[first].distanceTo(
+          pixels[second]
+        ) < 48
+      ) {
+        parent[root(first)] = root(second);
+      }
+    }
+  }
+
+  const groups = new Map();
+
+  markers.forEach((marker, index) => {
+    const groupId = root(index);
+
+    if (!groups.has(groupId)) {
+      groups.set(groupId, []);
+    }
+
+    groups.get(groupId).push(marker);
+  });
+
+  const selected = travelMapSelected(context);
+
+  for (const group of groups.values()) {
+    if (group.length < 2) continue;
+
+    const places = group.map(marker =>
+      marker.getLatLng()
+    );
+
+    const items = selected.filter(item => {
+      const coordinates =
+        context.results.get(item.id);
+
+      return (
+        coordinates &&
+        !coordinates.error &&
+        places.some(place =>
+          Math.abs(
+            place.lat - coordinates.lat
+          ) < 1e-6 &&
+          Math.abs(
+            place.lng - coordinates.lng
+          ) < 1e-6
+        )
+      );
+    });
+
+    if (!items.length) continue;
+
+    for (const marker of group) {
+      marker.closePopup();
+
+      const element = marker.getElement();
+
+      if (element) {
+        element.style.display = "none";
+      }
+    }
+
+    const lat = places.reduce(
+      (sum, place) => sum + place.lat,
+      0
+    ) / places.length;
+
+    const lng = places.reduce(
+      (sum, place) => sum + place.lng,
+      0
+    ) / places.length;
+
+    const icon = L.divIcon({
+      className: "map-nearby-marker",
+
+      html: `
+        <div class="map-nearby-count">
+          ${items.length}筆
+        </div>
+      `,
+
+      iconSize: [45, 45],
+      iconAnchor: [22.5, 22.5]
+    });
+
+    L.marker(
+      [lat, lng],
+      {
+        icon,
+        zIndexOffset: 3000,
+        title:
+          `附近 ${items.length} 筆行程，點開查看`
+      }
+    )
+      .bindPopup(
+        mapNearbyPopup(context, items),
+        {
+          maxWidth: 280,
+          maxHeight: 260
+        }
+      )
+      .addTo(context.nearbyLayer);
+  }
+}
+
+/* 接上原有地圖繪製流程 */
+
+const mapUsabilityOriginalDraw = travelMapDraw;
+
+travelMapDraw = function (context) {
+  mapUsabilityOriginalDraw(context);
+
+  if (
+    !context.geoPrefix ||
+    !context.map ||
+    context.closed
+  ) return;
+
+  mapInstallLandmarks(context);
+  mapArrangeNearby(context);
+
+  if (!context.readabilityHook) {
+    context.readabilityHook = true;
+
+    context.map.on("zoomend", () =>
+      mapArrangeNearby(context)
+    );
+  }
+};
+
+/* 明確按重試時，才立即重查失敗的項目 */
+
+const mapUsabilityOriginalOpen = openTravelMap;
+
+openTravelMap = async function () {
+  const operation = mapUsabilityOriginalOpen();
+  const context = travelMapCurrent;
+
+  await operation;
+
+  if (
+    !context ||
+    context.closed ||
+    context !== travelMapCurrent
+  ) return;
+
+  const note = document.createElement("p");
+
+  note.className = "map-cache-note";
+
+  note.textContent =
+    "地點位置會自動保留，修改網址後更新。" +
+    "相近行程以「幾筆」合併，點開查看各站；" +
+    "背景地標僅供概略參考。";
+
+  q(
+    context.mask,
+    "[data-map-status]"
+  ).after(note);
+
+  const retry = q(
+    context.mask,
+    "[data-map-retry]"
+  );
+
+  const original = retry.onclick;
+
+  retry.onclick = () => {
+    for (
+      const item of travelMapSelected(context)
+    ) {
+      mapPlaceFailures.delete(
+        mapPlaceKey(context, item)
+      );
+    }
+
+    original();
+  };
+};
   
 /* ---------- 啟動 ---------- */
 $("refresh").onclick = () => location.reload();
